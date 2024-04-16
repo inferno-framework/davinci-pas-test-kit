@@ -8,9 +8,13 @@ module DaVinciPASTestKit
       id :pas_server_v201_pas_request_bundle_validation_test
       title '[USER INPUT VALIDATION] Request Bundle is valid'
       description %(
+        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
+        Errors encountered will be treated as a skip instead of a failure.
+        
         This test validates the conformity of the
         user input to the
         [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle) structure, ensuring subsequent tests can accurately simulate content.
+        
         It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
