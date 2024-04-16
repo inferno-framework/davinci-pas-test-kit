@@ -10,6 +10,7 @@ AllCops:
   Exclude:
     - 'Gemfile'
     - 'lib/davinci_pas_test_kit/generated/**/*'
+    - 'vendor/**/*'
 
 Layout/LineLength:
   Max: 120
