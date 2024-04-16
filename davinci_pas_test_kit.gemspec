@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['inferno@groups.mitre.org']
   spec.date          = Time.now.utc.strftime('%Y-%m-%d')
   spec.summary       = 'Da Vinci PAS Test Kit'
-  spec.description   = 'Da Vinci PAS Test Kit'
+  spec.description   = 'Inferno Test Kit for the Da Vinci Prior Authorization Support IG'
   spec.homepage      = 'https://github.com/inferno-framework/davinci-pas-test-kit'
   spec.license       = 'Apache-2.0'
   spec.add_runtime_dependency 'inferno_core', '~> 0.4.34'
