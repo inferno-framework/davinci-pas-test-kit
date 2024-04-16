@@ -52,7 +52,7 @@ At a high-level, in-scope requirements include:
 - The ability of the system to produce and receive (currently server tests only)
   all PAS-defined profiles and their must support elements.
 
-Out of scope requirements that are not yet tested include (with links to details on the requirement in the IG):
+Out of scope requirements that are not yet tested include: (parens contain links to the requirement details in the IG):
 
 - Subscriptions ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription))
 - Prior Authorization update workflows ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests))
