@@ -38,11 +38,10 @@ that are not currently tested, can be found in [this spreadsheet](lib/davinci_pa
 ## Test Scope and Limitations
 
 Neither the server nor client test suite included test the full scope of the PAS IG.
-Documentation within the tests include details on what is currently tested
-and what is out of scope and why. Start a session with either test kit or see the description in these files 
-([server](lib/davinci_pas_test_kit/generated/v2.0.1/server_suite.rb),
-[client](lib/davinci_pas_test_kit/client_suite.rb)) for details beyond what
-is included here.
+Documentation of what is currently tested and what is out of scope and why can be
+found in the suite descriptions when the tests are run, or within this repository
+for the [server](lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
+and [client](lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations).
 
 At a high-level, in-scope requirements include:
 
@@ -53,7 +52,7 @@ At a high-level, in-scope requirements include:
 - The ability of the system to produce and receive (currently server tests only)
   all PAS-defined profiles and their must support elements.
 
-Out of scope requirements that are not yet tested include:
+Out of scope requirements that are not yet tested include (with links to details on the requirement in the IG):
 
 - Subscriptions ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription))
 - Prior Authorization update workflows ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests))
@@ -93,13 +92,14 @@ the test home pages include instructions for trying out the tests, including
   ([code on github](https://github.com/HL7-DaVinci/prior-auth))
 - For client testing: a [sample postman collection](config/PAS%20Test%20Kit%20Client%20Test%20Demo.postman_collection.json)
 
-Start a session with either test kit or see the description in these files 
-([server](lib/davinci_pas_test_kit/generated/v2.0.1/server_suite.rb),
-[client](lib/davinci_pas_test_kit/client_suite.rb)) for detailed instructions.
+Detailed instructions can be found in the suite descriptions when the tests
+are run, or within this repository for the 
+[server](lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#running-the-tests) and
+[client](lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#running-the-tests).
 
 ### ONC Hosted Instance
 
-You can run these tests via the [ONC Inferno](https://inferno.healthit.gov/test-kits/) website by choosing the “Da Vinci Prior Authorization Support (PAS) v2.0.1” test kit.
+You can run the PAS test kit via the [ONC Inferno](https://inferno.healthit.gov/test-kits/davinci-pas/) website by choosing the “Da Vinci Prior Authorization Support (PAS) v2.0.1” test kit.
 
 ### Local Inferno Instance
 
