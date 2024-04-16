@@ -1,0 +1,13 @@
+module DaVinciPASTestKit
+    module <%= module_name %>
+      module ResourceList
+        RESOURCE_LIST = [
+    <%= resource_list_string.gsub("\n", "\n" + " "*4) %>
+        ].freeze
+
+        RESOURCE_SUPPORTED_PROFILES = {<% resource_supported_profiles.each do |resource, profile_list| %>
+          <%= resource %>: <%= profile_list %>,<% end %>
+        }.freeze
+      end
+    end
+end

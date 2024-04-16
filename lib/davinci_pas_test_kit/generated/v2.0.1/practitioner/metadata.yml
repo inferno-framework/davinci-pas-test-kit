@@ -1,0 +1,74 @@
+---
+:name: profile_practitioner
+:class_name: ProfilePractitionerSequence
+:version: v2.0.1
+:reformatted_version: v201
+:resource: Practitioner
+:profile_url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitioner
+:profile_name: PAS Practitioner
+:profile_version: 2.0.1
+:title: Practitioner
+:short_description: Verify support for the server capabilities required by the PAS
+  Practitioner.
+:interactions: []
+:operations: []
+:required_concepts: []
+:must_supports:
+  :extensions: []
+  :slices:
+  - :name: Practitioner.identifier:NPI
+    :path: identifier
+    :discriminator:
+      :type: patternIdentifier
+      :path: ''
+      :system: http://hl7.org/fhir/sid/us-npi
+  :elements:
+  - :path: identifier
+  - :path: name
+  - :path: name.family
+  - :path: telecom
+  - :path: address
+:mandatory_elements:
+- Practitioner.identifier
+- Practitioner.name
+- Practitioner.name.family
+- Practitioner.qualification.code
+:bindings:
+- :type: code
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/languages
+  :path: language
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/name-use
+  :path: name.use
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/administrative-gender
+  :path: gender
+- :type: CodeableConcept
+  :strength: example
+  :system: http://terminology.hl7.org/ValueSet/v2-2.7-0360
+  :path: qualification.code
+- :type: CodeableConcept
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/languages
+  :path: communication
+:references:
+- :path: Practitioner.qualification.issuer
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Organization
+:tests:
+- :id: pas_server_submit_request_v201_practitioner_must_support_test
+  :file_name: server_submit_request_practitioner_must_support_test.rb
+- :id: pas_client_submit_request_v201_practitioner_must_support_test
+  :file_name: client_submit_request_practitioner_must_support_test.rb
+- :id: pas_server_submit_response_v201_practitioner_must_support_test
+  :file_name: server_submit_response_practitioner_must_support_test.rb
+- :id: pas_server_inquiry_request_v201_practitioner_must_support_test
+  :file_name: server_inquiry_request_practitioner_must_support_test.rb
+- :id: pas_client_inquiry_request_v201_practitioner_must_support_test
+  :file_name: client_inquiry_request_practitioner_must_support_test.rb
+- :id: pas_server_inquiry_response_v201_practitioner_must_support_test
+  :file_name: server_inquiry_response_practitioner_must_support_test.rb
+:delayed_references: []

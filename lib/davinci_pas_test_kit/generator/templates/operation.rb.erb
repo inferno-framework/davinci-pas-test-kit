@@ -1,0 +1,62 @@
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::Test
+
+      id :<%= test_id %>
+      title '<%= title %>'
+      description %(
+        <%=description.gsub("\n", "\n" + " "*8) %>
+      )
+
+      input :pa_<%= request_type %>_payload,
+            title: 'PAS <%= request_type.humanize.titleize%> Payload',
+            description: 'Insert Bundle to be sent for PAS <%= request_type.humanize.titleize%>',
+            type: 'textarea',
+            optional: true
+      input_order :server_endpoint, :smart_credentials
+      <% if operation == 'submit'%>output :response_time<% end %>
+      makes_request :pa_<%= operation %>
+
+      def scratch_resources
+        scratch[:<%= operation %>_request_response_pair] ||= {}
+      end
+
+      def request_bundles
+        parsed_payload = JSON.parse(pa_<%= request_type %>_payload)
+        [parsed_payload].flatten.compact.uniq
+      end
+
+      def perform_operation(request_payload)
+        <% if operation == 'submit'%>start_time = Time.now<% end %>
+        fhir_operation('/Claim/$<%= operation %>', body: request_payload, name: :pa_<%= operation %>)
+        <% if operation == 'submit'%>response_time = Time.now - start_time
+
+        if response_time > 15
+          warning %(
+              The server took more that 15 seconds to respond to the Prior Authorization
+              request.
+
+              Response Time: #{response_time}
+            )
+        end
+        <% end %>
+        assert_response_status([200, 201])
+        assert_valid_json(request.response_body)
+
+        # Save request/response pair
+        scratch_resources[:all] ||= []
+        scratch_resources[:all] << {request_bundle: request.request_body, response_bundle: resource}
+        <% if operation == 'submit'%>output response_time:<% end %>
+      end
+
+      run do
+        skip_if pa_<%= request_type %>_payload.blank?, 'No bundle request provided to perform the <%= operation %> operation'
+        assert_valid_json(pa_<%= request_type %>_payload)
+
+        request_bundles.each do |bundle|
+          perform_operation(bundle)
+        end
+      end
+    end
+  end
+end

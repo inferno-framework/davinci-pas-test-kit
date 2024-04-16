@@ -1,0 +1,111 @@
+---
+:name: profile_coverage
+:class_name: ProfileCoverageSequence
+:version: v2.0.1
+:reformatted_version: v201
+:resource: Coverage
+:profile_url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-coverage
+:profile_name: PAS Coverage
+:profile_version: 2.0.1
+:title: Coverage
+:short_description: Verify support for the server capabilities required by the PAS
+  Coverage.
+:interactions: []
+:operations: []
+:required_concepts: []
+:must_supports:
+  :extensions: []
+  :slices:
+  - :name: Coverage.relationship.coding:X12Code
+    :path: relationship.coding
+    :discriminator:
+      :type: value
+      :values:
+      - :path: "$this"
+        :value:
+  :elements:
+  - :path: identifier
+  - :path: status
+  - :path: subscriber
+    :types:
+    - Reference
+  - :path: subscriberId
+  - :path: beneficiary
+    :types:
+    - Reference
+  - :path: relationship
+  - :path: payor
+    :types:
+    - Reference
+:mandatory_elements:
+- Coverage.status
+- Coverage.beneficiary
+- Coverage.payor
+- Coverage.class.type
+- Coverage.class.value
+- Coverage.costToBeneficiary.value[x]
+- Coverage.costToBeneficiary.exception.type
+:bindings:
+- :type: code
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/languages
+  :path: language
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/fm-status
+  :path: status
+- :type: CodeableConcept
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/coverage-type
+  :path: type
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/ValueSet/subscriber-relationship
+  :path: relationship
+- :type: Coding
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000D/INS/1/02/00/1069
+  :path: relationship.coding
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/ValueSet/coverage-class
+  :path: class.type
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/ValueSet/coverage-copay-type
+  :path: costToBeneficiary.type
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/coverage-financial-exception
+  :path: costToBeneficiary.exception.type
+:references:
+- :path: Coverage.policyHolder
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Patient
+  - http://hl7.org/fhir/StructureDefinition/RelatedPerson
+  - http://hl7.org/fhir/StructureDefinition/Organization
+- :path: Coverage.subscriber
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber
+- :path: Coverage.beneficiary
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary
+- :path: Coverage.payor
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
+- :path: Coverage.contract
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Contract
+:tests:
+- :id: pas_server_submit_request_v201_coverage_must_support_test
+  :file_name: server_submit_request_coverage_must_support_test.rb
+- :id: pas_client_submit_request_v201_coverage_must_support_test
+  :file_name: client_submit_request_coverage_must_support_test.rb
+- :id: pas_server_inquiry_request_v201_coverage_must_support_test
+  :file_name: server_inquiry_request_coverage_must_support_test.rb
+- :id: pas_client_inquiry_request_v201_coverage_must_support_test
+  :file_name: client_inquiry_request_coverage_must_support_test.rb
+:delayed_references:
+- :path: payor
+  :resources:
+  - Organization

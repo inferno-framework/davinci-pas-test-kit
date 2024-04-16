@@ -1,0 +1,129 @@
+<% test_file_list.each do |file_name| %>require_relative '<%= file_name %>'
+<% end %>
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::TestGroup
+      title '<%= title %>'
+      description %(
+        <%=description.gsub("\n", "\n" + " "*8) %>
+      )
+
+      id :<%= group_id %>
+      <% if run_as_group %>run_as_group<% end %>
+  <% if system == 'client'%>
+    <% test_id_list.each do |id| %>
+      test from: :<%= id %><% end %>
+  <% else %>
+      def use_case
+        '<%= use_case %>'
+      end
+  <% if use_case != 'must_support'%>
+  <% test_id_list.each do |category, id_list| %>
+      group do
+        title '<%= category %>'
+        <% id_list.each do |id| %>
+        test from: :<%= id %><% if rename_input?(id) %> do
+          id :<%= alt_test_id(id, use_case) %>
+          config(
+            inputs: {
+              pa_submit_request_payload: {
+                name: :<%= alt_request_input_name(use_case, 'submit')%> ,
+                title: '<%= alt_request_input_title(use_case, 'submit')%>'
+              }
+            }
+          )
+        end<% end %><% end %>
+      end<% end %>
+  <% else %>
+    <% test_id_list.each do |group, subgroup|%>
+      group do
+        title '<%= group%>'
+        <% if group == '$submit Element Support' %>description %(
+          Check that the provided `$submit` requests both themselves contain
+          and elicit server responses that contain all PAS-defined profiles
+          and their must support elements.
+
+          For `$submit` requests, this includes the following profiles:
+
+          - [PAS Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
+          - [PAS Claim Update](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claim-update.html)
+          - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-coverage.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
+          - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-subscriber.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+          - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-encounter.html)
+          - At least one of the following request profiles
+            - [PAS Device Request](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-devicerequest.html)
+            - [PAS Medication Request](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-medicationrequest.html)
+            - [PAS Nutrition Order](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-nutritionorder.html)
+            - [PAS Service Request](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-servicerequest.html)
+
+          For `$submit` responses, this includes the following profiles (NOTE: request-specific
+          profiles that may be echoed from `$submit` requests, such as the Claim instance or request instances,
+          are not currently checked):
+          
+          - [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-response-bundle.html)
+          - [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claimresponse.html)
+          - [PAS CommunicationRequest](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-communicationrequest.html)
+          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+        )<% elsif group == '$inquire Element Support' %>description %(
+          Check that the provided `$inquire` requests both themselves contain
+          and elicit server responses that contain all PAS-defined profiles
+          and their must support elements.
+
+          For `$inquire` requests, this includes the following profiles:
+
+          - [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+          - [PAS Claim Inquiry](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claim-inquiry.html)
+          - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-coverage.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
+          - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-subscriber.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+          
+          For `$inquire` responses, this includes the following profiles (NOTE: request-specific
+          profiles that may be echoed from `$submit` requests, such as the Claim instance or request instances,
+          are not currently checked):
+
+          - [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+          - [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claiminquiryresponse.html)
+          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+        )<% end %>
+        run_as_group
+        <% subgroup.each do |category, id_list| %>
+        group do
+          title '<%= category%>'
+          <% id_list.each do |id|%>
+          test from: :<%= id%><% if must_support_rename_input?(id) %> do
+            id :<%= alt_test_id(id, use_case) %>
+            config(
+              inputs: {<% request_type = id.include?('inquiry') ? 'inquire' : 'submit' %>
+                pa_<%= request_type%>_request_payload: {
+                  name: :<%= alt_request_input_name(use_case, request_type)%>,
+                  title: '<%= alt_request_input_title(use_case, request_type)%>',
+                  description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
+                }
+              }
+            )
+          end<%end%><% end %>
+        end<% end %>
+      end<%end%>
+  <% end %><% end %>
+    end
+  end
+end

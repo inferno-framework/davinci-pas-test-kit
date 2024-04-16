@@ -1,0 +1,591 @@
+---
+:name: profile_claim_update
+:class_name: ProfileClaimUpdateSequence
+:version: v2.0.1
+:reformatted_version: v201
+:resource: Claim
+:profile_url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim-update
+:profile_name: PAS Claim Update
+:profile_version: 2.0.1
+:title: Claim Update
+:short_description: Verify support for the server capabilities required by the PAS
+  Claim Update.
+:interactions: []
+:operations:
+- :code: "$submit"
+  :expectation:
+- :code: "$inquire"
+  :expectation:
+:required_concepts:
+- careTeam.role
+- careTeam.qualification
+- careTeam.role
+- careTeam.qualification
+- diagnosis.diagnosisCodeableConcept
+- diagnosis.type
+- accident.type
+- item.extension.valueCodeableConcept
+- item.revenue
+- item.category
+- item.productOrService
+- item.modifier
+- item.locationCodeableConcept
+:must_supports:
+  :extensions:
+  - :id: Claim.extension:levelOfServiceType
+    :path: extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-levelOfServiceCode
+  - :id: Claim.extension:encounter
+    :path: extension
+    :url: http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter
+  - :id: Claim.careTeam.extension:careTeamClaimScope
+    :path: careTeam.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
+  - :id: Claim.careTeam:OverallClaimMember.extension:careTeamClaimScope
+    :path: careTeam.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
+  - :id: Claim.careTeam:ItemClaimMember.extension:careTeamClaimScope
+    :path: careTeam.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
+  - :id: Claim.diagnosis.extension:recordedDate
+    :path: diagnosis.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-diagnosisRecordedDate
+  - :id: Claim.item.extension:itemTraceNumber
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber
+  - :id: Claim.item.extension:authorizationNumber
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber
+  - :id: Claim.item.extension:administrationReferenceNumber
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber
+  - :id: Claim.item.extension:requestType
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType
+  - :id: Claim.item.extension:certificationType
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType
+  - :id: Claim.item.extension:epsdtIndicator
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator
+  - :id: Claim.item.extension:nursingHomeResidentialStatus
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus
+  - :id: Claim.item.extension:nursingHomeLevelOfCare
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare
+  - :id: Claim.item.extension:revenueUnitRateLimit
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit
+  - :id: Claim.item.extension:requestedService
+    :path: item.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService
+  :slices:
+  - :name: Claim.supportingInfo:AdditionalInformation
+    :path: supportingInfo
+    :discriminator:
+      :type: value
+      :values:
+      - :path: category
+        :value:
+  - :name: Claim.supportingInfo:MessageText
+    :path: supportingInfo
+    :discriminator:
+      :type: value
+      :values:
+      - :path: category
+        :value:
+  :elements:
+  - :path: identifier
+  - :path: insurer
+    :types:
+    - Reference
+  - :path: provider
+    :types:
+    - Reference
+  - :path: careTeam
+  - :path: careTeam.sequence
+  - :path: careTeam.provider
+    :types:
+    - Reference
+  - :path: careTeam.role
+  - :path: careTeam.qualification
+  - :path: supportingInfo
+  - :path: supportingInfo.category
+  - :path: supportingInfo.timing[x]
+  - :path: supportingInfo.category.coding.code
+    :fixed_value: additionalInformation
+  - :path: supportingInfo.sequence
+  - :path: supportingInfo.category.coding.code
+    :fixed_value: freeFormMessage
+  - :path: supportingInfo.value[x]
+  - :path: diagnosis
+  - :path: diagnosis.sequence
+  - :path: diagnosis.diagnosis[x]
+  - :path: diagnosis.type
+  - :path: insurance
+  - :path: insurance.sequence
+  - :path: insurance.coverage
+    :types:
+    - Reference
+  - :path: accident
+  - :path: accident.date
+  - :path: accident.type
+  - :path: item
+  - :path: item.sequence
+  - :path: item.careTeamSequence
+  - :path: item.diagnosisSequence
+  - :path: item.informationSequence
+  - :path: item.revenue
+  - :path: item.category
+  - :path: item.productOrService
+  - :path: item.modifier
+  - :path: item.serviced[x]
+  - :path: item.location[x]
+  - :path: item.quantity
+  - :path: item.unitPrice
+:mandatory_elements:
+- Claim.extension.url
+- Claim.extension.value[x]
+- Claim.identifier
+- Claim.status
+- Claim.type
+- Claim.use
+- Claim.patient
+- Claim.created
+- Claim.insurer
+- Claim.provider
+- Claim.priority
+- Claim.payee.type
+- Claim.careTeam.extension
+- Claim.careTeam.sequence
+- Claim.careTeam.provider
+- Claim.careTeam.extension.url
+- Claim.supportingInfo.sequence
+- Claim.supportingInfo.category
+- Claim.supportingInfo.timing[x]
+- Claim.supportingInfo.value[x]
+- Claim.diagnosis.sequence
+- Claim.diagnosis.diagnosis[x]
+- Claim.procedure.sequence
+- Claim.procedure.procedure[x]
+- Claim.insurance
+- Claim.insurance.sequence
+- Claim.insurance.focal
+- Claim.insurance.coverage
+- Claim.accident.date
+- Claim.item
+- Claim.item.extension.url
+- Claim.item.sequence
+- Claim.item.category
+- Claim.item.productOrService
+- Claim.item.detail.sequence
+- Claim.item.detail.productOrService
+- Claim.item.detail.subDetail.sequence
+- Claim.item.detail.subDetail.productOrService
+:bindings:
+- :type: code
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/languages
+  :path: language
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/fm-status
+  :path: status
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/ValueSet/claim-type
+  :path: type
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-subtype
+  :path: subType
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/claim-use
+  :path: use
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/process-priority
+  :path: priority
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/fundsreserve
+  :path: fundsReserve
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/related-claim-relationship
+  :path: related.relationship
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/payeetype
+  :path: payee.type
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-careteamrole
+  :path: careTeam.role
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/provider-qualification
+  :path: careTeam.qualification
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2010EA/NM1/1/01/00/98
+  :path: careTeam.role
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2010EA/PRV/1/03/00/127
+  :path: careTeam.qualification
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2010F/NM1/1/01/00/98
+  :path: careTeam.role
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2010F/PRV/1/03/00/127
+  :path: careTeam.qualification
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/PASSupportingInfoType
+  :path: supportingInfo.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-exception
+  :path: supportingInfo.code
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/missing-tooth-reason
+  :path: supportingInfo.reason
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-informationcategory
+  :path: supportingInfo.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-exception
+  :path: supportingInfo.code
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/missing-tooth-reason
+  :path: supportingInfo.reason
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-informationcategory
+  :path: supportingInfo.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-exception
+  :path: supportingInfo.code
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/missing-tooth-reason
+  :path: supportingInfo.reason
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-informationcategory
+  :path: supportingInfo.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-exception
+  :path: supportingInfo.code
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/missing-tooth-reason
+  :path: supportingInfo.reason
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/PASSupportingInfoType
+  :path: supportingInfo.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-exception
+  :path: supportingInfo.code
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/missing-tooth-reason
+  :path: supportingInfo.reason
+- :type: CodeableConcept
+  :strength: extensible
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/PASSupportingInfoType
+  :path: supportingInfo.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-exception
+  :path: supportingInfo.code
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/missing-tooth-reason
+  :path: supportingInfo.reason
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278DiagnosisCodes
+  :path: diagnosis.diagnosis
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278DiagnosisType
+  :path: diagnosis.type
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-diagnosis-on-admission
+  :path: diagnosis.onAdmission
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-diagnosisrelatedgroup
+  :path: diagnosis.packageCode
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-procedure-type
+  :path: procedure.type
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/icd-10-procedures
+  :path: procedure.procedure
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000E/UM/1/05/01/1362
+  :path: accident.type
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000F/SV2/1/09/00/1345
+  :path: item.extension.value
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/AHANUBCRevenueCodes
+  :path: item.revenue
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000F/UM/1/03/00/1365
+  :path: item.category
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278RequestedServiceType
+  :path: item.productOrService
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278RequestedServiceModifierType
+  :path: item.modifier
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-program-code
+  :path: item.programCode
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278LocationType
+  :path: item.location
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/tooth
+  :path: item.bodySite
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/surface
+  :path: item.subSite
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-revenue-center
+  :path: item.detail.revenue
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-benefitcategory
+  :path: item.detail.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/service-uscls
+  :path: item.detail.productOrService
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-modifiers
+  :path: item.detail.modifier
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-program-code
+  :path: item.detail.programCode
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-revenue-center
+  :path: item.detail.subDetail.revenue
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-benefitcategory
+  :path: item.detail.subDetail.category
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/service-uscls
+  :path: item.detail.subDetail.productOrService
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/claim-modifiers
+  :path: item.detail.subDetail.modifier
+- :type: CodeableConcept
+  :strength: example
+  :system: http://hl7.org/fhir/ValueSet/ex-program-code
+  :path: item.detail.subDetail.programCode
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000E/UM/1/06/00/1338
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-levelOfServiceCode
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278ConditionCategory
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-conditionCode
+  - category
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278ConditionCode
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-conditionCode
+  - code
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000E/CR6/1/01/00/923
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-homeHealthCareInformation
+  - prognosis
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/PASInformationChangeMode
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000E/UM/1/01/00/1525
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000F/UM/1/02/00/1322
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278RequestedServiceType
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd
+- :type: CodeableConcept
+  :strength: required
+  :system: https://valueset.x12.org/x217/005010/request/2000F/SV1/1/20/00/1337
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/PASInformationChangeMode
+  :path: value
+  :extensions:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged
+:references:
+- :path: Claim.extension.value[x]
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter
+- :path: Claim.patient
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary
+- :path: Claim.enterer
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Practitioner
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole
+- :path: Claim.insurer
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
+- :path: Claim.provider
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitionerrole
+- :path: Claim.related.claim
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Claim
+- :path: Claim.prescription
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/DeviceRequest
+  - http://hl7.org/fhir/StructureDefinition/MedicationRequest
+  - http://hl7.org/fhir/StructureDefinition/VisionPrescription
+- :path: Claim.originalPrescription
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/DeviceRequest
+  - http://hl7.org/fhir/StructureDefinition/MedicationRequest
+  - http://hl7.org/fhir/StructureDefinition/VisionPrescription
+- :path: Claim.payee.party
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Practitioner
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole
+  - http://hl7.org/fhir/StructureDefinition/Organization
+  - http://hl7.org/fhir/StructureDefinition/Patient
+  - http://hl7.org/fhir/StructureDefinition/RelatedPerson
+- :path: Claim.referral
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/ServiceRequest
+- :path: Claim.facility
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Location
+- :path: Claim.careTeam.provider
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-organization
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitionerrole
+- :path: Claim.careTeam.provider
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Practitioner
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole
+  - http://hl7.org/fhir/StructureDefinition/Organization
+- :path: Claim.careTeam.provider
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Practitioner
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole
+  - http://hl7.org/fhir/StructureDefinition/Organization
+- :path: Claim.supportingInfo.value[x]
+  :profiles:
+  - http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference
+  - http://hl7.org/fhir/StructureDefinition/Resource
+- :path: Claim.procedure.udi
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Device
+- :path: Claim.insurance.coverage
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-coverage
+- :path: Claim.insurance.claimResponse
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/ClaimResponse
+- :path: Claim.item.udi
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Device
+- :path: Claim.item.encounter
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Encounter
+- :path: Claim.item.detail.udi
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Device
+- :path: Claim.item.detail.subDetail.udi
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Device
+:tests:
+- :id: pas_server_submit_request_v201_claim_update_must_support_test
+  :file_name: server_submit_request_claim_update_must_support_test.rb
+- :id: pas_client_submit_request_v201_claim_update_must_support_test
+  :file_name: client_submit_request_claim_update_must_support_test.rb
+:delayed_references:
+- :path: extension.value[x]
+  :resources:
+  - Encounter
+- :path: insurer
+  :resources:
+  - Organization
+- :path: provider
+  :resources:
+  - Organization
+  - PractitionerRole
+- :path: careTeam.provider
+  :resources:
+  - Organization
+  - PractitionerRole
+- :path: insurance.coverage
+  :resources:
+  - Coverage

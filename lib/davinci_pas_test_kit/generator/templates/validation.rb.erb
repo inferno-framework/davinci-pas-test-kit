@@ -1,0 +1,98 @@
+require_relative '../../../pas_bundle_validation'
+
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::Test
+      include DaVinciPASTestKit::PasBundleValidation
+
+      id :<%= test_id %>
+      title '<%= title %>'
+      description %(
+        <%=description.strip.gsub("\n", "\n" + " "*8) %>
+      )
+      <% if request_type.include?('request') %>
+      input :pa_<%= request_type %>_payload,
+            title: 'PAS <%= request_type.humanize.titleize%> Payload',
+            description: 'Insert Bundle to be sent for PAS <%= request_type.humanize.titleize%>',
+            type: 'textarea',
+            optional: true
+
+      input_order :server_endpoint, :smart_credentials<% end %>
+      output :dar_code_found, :dar_extension_found
+
+      def resource_type
+        '<%= resource_type %>'
+      end
+
+      def scratch_resources
+        scratch[:<%= request_type %>_resources] ||= {}
+      end
+
+      def request_type
+        '<%= request_type.split('_').first %>'
+      end
+      <%if request_type.include?('response')%>
+      def target_request_response_pairs<% operation = request_type.split('_').first %>
+        scratch[:<%= operation %>_request_response_pair] ||= {}
+        scratch[:<%= operation %>_request_response_pair][:all] ||= []
+      end<% end %>
+
+      <%if request_type.include?('request')%>
+      def request_bundles
+        parsed_payload = JSON.parse(pa_<%= request_type %>_payload)
+        fhir_resources = [parsed_payload].flatten.compact.uniq.map { |payload| FHIR.from_contents(payload.to_json)}.compact
+        fhir_resources.select { |res| res.resourceType == 'Bundle'}
+      end<% end %>
+
+      run do<% if request_type.include?('request') %>
+        skip_if pa_<%= request_type %>_payload.blank?, 'No bundle request input provided.'
+        assert_valid_json(pa_<%= request_type %>_payload)
+        assert request_bundles.present?, 'Provided input is not a bundle or list of bundles'
+
+        save_bundles_and_entries_to_scratch(request_bundles)
+
+        request_bundles.each do |bundle|
+          perform_request_validation(
+            bundle,
+            '<%= profile_url %>',
+            '<%= profile_version %>',
+            request_type
+          )
+        end
+
+        validation_error_messages.each do |msg|
+          messages << { type: 'error', message: msg }
+        end
+        msg = 'Bundle(s) provided and/or entry resources are not conformant. Check messages for issues found.'
+        skip_if validation_error_messages.present?, msg
+      <% else %>
+        skip_if target_request_response_pairs.blank?, 'No <%= request_type.split('_').first%> response to validate. Either no <%= request_type.split('_').first%> request was made in a previous test or it resulted in a server error.'
+        target_pairs = target_request_response_pairs
+        # Clean request/response pair after validatation
+        scratch[:<%= operation %>_request_response_pair][:all] = []
+
+        response_bundles = target_pairs.map { |pair| pair[:response_bundle] }
+        save_bundles_and_entries_to_scratch(response_bundles)
+
+        target_pairs.each do |pair|
+          pair => {request_bundle:, response_bundle:}
+          assert_resource_type(:bundle, resource: response_bundle)
+
+          perform_response_validation(
+            response_bundle,
+            '<%= profile_url %>',
+            '<%= profile_version %>',
+            request_type,
+            request_bundle
+          )
+        end
+
+        validation_error_messages.each do |msg|
+          messages << { type: 'error', message: msg }
+        end
+        msg = 'Bundle response returned and/or entry resources are not conformant. Check messages for issues found.'
+        assert validation_error_messages.blank?, msg<% end %>
+      end
+    end
+  end
+end
