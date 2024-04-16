@@ -29,7 +29,7 @@ feedback on the tests. Future versions of these tests may validate other
 requirements and may change how these are tested.
 
 Additional details on the IG requirements that underlie this test kit, including those 
-that are not currently tested, can be found in [this spreadsheet](docs/PAS%20Requirements%20Interpretation.xlsx). The spreadsheet includes
+that are not currently tested, can be found in [this spreadsheet](lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx). The spreadsheet includes
 
 - a list of requirements extracted from the IG.
 - the requirements tested by this DRAFT test kit.
@@ -53,16 +53,16 @@ At a high-level, in-scope requirements include:
 - The ability of the system to produce and receive (currently server tests only)
   all PAS-defined profiles and their must support elements.
 
-Out of scope details that are not yet tested include:
+Out of scope requirements that are not yet tested include:
 
-- [Subscriptions](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription)
-- [Prior Authorization update workflows](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests)
-- [Requests for additional information](https://hl7.org/fhir/us/davinci-pas/STU2/additionalinfo.html) handled through the CDex framework
+- Subscriptions ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription))
+- Prior Authorization update workflows ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests))
+- Requests for additional information handled through the CDex framework ([here](https://hl7.org/fhir/us/davinci-pas/STU2/additionalinfo.html))
 - PDF, CDA, and JPG attachments (3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-submission))
-- [US Core profile support](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#integration-with-other-implementation-guides) for supporting information
+- US Core profile support for supporting information ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#integration-with-other-implementation-guides))
 - (Server) Inquiry matching and subsetting logic (2nd paragraph and 2 bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-inquiries))
 - (Server) Inquiry requests from non-submitting systems (3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#pended-authorization-responses))
-- (Server) [Collection and dissemination of metrics](https://hl7.org/fhir/us/davinci-pas/STU2/metrics.html)
+- (Server) Collection and dissemination of metrics ([here](https://hl7.org/fhir/us/davinci-pas/STU2/metrics.html))
 - (Client) The ability to handle responses containing all PAS-defined profiles and must support elements (3rd bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/background.html#must-support))
 - (Client) Most details requiring manual review of the client system, e.g., the requirement that clinicians can update details of the prior authorization request before submitting them (1st paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/usecases.html#submit-prior-authorization))
 
@@ -113,7 +113,7 @@ You can run these tests via the [ONC Inferno](https://inferno.healthit.gov/test-
 
 We welcome feedback on the tests, including but not limited to the following areas:
 - Validation logic, such as potential bugs, lax checks, and unexpected failures.
-- Requirements coverage, such as requirements that have been missed, tests that necessitate features that the IG does not require, or other issues with the [interpretation](docs/Plan%20Net%20Requirements%20Interpretation.xlsx) of the IG's requirements.
+- Requirements coverage, such as requirements that have been missed, tests that necessitate features that the IG does not require, or other issues with the [interpretation](lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx) of the IG's requirements.
 - User experience, such as confusing or missing information in the test UI.
 
 Please report any issues with this set of tests in the issues section of this repository.
