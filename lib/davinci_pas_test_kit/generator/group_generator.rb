@@ -174,13 +174,13 @@ module DaVinciPASTestKit
       end
 
       def approval_denial_test_ids
-        submit_request_validation_test_ids + submit_operation_test_ids + submit_response_validation_test_ids
+        submit_request_validation_test_ids + submit_operation_test_ids +
+          submit_response_validation_test_ids + [ claim_response_decision_test_id ]
       end
 
       def grouped_approval_denial_test_ids
         {
-          'PAS Submit Operation' => approval_denial_test_ids,
-          'PAS Claim Response Decision Validation' => [claim_response_decision_test_id]
+          'PAS Submit Operation' => approval_denial_test_ids
         }
       end
 

@@ -47,10 +47,6 @@ module DaVinciPASTestKit
           )
         end
         test from: :pas_server_v201_pas_response_bundle_validation_test
-      end
-      group do
-        title 'PAS Claim Response Decision Validation'
-        
         test from: :prior_auth_claim_response_decision_validation
       end
   

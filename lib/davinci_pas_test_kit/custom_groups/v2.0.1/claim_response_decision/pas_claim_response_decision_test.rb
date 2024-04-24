@@ -11,10 +11,12 @@ module DaVinciPASTestKit
       description %(
         This test aims to confirm that the decision in the returned ClaimResponse matches
         the decision code required for the workflow under examination.
-        (NOT YET IMPLEMENTED - see details on this limitation
-        [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations))
+        This test is not yet implemented due to limitations in the IG (see details
+        [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
+        Is is currently optional and will always be skipped, but will be implemented in the future.
       )
       uses_request :pa_submit
+      optional # optional and skipped until implemented
 
       def status
         if use_case == 'approval'
@@ -25,6 +27,8 @@ module DaVinciPASTestKit
       end
 
       run do
+
+        skip
         # Experiment with extraction of statuses and use in an attestation
         # Not used due to the following problems:
         # - no real clients to test with
