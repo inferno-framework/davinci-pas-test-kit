@@ -190,7 +190,8 @@ module DaVinciPASTestKit
       end
 
       def grouped_pended_test_ids
-        inquiry_operation = inquiry_request_validation_test_ids +
+        inquiry_operation = [inquiry_notification_test_id] +
+                            inquiry_request_validation_test_ids +
                             inquiry_operation_test_ids +
                             inquiry_response_validation_test_ids
         inquiry_tests = {
@@ -247,7 +248,10 @@ module DaVinciPASTestKit
       end
 
       def pended_test_file_list
-        common_test_file_list(pended_test_ids) << claim_response_decision_file_name
+        common_test_file_list(pended_test_ids).push(
+          claim_response_decision_file_name,
+          subscription_notification_file_name
+        )
       end
 
       def must_support_test_file_list
@@ -300,8 +304,16 @@ module DaVinciPASTestKit
         'prior_auth_claim_response_decision_validation'
       end
 
+      def inquiry_notification_test_id
+        'prior_auth_claim_response_update_notification_validation'
+      end
+
       def claim_response_decision_file_name
         "../../custom_groups/#{ig_metadata.ig_version}/claim_response_decision/pas_claim_response_decision_test"
+      end
+
+      def subscription_notification_file_name
+        "../../custom_groups/#{ig_metadata.ig_version}/notification/pas_subscription_notification_test"
       end
 
       def rename_input?(test_id)

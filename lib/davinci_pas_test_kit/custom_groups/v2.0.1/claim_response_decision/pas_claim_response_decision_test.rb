@@ -83,27 +83,6 @@ module DaVinciPASTestKit
         # )
         #
         # end of experiment with attestation code
-
-        # TODO: Implement subscription for pended: Inferno will subscribe to the server to receive notification
-        # when the submitted claim status will be updated.
-        if use_case == 'pended'
-          # rubocop:disable Layout/LineLength
-          wait(
-            identifier: use_case,
-            message: %(
-              Inferno has received a 'Pended' claim response as expected.
-
-              Please
-              **[click
-              here](#{Inferno::Application['base_url']}/custom/davinci_pas_server_suite_v201/resume_after_notification?use_case=#{use_case})**
-              when the status of this claim has been finalized to inform Inferno to resume testing.
-
-              Future versions of this test may implement automated monitoring
-              capabilities described in the implementation guide.
-            )
-          )
-          # rubocop:enable Layout/LineLength
-        end
       end
     end
   end
