@@ -119,7 +119,7 @@ module DaVinciPASTestKit
       end
 
       def title
-        "Claim/$#{operation} Operation Test"
+        "Submission of a claim to the $#{operation} operation succeeds"
       end
 
       def description

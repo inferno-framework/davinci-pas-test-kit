@@ -180,7 +180,8 @@ module DaVinciPASTestKit
 
       def grouped_approval_denial_test_ids
         {
-          'PAS Submit Operation' => approval_denial_test_ids
+          'Server can respond to claims submitted for prior authorization' =>
+            approval_denial_test_ids
         }
       end
 
@@ -195,7 +196,7 @@ module DaVinciPASTestKit
                             inquiry_operation_test_ids +
                             inquiry_response_validation_test_ids
         inquiry_tests = {
-          'PAS Inquiry Operation' => inquiry_operation
+          'Server can respond to claims submitted for inquiry' => inquiry_operation
         }
 
         grouped_approval_denial_test_ids.merge(inquiry_tests)
@@ -215,12 +216,12 @@ module DaVinciPASTestKit
                             inquiry_response_validation_test_ids
         {
           '$submit Element Support' => {
-            'PAS Submit Operation' => submit_tests,
+            'Submission of claims to the $submit operation for must support validation' => submit_tests,
             '[USER INPUT VALIDATION] Submit Request Must Support' => submit_request_must_support_test_ids,
             'Submit Response Must Support' => submit_response_must_support_test_ids
           },
           '$inquire Element Support' => {
-            'PAS Inquiry Operation' => inquiry_operation,
+            'Submission of claims to the $inquire operation for must support validation' => inquiry_operation,
             '[USER INPUT VALIDATION] Inquiry Request Must Support' => inquiry_request_must_support_test_ids,
             'Inquiry Response Must Support' => inquiry_response_must_support_test_ids
           }

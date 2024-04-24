@@ -3,7 +3,7 @@ module DaVinciPASTestKit
     class ClaimOperationTest < Inferno::Test
 
       id :pas_v201_claim_operation_test
-      title 'Claim/$submit Operation Test'
+      title 'Submission of a claim to the $submit operation succeeds'
       description %(
         Server SHALL support PAS Submit requests: a POST interaction to
         the /Claim/$submit endpoint.

@@ -22,7 +22,7 @@ module DaVinciPASTestKit
   
   
       group do
-        title 'PAS Submit Operation'
+        title 'Server can respond to claims submitted for prior authorization'
         
         test from: :pas_server_v201_pas_request_bundle_validation_test do
           id :pas_server_v201_pas_request_bundle_validation_test_approval
