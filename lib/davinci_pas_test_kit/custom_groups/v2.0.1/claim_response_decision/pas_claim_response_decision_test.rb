@@ -27,7 +27,6 @@ module DaVinciPASTestKit
       end
 
       run do
-
         skip
         # Experiment with extraction of statuses and use in an attestation
         # Not used due to the following problems:

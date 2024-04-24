@@ -175,7 +175,7 @@ module DaVinciPASTestKit
 
       def approval_denial_test_ids
         submit_request_validation_test_ids + submit_operation_test_ids +
-          submit_response_validation_test_ids + [ claim_response_decision_test_id ]
+          submit_response_validation_test_ids + [claim_response_decision_test_id]
       end
 
       def grouped_approval_denial_test_ids
