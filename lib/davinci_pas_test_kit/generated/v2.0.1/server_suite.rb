@@ -58,7 +58,7 @@ module DaVinciPASTestKit
         oauth_credentials :smart_credentials
       end
 
-      # Used for attestation experiment - see pas_claim_status_test.rb
+      # Used for attestation experiment - see pas_claim_response_decision_test.rb
       # resume_test_route :get, RESUME_PASS_PATH do |request|
       #   request.query_parameters['token']
       # end

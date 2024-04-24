@@ -3,15 +3,16 @@
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class PasClaimStatusTest < Inferno::Test
+    class PasClaimResponseDecisionTest < Inferno::Test
       # include URLs // used for attestation experiment - see below
 
-      id :prior_auth_claim_status
-      title 'Server returns the expected authorization response'
+      id :prior_auth_claim_response_decision_validation
+      title 'Server response includes the expected decision code in the ClaimResponse instance'
       description %(
-        This test aims to confirm that the status of the prior authorization matches
-        the anticipated status for the workflow under examination.
-        (NOT YET IMPLEMENTED)
+        This test aims to confirm that the decision in the returned ClaimResponse matches
+        the decision code required for the workflow under examination.
+        (NOT YET IMPLEMENTED - see details on this limitation
+        [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations))
       )
       uses_request :pa_submit
 

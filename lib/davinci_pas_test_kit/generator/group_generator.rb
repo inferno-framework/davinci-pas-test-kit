@@ -180,7 +180,7 @@ module DaVinciPASTestKit
       def grouped_approval_denial_test_ids
         {
           'PAS Submit Operation' => approval_denial_test_ids,
-          'PAS Status Check' => [claim_status_test_id]
+          'PAS Claim Response Decision Validation' => [claim_response_decision_test_id]
         }
       end
 
@@ -243,11 +243,11 @@ module DaVinciPASTestKit
       end
 
       def approval_denial_test_file_list
-        common_test_file_list(approval_denial_test_ids) << claim_status_file_name
+        common_test_file_list(approval_denial_test_ids) << claim_response_decision_file_name
       end
 
       def pended_test_file_list
-        common_test_file_list(pended_test_ids) << claim_status_file_name
+        common_test_file_list(pended_test_ids) << claim_response_decision_file_name
       end
 
       def must_support_test_file_list
@@ -296,12 +296,12 @@ module DaVinciPASTestKit
                             end
       end
 
-      def claim_status_test_id
-        'prior_auth_claim_status'
+      def claim_response_decision_test_id
+        'prior_auth_claim_response_decision_validation'
       end
 
-      def claim_status_file_name
-        "../../custom_groups/#{ig_metadata.ig_version}/claim_status/pas_claim_status_test"
+      def claim_response_decision_file_name
+        "../../custom_groups/#{ig_metadata.ig_version}/claim_response_decision/pas_claim_response_decision_test"
       end
 
       def rename_input?(test_id)
