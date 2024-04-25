@@ -43,6 +43,8 @@ found in the suite descriptions when the tests are run, or within this repositor
 for the [server](lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
 and [client](lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations).
 
+### In-Scope Requirements
+
 At a high-level, in-scope requirements include:
 
 - The ability of the system to participate in end-to-end prior authorization
@@ -51,6 +53,8 @@ At a high-level, in-scope requirements include:
   for the decision to be made.
 - The ability of the system to produce and receive (currently server tests only)
   all PAS-defined profiles and their must support elements.
+
+### Out-of-Scope Requirements
 
 Out of scope requirements that are not yet tested include: (parens contain links to the requirement details in the IG)
 
