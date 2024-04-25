@@ -56,18 +56,18 @@ At a high-level, in-scope requirements include:
 
 ### Out-of-Scope Requirements
 
-Out of scope requirements that are not yet tested include: (parens contain links to the requirement details in the IG)
+Out of scope requirements from the IG that are not yet tested include:
 
-- Subscriptions ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription))
-- Prior Authorization update workflows ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests))
-- Requests for additional information handled through the CDex framework ([here](https://hl7.org/fhir/us/davinci-pas/STU2/additionalinfo.html))
-- PDF, CDA, and JPG attachments (3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-submission))
-- US Core profile support for supporting information ([here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#integration-with-other-implementation-guides))
-- (Server) Inquiry matching and subsetting logic (2nd paragraph and 2 bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-inquiries))
-- (Server) Inquiry requests from non-submitting systems (3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#pended-authorization-responses))
-- (Server) Collection and dissemination of metrics ([here](https://hl7.org/fhir/us/davinci-pas/STU2/metrics.html))
-- (Client) The ability to handle responses containing all PAS-defined profiles and must support elements (3rd bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/background.html#must-support))
-- (Client) Most details requiring manual review of the client system, e.g., the requirement that clinicians can update details of the prior authorization request before submitting them (1st paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/usecases.html#submit-prior-authorization))
+- Subscriptions (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription))
+- Prior Authorization update workflows (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests))
+- Requests for additional information handled through the CDex framework ([see detail here](https://hl7.org/fhir/us/davinci-pas/STU2/additionalinfo.html))
+- PDF, CDA, and JPG attachments (see details in the 3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-submission))
+- US Core profile support for supporting information (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#integration-with-other-implementation-guides))
+- (Server) Inquiry matching and subsetting logic (see details in the 2nd paragraph and 2 bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-inquiries))
+- (Server) Inquiry requests from non-submitting systems (see details in the 3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#pended-authorization-responses))
+- (Server) Collection and dissemination of metrics (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/metrics.html))
+- (Client) The ability to handle responses containing all PAS-defined profiles and must support elements (see details under the 3rd bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/background.html#must-support))
+- (Client) Most details requiring manual review of the client system, e.g., the requirement that clinicians can update details of the prior authorization request before submitting them (see details in the 1st paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/usecases.html#submit-prior-authorization))
 
 ### Limitations
 
