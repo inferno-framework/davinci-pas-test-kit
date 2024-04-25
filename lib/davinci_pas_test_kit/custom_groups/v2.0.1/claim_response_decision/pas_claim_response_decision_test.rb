@@ -13,7 +13,7 @@ module DaVinciPASTestKit
         the decision code required for the workflow under examination.
         This test is not yet implemented due to limitations in the IG (see details
         [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
-        Is is currently optional and will always be skipped, but will be implemented in the future.
+        It is currently optional and will always be skipped, but will be implemented in the future.
       )
       uses_request :pa_submit
       optional # optional and skipped until implemented
