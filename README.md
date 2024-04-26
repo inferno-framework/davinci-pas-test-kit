@@ -60,7 +60,7 @@ Out of scope requirements from the IG that are not yet tested include:
 
 - Subscriptions (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#subscription))
 - Prior Authorization update workflows (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#updating-authorization-requests))
-- Requests for additional information handled through the CDex framework ([see detail here](https://hl7.org/fhir/us/davinci-pas/STU2/additionalinfo.html))
+- Requests for additional information handled through the CDex framework (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/additionalinfo.html))
 - PDF, CDA, and JPG attachments (see details in the 3rd paragraph [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-submission))
 - US Core profile support for supporting information (see details [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#integration-with-other-implementation-guides))
 - (Server) Inquiry matching and subsetting logic (see details in the 2nd paragraph and 2 bullet [here](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html#prior-authorization-inquiries))
