@@ -11,7 +11,7 @@ module DaVinciPASTestKit
         the pended workflow. In the future, Inferno will validate that the server
         can accept requests for a subscription and send notifications alerting the client
         to the availability of updates to the prior authorization request (see details on this limitation
-        [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
+        [here](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
       )
 
       run do
@@ -29,7 +29,7 @@ module DaVinciPASTestKit
 
             Future versions of this test will validate subscription-based notifications as
             described within the implementation guide (see
-            [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
+            [here](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
             for more details on this current limitation).
           )
         )

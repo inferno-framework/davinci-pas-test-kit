@@ -12,7 +12,7 @@ module DaVinciPASTestKit
         This test aims to confirm that the decision in the returned ClaimResponse matches
         the decision code required for the workflow under examination.
         This test is not yet implemented due to limitations in the IG (see details
-        [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
+        [here](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
         It is currently optional and will always be skipped, but will be implemented in the future.
       )
       uses_request :pa_submit
