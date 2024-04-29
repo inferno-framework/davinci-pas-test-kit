@@ -22,6 +22,8 @@ module DaVinciPASTestKit
         This test checks all identified instances of the <%= profile_name %>
         Profile on responses sent to the client to ensure that the following 
         must support elements are observed:<% end %><% if system == 'server' && request_type.include?('request') %>
+        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
+        
         PAS server systems are required to be able to receive all
         must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
         requests, including instances of the <%= profile_name %> Profile.
@@ -44,6 +46,10 @@ module DaVinciPASTestKit
         '<%= resource_type %>'
       end
 
+      def user_input_validation
+        <% if system == 'server' && request_type.include?('request') %>true<% else %>false<% end %>
+      end
+
       def self.metadata
         @metadata ||= Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, 'metadata.yml'), aliases: true))
       end
@@ -59,7 +65,7 @@ module DaVinciPASTestKit
 
       run do
         perform_must_support_test(resources_of_interest)
-        validate_must_support
+        validate_must_support(user_input_validation)
       end
     end
   end

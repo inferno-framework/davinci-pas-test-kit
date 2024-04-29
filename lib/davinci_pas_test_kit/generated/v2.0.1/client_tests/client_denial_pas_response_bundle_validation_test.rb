@@ -10,6 +10,9 @@ module DaVinciPASTestKit
       id :pas_client_v201_denial_pas_response_bundle_validation_test
       title '[USER INPUT VALIDATION] Response Bundle is valid'
       description %(
+        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
+        Errors encountered will be treated as a skip instead of a failure.
+        
         This test validates the conformity of the
         user input to the
         [PAS Response Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle) structure.

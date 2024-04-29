@@ -4,7 +4,8 @@ require_relative 'pas_response_bundle/server_pas_response_bundle_validation_test
 require_relative 'pas_inquiry_request_bundle/server_pas_inquiry_request_bundle_validation_test'
 require_relative 'claim_inquiry/claim_inquiry_operation_test'
 require_relative 'pas_inquiry_response_bundle/server_pas_inquiry_response_bundle_validation_test'
-require_relative '../../custom_groups/v2.0.1/claim_status/pas_claim_status_test'
+require_relative '../../custom_groups/v2.0.1/claim_response_decision/pas_claim_response_decision_test'
+require_relative '../../custom_groups/v2.0.1/notification/pas_subscription_notification_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -30,7 +31,7 @@ module DaVinciPASTestKit
   
   
       group do
-        title 'PAS Submit Operation'
+        title 'Server can respond to claims submitted for prior authorization'
         
         test from: :pas_server_v201_pas_request_bundle_validation_test do
           id :pas_server_v201_pas_request_bundle_validation_test_pended
@@ -55,15 +56,12 @@ module DaVinciPASTestKit
           )
         end
         test from: :pas_server_v201_pas_response_bundle_validation_test
+        test from: :prior_auth_claim_response_decision_validation
       end
       group do
-        title 'PAS Status Check'
+        title 'Server can respond to claims submitted for inquiry'
         
-        test from: :prior_auth_claim_status
-      end
-      group do
-        title 'PAS Inquiry Operation'
-        
+        test from: :prior_auth_claim_response_update_notification_validation
         test from: :pas_server_v201_pas_inquiry_request_bundle_validation_test
         test from: :pas_v201_claim_inquiry_operation_test do
           id :pas_v201_claim_inquiry_operation_test_pended

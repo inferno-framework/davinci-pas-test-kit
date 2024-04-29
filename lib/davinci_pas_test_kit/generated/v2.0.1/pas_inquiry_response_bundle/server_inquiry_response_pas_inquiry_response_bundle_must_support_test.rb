@@ -30,6 +30,10 @@ module DaVinciPASTestKit
         'Bundle'
       end
 
+      def user_input_validation
+        false
+      end
+
       def self.metadata
         @metadata ||= Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, 'metadata.yml'), aliases: true))
       end
@@ -45,7 +49,7 @@ module DaVinciPASTestKit
 
       run do
         perform_must_support_test(resources_of_interest)
-        validate_must_support
+        validate_must_support(user_input_validation)
       end
     end
   end

@@ -14,6 +14,9 @@ module DaVinciPASTestKit
         PAS Device Request, or PAS Nutrition Order) is observed with all of its must support elements
       )
       description %(
+        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
+        Errors encountered will be treated as a skip instead of a failure.
+
         The PAS IG includes four profiles for providing the specifics of the service or product requested
         in the prior authorization request. Any one of these profiles can be referenced in
         the must support element `Claim.item.extension:requestedService`:
@@ -109,7 +112,7 @@ module DaVinciPASTestKit
           @@resource_type = @resource_type = type # rubocop:disable Style/ClassVars
           perform_must_support_test(resources)
         end
-        validate_must_support
+        validate_must_support(true)
       end
     end
   end

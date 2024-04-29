@@ -141,6 +141,7 @@ module DaVinciPASTestKit
 
       def description
         <<~DESCRIPTION
+          #{description_user_input_validation if user_input?}
           #{system == 'server' ? description_intro_server : description_intro_client}
           It verifies the presence of mandatory elements and that elements with
           required bindings contain appropriate values. CodeableConcept element
@@ -158,6 +159,7 @@ module DaVinciPASTestKit
           This test validates the conformity of the
           #{request_type.include?('request') ? 'user input' : "server's response"} to the
           [#{profile_name}](#{profile_url}) structure#{request_type.include?('request') ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
+
           It also checks that other conformance requirements defined in the [PAS Formal
           Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
           such as the presence of all referenced instances within the bundle and the
@@ -175,6 +177,13 @@ module DaVinciPASTestKit
           such as the presence of all referenced instances within the bundle and the
           conformance of those instances to the appropriate profiles, are met.
         GENERIC_INTRO
+      end
+
+      def description_user_input_validation
+        <<~USER_INPUT_INTRO
+          **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
+          Errors encountered will be treated as a skip instead of a failure.
+        USER_INPUT_INTRO
       end
     end
   end

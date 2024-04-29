@@ -41,8 +41,12 @@ module DaVinciPASTestKit
       @all_must_support_errors ||= []
     end
 
-    def validate_must_support
-      assert all_must_support_errors.empty?, all_must_support_errors.join("\n")
+    def validate_must_support(user_input_validation)
+      if user_input_validation
+        skip_if !all_must_support_errors.empty?, all_must_support_errors.join("\n")
+      else
+        assert all_must_support_errors.empty?, all_must_support_errors.join("\n")
+      end
     end
 
     def perform_must_support_test(resources)

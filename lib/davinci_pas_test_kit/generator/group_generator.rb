@@ -174,13 +174,14 @@ module DaVinciPASTestKit
       end
 
       def approval_denial_test_ids
-        submit_request_validation_test_ids + submit_operation_test_ids + submit_response_validation_test_ids
+        submit_request_validation_test_ids + submit_operation_test_ids +
+          submit_response_validation_test_ids + [claim_response_decision_test_id]
       end
 
       def grouped_approval_denial_test_ids
         {
-          'PAS Submit Operation' => approval_denial_test_ids,
-          'PAS Status Check' => [claim_status_test_id]
+          'Server can respond to claims submitted for prior authorization' =>
+            approval_denial_test_ids
         }
       end
 
@@ -190,11 +191,12 @@ module DaVinciPASTestKit
       end
 
       def grouped_pended_test_ids
-        inquiry_operation = inquiry_request_validation_test_ids +
+        inquiry_operation = [inquiry_notification_test_id] +
+                            inquiry_request_validation_test_ids +
                             inquiry_operation_test_ids +
                             inquiry_response_validation_test_ids
         inquiry_tests = {
-          'PAS Inquiry Operation' => inquiry_operation
+          'Server can respond to claims submitted for inquiry' => inquiry_operation
         }
 
         grouped_approval_denial_test_ids.merge(inquiry_tests)
@@ -214,12 +216,12 @@ module DaVinciPASTestKit
                             inquiry_response_validation_test_ids
         {
           '$submit Element Support' => {
-            'PAS Submit Operation' => submit_tests,
+            'Submission of claims to the $submit operation for must support validation' => submit_tests,
             '[USER INPUT VALIDATION] Submit Request Must Support' => submit_request_must_support_test_ids,
             'Submit Response Must Support' => submit_response_must_support_test_ids
           },
           '$inquire Element Support' => {
-            'PAS Inquiry Operation' => inquiry_operation,
+            'Submission of claims to the $inquire operation for must support validation' => inquiry_operation,
             '[USER INPUT VALIDATION] Inquiry Request Must Support' => inquiry_request_must_support_test_ids,
             'Inquiry Response Must Support' => inquiry_response_must_support_test_ids
           }
@@ -243,11 +245,14 @@ module DaVinciPASTestKit
       end
 
       def approval_denial_test_file_list
-        common_test_file_list(approval_denial_test_ids) << claim_status_file_name
+        common_test_file_list(approval_denial_test_ids) << claim_response_decision_file_name
       end
 
       def pended_test_file_list
-        common_test_file_list(pended_test_ids) << claim_status_file_name
+        common_test_file_list(pended_test_ids).push(
+          claim_response_decision_file_name,
+          subscription_notification_file_name
+        )
       end
 
       def must_support_test_file_list
@@ -296,12 +301,20 @@ module DaVinciPASTestKit
                             end
       end
 
-      def claim_status_test_id
-        'prior_auth_claim_status'
+      def claim_response_decision_test_id
+        'prior_auth_claim_response_decision_validation'
       end
 
-      def claim_status_file_name
-        "../../custom_groups/#{ig_metadata.ig_version}/claim_status/pas_claim_status_test"
+      def inquiry_notification_test_id
+        'prior_auth_claim_response_update_notification_validation'
+      end
+
+      def claim_response_decision_file_name
+        "../../custom_groups/#{ig_metadata.ig_version}/claim_response_decision/pas_claim_response_decision_test"
+      end
+
+      def subscription_notification_file_name
+        "../../custom_groups/#{ig_metadata.ig_version}/notification/pas_subscription_notification_test"
       end
 
       def rename_input?(test_id)

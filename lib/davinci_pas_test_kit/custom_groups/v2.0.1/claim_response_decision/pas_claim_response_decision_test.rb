@@ -3,17 +3,20 @@
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class PasClaimStatusTest < Inferno::Test
+    class PasClaimResponseDecisionTest < Inferno::Test
       # include URLs // used for attestation experiment - see below
 
-      id :prior_auth_claim_status
-      title 'Server returns the expected authorization response'
+      id :prior_auth_claim_response_decision_validation
+      title 'Server response includes the expected decision code in the ClaimResponse instance'
       description %(
-        This test aims to confirm that the status of the prior authorization matches
-        the anticipated status for the workflow under examination.
-        (NOT YET IMPLEMENTED)
+        This test aims to confirm that the decision in the returned ClaimResponse matches
+        the decision code required for the workflow under examination.
+        This test is not yet implemented due to limitations in the IG (see details
+        [here](https://github.com/inferno-framework/davinci-pas-test-kit/tree/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
+        It is currently optional and will always be skipped, but will be implemented in the future.
       )
       uses_request :pa_submit
+      optional # optional and skipped until implemented
 
       def status
         if use_case == 'approval'
@@ -24,6 +27,7 @@ module DaVinciPASTestKit
       end
 
       run do
+        skip
         # Experiment with extraction of statuses and use in an attestation
         # Not used due to the following problems:
         # - no real clients to test with
@@ -82,27 +86,6 @@ module DaVinciPASTestKit
         # )
         #
         # end of experiment with attestation code
-
-        # TODO: Implement subscription for pended: Inferno will subscribe to the server to receive notification
-        # when the submitted claim status will be updated.
-        if use_case == 'pended'
-          # rubocop:disable Layout/LineLength
-          wait(
-            identifier: use_case,
-            message: %(
-              Inferno has received a 'Pended' claim response as expected.
-
-              Please
-              **[click
-              here](#{Inferno::Application['base_url']}/custom/davinci_pas_server_suite_v201/resume_after_notification?use_case=#{use_case})**
-              when the status of this claim has been finalized to inform Inferno to resume testing.
-
-              Future versions of this test may implement automated monitoring
-              capabilities described in the implementation guide.
-            )
-          )
-          # rubocop:enable Layout/LineLength
-        end
       end
     end
   end

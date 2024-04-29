@@ -110,7 +110,7 @@ module DaVinciPASTestKit
           @@resource_type = @resource_type = type # rubocop:disable Style/ClassVars
           perform_must_support_test(resources)
         end
-        validate_must_support
+        validate_must_support(false)
       end
     end
   end

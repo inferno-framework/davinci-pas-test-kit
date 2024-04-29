@@ -3,7 +3,7 @@ module DaVinciPASTestKit
     class ClaimInquiryOperationTest < Inferno::Test
 
       id :pas_v201_claim_inquiry_operation_test
-      title 'Claim/$inquire Operation Test'
+      title 'Submission of a claim to the $inquire operation succeeds'
       description %(
         Server SHALL support PAS Inquiry requests: a POST interaction to
         the /Claim/$inquire endpoint.

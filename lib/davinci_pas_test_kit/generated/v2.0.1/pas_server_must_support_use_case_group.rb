@@ -113,7 +113,7 @@ module DaVinciPASTestKit
         run_as_group
         
         group do
-          title 'PAS Submit Operation'
+          title 'Submission of claims to the $submit operation for must support validation'
           
           test from: :pas_server_v201_pas_request_bundle_validation_test do
             id :pas_server_v201_pas_request_bundle_validation_test_must_support
@@ -205,7 +205,7 @@ module DaVinciPASTestKit
         run_as_group
         
         group do
-          title 'PAS Inquiry Operation'
+          title 'Submission of claims to the $inquire operation for must support validation'
           
           test from: :pas_server_v201_pas_inquiry_request_bundle_validation_test do
             id :pas_server_v201_pas_inquiry_request_bundle_validation_test_must_support
