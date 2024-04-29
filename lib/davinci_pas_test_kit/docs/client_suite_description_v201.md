@@ -80,7 +80,7 @@ is made during the corresponding test.
 ### Postman-based Demo
 
 If you do not have a PAS client but would like to try the tests out, you can use
-[this postman collection](https://raw.githubusercontent.com/inferno-framework/davinci-pas-test-kit/blob/main/config/PAS%20Test%20Kit%20Client%20Test%20Demo.postman_collection.json)
+[this postman collection](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/config/PAS%20Test%20Kit%20Client%20Test%20Demo.postman_collection.json)
 to make requests against Inferno. The following requests and example responses from that collection can be used.
 
 - Configuration
