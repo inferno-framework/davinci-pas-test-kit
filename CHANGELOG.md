@@ -1,3 +1,7 @@
+# 0.9.2
+
+* Patch version bump
+
 # 0.9.1
 
 * Split out suite descriptions to files for linking from other contexts.
