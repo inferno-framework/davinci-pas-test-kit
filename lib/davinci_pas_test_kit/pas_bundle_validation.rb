@@ -369,6 +369,34 @@ module DaVinciPASTestKit
       end
     end
 
+    # Evaluates a FHIRPath expression against a FHIR resource using an external FHIRPath validator.
+    # @param resource [Object] The FHIR resource to be evaluated.
+    # @param expression [String] The FHIRPath expression to evaluate.
+    # @return [Array] An array of references extracted from the evaluation result, or an empty array in case of failure.
+    def evaluate_fhirpath_expression(resource, expression)
+      return [] unless expression && resource
+
+      logger = Logger.new($stdout)
+      begin
+        validator_url = 'http://localhost:6789' # 'https://inferno.healthit.gov/validatorapi/'
+        path = "#{validator_url}/evaluate?path=#{expression}"
+
+        response = Faraday.post(path, resource.to_json, 'Content-Type' => 'application/json')
+        if response.status.to_s.start_with? '2'
+          result = JSON.parse(response.body)
+          return result.map { |entry| entry.dig('element', 'reference') if entry['type'] == 'Reference' }.compact
+        else
+          logger.error "External evaluator failed: #{response.status}"
+          raise 'fhirpath service not available'
+        end
+      rescue Faraday::Error => e
+        logger.error "HTTP request failed: #{e.message}"
+        raise 'fhirpath service not available'
+      end
+
+      []
+    end
+
     # Finds a referenced instance in a FHIR bundle based on a reference and the full URL of the enclosing entry.
     # @param reference [String] The reference to find.
     # @param enclosing_entry_fullurl [String] The full URL of the enclosing entry.
