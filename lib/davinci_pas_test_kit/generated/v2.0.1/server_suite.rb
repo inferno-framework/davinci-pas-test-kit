@@ -5,6 +5,7 @@ require_relative 'pas_server_approval_use_case_group'
 require_relative 'pas_server_denial_use_case_group'
 require_relative 'pas_server_pended_use_case_group'
 require_relative 'pas_server_must_support_use_case_group'
+require_relative '../../ext/inferno_core/fhir_client_builder'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -53,9 +54,19 @@ module DaVinciPASTestKit
             type: :oauth_credentials,
             optional: true
 
+      input :basic_id,
+            title: 'Basic Authentication ID',
+            optional: true
+
+      input :basic_password,
+            title: 'Basic Authentication Password',
+            optional: true
+
       fhir_client do
         url :server_endpoint
         oauth_credentials :smart_credentials
+        basic_id :basic_id
+        basic_password :basic_password
       end
 
       # Used for attestation experiment - see pas_claim_response_decision_test.rb
@@ -66,14 +77,14 @@ module DaVinciPASTestKit
       # resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
       #   request.query_parameters['token']
       # end
-      
+
       group 'Demonstrate Workflow Support' do
         description %(
           The workflow tests validate that the server can participate in complete
           end-to-end prior authorization interactions, returning responses that are
           conformant and also contain the correct codes.
         )
-        
+
         group from: :pas_server_v201_approval_use_case
         group from: :pas_server_v201_denial_use_case
         group from: :pas_server_v201_pended_use_case
