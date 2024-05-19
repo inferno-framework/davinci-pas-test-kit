@@ -25,6 +25,7 @@ module DaVinciPASTestKit
       operation = request&.url&.split('$')&.last
       req_bundle = FHIR.from_contents(request&.request_body)
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
+      # TODO: Handle missing fullUrl gracefully. Cannot assume it's there
       root_url = base_url(claim_entry&.fullUrl)
       return unless ['submit', 'inquire'].include?(operation) && claim_entry.present?
 
