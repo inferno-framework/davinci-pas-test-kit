@@ -465,7 +465,7 @@ module DaVinciPASTestKit
       url_regex = /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/
       urn_uuid_regex = /\Aurn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/i
 
-      string.match?(url_regex) || string.match?(urn_uuid_regex)
+      string&.match?(url_regex) || string&.match?(urn_uuid_regex)
     end
 
     # This method traverses references within a FHIR resource, ensuring that referenced resources

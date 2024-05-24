@@ -25,9 +25,13 @@ module DaVinciPASTestKit
       operation = request&.url&.split('$')&.last
       req_bundle = FHIR.from_contents(request&.request_body)
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
-      root_url = base_url(claim_entry&.fullUrl)
-      return unless ['submit', 'inquire'].include?(operation) && claim_entry.present?
+      claim_full_url = claim_entry&.fullUrl
+      if claim_entry.blank? || claim_full_url.blank?
+        handle_missing_required_elements(claim_entry, request)
+        return
+      end
 
+      root_url = base_url(claim_full_url)
       claim_response = mock_claim_response(claim_entry.resource, req_bundle, operation, root_url)
 
       res_bundle = FHIR::Bundle.new(
@@ -137,11 +141,25 @@ module DaVinciPASTestKit
       request.query_parameters['token']
     end
 
+    def handle_missing_required_elements(claim_entry, request)
+      request.status = 400
+      request.response_headers = { 'Content-Type': 'application/json' }
+      details = if claim_entry.blank?
+                  'Required Claim entry missing from bundle'
+                else
+                  'Required element fullUrl missing from Claim entry'
+                end
+      request.response_body = FHIR::OperationOutcome.new(
+        issue: FHIR::OperationOutcome::Issue.new(severity: 'fatal', code: 'required',
+                                                 details: FHIR::CodeableConcept.new(text: details))
+      ).to_json
+    end
+
     # Drop the last two segments of a URL, i.e. the resource type and ID of a FHIR resource
     # e.g. http://example.org/fhir/Patient/123 -> http://example.org/fhir
     # @private
     def base_url(url)
-      return unless url.start_with?('http://', 'https://')
+      return unless url&.start_with?('http://', 'https://')
 
       # Drop everything after the second to last '/', ignoring a trailing slash
       url.sub(%r{/[^/]*/[^/]*(/)?\z}, '')
