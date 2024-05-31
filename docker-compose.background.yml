@@ -15,7 +15,7 @@ services:
   #   image: infernocommunity/fhir-validator-service
   #   # Update this path to match your directory structure
   #   volumes:
-  #     - ./lib/davinci_us_drug_formulary_test_kit/igs:/home/igs
+  #     - ./lib/davinci_pas_test_kit/igs:/home/igs
   # fhir_validator_app:
   #   image: infernocommunity/fhir-validator-app
   #   depends_on:
