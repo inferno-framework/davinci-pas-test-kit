@@ -48,6 +48,11 @@ module DaVinciPASTestKit
         "Da Vinci PAS Server Suite #{ig_metadata.ig_version}"
       end
 
+      def ig_identifier
+        version = ig_metadata.ig_version[1..] # Remove leading 'v'
+        "hl7.fhir.us.davinci-pas##{version}"
+      end
+
       def ig_link
         case ig_metadata.ig_version
         when 'v2.0.1'

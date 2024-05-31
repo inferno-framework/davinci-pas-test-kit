@@ -370,18 +370,20 @@ module DaVinciPASTestKit
 
       logger = Logger.new($stdout)
       begin
-        validator_url = ENV.fetch('VALIDATOR_URL') # 'https://inferno.healthit.gov/validatorapi/'
-        path = "#{validator_url}/evaluate?path=#{expression}"
+        fhirpath_url = ENV.fetch('FHIRPATH_URL')
+        path = "#{fhirpath_url}/evaluate?path=#{expression}"
 
         response = Faraday.post(path, resource.to_json, 'Content-Type' => 'application/json')
         if response.status.to_s.start_with? '2'
           result = JSON.parse(response.body)
           return result.map { |entry| entry.dig('element', 'reference') if entry['type'] == 'Reference' }.compact
         else
-          logger.error "External validator failed: #{response.status}"
+          logger.error "External FHIRPath service failed: #{response.status}"
+          raise 'FHIRPath service not available'
         end
       rescue Faraday::Error => e
         logger.error "HTTP request failed: #{e.message}"
+        raise 'FHIRPath service not available'
       end
 
       []
