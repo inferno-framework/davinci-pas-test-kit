@@ -213,8 +213,8 @@ module DaVinciPASTestKit
         resource = item[:resource]
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
         success_profile = item[:profile_urls].find do |url|
-          profile_to_validate = (url == base_profile) ? url : "#{url}|#{version}"
-          resource_is_valid?(resource: resource, profile_url: profile_to_validate)
+          profile_to_validate = url == base_profile ? url : "#{url}|#{version}"
+          resource_is_valid?(resource:, profile_url: profile_to_validate)
         end
 
         validation_error_messages << generate_non_conformance_message(item) unless success_profile
