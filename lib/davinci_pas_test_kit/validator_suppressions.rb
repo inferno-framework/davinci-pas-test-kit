@@ -134,7 +134,7 @@ module DaVinciPASTestKit
       /Details for (.+) matching against profile/,
       ': All OK',
       # This was ignored natively in the Inferno validator but needs to be ignored by the test kit with the HL7 validator
-      "URL value '.*' does not resolve",
+      /URL value '.*' does not resolve/,
       # addition validator clean-up based on Bundle sub-validations where Inferno error supression doesn't
       # work. The test kit validates these instances individually as well, so they are still checked,
       # but in a way that Inferno can supress errors
