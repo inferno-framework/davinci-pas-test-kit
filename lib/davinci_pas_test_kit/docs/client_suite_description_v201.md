@@ -77,6 +77,11 @@ json-encoded FHIR bundle in the "Claim pended response JSON" and "Claim deny res
 clicking the '*Run All Tests*' button. These responses will be echoed back when a request
 is made during the corresponding test.
 
+Selecting the *Example PAS Server Responses* Preset in the dropdown in the upper left will fill in example
+FHIR bundles for the pended and deny responses. It will also fill in a sample value for the Client ID,
+which is only necessary for the *Demonstrate Authorization* test group, which can be skipped in favor of
+manual bearer token input in subsequent tests as described above.
+
 ### Postman-based Demo
 
 If you do not have a PAS client but would like to try the tests out, you can use
