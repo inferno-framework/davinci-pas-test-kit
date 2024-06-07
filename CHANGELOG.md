@@ -1,3 +1,9 @@
+# 0.9.3
+
+* More gracefully handle missing claim and missing fullUrl by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/3
+* Dependency Updates 2024-06-05 by @Jammjammjamm in https://github.com/inferno-framework/davinci-pas-test-kit/pull/5
+* Add client preset by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/6
+
 # 0.9.2
 
 * Patch version bump
