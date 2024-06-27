@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.9.3)
-      inferno_core (~> 0.4.34)
+      inferno_core (~> 0.4.37)
 
 GEM
   remote: https://rubygems.org/
