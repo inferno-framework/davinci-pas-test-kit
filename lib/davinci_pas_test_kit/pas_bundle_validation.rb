@@ -210,9 +210,11 @@ module DaVinciPASTestKit
     # @param version [String] The version of the IG.
     def validate_bundle_entries_against_profiles(version)
       bundle_resources_target_profile_map.each_value do |item|
+        resource = item[:resource]
+        base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
         success_profile = item[:profile_urls].find do |url|
-          profile_with_version = "#{url}|#{version}"
-          resource_is_valid?(resource: item[:resource], profile_url: profile_with_version)
+          profile_to_validate = url == base_profile ? url : "#{url}|#{version}"
+          resource_is_valid?(resource:, profile_url: profile_to_validate)
         end
 
         validation_error_messages << generate_non_conformance_message(item) unless success_profile
@@ -370,18 +372,20 @@ module DaVinciPASTestKit
 
       logger = Logger.new($stdout)
       begin
-        validator_url = ENV.fetch('VALIDATOR_URL') # 'https://inferno.healthit.gov/validatorapi/'
-        path = "#{validator_url}/evaluate?path=#{expression}"
+        fhirpath_url = ENV.fetch('FHIRPATH_URL')
+        path = "#{fhirpath_url}/evaluate?path=#{expression}"
 
         response = Faraday.post(path, resource.to_json, 'Content-Type' => 'application/json')
         if response.status.to_s.start_with? '2'
           result = JSON.parse(response.body)
           return result.map { |entry| entry.dig('element', 'reference') if entry['type'] == 'Reference' }.compact
         else
-          logger.error "External validator failed: #{response.status}"
+          logger.error "External FHIRPath service failed: #{response.status}"
+          raise 'FHIRPath service not available'
         end
       rescue Faraday::Error => e
         logger.error "HTTP request failed: #{e.message}"
+        raise 'FHIRPath service not available'
       end
 
       []

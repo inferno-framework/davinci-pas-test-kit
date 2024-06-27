@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.9.3)
-      inferno_core (~> 0.4.34)
+      inferno_core (~> 0.4.37)
 
 GEM
   remote: https://rubygems.org/
@@ -134,7 +134,7 @@ GEM
       domain_name (~> 0.5)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
-    inferno_core (0.4.38)
+    inferno_core (0.4.39)
       activesupport (~> 6.1.7.5)
       base62-rb (= 0.3.1)
       blueprinter (= 0.25.2)
@@ -165,7 +165,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.7.2)
-    jwt (2.8.1)
+    jwt (2.8.2)
       base64
     kramdown (2.4.0)
       rexml
@@ -187,14 +187,14 @@ GEM
       mustermann (= 1.1.2)
     netrc (0.11.0)
     nio4r (2.7.3)
-    nokogiri (1.16.5)
+    nokogiri (1.16.6)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.5-arm64-darwin)
+    nokogiri (1.16.6-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-darwin)
+    nokogiri (1.16.6-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-linux)
+    nokogiri (1.16.6-x86_64-linux)
       racc (~> 1.4)
     oauth2 (1.4.11)
       faraday (>= 0.17.3, < 3.0)
@@ -238,7 +238,7 @@ GEM
       netrc (~> 0.8)
     rexml (3.2.8)
       strscan (>= 3.0.9)
-    rouge (4.2.1)
+    rouge (4.3.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)

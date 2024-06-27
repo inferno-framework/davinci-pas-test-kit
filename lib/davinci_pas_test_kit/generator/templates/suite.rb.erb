@@ -30,8 +30,8 @@ module DaVinciPASTestKit
         request.query_parameters['use_case']
       end
 
-      validator do
-        url ENV.fetch('VALIDATOR_URL')
+      fhir_resource_validator do
+        igs '<%= ig_identifier %>'
 
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
