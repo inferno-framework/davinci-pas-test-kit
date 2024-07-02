@@ -95,10 +95,6 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation do
       Class.new(Inferno::Test) do
         include DaVinciPASTestKit::PasBundleValidation
 
-        validator do
-          url ENV.fetch('VALIDATOR_URL')
-        end
-
         fhir_client { url :server_endpoint }
         input :server_endpoint, :response_body, :request_bundle
 

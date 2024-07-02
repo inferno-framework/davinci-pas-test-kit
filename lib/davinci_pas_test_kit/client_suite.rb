@@ -41,8 +41,8 @@ module DaVinciPASTestKit
       !test.config.options[:accepts_multiple_requests]
     end
 
-    validator do
-      url ENV.fetch('VALIDATOR_URL')
+    fhir_resource_validator do
+      igs 'hl7.fhir.us.davinci-pas#2.0.1'
 
       exclude_message do |message|
         # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
