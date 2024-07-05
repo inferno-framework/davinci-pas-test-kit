@@ -1,3 +1,7 @@
+# 0.10.0
+
+* FI-2701: Migrate to HL7 validator wrapper by @dehall in https://github.com/inferno-framework/davinci-pas-test-kit/pull/4
+
 # 0.9.3
 
 * More gracefully handle missing claim and missing fullUrl by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/3
