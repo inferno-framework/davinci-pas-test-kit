@@ -101,10 +101,10 @@
   :file_name: server_submit_request_coverage_must_support_test.rb
 - :id: pas_client_submit_request_v201_coverage_must_support_test
   :file_name: client_submit_request_coverage_must_support_test.rb
-- :id: pas_server_inquiry_request_v201_coverage_must_support_test
-  :file_name: server_inquiry_request_coverage_must_support_test.rb
-- :id: pas_client_inquiry_request_v201_coverage_must_support_test
-  :file_name: client_inquiry_request_coverage_must_support_test.rb
+- :id: pas_server_inquire_request_v201_coverage_must_support_test
+  :file_name: server_inquire_request_coverage_must_support_test.rb
+- :id: pas_client_inquire_request_v201_coverage_must_support_test
+  :file_name: client_inquire_request_coverage_must_support_test.rb
 :delayed_references:
 - :path: payor
   :resources:

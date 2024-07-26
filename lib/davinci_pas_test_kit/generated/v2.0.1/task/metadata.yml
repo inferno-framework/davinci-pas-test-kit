@@ -187,6 +187,6 @@
 :tests:
 - :id: pas_server_submit_response_v201_task_must_support_test
   :file_name: server_submit_response_task_must_support_test.rb
-- :id: pas_server_inquiry_response_v201_task_must_support_test
-  :file_name: server_inquiry_response_task_must_support_test.rb
+- :id: pas_server_inquire_response_v201_task_must_support_test
+  :file_name: server_inquire_response_task_must_support_test.rb
 :delayed_references: []

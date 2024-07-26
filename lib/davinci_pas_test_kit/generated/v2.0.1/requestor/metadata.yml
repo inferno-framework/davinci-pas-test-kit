@@ -98,10 +98,10 @@
   :file_name: client_submit_request_requestor_must_support_test.rb
 - :id: pas_server_submit_response_v201_requestor_must_support_test
   :file_name: server_submit_response_requestor_must_support_test.rb
-- :id: pas_server_inquiry_request_v201_requestor_must_support_test
-  :file_name: server_inquiry_request_requestor_must_support_test.rb
-- :id: pas_client_inquiry_request_v201_requestor_must_support_test
-  :file_name: client_inquiry_request_requestor_must_support_test.rb
-- :id: pas_server_inquiry_response_v201_requestor_must_support_test
-  :file_name: server_inquiry_response_requestor_must_support_test.rb
+- :id: pas_server_inquire_request_v201_requestor_must_support_test
+  :file_name: server_inquire_request_requestor_must_support_test.rb
+- :id: pas_client_inquire_request_v201_requestor_must_support_test
+  :file_name: client_inquire_request_requestor_must_support_test.rb
+- :id: pas_server_inquire_response_v201_requestor_must_support_test
+  :file_name: server_inquire_response_requestor_must_support_test.rb
 :delayed_references: []

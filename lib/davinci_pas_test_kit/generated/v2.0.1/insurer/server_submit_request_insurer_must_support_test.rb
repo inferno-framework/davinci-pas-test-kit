@@ -11,12 +11,12 @@ module DaVinciPASTestKit
       description %(
         
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
-        
+
         PAS server systems are required to be able to receive all
         must support elements on instances of all profiles included in 
         requests, including instances of the PAS Insurer Organization Profile.
         This test checks all identified instances of the PAS Insurer Organization
-        Profile on requests sent to the server to ensure that the following 
+        Profile on requests sent to the server to ensure that the following
         must support elements are observed:
 
         * Organization.active
@@ -49,6 +49,7 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
         scratch[:submit_request_resources] ||= {}
       end
 

@@ -62,6 +62,6 @@
 :tests:
 - :id: pas_server_v201_pas_inquiry_response_bundle_validation_test
   :file_name: server_pas_inquiry_response_bundle_validation_test.rb
-- :id: pas_server_inquiry_response_v201_pas_inquiry_response_bundle_must_support_test
-  :file_name: server_inquiry_response_pas_inquiry_response_bundle_must_support_test.rb
+- :id: pas_server_inquire_response_v201_pas_inquiry_response_bundle_must_support_test
+  :file_name: server_inquire_response_pas_inquiry_response_bundle_must_support_test.rb
 :delayed_references: []

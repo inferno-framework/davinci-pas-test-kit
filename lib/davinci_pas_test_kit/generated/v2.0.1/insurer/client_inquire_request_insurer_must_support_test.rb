@@ -4,18 +4,18 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerInquiryResponseRequestorMustSupportTest < Inferno::Test
+    class ClientInquireRequestInsurerMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
-      title 'All must support elements for Profile PAS Requestor Organization are observed across all instances returned'
+      title 'All must support elements for Profile PAS Insurer Organization are observed across all instances submitted'
       description %(
         
-        PAS server systems are required to be able to populate all
+        PAS client systems are required to be able to populate all
         must support elements on instances of all profiles included in 
-        responses, including instances of the PAS Requestor Organization Profile.
-        This test checks all identified instances of the PAS Requestor Organization
-        Profile on responses returned by the server to ensure that the following 
-        must support elements are observed:
+        requests, including instances of the PAS Insurer Organization Profile.
+        This test checks all identified instances of the PAS Insurer Organization
+        Profile on requests sent by the client to ensure that the following
+        must support elements are observed: 
 
         * Organization.active
         * Organization.address
@@ -24,9 +24,6 @@ module DaVinciPASTestKit
         * Organization.address.line
         * Organization.address.postalCode
         * Organization.address.state
-        * Organization.contact
-        * Organization.contact.name
-        * Organization.contact.telecom
         * Organization.identifier
         * Organization.identifier:NPI
         * Organization.identifier:TIN
@@ -35,7 +32,7 @@ module DaVinciPASTestKit
         * Organization.type
       )
 
-      id :pas_server_inquiry_response_v201_requestor_must_support_test
+      id :pas_client_inquire_request_v201_insurer_must_support_test
 
       def resource_type
         'Organization'
@@ -50,7 +47,8 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
-        scratch[:inquiry_response_resources] ||= {}
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+        scratch[:inquire_request_resources] ||= {}
       end
 
       def resources_of_interest

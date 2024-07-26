@@ -27,10 +27,10 @@ module DaVinciPASTestKit
           submit_response_groups.each { |group| new(group, base_output_dir, 'submit_response').generate }
 
           inquiry_request_groups.each do |group|
-            new(group, base_output_dir, 'inquiry_request').generate
-            new(group, base_output_dir, 'inquiry_request', 'client').generate
+            new(group, base_output_dir, 'inquire_request').generate
+            new(group, base_output_dir, 'inquire_request', 'client').generate
           end
-          inquiry_response_groups.each { |group| new(group, base_output_dir, 'inquiry_response').generate }
+          inquiry_response_groups.each { |group| new(group, base_output_dir, 'inquire_response').generate }
         end
       end
 
