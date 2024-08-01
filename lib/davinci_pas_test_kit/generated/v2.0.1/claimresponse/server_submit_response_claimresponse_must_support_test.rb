@@ -14,7 +14,7 @@ module DaVinciPASTestKit
         must support elements on instances of all profiles included in 
         responses, including instances of the PAS Claim Response Profile.
         This test checks all identified instances of the PAS Claim Response
-        Profile on responses returned by the server to ensure that the following 
+        Profile on responses returned by the server to ensure that the following
         must support elements are observed:
 
         * ClaimResponse.communicationRequest
@@ -62,6 +62,7 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
         scratch[:submit_response_resources] ||= {}
       end
 

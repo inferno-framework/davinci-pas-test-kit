@@ -299,8 +299,8 @@
   :profiles:
   - http://hl7.org/fhir/StructureDefinition/ClaimResponse
 :tests:
-- :id: pas_server_inquiry_response_v201_claiminquiryresponse_must_support_test
-  :file_name: server_inquiry_response_claiminquiryresponse_must_support_test.rb
+- :id: pas_server_inquire_response_v201_claiminquiryresponse_must_support_test
+  :file_name: server_inquire_response_claiminquiryresponse_must_support_test.rb
 :delayed_references:
 - :path: insurer
   :resources:

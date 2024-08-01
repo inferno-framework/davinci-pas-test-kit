@@ -4,33 +4,35 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerInquiryRequestPasInquiryRequestBundleMustSupportTest < Inferno::Test
+    class ServerInquireRequestCoverageMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
-      title 'All must support elements for Profile PAS Inquiry Request Bundle are observed across all instances submitted'
+      title 'All must support elements for Profile PAS Coverage are observed across all instances submitted'
       description %(
         
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
-        
+
         PAS server systems are required to be able to receive all
         must support elements on instances of all profiles included in 
-        requests, including instances of the PAS Inquiry Request Bundle Profile.
-        This test checks all identified instances of the PAS Inquiry Request Bundle
-        Profile on requests sent to the server to ensure that the following 
+        requests, including instances of the PAS Coverage Profile.
+        This test checks all identified instances of the PAS Coverage
+        Profile on requests sent to the server to ensure that the following
         must support elements are observed:
 
-        * Bundle.entry
-        * Bundle.entry.fullUrl
-        * Bundle.entry.resource
-        * Bundle.entry:Claim
-        * Bundle.identifier
-        * Bundle.timestamp
+        * Coverage.beneficiary
+        * Coverage.identifier
+        * Coverage.payor
+        * Coverage.relationship
+        * Coverage.relationship.coding:X12Code
+        * Coverage.status
+        * Coverage.subscriber
+        * Coverage.subscriberId
       )
 
-      id :pas_server_inquiry_request_v201_pas_inquiry_request_bundle_must_support_test
+      id :pas_server_inquire_request_v201_coverage_must_support_test
 
       def resource_type
-        'Bundle'
+        'Coverage'
       end
 
       def user_input_validation
@@ -42,6 +44,7 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
         scratch[:inquire_request_resources] ||= {}
       end
 

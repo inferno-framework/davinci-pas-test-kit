@@ -4,29 +4,43 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerInquiryRequestPractitionerRoleMustSupportTest < Inferno::Test
+    class ServerInquireRequestRequestorMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
-      title 'All must support elements for Profile PAS PractitionerRole are observed across all instances submitted'
+      title 'All must support elements for Profile PAS Requestor Organization are observed across all instances submitted'
       description %(
         
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
-        
+
         PAS server systems are required to be able to receive all
         must support elements on instances of all profiles included in 
-        requests, including instances of the PAS PractitionerRole Profile.
-        This test checks all identified instances of the PAS PractitionerRole
-        Profile on requests sent to the server to ensure that the following 
+        requests, including instances of the PAS Requestor Organization Profile.
+        This test checks all identified instances of the PAS Requestor Organization
+        Profile on requests sent to the server to ensure that the following
         must support elements are observed:
 
-        * PractitionerRole.organization
-        * PractitionerRole.practitioner
+        * Organization.active
+        * Organization.address
+        * Organization.address.city
+        * Organization.address.country
+        * Organization.address.line
+        * Organization.address.postalCode
+        * Organization.address.state
+        * Organization.contact
+        * Organization.contact.name
+        * Organization.contact.telecom
+        * Organization.identifier
+        * Organization.identifier:NPI
+        * Organization.identifier:TIN
+        * Organization.name
+        * Organization.telecom
+        * Organization.type
       )
 
-      id :pas_server_inquiry_request_v201_practitioner_role_must_support_test
+      id :pas_server_inquire_request_v201_requestor_must_support_test
 
       def resource_type
-        'PractitionerRole'
+        'Organization'
       end
 
       def user_input_validation
@@ -38,6 +52,7 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
         scratch[:inquire_request_resources] ||= {}
       end
 

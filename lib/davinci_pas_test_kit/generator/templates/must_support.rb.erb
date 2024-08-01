@@ -14,27 +14,27 @@ module DaVinciPASTestKit
         must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
         requests, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
-        Profile on requests sent by the client to ensure that the following 
+        Profile on requests sent by the client to ensure that the following
         must support elements are observed: <% end %><% if system == 'client' && request_type.include?('response') %>
         PAS client systems are required to be able to receive all
         must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
         responses, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
-        Profile on responses sent to the client to ensure that the following 
+        Profile on responses sent to the client to ensure that the following
         must support elements are observed:<% end %><% if system == 'server' && request_type.include?('request') %>
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
-        
+
         PAS server systems are required to be able to receive all
         must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
         requests, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
-        Profile on requests sent to the server to ensure that the following 
+        Profile on requests sent to the server to ensure that the following
         must support elements are observed:<% end %><% if system == 'server' && request_type.include?('response') %>
         PAS server systems are required to be able to populate all
         must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
         responses, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
-        Profile on responses returned by the server to ensure that the following 
+        Profile on responses returned by the server to ensure that the following
         must support elements are observed:<% end %>
 
 <%= must_support_list_string %>
@@ -55,7 +55,8 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
-        scratch[:<%= request_type == 'inquiry_request' && system == 'server' ? 'inquire_request' : request_type %>_resources] ||= {}
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+        scratch[:<%= request_type %>_resources] ||= {}
       end
 
       def resources_of_interest

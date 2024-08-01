@@ -4,30 +4,31 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerInquiryResponsePasInquiryResponseBundleMustSupportTest < Inferno::Test
+    class ServerInquireResponsePractitionerMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
-      title 'All must support elements for Profile PAS Inquiry Response Bundle are observed across all instances returned'
+      title 'All must support elements for Profile PAS Practitioner are observed across all instances returned'
       description %(
         
         PAS server systems are required to be able to populate all
         must support elements on instances of all profiles included in 
-        responses, including instances of the PAS Inquiry Response Bundle Profile.
-        This test checks all identified instances of the PAS Inquiry Response Bundle
-        Profile on responses returned by the server to ensure that the following 
+        responses, including instances of the PAS Practitioner Profile.
+        This test checks all identified instances of the PAS Practitioner
+        Profile on responses returned by the server to ensure that the following
         must support elements are observed:
 
-        * Bundle.entry
-        * Bundle.entry.fullUrl
-        * Bundle.entry.resource
-        * Bundle.entry:ClaimResponse
-        * Bundle.timestamp
+        * Practitioner.address
+        * Practitioner.identifier
+        * Practitioner.identifier:NPI
+        * Practitioner.name
+        * Practitioner.name.family
+        * Practitioner.telecom
       )
 
-      id :pas_server_inquiry_response_v201_pas_inquiry_response_bundle_must_support_test
+      id :pas_server_inquire_response_v201_practitioner_must_support_test
 
       def resource_type
-        'Bundle'
+        'Practitioner'
       end
 
       def user_input_validation
@@ -39,7 +40,8 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
-        scratch[:inquiry_response_resources] ||= {}
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+        scratch[:inquire_response_resources] ||= {}
       end
 
       def resources_of_interest

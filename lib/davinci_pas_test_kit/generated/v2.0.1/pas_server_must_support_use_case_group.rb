@@ -23,23 +23,23 @@ require_relative 'beneficiary/server_submit_response_beneficiary_must_support_te
 require_relative 'practitioner/server_submit_response_practitioner_must_support_test'
 require_relative 'practitioner_role/server_submit_response_practitioner_role_must_support_test'
 require_relative 'task/server_submit_response_task_must_support_test'
-require_relative 'pas_inquiry_request_bundle/server_inquiry_request_pas_inquiry_request_bundle_must_support_test'
-require_relative 'claim_inquiry/server_inquiry_request_claim_inquiry_must_support_test'
-require_relative 'coverage/server_inquiry_request_coverage_must_support_test'
-require_relative 'insurer/server_inquiry_request_insurer_must_support_test'
-require_relative 'requestor/server_inquiry_request_requestor_must_support_test'
-require_relative 'beneficiary/server_inquiry_request_beneficiary_must_support_test'
-require_relative 'subscriber/server_inquiry_request_subscriber_must_support_test'
-require_relative 'practitioner/server_inquiry_request_practitioner_must_support_test'
-require_relative 'practitioner_role/server_inquiry_request_practitioner_role_must_support_test'
-require_relative 'pas_inquiry_response_bundle/server_inquiry_response_pas_inquiry_response_bundle_must_support_test'
-require_relative 'claiminquiryresponse/server_inquiry_response_claiminquiryresponse_must_support_test'
-require_relative 'insurer/server_inquiry_response_insurer_must_support_test'
-require_relative 'requestor/server_inquiry_response_requestor_must_support_test'
-require_relative 'beneficiary/server_inquiry_response_beneficiary_must_support_test'
-require_relative 'practitioner/server_inquiry_response_practitioner_must_support_test'
-require_relative 'practitioner_role/server_inquiry_response_practitioner_role_must_support_test'
-require_relative 'task/server_inquiry_response_task_must_support_test'
+require_relative 'pas_inquiry_request_bundle/server_inquire_request_pas_inquiry_request_bundle_must_support_test'
+require_relative 'claim_inquiry/server_inquire_request_claim_inquiry_must_support_test'
+require_relative 'coverage/server_inquire_request_coverage_must_support_test'
+require_relative 'insurer/server_inquire_request_insurer_must_support_test'
+require_relative 'requestor/server_inquire_request_requestor_must_support_test'
+require_relative 'beneficiary/server_inquire_request_beneficiary_must_support_test'
+require_relative 'subscriber/server_inquire_request_subscriber_must_support_test'
+require_relative 'practitioner/server_inquire_request_practitioner_must_support_test'
+require_relative 'practitioner_role/server_inquire_request_practitioner_role_must_support_test'
+require_relative 'pas_inquiry_response_bundle/server_inquire_response_pas_inquiry_response_bundle_must_support_test'
+require_relative 'claiminquiryresponse/server_inquire_response_claiminquiryresponse_must_support_test'
+require_relative 'insurer/server_inquire_response_insurer_must_support_test'
+require_relative 'requestor/server_inquire_response_requestor_must_support_test'
+require_relative 'beneficiary/server_inquire_response_beneficiary_must_support_test'
+require_relative 'practitioner/server_inquire_response_practitioner_must_support_test'
+require_relative 'practitioner_role/server_inquire_response_practitioner_role_must_support_test'
+require_relative 'task/server_inquire_response_task_must_support_test'
 require_relative '../../custom_groups/v2.0.1/must_support/pas_server_must_support_requirement_test'
 
 module DaVinciPASTestKit
@@ -236,27 +236,27 @@ module DaVinciPASTestKit
         group do
           title '[USER INPUT VALIDATION] Inquiry Request Must Support'
           
-          test from: :pas_server_inquiry_request_v201_pas_inquiry_request_bundle_must_support_test
-          test from: :pas_server_inquiry_request_v201_claim_inquiry_must_support_test
-          test from: :pas_server_inquiry_request_v201_coverage_must_support_test
-          test from: :pas_server_inquiry_request_v201_insurer_must_support_test
-          test from: :pas_server_inquiry_request_v201_requestor_must_support_test
-          test from: :pas_server_inquiry_request_v201_beneficiary_must_support_test
-          test from: :pas_server_inquiry_request_v201_subscriber_must_support_test
-          test from: :pas_server_inquiry_request_v201_practitioner_must_support_test
-          test from: :pas_server_inquiry_request_v201_practitioner_role_must_support_test
+          test from: :pas_server_inquire_request_v201_pas_inquiry_request_bundle_must_support_test
+          test from: :pas_server_inquire_request_v201_claim_inquiry_must_support_test
+          test from: :pas_server_inquire_request_v201_coverage_must_support_test
+          test from: :pas_server_inquire_request_v201_insurer_must_support_test
+          test from: :pas_server_inquire_request_v201_requestor_must_support_test
+          test from: :pas_server_inquire_request_v201_beneficiary_must_support_test
+          test from: :pas_server_inquire_request_v201_subscriber_must_support_test
+          test from: :pas_server_inquire_request_v201_practitioner_must_support_test
+          test from: :pas_server_inquire_request_v201_practitioner_role_must_support_test
         end
         group do
           title 'Inquiry Response Must Support'
           
-          test from: :pas_server_inquiry_response_v201_pas_inquiry_response_bundle_must_support_test
-          test from: :pas_server_inquiry_response_v201_claiminquiryresponse_must_support_test
-          test from: :pas_server_inquiry_response_v201_insurer_must_support_test
-          test from: :pas_server_inquiry_response_v201_requestor_must_support_test
-          test from: :pas_server_inquiry_response_v201_beneficiary_must_support_test
-          test from: :pas_server_inquiry_response_v201_practitioner_must_support_test
-          test from: :pas_server_inquiry_response_v201_practitioner_role_must_support_test
-          test from: :pas_server_inquiry_response_v201_task_must_support_test
+          test from: :pas_server_inquire_response_v201_pas_inquiry_response_bundle_must_support_test
+          test from: :pas_server_inquire_response_v201_claiminquiryresponse_must_support_test
+          test from: :pas_server_inquire_response_v201_insurer_must_support_test
+          test from: :pas_server_inquire_response_v201_requestor_must_support_test
+          test from: :pas_server_inquire_response_v201_beneficiary_must_support_test
+          test from: :pas_server_inquire_response_v201_practitioner_must_support_test
+          test from: :pas_server_inquire_response_v201_practitioner_role_must_support_test
+          test from: :pas_server_inquire_response_v201_task_must_support_test
         end
       end
   

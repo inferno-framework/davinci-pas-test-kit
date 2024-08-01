@@ -4,17 +4,19 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerInquiryResponsePractitionerMustSupportTest < Inferno::Test
+    class ServerInquireRequestPractitionerMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
-      title 'All must support elements for Profile PAS Practitioner are observed across all instances returned'
+      title 'All must support elements for Profile PAS Practitioner are observed across all instances submitted'
       description %(
         
-        PAS server systems are required to be able to populate all
+        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
+
+        PAS server systems are required to be able to receive all
         must support elements on instances of all profiles included in 
-        responses, including instances of the PAS Practitioner Profile.
+        requests, including instances of the PAS Practitioner Profile.
         This test checks all identified instances of the PAS Practitioner
-        Profile on responses returned by the server to ensure that the following 
+        Profile on requests sent to the server to ensure that the following
         must support elements are observed:
 
         * Practitioner.address
@@ -25,14 +27,14 @@ module DaVinciPASTestKit
         * Practitioner.telecom
       )
 
-      id :pas_server_inquiry_response_v201_practitioner_must_support_test
+      id :pas_server_inquire_request_v201_practitioner_must_support_test
 
       def resource_type
         'Practitioner'
       end
 
       def user_input_validation
-        false
+        true
       end
 
       def self.metadata
@@ -40,7 +42,8 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
-        scratch[:inquiry_response_resources] ||= {}
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+        scratch[:inquire_request_resources] ||= {}
       end
 
       def resources_of_interest

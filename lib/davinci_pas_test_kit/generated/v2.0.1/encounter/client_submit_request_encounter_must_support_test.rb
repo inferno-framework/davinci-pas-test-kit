@@ -14,7 +14,7 @@ module DaVinciPASTestKit
         must support elements on instances of all profiles included in 
         requests, including instances of the PAS Encounter Profile.
         This test checks all identified instances of the PAS Encounter
-        Profile on requests sent by the client to ensure that the following 
+        Profile on requests sent by the client to ensure that the following
         must support elements are observed: 
 
         * Encounter.class
@@ -54,6 +54,7 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
         scratch[:submit_request_resources] ||= {}
       end
 

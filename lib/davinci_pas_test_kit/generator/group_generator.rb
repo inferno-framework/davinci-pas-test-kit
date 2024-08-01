@@ -147,12 +147,12 @@ module DaVinciPASTestKit
       end
 
       def inquiry_request_must_support_test_ids
-        @inquiry_request_must_support_test_ids ||= select_test_ids(['inquiry_request', 'must_support_test'], ['client'])
+        @inquiry_request_must_support_test_ids ||= select_test_ids(['inquire_request', 'must_support_test'], ['client'])
       end
 
       def client_inquiry_request_must_support_test_ids
         @client_inquiry_request_must_support_test_ids ||= select_test_ids(
-          ['inquiry_request', 'must_support_test'],
+          ['inquire_request', 'must_support_test'],
           ['server']
         ).unshift(pas_client_must_support_test_id)
       end
@@ -162,7 +162,7 @@ module DaVinciPASTestKit
       end
 
       def inquiry_response_must_support_test_ids
-        @inquiry_response_must_support_test_ids ||= select_test_ids(['inquiry_response', 'must_support_test'])
+        @inquiry_response_must_support_test_ids ||= select_test_ids(['inquire_response', 'must_support_test'])
       end
 
       def submit_operation_test_ids

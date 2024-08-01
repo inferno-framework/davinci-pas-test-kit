@@ -1,12 +1,12 @@
-require_relative 'pas_inquiry_request_bundle/client_inquiry_request_pas_inquiry_request_bundle_must_support_test'
-require_relative 'claim_inquiry/client_inquiry_request_claim_inquiry_must_support_test'
-require_relative 'coverage/client_inquiry_request_coverage_must_support_test'
-require_relative 'insurer/client_inquiry_request_insurer_must_support_test'
-require_relative 'requestor/client_inquiry_request_requestor_must_support_test'
-require_relative 'beneficiary/client_inquiry_request_beneficiary_must_support_test'
-require_relative 'subscriber/client_inquiry_request_subscriber_must_support_test'
-require_relative 'practitioner/client_inquiry_request_practitioner_must_support_test'
-require_relative 'practitioner_role/client_inquiry_request_practitioner_role_must_support_test'
+require_relative 'pas_inquiry_request_bundle/client_inquire_request_pas_inquiry_request_bundle_must_support_test'
+require_relative 'claim_inquiry/client_inquire_request_claim_inquiry_must_support_test'
+require_relative 'coverage/client_inquire_request_coverage_must_support_test'
+require_relative 'insurer/client_inquire_request_insurer_must_support_test'
+require_relative 'requestor/client_inquire_request_requestor_must_support_test'
+require_relative 'beneficiary/client_inquire_request_beneficiary_must_support_test'
+require_relative 'subscriber/client_inquire_request_subscriber_must_support_test'
+require_relative 'practitioner/client_inquire_request_practitioner_must_support_test'
+require_relative 'practitioner_role/client_inquire_request_practitioner_role_must_support_test'
 require_relative '../../custom_groups/v2.0.1/client_tests/pas_client_inquire_must_support_test'
 
 module DaVinciPASTestKit
@@ -36,15 +36,15 @@ module DaVinciPASTestKit
   
     
       test from: :pas_client_inquire_v201_must_support_test
-      test from: :pas_client_inquiry_request_v201_pas_inquiry_request_bundle_must_support_test
-      test from: :pas_client_inquiry_request_v201_claim_inquiry_must_support_test
-      test from: :pas_client_inquiry_request_v201_coverage_must_support_test
-      test from: :pas_client_inquiry_request_v201_insurer_must_support_test
-      test from: :pas_client_inquiry_request_v201_requestor_must_support_test
-      test from: :pas_client_inquiry_request_v201_beneficiary_must_support_test
-      test from: :pas_client_inquiry_request_v201_subscriber_must_support_test
-      test from: :pas_client_inquiry_request_v201_practitioner_must_support_test
-      test from: :pas_client_inquiry_request_v201_practitioner_role_must_support_test
+      test from: :pas_client_inquire_request_v201_pas_inquiry_request_bundle_must_support_test
+      test from: :pas_client_inquire_request_v201_claim_inquiry_must_support_test
+      test from: :pas_client_inquire_request_v201_coverage_must_support_test
+      test from: :pas_client_inquire_request_v201_insurer_must_support_test
+      test from: :pas_client_inquire_request_v201_requestor_must_support_test
+      test from: :pas_client_inquire_request_v201_beneficiary_must_support_test
+      test from: :pas_client_inquire_request_v201_subscriber_must_support_test
+      test from: :pas_client_inquire_request_v201_practitioner_must_support_test
+      test from: :pas_client_inquire_request_v201_practitioner_role_must_support_test
   
     end
   end

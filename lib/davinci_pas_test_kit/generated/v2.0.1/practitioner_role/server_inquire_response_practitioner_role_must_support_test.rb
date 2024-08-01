@@ -4,24 +4,24 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientInquiryRequestPractitionerRoleMustSupportTest < Inferno::Test
+    class ServerInquireResponsePractitionerRoleMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
-      title 'All must support elements for Profile PAS PractitionerRole are observed across all instances submitted'
+      title 'All must support elements for Profile PAS PractitionerRole are observed across all instances returned'
       description %(
         
-        PAS client systems are required to be able to populate all
+        PAS server systems are required to be able to populate all
         must support elements on instances of all profiles included in 
-        requests, including instances of the PAS PractitionerRole Profile.
+        responses, including instances of the PAS PractitionerRole Profile.
         This test checks all identified instances of the PAS PractitionerRole
-        Profile on requests sent by the client to ensure that the following 
-        must support elements are observed: 
+        Profile on responses returned by the server to ensure that the following
+        must support elements are observed:
 
         * PractitionerRole.organization
         * PractitionerRole.practitioner
       )
 
-      id :pas_client_inquiry_request_v201_practitioner_role_must_support_test
+      id :pas_server_inquire_response_v201_practitioner_role_must_support_test
 
       def resource_type
         'PractitionerRole'
@@ -36,7 +36,8 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
-        scratch[:inquiry_request_resources] ||= {}
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+        scratch[:inquire_response_resources] ||= {}
       end
 
       def resources_of_interest

@@ -4,20 +4,18 @@ require_relative '../../../tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerInquiryRequestBeneficiaryMustSupportTest < Inferno::Test
+    class ClientInquireRequestBeneficiaryMustSupportTest < Inferno::Test
       include DaVinciPASTestKit::MustSupportTest
 
       title 'All must support elements for Profile PAS Beneficiary Patient are observed across all instances submitted'
       description %(
         
-        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
-        
-        PAS server systems are required to be able to receive all
+        PAS client systems are required to be able to populate all
         must support elements on instances of all profiles included in 
         requests, including instances of the PAS Beneficiary Patient Profile.
         This test checks all identified instances of the PAS Beneficiary Patient
-        Profile on requests sent to the server to ensure that the following 
-        must support elements are observed:
+        Profile on requests sent by the client to ensure that the following
+        must support elements are observed: 
 
         * Patient.address
         * Patient.address.city
@@ -49,14 +47,14 @@ module DaVinciPASTestKit
         * Patient.telecom.value
       )
 
-      id :pas_server_inquiry_request_v201_beneficiary_must_support_test
+      id :pas_client_inquire_request_v201_beneficiary_must_support_test
 
       def resource_type
         'Patient'
       end
 
       def user_input_validation
-        true
+        false
       end
 
       def self.metadata
@@ -64,6 +62,7 @@ module DaVinciPASTestKit
       end
 
       def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
         scratch[:inquire_request_resources] ||= {}
       end
 
