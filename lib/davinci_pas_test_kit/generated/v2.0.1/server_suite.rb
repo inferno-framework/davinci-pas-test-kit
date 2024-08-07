@@ -30,7 +30,7 @@ module DaVinciPASTestKit
       ]
 
       resume_test_route :get, '/resume_after_notification' do |request|
-        request.query_parameters['use_case']
+        request.query_parameters['token']
       end
 
       fhir_resource_validator do

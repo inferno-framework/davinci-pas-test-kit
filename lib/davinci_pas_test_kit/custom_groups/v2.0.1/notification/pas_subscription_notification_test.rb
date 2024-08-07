@@ -15,16 +15,17 @@ module DaVinciPASTestKit
       )
 
       run do
+        token = SecureRandom.hex(32)
         # rubocop:disable Layout/LineLength
         wait(
-          identifier: 'pended',
+          identifier: token,
           message: %(
             Inferno has received a 'Pended' claim response indicating that a final decision
             has not yet been made on the prior authorization request.
 
             Please
             **[click
-            here](#{Inferno::Application['base_url']}/custom/davinci_pas_server_suite_v201/resume_after_notification?use_case=pended)**
+            here](#{Inferno::Application['base_url']}/custom/davinci_pas_server_suite_v201/resume_after_notification?token=#{token})**
             when the status of this claim has been finalized to inform Inferno to resume testing.
 
             Future versions of this test will validate subscription-based notifications as
