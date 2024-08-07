@@ -69,7 +69,7 @@ RSpec/DescribeClass:
 RSpec/ExampleLength:
   Enabled: false
 
-RSpec/FilePath:
+RSpec/SpecFilePathFormat:
   CustomTransform:
     DaVinciPASTestKit: davinci_pas_test_kit
 
