@@ -30,8 +30,9 @@ module DaVinciPASTestKit
 
         Due to recognized errors in the DTR IG around extension context definitions,
         this test may not pass due to spurious errors of the form "The extension
-        [extension url] is not allowed at this point". See more details
-        [here](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11).
+        [extension url] is not allowed at this point". See [this
+        issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
+        for additional details.
       )
       
       output :dar_code_found, :dar_extension_found
