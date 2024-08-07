@@ -148,3 +148,9 @@ The PAS IG places additional requirements on servers that are not currently test
 - Collection of metrics
 
 These and any other requirements found in the PAS IG may be tested in future versions of these tests.
+
+### Known Issues
+
+Testing has identified issues with the source IG that result in spurious failures. 
+Tests impacted by these issues have an indication in their documentations. You can find the full 
+list of known issues [here](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).
