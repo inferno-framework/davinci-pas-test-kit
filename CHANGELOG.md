@@ -1,3 +1,10 @@
+# 0.10.1
+
+* FI-2970: Fix inquiry Response Must Support Test by @vanessuniq in https://github.com/inferno-framework/davinci-pas-test-kit/pull/12
+* Create unique identifier for pended test wait continuation by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/15
+* Documentation pointers to known validator errors due to spec issues by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/14
+* Dependency Updates 2024-07-03 by @Jammjammjamm in https://github.com/inferno-framework/davinci-pas-test-kit/pull/9
+
 # 0.10.0
 
 * FI-2701: Migrate to HL7 validator wrapper by @dehall in https://github.com/inferno-framework/davinci-pas-test-kit/pull/4
