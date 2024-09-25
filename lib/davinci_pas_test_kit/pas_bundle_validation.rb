@@ -282,7 +282,10 @@ module DaVinciPASTestKit
     # @param bundle_map [Hash] A map of the bundle contents.
     # @param version [String] The FHIR version.
     def process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version)
-      reference_element_values = evaluate_fhirpath_expression(current_entry.resource, reference_element[:path])
+      fhirpath_result = evaluate_fhirpath(resource: current_entry.resource, path: reference_element[:path])
+      reference_element_values = fhirpath_result.map do |entry|
+        entry['element']&.reference if entry['type'] == 'Reference'
+      end.compact
       referenced_instances = reference_element_values.map do |value|
         find_referenced_instance_in_bundle(value, current_entry.fullUrl, bundle_map)
       end.compact
@@ -361,34 +364,6 @@ module DaVinciPASTestKit
       @bundle_entry_map ||= bundle_entry.each_with_object({}) do |entry, obj|
         obj[entry.fullUrl] = entry
       end
-    end
-
-    # Evaluates a FHIRPath expression against a FHIR resource using an external FHIRPath validator.
-    # @param resource [Object] The FHIR resource to be evaluated.
-    # @param expression [String] The FHIRPath expression to evaluate.
-    # @return [Array] An array of references extracted from the evaluation result, or an empty array in case of failure.
-    def evaluate_fhirpath_expression(resource, expression)
-      return [] unless expression && resource
-
-      logger = Logger.new($stdout)
-      begin
-        fhirpath_url = ENV.fetch('FHIRPATH_URL')
-        path = "#{fhirpath_url}/evaluate?path=#{expression}"
-
-        response = Faraday.post(path, resource.to_json, 'Content-Type' => 'application/json')
-        if response.status.to_s.start_with? '2'
-          result = JSON.parse(response.body)
-          return result.map { |entry| entry.dig('element', 'reference') if entry['type'] == 'Reference' }.compact
-        else
-          logger.error "External FHIRPath service failed: #{response.status}"
-          raise 'FHIRPath service not available'
-        end
-      rescue Faraday::Error => e
-        logger.error "HTTP request failed: #{e.message}"
-        raise 'FHIRPath service not available'
-      end
-
-      []
     end
 
     # Finds a referenced instance in a FHIR bundle based on a reference and the full URL of the enclosing entry.
