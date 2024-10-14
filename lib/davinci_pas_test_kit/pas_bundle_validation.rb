@@ -283,12 +283,13 @@ module DaVinciPASTestKit
     # @param version [String] The FHIR version.
     def process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version)
       fhirpath_result = evaluate_fhirpath(resource: current_entry.resource, path: reference_element[:path])
-      reference_element_values = fhirpath_result.map do |entry|
+      reference_element_values = fhirpath_result.filter_map do |entry|
         entry['element']&.reference if entry['type'] == 'Reference'
-      end.compact
-      referenced_instances = reference_element_values.map do |value|
+      end
+
+      referenced_instances = reference_element_values.filter_map do |value|
         find_referenced_instance_in_bundle(value, current_entry.fullUrl, bundle_map)
-      end.compact
+      end
 
       referenced_instances.each do |instance|
         process_instance_profiles(instance, bundle_entry, reference_element, version)
