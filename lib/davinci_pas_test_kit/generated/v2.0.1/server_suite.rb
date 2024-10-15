@@ -52,7 +52,13 @@ module DaVinciPASTestKit
             title: 'OAuth Credentials',
             type: :auth_info,
             options: {
-              mode: 'access'
+              mode: 'access',
+              components: [
+                {
+                  name: :auth_type,
+                  default: 'backend_services'
+                }
+              ]
             },
             optional: true
 
@@ -76,7 +82,7 @@ module DaVinciPASTestKit
           end-to-end prior authorization interactions, returning responses that are
           conformant and also contain the correct codes.
         )
-
+        
         group from: :pas_server_v201_approval_use_case
         group from: :pas_server_v201_denial_use_case
         group from: :pas_server_v201_pended_use_case
