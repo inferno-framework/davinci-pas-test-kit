@@ -12,7 +12,7 @@
     },
     {
       "name": "smart_credentials",
-      "type": "oauth_credentials",
+      "type": "auth_info",
       "title": "OAuth Credentials",
       "optional": true,
       "value": "{\"access_token\":\"Y3YWq2l08kvFqy50fQJY\"}"
