@@ -1,6 +1,6 @@
 require_relative '../../validator_suppressions'
 require_relative '../../custom_groups/v2.0.1/pas_error_group'
-require_relative '../../version.rb'
+require_relative '../../version'
 require_relative 'pas_server_approval_use_case_group'
 require_relative 'pas_server_denial_use_case_group'
 require_relative 'pas_server_pended_use_case_group'
@@ -15,12 +15,12 @@ module DaVinciPASTestKit
       description File.read(File.join(__dir__, '..', '..', 'docs', 'server_suite_description_v201.md'))
 
       links [
-       {
-         label: 'Report Issue',
-         url: 'https://github.com/inferno-framework/davinci-pas-test-kit/issues/'
+        {
+          label: 'Report Issue',
+          url: 'https://github.com/inferno-framework/davinci-pas-test-kit/issues/'
         },
         {
-         label: 'Open Source',
+          label: 'Open Source',
           url: 'https://github.com/inferno-framework/davinci-pas-test-kit/'
         },
         {
@@ -50,12 +50,21 @@ module DaVinciPASTestKit
 
       input :smart_credentials,
             title: 'OAuth Credentials',
-            type: :oauth_credentials,
+            type: :auth_info,
+            options: {
+              mode: 'access',
+              components: [
+                {
+                  name: :auth_type,
+                  default: 'backend_services'
+                }
+              ]
+            },
             optional: true
 
       fhir_client do
         url :server_endpoint
-        oauth_credentials :smart_credentials
+        auth_info :smart_credentials
       end
 
       # Used for attestation experiment - see pas_claim_response_decision_test.rb
@@ -66,7 +75,7 @@ module DaVinciPASTestKit
       # resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
       #   request.query_parameters['token']
       # end
-      
+
       group 'Demonstrate Workflow Support' do
         description %(
           The workflow tests validate that the server can participate in complete
