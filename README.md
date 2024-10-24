@@ -131,9 +131,9 @@ particularly the instructions on
 
 ### Test Generation
 
-The Davinci PAS Test Kit has an implemeneted test generator that create some of the
+The Davinci PAS Test Kit has an implemented test generator that create some of the
 tests in this kit from the capability statement and profiles in the IG. It
-extracts necessarry data elements from Davinci Prior Authorization Support Implementation Guide archive files and generates tests accordingly. The repo currently contains
+extracts necessary data elements from Davinci Prior Authorization Support Implementation Guide archive files and generates tests accordingly. The repo currently contains
 suites for IG versions 2.0.1.
 
 To generate a test suite for a different Davinci PAS IG version:
