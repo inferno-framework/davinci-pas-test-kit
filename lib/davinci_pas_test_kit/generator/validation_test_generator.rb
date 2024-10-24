@@ -153,7 +153,7 @@ module DaVinciPASTestKit
           sets containing X12 codes are not validated.
 
           **Limitations**
-  
+
           Due to recognized errors in the PAS IG around extension context definitions,
           this test may not pass due to spurious errors of the form "The extension
           [extension url] is not allowed at this point". See [this
