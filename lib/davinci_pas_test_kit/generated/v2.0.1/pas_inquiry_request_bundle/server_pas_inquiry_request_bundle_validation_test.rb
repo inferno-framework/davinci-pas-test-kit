@@ -28,6 +28,14 @@ module DaVinciPASTestKit
         
         Note that because X12 value sets are not public, elements bound to value
         sets containing X12 codes are not validated.
+        
+        **Limitations**
+        
+        Due to recognized errors in the PAS IG around extension context definitions,
+        this test may not pass due to spurious errors of the form "The extension
+        [extension url] is not allowed at this point". See [this
+        issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
+        for additional details.
       )
       
       input :pa_inquire_request_payload,

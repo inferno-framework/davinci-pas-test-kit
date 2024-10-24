@@ -176,4 +176,4 @@ These and any other requirements found in the PAS IG may be tested in future ver
 Testing has identified issues with the source IG that result in spurious failures. 
 Tests impacted by these issues have an indication in their documentations. The full
 list of known issues can be found on the [repository's issues page with the 'source ig issue'
-lable](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).
+label](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).
