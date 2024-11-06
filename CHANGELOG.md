@@ -1,3 +1,9 @@
+# 0.11.0
+
+* Auth info by @vanessuniq in https://github.com/inferno-framework/davinci-pas-test-kit/pull/17
+* FI-3279: PAS Fix Limitation Documentation by @degradification in https://github.com/inferno-framework/davinci-pas-test-kit/pull/18
+* FI-3410: Update inferno core requirement by @Jammjammjamm in https://github.com/inferno-framework/davinci-pas-test-kit/pull/19
+
 # 0.10.1
 
 * FI-2970: Fix inquiry Response Must Support Test by @vanessuniq in https://github.com/inferno-framework/davinci-pas-test-kit/pull/12
