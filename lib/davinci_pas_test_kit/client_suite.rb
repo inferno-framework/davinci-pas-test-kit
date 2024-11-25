@@ -1,10 +1,8 @@
-require_relative 'ext/inferno_core/record_response_route'
-require_relative 'ext/inferno_core/runnable'
-require_relative 'ext/inferno_core/request'
 require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
-require_relative 'mock_server'
+require_relative 'endpoints/claim_endpoint'
+require_relative 'endpoints/token_endpoint'
 require_relative 'custom_groups/v2.0.1/pas_client_authentication_group'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
 require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
@@ -15,8 +13,6 @@ require_relative 'version'
 
 module DaVinciPASTestKit
   class ClientSuite < Inferno::TestSuite
-    extend MockServer
-
     id :davinci_pas_client_suite_v201
     title 'Da Vinci PAS Client Suite v2.0.1'
     version VERSION
@@ -37,10 +33,6 @@ module DaVinciPASTestKit
       }
     ]
 
-    def self.test_resumes?(test)
-      !test.config.options[:accepts_multiple_requests]
-    end
-
     fhir_resource_validator do
       igs 'hl7.fhir.us.davinci-pas#2.0.1'
 
@@ -51,26 +43,16 @@ module DaVinciPASTestKit
       end
     end
 
-    record_response_route :post, TOKEN_PATH, AUTH_TAG, method(:token_response) do |request|
-      ClientSuite.extract_client_id(request)
-    end
-
-    record_response_route :post, SUBMIT_PATH, SUBMIT_TAG, method(:claim_response),
-                          resumes: method(:test_resumes?) do |request|
-      ClientSuite.extract_bearer_token(request)
-    end
-
-    record_response_route :post, INQUIRE_PATH, INQUIRE_TAG, method(:claim_response),
-                          resumes: method(:test_resumes?) do |request|
-      ClientSuite.extract_bearer_token(request)
-    end
+    suite_endpoint :post, TOKEN_PATH, TokenEndpoint
+    suite_endpoint :post, SUBMIT_PATH, ClaimEndpoint
+    suite_endpoint :post, INQUIRE_PATH, ClaimEndpoint
 
     resume_test_route :get, RESUME_PASS_PATH do |request|
-      ClientSuite.extract_token_from_query_params(request)
+      request.query_parameters['token']
     end
 
     resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
-      ClientSuite.extract_token_from_query_params(request)
+      request.query_parameters['token']
     end
 
     group from: :pas_client_v201_authentication_group
