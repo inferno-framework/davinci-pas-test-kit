@@ -1,38 +1,35 @@
-require_relative 'user_input_response'
+require_relative '../user_input_response'
 
 module DaVinciPASTestKit
-  # Serve responses to PAS requests
-  #
-  # Note that there are numerous expected validation issues that can safely be ignored.
-  # See here for full list: https://hl7.org/fhir/us/davinci-pas/STU2/qa.html#suppressed
-  module MockServer
-    def token_response(request, _test = nil, _test_result = nil)
-      # Placeholder for a more complete mock token endpoint
-      request.response_body = { access_token: SecureRandom.hex, token_type: 'bearer', expires_in: 300 }.to_json
-      request.status = 200
+  class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
+    def test_run_identifier
+      request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
-    def claim_response(request, test = nil, test_result = nil)
-      request.status = 200
-      request.response_headers = { 'Content-Type': 'application/json' }
+    def tags
+      [operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG]
+    end
 
-      user_inputted_response = UserInputResponse.user_inputted_response(test, test_result)
-      if test.present? && test_result.present? && user_inputted_response.present?
-        request.response_body = user_inputted_response
+    def make_response
+      response.status = 200
+      response.format = :json
+
+      user_inputted_response = UserInputResponse.user_inputted_response(test, result)
+      if user_inputted_response.present?
+        response.body = user_inputted_response
         return
       end
 
-      operation = request&.url&.split('$')&.last
-      req_bundle = FHIR.from_contents(request&.request_body)
+      req_bundle = FHIR.from_contents(request.body.string)
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
       claim_full_url = claim_entry&.fullUrl
       if claim_entry.blank? || claim_full_url.blank?
-        handle_missing_required_elements(claim_entry, request)
+        handle_missing_required_elements(claim_entry, response)
         return
       end
 
       root_url = base_url(claim_full_url)
-      claim_response = mock_claim_response(claim_entry.resource, req_bundle, operation, root_url)
+      claim_response = mock_claim_response(claim_entry.resource, req_bundle, root_url)
 
       res_bundle = FHIR::Bundle.new(
         id: SecureRandom.uuid,
@@ -51,16 +48,20 @@ module DaVinciPASTestKit
 
       res_bundle.entry.concat(referenced_entities(claim_response, req_bundle.entry, root_url))
 
-      request.response_body = res_bundle.to_json
-      request.status = 200
-      request.response_headers = { 'Content-Type': 'application/json' }
+      response.body = res_bundle.to_json
     end
+
+    def update_result
+      results_repo.update_result(result.id, 'pass') unless test.config.options[:accepts_multiple_requests]
+    end
+
+    private
 
     # Note that references from the claim to other resources in the bundle need to be changed to absolute URLs
     # if they are relative, because the ClaimResponse's fullUrl is a urn:uuid
     #
     # @private
-    def mock_claim_response(claim, bundle, operation, root_url)
+    def mock_claim_response(claim, bundle, root_url)
       return FHIR::ClaimResponse.new(id: SecureRandom.uuid) if claim.blank?
 
       now = Time.now.utc
@@ -128,31 +129,21 @@ module DaVinciPASTestKit
       )
     end
 
-    def extract_client_id(request)
-      URI.decode_www_form(request.request_body).to_h['client_id']
-    end
-
-    # Header expected to be a bearer token of the form "Bearer: <token>"
-    def extract_bearer_token(request)
-      request.request_header('Authorization')&.value&.split&.last
-    end
-
-    def extract_token_from_query_params(request)
-      request.query_parameters['token']
-    end
-
-    def handle_missing_required_elements(claim_entry, request)
-      request.status = 400
-      request.response_headers = { 'Content-Type': 'application/json' }
+    def handle_missing_required_elements(claim_entry, response)
+      response.status = 400
       details = if claim_entry.blank?
                   'Required Claim entry missing from bundle'
                 else
                   'Required element fullUrl missing from Claim entry'
                 end
-      request.response_body = FHIR::OperationOutcome.new(
+      response.body = FHIR::OperationOutcome.new(
         issue: FHIR::OperationOutcome::Issue.new(severity: 'fatal', code: 'required',
                                                  details: FHIR::CodeableConcept.new(text: details))
       ).to_json
+    end
+
+    def operation
+      request.url&.split('$')&.last
     end
 
     # Drop the last two segments of a URL, i.e. the resource type and ID of a FHIR resource
@@ -165,7 +156,6 @@ module DaVinciPASTestKit
       url.sub(%r{/[^/]*/[^/]*(/)?\z}, '')
     end
 
-    # @private
     def referenced_entities(resource, entries, root_url)
       matches = []
       attributes = resource&.source_hash&.keys
@@ -185,21 +175,18 @@ module DaVinciPASTestKit
       matches
     end
 
-    # @private
     def absolute_reference(ref, entries, root_url)
       url = find_matching_entry(ref&.reference, entries, root_url)&.fullUrl
       ref.reference = url if url
       ref
     end
 
-    # @private
     def find_matching_entry(ref, entries, root_url = '')
       ref = "#{root_url}/#{ref}" if relative_reference?(ref) && root_url&.present?
 
       entries&.find { |entry| entry&.fullUrl == ref }
     end
 
-    # @private
     def relative_reference?(ref)
       ref&.count('/') == 1
     end
