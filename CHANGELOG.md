@@ -1,3 +1,8 @@
+# 0.11.1
+
+* FI-3301: SuiteEndpoints by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/21
+
+
 # 0.11.0
 
 * Auth info by @vanessuniq in https://github.com/inferno-framework/davinci-pas-test-kit/pull/17
