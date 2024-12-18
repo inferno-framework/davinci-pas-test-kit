@@ -1,3 +1,4 @@
+require 'subscriptions_test_kit'
 require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'

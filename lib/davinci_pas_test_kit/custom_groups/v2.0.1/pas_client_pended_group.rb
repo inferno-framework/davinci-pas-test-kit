@@ -21,36 +21,45 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      input :pended_json_response,
-            title: 'Claim pended response JSON',
-            type: 'textarea',
-            optional: true,
-            description: %(
-              The response provided will be validated against the PAS Response Bundle profile. If determined to be
-              invalid, a validation message will be returned, and the test group will be skipped.
-            )
+      group do
+        title 'Create pended prior authorization request'
+        input :pended_json_response,
+              title: 'Claim pended response JSON',
+              type: 'textarea',
+              optional: true,
+              description: %(
+                The response provided will be validated against the PAS Response Bundle profile. If determined to be
+                invalid, a validation message will be returned, and the test group will be skipped.
+              )
 
-      test from: :pas_client_v201_pended_submit_test,
-           receives_request: :pended_claim,
-           respond_with: :pended_json_response
+        test from: :pas_client_v201_pended_submit_test,
+             receives_request: :pended_claim,
+             respond_with: :pended_json_response
 
-      test from: :pas_client_v201_pended_pas_response_bundle_validation_test
+        test from: :pas_client_v201_pended_pas_response_bundle_validation_test
 
-      test from: :pas_client_v201_pas_request_bundle_validation_test,
-           uses_request: :pended_claim
+        test from: :pas_client_v201_pas_request_bundle_validation_test,
+             uses_request: :pended_claim
 
-      test from: :pas_client_v201_pended_submit_response_attest,
-           uses_request: :pended_claim
+        test from: :pas_client_v201_pended_submit_response_attest,
+             uses_request: :pended_claim
+      end
+      group from: :subscriptions_r4_client_workflow do
+        title 'Notify client of decision finalization'
+      end
 
-      test from: :pas_client_v201_pended_inquire_test,
-           uses_request: :pended_claim,
-           receives_request: :pended_inquiry
+      group do
+        title 'Process finalized prior authorization request'
+        test from: :pas_client_v201_pended_inquire_test,
+             uses_request: :pended_claim,
+             receives_request: :pended_inquiry
 
-      test from: :pas_client_v201_pended_pas_inquiry_request_bundle_validation_test,
-           uses_request: :pended_inquiry
+        test from: :pas_client_v201_pended_pas_inquiry_request_bundle_validation_test,
+             uses_request: :pended_inquiry
 
-      test from: :pas_client_v201_pended_inquire_response_attest,
-           uses_request: :pended_inquiry
+        test from: :pas_client_v201_pended_inquire_response_attest,
+             uses_request: :pended_inquiry
+      end
     end
   end
 end
