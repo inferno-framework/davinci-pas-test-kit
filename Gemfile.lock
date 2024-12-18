@@ -3,6 +3,7 @@ PATH
   specs:
     davinci_pas_test_kit (0.11.1)
       inferno_core (~> 0.5.0)
+      subscriptions_test_kit (~> 0.9.3)
 
 GEM
   remote: https://rubygems.org/
@@ -290,6 +291,8 @@ GEM
       unicode-display_width (>= 1.5, < 3.0)
       unicode_utils (~> 1.4)
     strings-ansi (0.2.0)
+    subscriptions_test_kit (0.9.3)
+      inferno_core (~> 0.5.0)
     thor (1.2.2)
     tilt (2.4.0)
     tty-color (0.6.0)
