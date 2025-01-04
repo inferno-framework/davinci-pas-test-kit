@@ -44,7 +44,21 @@ module DaVinciPASTestKit
         'inquire'
       end
 
+      def request_type_tag
+        INQUIRE_TAG
+      end
+
+      def workflow_tag
+        config.options[:workflow_tag]
+      end
+
       run do
+        if workflow_tag.present?
+          load_tagged_requests(request_type_tag, workflow_tag)
+        else
+          load_tagged_requests(request_type_tag)
+        end
+        skip_if !request.present?, "No #{request_type} requests received."
         assert request.url == inquire_url,
              "Request made to wrong URL: #{request.url}. Should instead be to #{inquire_url}"
 

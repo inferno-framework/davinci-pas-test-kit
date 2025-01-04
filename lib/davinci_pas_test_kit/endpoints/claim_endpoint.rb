@@ -1,18 +1,38 @@
 require_relative '../user_input_response'
+require_relative '../urls'
+require_relative '../jobs/send_pas_subscription_notification'
+require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
   class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
+    include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
+
     def test_run_identifier
       request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
     def tags
-      [operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG]
+      operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
+      workflow_tag =
+        case test.id
+        when /.*pended.*/
+          PENDED_WORKFLOW_TAG
+        when /.*denial.*/
+          DENIAL_WORKFLOW_TAG
+        when /.*approval.*/
+          APPROVAL_WORKFLOW_TAG
+        end
+
+      return [operation_tag, workflow_tag] if workflow_tag.present?
+
+      [operation_tag]
     end
 
     def make_response
       response.status = 200
       response.format = :json
+
+      start_notification_job if pend_test?
 
       user_inputted_response = UserInputResponse.user_inputted_response(test, result)
       if user_inputted_response.present?
@@ -28,7 +48,7 @@ module DaVinciPASTestKit
         return
       end
 
-      root_url = base_url(claim_full_url)
+      root_url = extract_fhir_base_url(claim_full_url)
       claim_response = mock_claim_response(claim_entry.resource, req_bundle, root_url)
 
       res_bundle = FHIR::Bundle.new(
@@ -149,7 +169,7 @@ module DaVinciPASTestKit
     # Drop the last two segments of a URL, i.e. the resource type and ID of a FHIR resource
     # e.g. http://example.org/fhir/Patient/123 -> http://example.org/fhir
     # @private
-    def base_url(url)
+    def extract_fhir_base_url(url)
       return unless url&.start_with?('http://', 'https://')
 
       # Drop everything after the second to last '/', ignoring a trailing slash
@@ -189,6 +209,24 @@ module DaVinciPASTestKit
 
     def relative_reference?(ref)
       ref&.count('/') == 1
+    end
+
+    def pend_test?
+      test.id.include?('pend')
+    end
+
+    def start_notification_job
+      notification_json = JSON.parse(result.input_json).find { |i| i['name'] == 'notification_bundle' }['value']
+      created_subscription = find_subscription(test_run.test_session_id)
+      client_endpoint = created_subscription.channel.endpoint
+      bearer_token = client_access_token_input(result)
+      fhir_base_url = extract_fhir_base_url(request.url)
+      test_suite_base_url = fhir_base_url.chomp('/').chomp('/fhir')
+      fhir_subscription_url = test_suite_base_url + FHIR_SUBSCRIPTION_PATH
+
+      Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, test_run.id, test_run.test_session_id, result.id,
+                            created_subscription.id, fhir_subscription_url, client_endpoint, bearer_token,
+                            notification_json, test_run_identifier, test_suite_base_url)
     end
   end
 end
