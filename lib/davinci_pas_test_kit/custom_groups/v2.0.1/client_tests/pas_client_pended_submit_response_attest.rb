@@ -25,8 +25,9 @@ module DaVinciPASTestKit
           message: %(
             **Pended Workflow Test**:
 
-            I attest that the client system displays the submitted claim as 'pended' meaning that
-            a final decision has not yet been made.
+            I attest that following the receipt of the 'pended' response to the submitted claim,
+            the client system indicates to users that a final decision on request has not yet
+            been made.
 
             [Click here](#{resume_pass_url}?token=#{access_token}) if the above statement is **true**.
 

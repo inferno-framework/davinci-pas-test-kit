@@ -34,17 +34,30 @@ module DaVinciPASTestKit
 
       start_notification_job if pend_test?
 
-      user_inputted_response = UserInputResponse.user_inputted_response(test, result)
-      if user_inputted_response.present?
-        response.body = user_inputted_response
-        return
-      end
-
       req_bundle = FHIR.from_contents(request.body.string)
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
       claim_full_url = claim_entry&.fullUrl
       if claim_entry.blank? || claim_full_url.blank?
         handle_missing_required_elements(claim_entry, response)
+        return
+      end
+
+      user_inputted_response = UserInputResponse.user_inputted_response(test, result)
+      if user_inputted_response.present? && operation == 'submit'
+        response_bundle = FHIR.from_contents(user_inputted_response)
+        claim_response_entry = response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
+        if claim_response_entry.blank?
+          # echo bad response without modification, other tests will catch problems
+          response.body = user_inputted_response
+        else
+          now = Time.now.utc
+          response_bundle.timestamp = now.iso8601
+          claim_response_entry.resource.created = now.iso8601
+          if claim_response_entry.resource.request.present?
+            claim_response_entry.resource.request.reference = claim_full_url
+          end
+          response.body = response_bundle.to_json
+        end
         return
       end
 
