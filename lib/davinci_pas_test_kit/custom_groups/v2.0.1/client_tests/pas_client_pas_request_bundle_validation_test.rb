@@ -17,18 +17,18 @@ module DaVinciPASTestKit
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
         conformance of those instances to the appropriate profiles, are met.
-        
+
         It verifies the presence of mandatory elements and that elements with
         required bindings contain appropriate values. CodeableConcept element
         bindings will fail if none of their codings have a code/system belonging
         to the bound ValueSet. Quantity, Coding, and code element bindings will
         fail if their code/system are not found in the valueset.
-        
+
         Note that because X12 value sets are not public, elements bound to value
         sets containing X12 codes are not validated.
-        
+
         **Limitations**
-        
+
         Due to recognized errors in the PAS IG around extension context definitions,
         this test may not pass due to spurious errors of the form "The extension
         [extension url] is not allowed at this point". See [this
@@ -60,7 +60,7 @@ module DaVinciPASTestKit
         end
         skip_if !request.present?, "No #{request_type} requests received."
         assert request.url == submit_url,
-             "Request made to wrong URL: #{request.url}. Should instead be to #{submit_url}"
+               "Request made to wrong URL: #{request.url}. Should instead be to #{submit_url}"
 
         validate_pas_bundle_json(
           request.request_body,
@@ -70,7 +70,6 @@ module DaVinciPASTestKit
           'request_bundle',
           message: 'The submit Bundle request provided for the Claim/$submit operation is invalid:'
         )
-        
       end
     end
   end

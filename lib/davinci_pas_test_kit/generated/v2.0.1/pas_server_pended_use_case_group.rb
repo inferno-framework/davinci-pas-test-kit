@@ -19,7 +19,8 @@ module DaVinciPASTestKit
         - Respond to a prior authorization request with an `pended` status.
         - Accept a Subscription creation request and send a notification when
           the pended claim has been finalized.
-        - Respond to a subsequent inquiry request with a final decision for the request
+        - Respond to a subsequent inquiry request with a final decision for the request.
+        
       )
 
       id :pas_server_v201_pended_use_case
@@ -28,6 +29,7 @@ module DaVinciPASTestKit
       def use_case
         'pended'
       end
+  
   
       group do
         title 'Server can respond to claims submitted for prior authorization'
@@ -58,24 +60,9 @@ module DaVinciPASTestKit
         test from: :prior_auth_claim_response_decision_validation
       end
       group do
-        title 'Server can notify the client of claim updates using Subscriptions'
-        group from: :subscriptions_r4_server_interaction
-        group do
-          title 'Subscription Notification verification'
-
-          test do
-            title 'claim-specific notification details'
-            run do
-              skip_if true, 'implement me'
-            end
-          end
-        end
-
-      end
-      group do
         title 'Server can respond to claims submitted for inquiry'
         
-        # test from: :prior_auth_claim_response_update_notification_validation
+        test from: :prior_auth_claim_response_update_notification_validation
         test from: :pas_server_v201_pas_inquiry_request_bundle_validation_test
         test from: :pas_v201_claim_inquiry_operation_test do
           id :pas_v201_claim_inquiry_operation_test_pended

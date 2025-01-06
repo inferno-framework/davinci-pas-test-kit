@@ -6,42 +6,23 @@ module DaVinciPASTestKit
     class ValidationTestGenerator
       class << self
         def generate(ig_metadata, base_output_dir)
-          ['server', 'client'].each do |system|
-            if system == 'server'
-              ig_metadata.bundle_groups.each do |group|
-                new(group, system, base_output_dir:).generate
-              end
-            else
-              ig_metadata.bundle_groups.each do |group|
-                case group.profile_name
-                when 'PAS Request Bundle'
-                  new(group, system, base_output_dir:).generate
-                when 'PAS Inquiry Request Bundle'
-                  new(group, system, 'pended_inquiry', base_output_dir:).generate
-                when 'PAS Response Bundle'
-                  ['denial', 'pended'].each do |workflow|
-                    new(group, system, workflow, base_output_dir:).generate
-                  end
-                end
-              end
-            end
+          ig_metadata.bundle_groups.each do |group|
+            new(group, base_output_dir:).generate
           end
         end
       end
 
-      attr_accessor :group_metadata, :medication_request_metadata, :base_output_dir, :system, :workflow
+      attr_accessor :group_metadata, :medication_request_metadata, :base_output_dir, :workflow
 
-      def initialize(group_metadata, system, workflow = nil, medication_request_metadata = nil, base_output_dir:)
+      def initialize(group_metadata, workflow = nil, medication_request_metadata = nil, base_output_dir:)
         self.group_metadata = group_metadata
-        self.system = system
         self.workflow = workflow
         self.medication_request_metadata = medication_request_metadata
         self.base_output_dir = base_output_dir
       end
 
       def template
-        temp = system == 'server' ? 'validation.rb.erb' : 'validation_client.rb.erb'
-        @template ||= File.read(File.join(__dir__, 'templates', temp))
+        @template ||= File.read(File.join(__dir__, 'templates', 'validation.rb.erb'))
       end
 
       def output
@@ -61,8 +42,6 @@ module DaVinciPASTestKit
       end
 
       def directory_name
-        return 'client_tests' if system == 'client'
-
         Naming.snake_case_for_profile(medication_request_metadata || group_metadata)
       end
 
@@ -87,12 +66,12 @@ module DaVinciPASTestKit
       end
 
       def test_id
-        pref = "pas_#{system}_#{group_metadata.reformatted_version}_#{formatted_workflow}".delete_suffix('_')
+        pref = "pas_server_#{group_metadata.reformatted_version}_#{formatted_workflow}".delete_suffix('_')
         "#{pref}_#{profile_identifier}_validation_test"
       end
 
       def class_name
-        pref = "#{system.capitalize}#{formatted_workflow.camelize}"
+        pref = "Server#{formatted_workflow.camelize}"
         "#{pref}#{Naming.upper_camel_case_for_profile(group_metadata)}ValidationTest"
       end
 
@@ -135,14 +114,23 @@ module DaVinciPASTestKit
       end
 
       def user_input?
-        (system == 'server' && request_type.include?('request')) ||
-          (system == 'client' && request_type.include?('response'))
+        request_type.include?('request')
       end
 
       def description
         <<~DESCRIPTION
           #{description_user_input_validation if user_input?}
-          #{system == 'server' ? description_intro_server : description_intro_client}
+
+          This test validates the conformity of the
+          #{request_type.include?('request') ? 'user input' : "server's response"} to the
+          [#{profile_name}](#{profile_url})#{' '}
+          structure#{request_type.include?('request') ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
+
+          It also checks that other conformance requirements defined in the [PAS Formal
+          Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+          such as the presence of all referenced instances within the bundle and the
+          conformance of those instances to the appropriate profiles, are met.
+
           It verifies the presence of mandatory elements and that elements with
           required bindings contain appropriate values. CodeableConcept element
           bindings will fail if none of their codings have a code/system belonging
@@ -160,31 +148,6 @@ module DaVinciPASTestKit
           issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
           for additional details.
         DESCRIPTION
-      end
-
-      def description_intro_server
-        <<~GENERIC_INTRO
-          This test validates the conformity of the
-          #{request_type.include?('request') ? 'user input' : "server's response"} to the
-          [#{profile_name}](#{profile_url}) structure#{request_type.include?('request') ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
-
-          It also checks that other conformance requirements defined in the [PAS Formal
-          Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
-          such as the presence of all referenced instances within the bundle and the
-          conformance of those instances to the appropriate profiles, are met.
-        GENERIC_INTRO
-      end
-
-      def description_intro_client
-        <<~GENERIC_INTRO
-          This test validates the conformity of the
-          #{request_type.include?('response') ? 'user input' : "client's request"} to the
-          [#{profile_name}](#{profile_url}) structure.
-          It also checks that other conformance requirements defined in the [PAS Formal
-          Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
-          such as the presence of all referenced instances within the bundle and the
-          conformance of those instances to the appropriate profiles, are met.
-        GENERIC_INTRO
       end
 
       def description_user_input_validation
