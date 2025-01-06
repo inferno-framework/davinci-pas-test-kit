@@ -49,8 +49,7 @@ module DaVinciPASTestKit
           - $inquire request from the client to Inferno where Inferno returns an approved response.
         )
 
-        test from: :pas_client_v201_pended_submit_test,
-             respond_with: :pended_json_response
+        test from: :pas_client_v201_pended_submit_test
       end
 
       group do
@@ -77,18 +76,14 @@ module DaVinciPASTestKit
                level that matches what was requested in the Subscription sent during the _PAS Subscription Setup_
                group.
              )
-        # test for PAS-specific requirements?
+        # test for PAS-specific requirements? Current decision: no, there isn't anything hard in the spec
+        # and testers have to demonstrate and attest that their systems work, which will require some
+        # correspondence.
         test from: :subscriptions_r4_client_event_notification_verification,
              title: 'Client accepts the "claim updated" event notification',
              description: %(
                The client responds appropriately to the event notification request.
              )
-        # test from: :subscriptions_r4_client_processing_attestation,
-        #     title: 'Client processes the "claim updated" event notification (Attestation)',
-        #     description: %(
-        #       Receipt of the notification causes the client to register that
-        #       an update to the claim is available.
-        #     )
       end
 
       group do

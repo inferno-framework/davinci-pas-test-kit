@@ -35,6 +35,7 @@ module DaVinciPASTestKit
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
+      respond_with :pended_json_response
 
       run do
         check_user_inputted_response :pended_json_response
@@ -64,6 +65,11 @@ module DaVinciPASTestKit
 
             3. Once the notification has been received, submit an inquiry request to get the details on the
                updated ClaimResponse. Inferno will return an approved response.
+
+            Note that Inferno will ask testers to attest to correct behavior of the system between these steps,
+            e.g., that the system marked the pended prior auth request appropriately after step 1 (submit) but
+            before step 2 (notification). Thus testers should check their system state as appropriate in order
+            to be able to faithfully answer the attestations.
 
             Once the client has completed these steps,
             [click here to complete the test](#{resume_pass_url}?token=#{access_token})

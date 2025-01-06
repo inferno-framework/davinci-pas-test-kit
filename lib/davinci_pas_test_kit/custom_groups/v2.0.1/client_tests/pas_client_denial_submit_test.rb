@@ -22,6 +22,7 @@ module DaVinciPASTestKit
               Access token that the client will provide in the Authorization header of each request
               made during this test.
             )
+      respond_with :denial_json_response
 
       run do
         check_user_inputted_response :denial_json_response

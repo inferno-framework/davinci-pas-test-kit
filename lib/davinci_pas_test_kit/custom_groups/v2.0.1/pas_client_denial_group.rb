@@ -26,8 +26,7 @@ module DaVinciPASTestKit
               invalid, a validation message will be returned, and the test group will be skipped.
             )
 
-      test from: :pas_client_v201_denial_submit_test,
-           respond_with: :denial_json_response
+      test from: :pas_client_v201_denial_submit_test
 
       test from: :pas_client_v201_denial_pas_response_bundle_validation_test
 
