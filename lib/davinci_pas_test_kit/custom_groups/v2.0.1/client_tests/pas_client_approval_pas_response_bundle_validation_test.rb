@@ -4,12 +4,12 @@ require_relative '../../../response_generator'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientPendedPasResponseBundleValidationTest < Inferno::Test
+    class ClientApprovalPasResponseBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include UserInputResponse
       include ResponseGenerator
 
-      id :pas_client_v201_pended_pas_response_bundle_validation_test
+      id :pas_client_v201_approval_pas_response_bundle_validation_test
       title '[USER INPUT VALIDATION] Response Bundle is valid'
       description %(
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
@@ -50,10 +50,10 @@ module DaVinciPASTestKit
       end
 
       run do
-        load_tagged_requests(PENDED_WORKFLOW_TAG, SUBMIT_TAG)
+        load_tagged_requests(APPROVAL_WORKFLOW_TAG, SUBMIT_TAG)
         skip_if requests.empty?, 'No responses to verify because no submit requests made.'
-        message = if user_inputted_response? :pended_json_response
-                    "Invalid reponse generated from provided input '#{input_title(:pended_json_response)}':"
+        message = if user_inputted_response? :approval_json_response
+                    "Invalid reponse generated from provided input '#{input_title(:approval_json_response)}':"
                   else
                     'Invalid response generated from the submitted claim:'
                   end

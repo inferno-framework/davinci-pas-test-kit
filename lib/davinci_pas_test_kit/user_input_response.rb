@@ -4,8 +4,9 @@ module DaVinciPASTestKit
       klass.extend ClassMethods
     end
 
-    def self.user_inputted_response(configurable, result)
-      input_key = configurable.config.options[:respond_with]
+    def self.user_inputted_response(configurable, operation, result)
+      config_key = operation == 'submit' ? :submit_respond_with : :inquire_respond_with
+      input_key = configurable.config.options[config_key]
       return unless input_key.present?
 
       JSON.parse(result.input_json)&.find { |i| i['name'] == input_key.to_s }&.dig('value')
@@ -13,10 +14,8 @@ module DaVinciPASTestKit
       nil
     end
 
-    def check_user_inputted_response(input_key, message = nil)
-      skip_if send(input_key).blank?,
-              message ||
-              "To run this test a response body must be provided in the '**#{input_title(input_key)}**' input"
+    def user_inputted_response?(input_key)
+      send(input_key).present?
     end
 
     def input_title(input_key)
@@ -24,8 +23,12 @@ module DaVinciPASTestKit
     end
 
     module ClassMethods
-      def respond_with(key)
-        config options: { respond_with: key }
+      def submit_respond_with(key)
+        config options: { submit_respond_with: key }
+      end
+
+      def inquire_respond_with(key)
+        config options: { inquire_respond_with: key }
       end
     end
   end

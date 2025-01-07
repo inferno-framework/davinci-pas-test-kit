@@ -1,11 +1,13 @@
 require_relative '../../../pas_bundle_validation'
 require_relative '../../../user_input_response'
+require_relative '../../../response_generator'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientDenialPasResponseBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include UserInputResponse
+      include ResponseGenerator
 
       id :pas_client_v201_denial_pas_response_bundle_validation_test
       title '[USER INPUT VALIDATION] Response Bundle is valid'
@@ -48,15 +50,22 @@ module DaVinciPASTestKit
       end
 
       run do
-        check_user_inputted_response :denial_json_response
+        load_tagged_requests(DENIAL_WORKFLOW_TAG, SUBMIT_TAG)
+        skip_if requests.empty?, 'No responses to verify because no submit requests made.'
+        message = if user_inputted_response? :denial_json_response
+                    "Invalid reponse generated from provided input '#{input_title(:denial_json_response)}':"
+                  else
+                    'Invalid response generated from the submitted claim:'
+                  end
+
         validate_pas_bundle_json(
-          denial_json_response,
+          request.response_body,
           'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle',
           '2.0.1',
           request_type,
           'response_bundle',
           skips: true,
-          message: "Invalid input for '#{input_title(:denial_json_response)}':"
+          message:
         )
       end
     end

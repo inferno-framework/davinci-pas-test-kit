@@ -2,9 +2,10 @@ require_relative 'client_tests/pas_client_pended_submit_test'
 require_relative 'client_tests/pas_client_pended_submit_response_attest'
 require_relative 'client_tests/pas_client_pended_inquire_test'
 require_relative 'client_tests/pas_client_pended_inquire_response_attest'
-require_relative '../../custom_groups/v2.0.1/client_tests/pas_client_pended_pas_response_bundle_validation_test'
-require_relative '../../custom_groups/v2.0.1/client_tests/pas_client_pas_request_bundle_validation_test'
-require_relative '../../custom_groups/v2.0.1/client_tests/pas_client_pended_pas_inquiry_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_pended_pas_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_pended_inquire_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_pas_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_pended_pas_inquiry_request_bundle_validation_test'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
@@ -34,7 +35,22 @@ module DaVinciPASTestKit
             type: 'textarea',
             optional: true,
             description: %(
-              The response provided will be validated against the PAS Response Bundle profile.
+              If provided, this JSON will be sent in response to $submit requests during this test
+              to indicate that the request has been pended awaaiting a final decision.
+              It will be updated to make creation timestamps current.
+              If not provided, a pended response will be generated from the submitted Claim.
+              In either case the response will be validated against the PAS Response Bundle profile.
+            )
+      input :inquire_json_response,
+            title: 'Inquire response JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent in response to $inquire requests during this test
+              to indicate that the request has been approved.
+              It will be updated to make creation timestamps current.
+              If not provided, an approval response will be generated from the submitted Claim.
+              In either case, the response will be validated against the PAS Response Bundle profile.
             )
 
       group do
@@ -91,7 +107,7 @@ module DaVinciPASTestKit
 
         test from: :pas_client_v201_pended_pas_inquiry_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-
+        test from: :pas_client_v201_pended_inquire_response_bundle_validation_test
         test from: :pas_client_v201_pended_inquire_response_attest
       end
     end

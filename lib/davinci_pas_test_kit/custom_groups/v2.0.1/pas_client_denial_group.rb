@@ -1,7 +1,7 @@
 require_relative 'client_tests/pas_client_denial_submit_test'
 require_relative 'client_tests/pas_client_denial_submit_response_attest'
-require_relative '../../custom_groups/v2.0.1/client_tests/pas_client_denial_pas_response_bundle_validation_test'
-require_relative '../../custom_groups/v2.0.1/client_tests/pas_client_pas_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_denial_pas_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_pas_request_bundle_validation_test'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
@@ -22,17 +22,17 @@ module DaVinciPASTestKit
             type: 'textarea',
             optional: true,
             description: %(
-              The response provided will be validated against the PAS Response Bundle profile. If determined to be
-              invalid, a validation message will be returned, and the test group will be skipped.
+              If provided, this JSON will be sent in response to $submit requests during this test
+              to indicate that the request has been denied.
+              It will be updated to make creation timestamps current.
+              If not provided, a denial response will be generated from the submitted Claim.
+              In either case, the response will be validated against the PAS Response Bundle profile.
             )
 
       test from: :pas_client_v201_denial_submit_test
-
-      test from: :pas_client_v201_denial_pas_response_bundle_validation_test
-
       test from: :pas_client_v201_pas_request_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
-
+      test from: :pas_client_v201_denial_pas_response_bundle_validation_test
       test from: :pas_client_v201_denial_submit_response_attest
     end
   end
