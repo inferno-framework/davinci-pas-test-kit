@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../tags'
+require_relative '../urls'
 require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
@@ -8,23 +9,24 @@ module DaVinciPASTestKit
     class SendPASSubscriptionNotification
       include Sidekiq::Job
       include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
+      include URLs
+
+      # override the one from URLs
+      def suite_id
+        :davinci_pas_client_suite_v201 # TODO: don't hard-code the id here...
+      end
 
       sidekiq_options retry: false
 
-      def perform(test_run_id, test_session_id, result_id, subscription_id, subscription_url, client_endpoint,
-                  bearer_token, notification_json, test_run_identifier, test_suite_base_url)
+      def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token)
         @test_run_id = test_run_id
         @test_session_id = test_session_id
         @result_id = result_id
-        @subscription_id = subscription_id
-        @subscription_url = subscription_url
-        @client_endpoint = client_endpoint
-        @bearer_token = bearer_token
+        @notification_bearer_token = notification_bearer_token
         @notification_json = notification_json
-        @test_run_identifier = test_run_identifier
-        @test_suite_base_url = test_suite_base_url
+        @resume_token = resume_token
 
-        await_subcription_creation
+        await_subcription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
         sleep 1
         return unless test_still_waiting?
 
@@ -46,16 +48,21 @@ module DaVinciPASTestKit
         @subscription ||= find_subscription(@test_session_id)
       end
 
+      def subscription_notification_endpoint
+        subscription&.channel&.endpoint
+      end
+
       def headers
         @headers ||= subscription_headers.merge(content_type_header).merge(authorization_header)
       end
 
       def rest_hook_connection
-        @rest_hook_connection ||= Faraday.new(url: @client_endpoint, request: { open_timeout: 30 }, headers:)
+        @rest_hook_connection ||= Faraday.new(url: subscription_notification_endpoint, request: { open_timeout: 30 },
+                                              headers:)
       end
 
       def test_suite_connection
-        @test_suite_connection ||= Faraday.new(@test_suite_base_url)
+        @test_suite_connection ||= Faraday.new(base_url)
       end
 
       def content_type_header
@@ -63,18 +70,23 @@ module DaVinciPASTestKit
       end
 
       def subscription_headers
-        @subscription_headers ||= subscription&.channel&.header&.each_with_object({}) do |header, hash|
+        @subscription_headers ||= subscription.channel&.header&.each_with_object({}) do |header, hash|
           header_name, header_value = header.split(': ', 2)
           hash[header_name] = header_value
         end || {}
       end
 
       def authorization_header
-        @authorization_header ||= @bearer_token.present? ? { 'Authorization' => "Bearer #{@bearer_token}" } : {}
+        @authorization_header ||=
+          @notification_bearer_token.present? ? { 'Authorization' => "Bearer #{@notification_bearer_token}" } : {}
       end
 
       def subscription_topic
         @subscription_topic ||= subscription&.criteria
+      end
+
+      def subscription_full_url
+        @subscription_full_url ||= "#{fhir_subscription_url}/#{subscription.id}"
       end
 
       def test_still_waiting?
@@ -82,17 +94,17 @@ module DaVinciPASTestKit
       end
 
       def await_subcription_creation
-        sleep 0.5 until subscription.present?
+        sleep 0.5 until subscription.present? || !test_still_waiting?
       end
 
       def send_event_notification
-        event_json = derive_event_notification(@notification_json, @subscription_url, subscription_topic, 1).to_json
+        event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic, 1).to_json
         response = send_notification(event_json)
         persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
       end
 
       def resume_inferno_test
-        test_suite_connection.get(RESUME_PASS_PATH.delete_prefix('/'), { token: @test_run_identifier })
+        test_suite_connection.get(RESUME_PASS_PATH.delete_prefix('/'), { token: @resume_token })
       end
 
       def send_notification(request_body)

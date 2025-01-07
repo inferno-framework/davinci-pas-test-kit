@@ -26,9 +26,15 @@ module DaVinciPASTestKit
       input :notification_bundle,
             title: 'Claim Updated Notification Bundle',
             type: 'textarea',
+            optional: true,
             description: %(
-              The event notification bundle that Inferno will send to the client under test to indicate
-              that the pended claim has been updated.
+              If provided, this JSON will be sent as the notification for the
+              PAS Subscription to tell the client that a decision has been made on the pended claim.
+              It will be updated to make creation timestamps current refer to the correct
+              ClaimResponse id if it was mocked by Inferno.
+              If not provided, a notification will be generated from the returned ClaimResponse.
+              In either case the response will be validated to ensure that the notification
+              is conformant.
             )
       input :pended_json_response,
             title: 'Claim pended response JSON',

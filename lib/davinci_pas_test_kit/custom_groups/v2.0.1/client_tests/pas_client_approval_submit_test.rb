@@ -1,9 +1,11 @@
 require_relative '../../../urls'
+require_relative '../../../user_input_response'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientApprovalSubmitTest < Inferno::Test
       include URLs
+      include UserInputResponse
 
       id :pas_client_v201_approval_submit_test
       title 'Client submits a claim using the $submit operation'

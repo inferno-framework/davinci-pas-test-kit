@@ -1,7 +1,7 @@
 require_relative 'client_tests/pas_client_approval_submit_test'
 require_relative 'client_tests/pas_client_approval_submit_response_attest'
 require_relative 'client_tests/pas_client_pas_request_bundle_validation_test'
-require_relative 'client_tests/pas_client_denial_pas_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_approval_pas_response_bundle_validation_test'
 require_relative '../../tags'
 
 module DaVinciPASTestKit

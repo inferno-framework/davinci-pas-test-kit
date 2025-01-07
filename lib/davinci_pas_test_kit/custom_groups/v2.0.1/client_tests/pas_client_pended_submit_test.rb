@@ -25,7 +25,9 @@ module DaVinciPASTestKit
               Access token that the client will provide in the Authorization header of each request
               made during this test.
             )
+      input :pended_json_response
       input :notification_bundle
+      input :inquire_json_response
       input :client_endpoint_access_token,
             optional: true,
             title: 'Client Notification Access Token',
@@ -40,7 +42,7 @@ module DaVinciPASTestKit
 
       run do
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
-        skip_if requests.empty?,
+        skip_if requests.empty?, # NOTE: subscription needed ahead of time to support notification generation
                 %(
                   No Subscription exists to receive notifications for pended claims. Run the _PAS Subscription Setup_
                   tests to provide a Subscription for use in delivering notifications.
