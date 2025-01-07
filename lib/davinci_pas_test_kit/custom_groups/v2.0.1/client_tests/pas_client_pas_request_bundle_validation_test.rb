@@ -12,8 +12,8 @@ module DaVinciPASTestKit
       description %(
         This test validates the conformity of the
         client's request to the
-        [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle) structure.
-        It also checks that other conformance requirements defined in the [PAS Formal
+        [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle)
+        structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
         conformance of those instances to the appropriate profiles, are met.
