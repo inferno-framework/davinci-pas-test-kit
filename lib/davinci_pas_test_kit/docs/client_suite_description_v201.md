@@ -236,7 +236,8 @@ requirements of the PAS specification, but may not make sense in an actual workf
   - When generating a `full-resource` notification, Inferno will include `additional-context`
     references for each entry in the `$submit` response Bundle other than the ClaimResponse
     (which is already in the `focus`). Then it will include Notification Bundle entries for
-    each instance in the `$submit` response Bundle, including the ClaimResponse.
+    each instance in the `$submit` response Bundle, including the ClaimResponse, with `reviewActionCode`
+    extensions updated to indicate approval using code `A1` ("Certified in total") for approval.
 
 ## Testing Limitations
 
