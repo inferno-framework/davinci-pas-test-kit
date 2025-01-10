@@ -63,6 +63,7 @@ module DaVinciPASTestKit
 
         wait(
           identifier: access_token,
+          timeout: 600,
           message: %(
             **Pended Workflow Test**:
 

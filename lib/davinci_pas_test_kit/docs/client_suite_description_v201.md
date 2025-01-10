@@ -16,27 +16,23 @@ Inferno will simulate a PAS server for the client under test to interact with. T
 will be expected to initiate requests to the server and demonstrate its ability to react
 to the returned responses. Over the course of these interactions,
 Inferno will seek to observe conformant handling of PAS requirements, including
-- The ability of the client to initiate and react to
-    - The approval of a prior authorization request
-    - The denial of a prior authorization request
-    - The pending of a prior authorization request and a subsequent final decision
+- The ability of the client to initiate a prior authorization submission and react to
+    - The approval of the request
+    - The denial of the request
+    - The pending of the request and a subsequent notification that a final decision was made
 - The ability of the client to provide data covering the full scope of required by PAS, including
     - The ability to send prior auth requests and inquiries with all PAS profiles and all must support elements on
     those profiles
     - The ability to handle responses that contain all PAS profiles and all must support elements on those
     profiles (not included in the current version of these tests)
 
-Because X12 details, including coded values indicating details like “denied” and “pended”,
-are not public, Inferno is not currently able to generate a full set of responses to requests
-or otherwise provide details on specific codes used to represent those concepts
-and is limited to responses that look similar to the examples in the IG (e.g., [here](https://hl7.org/fhir/us/davinci-pas/STU2/Bundle-ReferralAuthorizationResponseBundleExample.html)).
-Thus,
-
-- In order to demonstrate specific workflows, namely pend and denial, users will need to provide the expected
-response for Inferno to send back
-- The current tests do not return to the client all PAS profiles and must support elements to confirm support.
-
-For further details on limitations of these tests, see the *Testing Limitations* section below.
+Inferno contains basic logic to generate approval, denial, and pended responses, along with a
+notification that a final decision was made, as a part of the above workflows.
+These responses are based on examples available in the PAS Implementation Guide
+and are conformant, but may not meet the needs of actual implementations. Thus,
+testers may provide Inferno with specific responses for Inferno to echo. If responses
+are provided, Inferno will check them for conformance to ensure that they demonstrate
+a fully conformant exchange.
 
 All requests and responses will be checked for conformance to the PAS
 IG requirements individually and used in aggregate to determine whether
@@ -47,7 +43,7 @@ validated with the Java validator using `tx.fhir.org` as the terminology server.
 
 ### Quick Start
 
-For Inferno to simulate a server that always returns approved responses, it needs
+For Inferno to simulate a server that returns basic mocked responses, it needs
 only to know the bearer token that the client will send on requests, for which there are two options.
 
 1. If you want to choose your own bearer token, then
@@ -65,49 +61,84 @@ only to know the bearer token that the client will send on requests, for which t
         `<inferno host>/custom/davinci_pas_client_suite_v201/mock_auth/token` endpoint to get
         an access token to use on the request of the requests.
 
-In either case, the tests will continue from that point, requesting the user to
+In either case, the tests will continue from that point, requesting the tester to
 direct the client to make certain requests to demonstrate PAS client capabilities.
 
 Note: authentication options for these tests have not been finalized and are subject to change.
-
-### Complete Setup
-
-The *Quick Start* approach does not test pended or deny workflows. To test these, provide a
-json-encoded FHIR bundle in the "Claim pended response JSON" and "Claim deny response JSON" input field after
-clicking the '*Run All Tests*' button. These responses will be echoed back when a request
-is made during the corresponding test.
-
-Selecting the *Example PAS Server Responses* Preset in the dropdown in the upper left will fill in example
-FHIR bundles for the pended and deny responses. It will also fill in a sample value for the Client ID,
-which is only necessary for the *Demonstrate Authorization* test group, which can be skipped in favor of
-manual bearer token input in subsequent tests as described above.
 
 ### Postman-based Demo
 
 If you do not have a PAS client but would like to try the tests out, you can use
 [this postman collection](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/config/PAS%20Test%20Kit%20Client%20Test%20Demo.postman_collection.json)
-to make requests against Inferno. The following requests and example responses from that collection can be used.
+to make requests against Inferno and see the mocked responses provided by Inferno. To use, load
+the collection into the [Postman app](https://www.postman.com/downloads/) and follow these steps:
 
-- Configuration
-- *Deny Response* example under the *Homecare Prior Authorization Request*: use as the value of the
-    "Claim denied response JSON" input field. NOTE: this contains a placeholder code `DENIEDCODE` for the
-    X12 code representing the denied status. Replace with the X12-specified code before providing to Inferno
-    to accurately replicate a denial workflow for the client under test.
-- *Pend Response* example under the *Medical Services Prior Authorization Request*: use as the value of the
-    "Claim pended response JSON" input field. NOTE: this contains a placeholder code `PENDEDCODE` for the
-    X12 code representing the pended status. Replace with the X12-specified code before providing to Inferno
-    to accurately replicate a pend workflow for the client under test.
-- Submissions
-- *mock token*: for submitting a client id to get back an access token to use on the rest of the tests. Set the
-    collection's access_token variable to the result.
-- *Referral Prior Authorization Request*: use for the "Approval" workflow test submission.
-- *Medical Services Prior Authorization Request*: use for the "Pended" workflow test submission.
-- *Medical Services Inquiry Request*: use for the "Pended" workflow test inquiry.
+1. Select the *PAS Client Test Suite Demo* Collection in postman and go to the "Variables" tab 
+   (see the Overview tab for more details on what the variables control).
+1. Note the "Current value" of the **client_id** variable for use in configuring Inferno. Update it
+   to another value to use instead, if desired.
+1. Start a Da Vinci PAS Client Suite v2.0.1 session from the [PAS Test Kit page on 
+   inferno.healthit.gov](https://inferno.healthit.gov/test-kits/davinci-pas/). 
+1. Click the *Run All Tests* button in the upper right hand corner of the suite.
+1. In the **Client ID** input, enter the value from the **client_id** Postman variable and click the 
+   *Submit* button.
+1. When the "User Action" dialog appears, return to Postman and change to the Authorization tab. Scroll down 
+   to find the *Get New Access Token* button at the bottom and click it.
+1. When a success message appears, click the *Proceed* button and then the *Use Token* button.
+1. Back in Inferno, a new "User Action" dialog will appear requesting a Subscription. When it does, return to Postman,
+   open the "Create Subscription Request" entry under the "Subscription Setup" folder in the collection,
+   and click the *Send* button.
+1. Back in Inferno, an **Approval Workflow Test** "User Action" will appear. When it does, return to Postman,
+   open the "Prior Auth Request For Approval" entry under the "Approval Workflow Requests" folder in the
+   collection, and click the *Send* button.
+1. Back in Inferno, an attestation "User Action" will appear asking you to confirm that the prior auth
+   request is listed as approved in the client app based on Inferno's response to the request. Search
+   in the response returned to Postman for the string "Certified in total" which indicates the prior
+   auth request was approved and click the link in Inferno indicating the attestation statement is true.
+1. Next, a **Denial Workflow Test** "User Action" will appear. When it does, return to Postman,
+   open the "Prior Auth Request For Denial" entry under the "Denial Workflow Requests" folder in the
+   collection, and click the *Send* button.
+1. Back in Inferno, an attestation "User Action" will appear asking you to confirm that the prior auth
+   request is listed as denied in the client app based on Inferno's response to the request. Search
+   in the response returned to Postman for the string "Not Certified" which indicates the prior
+   auth request was denied and click the link in Inferno indicating the attestation statement is true.
+1. Next, a **Pended Workflow Test** "User Action" will appear. When it does, return to Postman,
+   open the "Prior Auth Request For Pended" entry under the "Pended Workflow Requests" folder in the
+   collection, and click the *Send* button.
+1. Search in the response returned to Postman for the string "Pending" which indicates the prior
+   auth request was pended and a final decision will be made later. You'll use this information in
+   a later attestation.
+1. Meanwhile, Inferno sent a notification indicating that a final decision was made (5-10 seconds
+   after the prior auth request). If interested in seeing the notification message, it can be found
+   on the [notifications 
+   page](https://subscriptions.argo.run/subscriptions/notifications-received?store=r4) for the 
+   [Argonaut Subscriptions Reference Implementation](https://subscriptions.argo.run/), which
+   hosts a notification endpoint that is used to receive Subscription notifications for this demo.
+   Note that when looking for recent notifications, **Received** timestamps are in UTC which is
+   5 hours ahead of Eastern Standard Time (4 hours ahead of Eastern Daylight Time).
+1. Return to Postman, open the "Prior Auth Inquiry For Pended" entry under the "Pended Workflow Requests"
+   folder in the collection, and click the *Send* button.
+1. Search in the response returned to Postman for the string "Certified in total" which indicates the prior
+   auth request was approved. You'll use this information in a later attestation.
+1. Return to Inferno, scroll down in the "User Action" dialog and click the "click here to complete the test"
+   link to allow Inferno to evaluate the pended workflow.
+1. Two attestations will appear, the first stating that the prior auth request was registered in the
+   client as pended and that it was subsequently finalized. You checked these above and can use the
+   true link for both.
+1. Two additional "User Action" dialogs will appear requesting additional `$submit` and `$inquire`
+   requests to demonstrate must support elements. This demo does not have any additional requests
+   and does not attempt to demonstrate all must support elements, so click the link to indicate
+   you are done submitting requests for each. Note that requests submitted during the workflow section
+   will be evaluated and you can inspect the results under test **3.2** *Demonstrate Element Support*
+   to see both passing and failing tests.
+1. Once Inferno finishes evaluating the requests, the test will complete allowing you to review the
+   results, including warning and error messages as well as requests associated with each test.
 
-No additional requests are present to submit as a part of the must support tests, so
-testers can simply click the link to indicate they are done submitting requests. Note
-that the requests within the Postman client are not expected to fully pass the tests as they
-do not contain all must support items.
+#### Optional Demo Modifications
+
+This demo uses `id-only` notifications for Pended workflow. To see a demonstration of `full-resource`
+notifications, replace the string "id-only" in the "Create Subscription Request" entry under the 
+"Subscription Setup" folder in the collection with the string "full-resource".
 
 ## Testing Limitations
 

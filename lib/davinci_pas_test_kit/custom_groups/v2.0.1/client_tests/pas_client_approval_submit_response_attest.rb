@@ -20,7 +20,6 @@ module DaVinciPASTestKit
             )
 
       run do
-        skip_if request.status.between?(400, 499), 'Bad claim submission request.'
         wait(
           identifier: access_token,
           message: %(
