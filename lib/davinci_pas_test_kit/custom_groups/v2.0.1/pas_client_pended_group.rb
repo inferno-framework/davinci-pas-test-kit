@@ -24,7 +24,7 @@ module DaVinciPASTestKit
       run_as_group
 
       input :notification_bundle,
-            title: 'Claim Updated Notification Bundle',
+            title: 'Claim updated notification JSON',
             type: 'textarea',
             optional: true,
             description: %(
@@ -48,7 +48,7 @@ module DaVinciPASTestKit
               In either case the response will be validated against the PAS Response Bundle profile.
             )
       input :inquire_json_response,
-            title: 'Inquire response JSON',
+            title: 'Inquire approved response JSON',
             type: 'textarea',
             optional: true,
             description: %(
@@ -65,10 +65,10 @@ module DaVinciPASTestKit
           All interactions for the pended prior authorization request workflow
           between Inferno and the client under test will be performed during this test
           including
-          - $submit request from the client to Inferno where Inferno returns a pended response.
-          - Notification that the prior authorization decision has been finalized from Inferno
+          - A `$submit` request from the client to Inferno where Inferno returns a pended response.
+          - A notification that the prior authorization decision has been finalized from Inferno
             to the client under test.
-          - $inquire request from the client to Inferno where Inferno returns an approved response.
+          - An `$inquire` request from the client to Inferno where Inferno returns an approved response.
         )
 
         test from: :pas_client_v201_pended_submit_test
@@ -89,14 +89,18 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_notification_input_verification,
              title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle is conformant',
              description: %(
-               The '**Claim Updated Notification Bundle**' input contains a conformant notification.
+               This test checks that the notification Bundle sent to the client, which will be either
+               the tester-provided notification Bundle in the **Claim updated notification JSON** input
+               or mocked by Inferno based on details in the Subscription and submitted Claim, is conformant
+               to Subscription Backport IG requirements.
              )
         test from: :subscriptions_r4_client_notification_input_payload_verification,
              title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle matches the Subscription',
              description: %(
-               The '**Claim Updated Notification Bundle**' input contains a notification bundle with a content
-               level that matches what was requested in the Subscription sent during the _PAS Subscription Setup_
-               group.
+               This test checks that the notification Bundle sent to the client, which will be either
+               the tester-provided notification Bundle in the **Claim updated notification JSON** input
+               or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
+               requested in the Subscription provided during the **2.1** "PAS Subscription Setup" tests.
              )
         # test for PAS-specific requirements? Current decision: no, there isn't anything hard in the spec
         # and testers have to demonstrate and attest that their systems work, which will require some
@@ -104,7 +108,7 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_event_notification_verification,
              title: 'Client accepts the "claim updated" event notification',
              description: %(
-               The client responds appropriately to the event notification request.
+               This test checks that the client responds appropriately to the event notification request.
              )
       end
 

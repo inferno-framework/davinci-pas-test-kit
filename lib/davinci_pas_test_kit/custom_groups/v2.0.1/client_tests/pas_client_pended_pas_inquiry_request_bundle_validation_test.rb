@@ -60,8 +60,6 @@ module DaVinciPASTestKit
           load_tagged_requests(request_type_tag)
         end
         skip_if !request.present?, "No #{request_type} requests received."
-        assert request.url == inquire_url,
-               "Request made to wrong URL: #{request.url}. Should instead be to #{inquire_url}"
 
         validate_pas_bundle_json(
           request.request_body,

@@ -68,20 +68,6 @@ module DaVinciPASTestKit
 
     group from: :pas_client_v201_authentication_group
     group do
-      title 'PAS Subscription Setup'
-      description %(
-        These tests verify that the client can create a Subscription intance
-        that will tell the Payer how to notify the client when pended claims
-        are updated.
-      )
-      run_as_group
-
-      test from: :pas_client_v201_subscription_create_test
-      test from: :subscriptions_r4_client_subscription_verification
-      test from: :pas_client_v201_subscription_pas_conformance_test
-      test from: :subscriptions_r4_client_handshake_notification_verification
-    end
-    group do
       title 'PAS Client Validation'
       description %(
         These tests perform the functional validation of the client under test.
@@ -90,6 +76,20 @@ module DaVinciPASTestKit
         (user provided or generated during the authorization tests)
         in the Authorization HTTP header with prefix "Bearer: ".
       )
+      group do
+        title 'PAS Subscription Setup'
+        description %(
+          These tests verify that the client can create a Subscription intance
+          that will tell the Payer how to notify the client when pended claims
+          are updated.
+        )
+        run_as_group
+
+        test from: :pas_client_v201_subscription_create_test
+        test from: :subscriptions_r4_client_subscription_verification
+        test from: :pas_client_v201_subscription_pas_conformance_test
+        test from: :subscriptions_r4_client_handshake_notification_verification
+      end
 
       group do
         title 'Demonstrate Workflow Support'

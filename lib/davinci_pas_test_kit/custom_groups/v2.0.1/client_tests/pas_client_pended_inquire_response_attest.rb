@@ -20,6 +20,8 @@ module DaVinciPASTestKit
             )
 
       run do
+        load_tagged_requests(PENDED_WORKFLOW_TAG, INQUIRE_TAG)
+        skip_if requests.empty?, 'No inquire requests made.'
         wait(
           identifier: access_token,
           message: %(

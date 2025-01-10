@@ -43,23 +43,26 @@ validated with the Java validator using `tx.fhir.org` as the terminology server.
 
 ### Quick Start
 
-For Inferno to simulate a server that returns basic mocked responses, it needs
+For Inferno to simulate a server that returns mocked conformant responses, it needs
 only to know the bearer token that the client will send on requests, for which there are two options.
 
-1. If you want to choose your own bearer token, then
-    1. Select the "2. PAS Client Validation" test from the list on the left.
+1. If you want to choose your own bearer token, then:
+    1. Select the **2.** PAS Client Validation test from the list on the left.
     2. Click the '*Run All Tests*' button on the right.
-    3. In the "access_token" field, enter the bearer token that will be sent by the client under test (as part
-        of the Authorization header - Bearer: <provided value>).
+    3. In the "Access Token" input field, enter the bearer token that will be sent by the client under test
+       in the Authorization HTTP header (format: `Bearer <provided value>`) for all requests to Inferno.
     4. Click the '*Submit*' button at the bottom of the dialog.
-2. If you want to use a client_id to obtain an access token, then
+2. If you want to use a Client ID to obtain an access token, then
     1. Click the '*Run All Tests*' button on the right.
-    2. Provide the client's registered id "client_id" field of the input (NOTE, Inferno doesn't support the
+    2. Provide the client's registered id "Client ID" input field (NOTE: Inferno doesn't support the
         registration API, so this must be obtained from another system or configured manually).
     3. Click the '*Submit*' button at the bottom of the dialog.
-    4. Make a token request that includes the specified client id to the
-        `<inferno host>/custom/davinci_pas_client_suite_v201/mock_auth/token` endpoint to get
-        an access token to use on the request of the requests.
+    4. Make a token request that includes the specified Client ID to the
+       `<inferno host>/custom/davinci_pas_client_suite_v201/mock_auth/token` endpoint to get
+       an access token from Inferno which the client will need to provide in the 
+       Authorization HTTP header (format: `Bearer <provided value>`) for all subsequent 
+       requests to Inferno for this test session. See the documentation in the 
+       **1.** Demonstration Authorization test for details on the supported access token request.
 
 In either case, the tests will continue from that point, requesting the tester to
 direct the client to make certain requests to demonstrate PAS client capabilities.
@@ -137,8 +140,103 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
 #### Optional Demo Modifications
 
 This demo uses `id-only` notifications for Pended workflow. To see a demonstration of `full-resource`
-notifications, replace the string "id-only" in the "Create Subscription Request" entry under the 
-"Subscription Setup" folder in the collection with the string "full-resource".
+notifications, replace the string `id-only` in the "Create Subscription Request" entry under the 
+"Subscription Setup" folder in the collection with the string `full-resource` (found in an extension
+under the `_payload` element).
+
+## Response and Notification Content
+
+To assist in testers getting started with the PAS Client tests quickly, Inferno will generate
+conformant mocked `$submit` and `$inquire` operation responses and Subscription notifications.
+However, the simple mocked messages may not drive the workflows of real systems in a way that allows
+them to demonstrate their implementation of the PAS specification. Thus, Inferno also allows each message
+returned or initiated by Inferno to be specified by the tester. These messages must themselves be
+conform to PAS specification requirements and additional test requirements in order for a test run to
+serve as a demonstration of a conformant implementation.
+
+The rest of this section provides details on how Inferno determines the content to use in responses
+and notifications.
+
+### Inferno Modifications of Tester-provided Responses and Notifications
+
+Requests provided by testers will be modified by Inferno to try and populated details that testers won't
+know ahead of time. These modifications fall into two categories:
+- **Timestamps**: creation timestamps, such as those on Bundles, ClaimResponses, and event notifications,
+  will be updated or populated by Inferno so that they are in sync with the time the message is sent.
+- **Resource Ids**: some resource ids will not be known ahead of time and will be added or updated by Inferno 
+  including
+  - *Claim Id*: if the tester provides a `$submit` or `$inquire` response with `ClaimResponse.request` populated,
+    then Inferno will update it with the fullUrl of the Claim provided in the request. This avoids the need for 
+    testers to know the Claim Id ahead of time which may be difficult for some systems.
+  - *ClaimResponse Id*: if the tester provides a Notification but has Inferno generate the `$submit` response,
+    then Inferno will update the focus to use the ClaimResponse id that it generates.
+
+If the tester provides an input that is malformed in some way such that Inferno cannot get the details
+that Inferno needs to make the modifications, then the raw input will be used.
+
+### Response and Notification Correspondence Requirements
+
+Beyond the minor modifications described above, Inferno does not modify perform checks to ensure that
+provided responses are themselves consistent with each other or the time they are executed. For example, in the pended
+workflow, it is up to the tester to ensure that if they provide responses for the `$submit` and `$inquire`
+operations that they share whatever details, such as indentifiers, needed to connect them together and drive
+the workflow in their system. Timestamps not associated with messaging time such as when a prior authorization
+response is valid are also not modified by Inferno. Unlike details that Inferno modifies as described above,
+testers should have control over and/or knowledge of the necessary details and values to construct consistent
+and working messages for Inferno to use.
+
+### Tester-provided Response and Notification Inputs
+
+The following test inputs control Inferno messaging behavior:
+- **Claim approved response JSON**: If populated, this used in the **2.2.1** "Demonstrate Approval Workflow" tests
+  to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
+  been approved.
+- **Claim denied response JSON**: If populated, this used in the **2.2.2** "Demonstrate Denial Workflow" tests
+  to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
+  been denied.
+- **Claim pended response JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow" tests
+  to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
+  been pended.
+- **Claim updated notification JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow" tests
+  as the event notification sent for the Subscription indicating that a decision has been finalize for the
+  pended prior auth request. The content of the notification needs to match the details of the Subscription
+  provided in the **2.1** "Subscription Setup" tests.
+- **Inquire approved response JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow"
+  tests to respond to `$inquire` requests. The response needs to indicate to the system that the
+  prior auth request has been approved.
+
+### Generation Logic
+
+When generating responses and notifications, Inferno uses the following logic. These conform to the
+requirements of the PAS specification, but may not make sense in an actual workflow.
+- **`$submit` and `$inquire` responses**: these responses are created mostly from the incoming request, specific details include:
+  - The Patient, insurer Organization, and requestor entity instances are pulled into the response
+  Bundle and referenced in the `patient`, `insurer`, and `requestor` elements respectively.
+  - In the ClaimResponse, the `identifier`, `type`, `status`, and `use` elements are pulled
+    in from the Claim in the request.
+  - The `Bundle.timestamp` and `ClaimResponse.created` timestamps are populated using the current time.
+  - The `ClaimResponse.outcome` is hardcoded to `complete`.
+  - For each `item` entry in the request Claim, a `ClaimResponse.item` entry is created with the
+    `itemSequence` value copied over, `itemPreAuthIssueDate` and `itemPreAuthPeriod` extensions 
+    added using the current date and a month starting on the current date respectively,
+    and an adjudication entry with a `category` of `submitted` that contains the `reviewAction` extension with a
+    `reviewActionCode` that matches the current workflow: `A1` ("Certified in total") for approval,
+    `A3` ("Not Certified") for denial, and `A4` ("Pending") for pending.
+- **Notification Bundle**: Inferno supports mocking both `id-only` and `full-resource` notifications.
+  The following details are relevant:
+  - Inferno pulls in details from the Subscription created for the test session to use in
+   creating the Notification, including the `topic` and the `subscription` reference.
+  - Inferno hardcodes the `status` as `active` and the `type` as `event-notification`.
+  - Inferno will always include a single `notification-event` entry with a `timestamp` of the current
+    time and with a `focus` that points to the ClaimResponse returned on the `$submit`.
+    If it cannot find the ClaimResponse reference from the `$submit` response returned
+    by Inferno, it will generate a random UUID (which isn't likely to work correctly when received).
+  - The subscription's `events-since-subscription-start` and the event's `event-number` will always
+    be 1 as Inferno is not able to track notifications across multiple sessions or runs.
+  - When generating a `full-resource` notification, Inferno will include `additional-context`
+    references for each entry in the `$submit` response Bundle other than the ClaimResponse
+    (which is already in the `focus`). Then it will include Notification Bundle entries for
+    each instance in the `$submit` response Bundle, including the ClaimResponse.
 
 ## Testing Limitations
 
@@ -167,26 +265,34 @@ top of the [IG home page](https://hl7.org/fhir/us/davinci-pas/STU2/index.html):
 The implications of this reliance on proprietary information that is not publicly available means that this test
 kit:
 
-- Cannot verify the correct usage of X12-based terminology: terminology requirements for all elements bound to X12
+- *Cannot verify the correct usage of X12-based terminology*: terminology requirements for all elements bound to X12
 value sets will not be validated.
-- Cannot verify the meaning of codes: validation that a given response conveys something specific, e.g., approval
+- *Cannot verify the meaning of codes*: validation that a given response conveys something specific, e.g., approval
 or pending, is not performed.
-- Cannot verify matching semantics on inquiries: no checking of the identity of the ClaimResponse returned for an
+- *Cannot verify matching semantics on inquiries*: no checking of the identity of the ClaimResponse returned for an
 inquiry, e.g., that it matches the input or the original request.
 
 These limitations may be removed in future versions of these tests. In the meantime, testers should consider these
 requirements to be verified through attestation and should not represent their systems to have passed these tests
 if these requirements are not met.
 
-### Underspecified Subscription Details
+### Subscription Details
 
-The current PAS specification around subscriptions and notifications
-is not detailed enough to support testing. Notably,
-- There are no examples of what a notification payload looks like
-- There is no instruction on how to turn the notification payload into an inquiry
+Subscription details in the PAS 2.0.1 specification are relatively underspecified and the
+[published 2.1.0 version of the 
+specification](https://hl7.org/fhir/us/davinci-pas/STU2.1/specification.html#subscription) 
+makes significant changes, including requiring `full-resource` and updating details such as
+the filter criteria.
 
-Once these details have been clarified, validation of the notification workflows
-will be added to these tests.
+Based on the immaturity of the 2.0.1 requirments around Subscriptions, these tests implement and check for
+the mechanics of Subscriptions and notifications, but do not look closely at the details. For example,
+`id-only` and `full-resource` are supported and the filter criteria format is not checked. Future versions
+of these tests may be more stringent.
+
+Additionally, to test Subscriptions and pending workflows, a new Subscription must be created for each
+test session, which may require testers to re-initialize previously-created Subscriptions. Future versions
+of these tests may relax this requirement and feedback on whether this would reduce burden and how this
+might look are welcome.
 
 ### Future Details
 
@@ -198,7 +304,7 @@ The PAS IG places additional requirements on clients that are not currently test
 - US Core profile support for supporting information
 - The ability to handle responses containing all PAS-defined profiles and must support elements
 - Most details requiring manual review of the client system, e.g., the requirement that clinicians can update
-details of the prior authorization request before submitting them
+  details of the prior authorization request before submitting them
 
 These and any other requirements found in the PAS IG may be tested in future versions of these tests.
 
