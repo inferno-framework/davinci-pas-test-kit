@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    davinci_pas_test_kit (0.11.1)
+    davinci_pas_test_kit (0.11.2)
       inferno_core (~> 0.5.0)
       subscriptions_test_kit (~> 0.9.4)
 
@@ -191,14 +191,8 @@ GEM
       mustermann (= 1.1.2)
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.16.8)
+    nokogiri (1.18.1)
       mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
-    nokogiri (1.16.8-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.16.8-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.16.8-x86_64-linux)
       racc (~> 1.4)
     oauth2 (1.4.11)
       faraday (>= 0.17.3, < 3.0)
