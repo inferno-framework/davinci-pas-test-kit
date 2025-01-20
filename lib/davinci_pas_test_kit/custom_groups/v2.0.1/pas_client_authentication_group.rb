@@ -38,7 +38,7 @@ module DaVinciPASTestKit
         the "Authorization" HTTP header with prefix "Bearer: ". In this example, the
         Authorization HTTP header would have value:
 
-        ```Bearer: 97e792038d922bc3cf388b608e45c318```
+        ```Bearer 97e792038d922bc3cf388b608e45c318```
       )
       run_as_group
 
