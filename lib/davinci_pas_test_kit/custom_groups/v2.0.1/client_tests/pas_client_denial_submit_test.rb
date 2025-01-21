@@ -20,6 +20,17 @@ module DaVinciPASTestKit
               Access token that the client will provide in the Authorization header of each request
               made during this test.
             )
+      input :denial_json_response,
+            title: 'Claim denied response JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent in response to $submit requests during this test
+              to indicate that the request has been denied.
+              It will be updated to make creation timestamps current.
+              If not provided, a denial response will be generated from the submitted Claim.
+              In either case, the response will be validated against the PAS Response Bundle profile.
+            )
       submit_respond_with :denial_json_response
 
       run do

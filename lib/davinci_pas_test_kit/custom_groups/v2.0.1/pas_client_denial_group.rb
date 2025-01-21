@@ -17,18 +17,6 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      input :denial_json_response,
-            title: 'Claim denied response JSON',
-            type: 'textarea',
-            optional: true,
-            description: %(
-              If provided, this JSON will be sent in response to $submit requests during this test
-              to indicate that the request has been denied.
-              It will be updated to make creation timestamps current.
-              If not provided, a denial response will be generated from the submitted Claim.
-              In either case, the response will be validated against the PAS Response Bundle profile.
-            )
-
       test from: :pas_client_v201_denial_submit_test
       test from: :pas_client_v201_pas_request_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
