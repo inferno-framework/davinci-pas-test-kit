@@ -1,8 +1,4 @@
-require_relative '../../request_helper'
-
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do # rubocop:disable RSpec/SpecFilePathFormat
-  include Rack::Test::Methods
-  include RequestHelpers
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
@@ -22,7 +18,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do
       expect(result.result).to eq('wait')
 
       header('Authorization', "Bearer #{access_token}")
-      post_fhir(submit_url, submit_request_json)
+      post_json(submit_url, submit_request_json)
 
       result = results_repo.find(result.id)
       expect(result.result).to eq('pass')
@@ -34,7 +30,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do
     #  expect(result.result).to eq('wait')
 
     #  header('Authorization', "Bearer #{access_token}")
-    #  post_fhir(submit_url, submit_request_json)
+    #  post_json(submit_url, submit_request_json)
 
     #  requests = requests_repo.tagged_requests(result.test_session_id, ['pas_submit', 'pas_approved_workflow'])
     #  binding.pry
@@ -49,7 +45,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do
         expect(result.result).to eq('wait')
 
         header('Authorization', "Bearer #{access_token}")
-        post_fhir(submit_url, submit_request_json)
+        post_json(submit_url, submit_request_json)
+        fhir_body = FHIR.from_contents(last_response.body)
         expect(fhir_body).to be_a(FHIR::Bundle)
         expect(fhir_body.entry.length).to be >= 1
         expect(fhir_body.entry[0].resource).to be_a(FHIR::ClaimResponse)
@@ -80,7 +77,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do
         expect(result.result).to eq('wait')
 
         header('Authorization', "Bearer #{access_token}")
-        post_fhir(submit_url, submit_request_json)
+        post_json(submit_url, submit_request_json)
+        fhir_body = FHIR.from_contents(last_response.body)
         expect(fhir_body).to be_a(FHIR::Bundle)
         expect(fhir_body.entry.length).to be >= 1
         expect(fhir_body.entry[0].resource).to be_a(FHIR::ClaimResponse)
