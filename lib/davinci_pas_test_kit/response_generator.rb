@@ -102,7 +102,6 @@ module DaVinciPASTestKit
         else
           []
         end
-      puts additional_context_references.size
       mock_notification_status = build_mock_notification_status(notification_timestamp, subscription_reference,
                                                                 subscription_topic, claim_response_full_url,
                                                                 additional_context_references)

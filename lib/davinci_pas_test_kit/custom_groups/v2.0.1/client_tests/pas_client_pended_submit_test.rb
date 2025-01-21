@@ -25,9 +25,41 @@ module DaVinciPASTestKit
               Access token that the client will provide in the Authorization header of each request
               made during this test.
             )
-      input :pended_json_response
-      input :notification_bundle
-      input :inquire_json_response
+      input :notification_bundle,
+            title: 'Claim updated notification JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent as the notification for the
+              PAS Subscription to tell the client that a decision has been made on the pended claim.
+              It will be updated to make creation timestamps current refer to the correct
+              ClaimResponse id if it was mocked by Inferno.
+              If not provided, a notification will be generated from the returned ClaimResponse.
+              In either case the response will be validated to ensure that the notification
+              is conformant.
+            )
+      input :pended_json_response,
+            title: 'Claim pended response JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent in response to $submit requests during this test
+              to indicate that the request has been pended awaaiting a final decision.
+              It will be updated to make creation timestamps current.
+              If not provided, a pended response will be generated from the submitted Claim.
+              In either case the response will be validated against the PAS Response Bundle profile.
+            )
+      input :inquire_json_response,
+            title: 'Inquire approved response JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent in response to $inquire requests during this test
+              to indicate that the request has been approved.
+              It will be updated to make creation timestamps current.
+              If not provided, an approval response will be generated from the submitted Claim.
+              In either case, the response will be validated against the PAS Response Bundle profile.
+            )
       input :client_endpoint_access_token,
             optional: true,
             title: 'Client Notification Access Token',

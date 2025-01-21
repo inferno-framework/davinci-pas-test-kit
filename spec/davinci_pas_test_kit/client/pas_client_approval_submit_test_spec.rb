@@ -7,7 +7,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
     let(:test) { described_class }
     let(:results_repo) { Inferno::Repositories::Results.new }
     let(:requests_repo) { Inferno::Repositories::Requests.new }
-    let(:submit_url) { "/custom/#{suite_id}/fhir/Claim/$submit" }
+    let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
     let(:submit_request_json) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
     end
@@ -32,17 +32,18 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
       header('Authorization', "Bearer #{access_token}")
       post_json(submit_url, submit_request_json)
 
-      requests = requests_repo.tagged_requests(result.test_session_id, ['pas_submit', 'pas_approved_workflow'])
+      requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBMIT_TAG,
+                                                                        DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG])
       expect(requests.length).to be(1)
     end
 
     describe 'when the tester does not provide a response body' do
       it 'generates an approved response body' do
-        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         inputs = { access_token: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
+        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
         fhir_body = FHIR.from_contents(last_response.body)
@@ -70,11 +71,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
       end
 
       it 'echoes the response body' do
-        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         inputs = { access_token:, approval_json_response: approved_response_json }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
+        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
         fhir_body = FHIR.from_contents(last_response.body)
