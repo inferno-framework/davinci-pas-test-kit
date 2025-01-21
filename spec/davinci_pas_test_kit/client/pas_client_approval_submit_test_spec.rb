@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
@@ -6,7 +6,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
     let(:test) { described_class }
     let(:results_repo) { Inferno::Repositories::Results.new }
-    # let(:requests_repo) { Inferno::Repositories::Requests.new }
+    let(:requests_repo) { Inferno::Repositories::Requests.new }
     let(:submit_url) { "/custom/#{suite_id}/fhir/Claim/$submit" }
     let(:submit_request_json) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
@@ -24,18 +24,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest do
       expect(result.result).to eq('pass')
     end
 
-    # it 'tags submit requests' do
-    #  inputs = { access_token: }
-    #  result = run(test, inputs)
-    #  expect(result.result).to eq('wait')
+    it 'tags submit requests' do
+      inputs = { access_token: }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
 
-    #  header('Authorization', "Bearer #{access_token}")
-    #  post_json(submit_url, submit_request_json)
+      header('Authorization', "Bearer #{access_token}")
+      post_json(submit_url, submit_request_json)
 
-    #  requests = requests_repo.tagged_requests(result.test_session_id, ['pas_submit', 'pas_approved_workflow'])
-    #  binding.pry
-    #  expect(requests.length).to be(1)
-    # end
+      requests = requests_repo.tagged_requests(result.test_session_id, ['pas_submit', 'pas_approved_workflow'])
+      expect(requests.length).to be(1)
+    end
 
     describe 'when the tester does not provide a response body' do
       it 'generates an approved response body' do

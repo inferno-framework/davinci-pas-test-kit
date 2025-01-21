@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientDenialSubmitTest do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientDenialSubmitTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
@@ -32,7 +32,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientDenialSubmitTest do #
       header('Authorization', "Bearer #{access_token}")
       post_json(submit_url, submit_request_json)
 
-      requests = requests_repo.tagged_requests(result.test_session_id, ['pas_submit', 'pas_approved_workflow'])
+      requests = requests_repo.tagged_requests(result.test_session_id, ['pas_submit', 'pas_denied_workflow'])
       expect(requests.length).to be(1)
     end
 
