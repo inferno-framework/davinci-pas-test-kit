@@ -111,10 +111,6 @@ module DaVinciPASTestKit
         response
       end
 
-      def resume_inferno_test
-        test_suite_connection.get(RESUME_PASS_PATH.delete_prefix('/'), { test_run_identifier: @test_run_identifier })
-      end
-
       def send_notification(request_body)
         rest_hook_connection.post('', request_body)
       rescue Faraday::Error => e
