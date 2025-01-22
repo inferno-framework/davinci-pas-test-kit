@@ -34,7 +34,7 @@ module DaVinciPASTestKit
           &.select do |ext|
             ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria'
           end
-        unless filter_criteria.size == 1
+        unless filter_criteria&.length == 1
           add_message('error', %(
             The created Subscription must include a single filter on the submitting organization
             in the `Subscription.criteria.extension` element.

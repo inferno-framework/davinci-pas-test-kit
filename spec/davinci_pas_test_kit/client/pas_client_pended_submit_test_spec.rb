@@ -44,7 +44,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       inputs = { access_token: }
       result = run(test, inputs)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/\bno Subscription\b/)
+      expect(result.result_message).to match(/no Subscription/)
     end
 
     it 'continues after a resume request' do
