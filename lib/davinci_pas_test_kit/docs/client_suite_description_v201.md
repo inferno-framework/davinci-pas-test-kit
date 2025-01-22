@@ -176,8 +176,8 @@ that Inferno needs to make the modifications, then the raw input will be used.
 
 ### Response and Notification Correspondence Requirements
 
-Beyond the minor modifications described above, Inferno does not modify perform checks to ensure that
-provided responses are themselves consistent with each other or the time they are executed. For example, in the pended
+Beyond the minor modifications described above, Inferno does not modify provided content to ensure that
+they are consistent with each other or the time they are executed. For example, in the pended
 workflow, it is up to the tester to ensure that if they provide responses for the `$submit` and `$inquire`
 operations that they share whatever details, such as indentifiers, needed to connect them together and drive
 the workflow in their system. Timestamps not associated with messaging time such as when a prior authorization
@@ -211,7 +211,10 @@ When generating responses and notifications, Inferno uses the following logic. T
 requirements of the PAS specification, but may not make sense in an actual workflow.
 - **`$submit` and `$inquire` responses**: these responses are created mostly from the incoming request, specific details include:
   - The Patient, insurer Organization, and requestor entity instances are pulled into the response
-  Bundle and referenced in the `patient`, `insurer`, and `requestor` elements respectively.
+    Bundle and referenced in the `patient`, `insurer`, and `requestor` elements respectively.
+    Note that get found by following references found in the submitted Claim instance. If relative
+    references are used in the Claim, the Claim entry `fullUrl` needs to be a absolute reference
+    and not a UUID, else the entries won't get pulled in correctly.
   - In the ClaimResponse, the `identifier`, `type`, `status`, and `use` elements are pulled
     in from the Claim in the request.
   - The `Bundle.timestamp` and `ClaimResponse.created` timestamps are populated using the current time.

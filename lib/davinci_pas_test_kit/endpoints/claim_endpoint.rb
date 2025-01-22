@@ -115,15 +115,7 @@ module DaVinciPASTestKit
         JSON.parse(result.input_json).find { |i| i['name'] == 'notification_bundle' }['value']
 
       if user_inputted_notification_json.present?
-        if generated_claim_response_uuid.present?
-          # if Inferno generated the ClaimResponse id, tester cannot know it ahead of time,
-          # so update their notification with the correct id
-          update_tester_provided_notification(user_inputted_notification_json, generated_claim_response_uuid)
-        else
-          # Otherwise, tester had control over the id in both the pended response and the notification
-          # so make no updates
-          user_inputted_notification_json
-        end
+        update_tester_provided_notification(user_inputted_notification_json, generated_claim_response_uuid)
       else
         generate_notification(response_bundle_json, decision)
       end

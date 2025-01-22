@@ -74,6 +74,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
           expect(review_action_code.valueCodeableConcept&.coding&.dig(0)&.code).to eq('A1')
         end
       end
+
+      it 'logs an info message' do
+        inputs = { access_token: }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+        expect(result_messages.length).to be(1)
+        expect(result_messages[0].type).to eq('info')
+        expect(result_messages[0].message).to match(/No approved response provided/)
+      end
     end
 
     describe 'when the tester provides a response body' do
@@ -94,6 +105,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
         expect(fhir_body.entry.length).to be >= 1
         expect(fhir_body.entry[0].resource).to be_a(FHIR::ClaimResponse)
         expect(fhir_body.entry[0].resource.id).to eq(FHIR.from_contents(approved_response_json).entry[0].resource.id)
+      end
+
+      it 'fails when a non-json response provided' do
+        inputs = { access_token:, approval_json_response: 'not json' }
+        result = run(test, inputs)
+        expect(result.result).to eq('fail')
+        expect(result.result_message).to match(/must be valid JSON/)
       end
     end
   end

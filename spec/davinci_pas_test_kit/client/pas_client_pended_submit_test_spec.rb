@@ -133,6 +133,19 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
             expect(review_action_code.valueCodeableConcept&.coding&.dig(0)&.code).to eq('A4')
           end
         end
+
+        it 'logs an info message' do
+          create_subscription_request
+          inputs = { access_token: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+          expect(result_messages.length).to be >= 1
+          pended_message = result_messages.find { |message| /No pended response provided/.match(message.message) }
+          expect(pended_message).to_not be_nil
+          expect(pended_message.type).to eq('info')
+        end
       end
 
       describe 'and the tester provides a submit response body' do
@@ -156,6 +169,14 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           expect(fhir_body.entry.length).to be >= 1
           expect(fhir_body.entry[0].resource).to be_a(FHIR::ClaimResponse)
           expect(fhir_body.entry[0].resource.id).to eq(FHIR.from_contents(pended_response_json).entry[0].resource.id)
+        end
+
+        it 'fails when a non-json response provided' do
+          create_subscription_request
+          inputs = { access_token:, pended_json_response: 'not json' }
+          result = run(test, inputs)
+          expect(result.result).to eq('fail')
+          expect(result.result_message).to match(/must be valid JSON/)
         end
       end
     end
@@ -227,6 +248,19 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
             expect(review_action_code.valueCodeableConcept&.coding&.dig(0)&.code).to eq('A1')
           end
         end
+
+        it 'logs an info message' do
+          create_subscription_request
+          inputs = { access_token: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+          expect(result_messages.length).to be >= 1
+          pended_message = result_messages.find { |message| /No inquire response provided/.match(message.message) }
+          expect(pended_message).to_not be_nil
+          expect(pended_message.type).to eq('info')
+        end
       end
 
       describe 'and the tester provides an inquire response body' do
@@ -250,6 +284,14 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           expect(fhir_body.entry.length).to be >= 1
           expect(fhir_body.entry[0].resource).to be_a(FHIR::ClaimResponse)
           expect(fhir_body.entry[0].resource.id).to eq(FHIR.from_contents(approval_response_json).entry[0].resource.id)
+        end
+
+        it 'fails when a non-json response provided' do
+          create_subscription_request
+          inputs = { access_token:, inquire_json_response: 'not json' }
+          result = run(test, inputs)
+          expect(result.result).to eq('fail')
+          expect(result.result_message).to match(/must be valid JSON/)
         end
       end
     end
@@ -278,6 +320,19 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           fhir_body = FHIR.from_contents(notifications[0].request_body)
           expect(fhir_body).to be_a(FHIR::Bundle)
           expect(fhir_body.id).to eq(static_uuid)
+        end
+
+        it 'logs an info message' do
+          create_subscription_request
+          inputs = { access_token: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+          expect(result_messages.length).to be >= 1
+          pended_message = result_messages.find { |message| /No notification body provided/.match(message.message) }
+          expect(pended_message).to_not be_nil
+          expect(pended_message.type).to eq('info')
         end
       end
 
@@ -311,6 +366,14 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           expect(fhir_body.entry[0].resource).to be_a(FHIR::Parameters)
           expect(fhir_body.entry[0].resource.id)
             .to eq(FHIR.from_contents(notification_json_bundle).entry[0].resource.id)
+        end
+
+        it 'fails when a non-json notification provided' do
+          create_subscription_request
+          inputs = { access_token:, notification_bundle: 'not json' }
+          result = run(test, inputs)
+          expect(result.result).to eq('fail')
+          expect(result.result_message).to match(/must be valid JSON/)
         end
       end
     end
