@@ -24,6 +24,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientDenialSubmitTest, :re
       expect(result.result).to eq('pass')
     end
 
+    it 'returns HTTP status 200 when a submit request received' do
+      inputs = { access_token: }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      header('Authorization', "Bearer #{access_token}")
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+    end
+
     it 'tags submit requests' do
       inputs = { access_token: }
       result = run(test, inputs)

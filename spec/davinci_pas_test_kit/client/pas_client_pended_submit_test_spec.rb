@@ -59,7 +59,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
     end
 
     describe 'when receiving $submit requets' do
-      it 'keeps waiting when a submit request received' do
+      it 'keeps waiting' do
         allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
           .to receive(:perform).and_return(nil)
         create_subscription_request
@@ -72,6 +72,20 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         result = results_repo.find(result.id)
         expect(result.result).to eq('wait')
+      end
+
+      it 'returns HTTP status 200' do
+        allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
+          .to receive(:perform).and_return(nil)
+        create_subscription_request
+        inputs = { access_token: }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        header('Authorization', "Bearer #{access_token}")
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
       end
 
       it 'adds submit and pended tags' do
@@ -158,6 +172,18 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         result = results_repo.find(result.id)
         expect(result.result).to eq('wait')
+      end
+
+      it 'returns HTTP status 200' do
+        create_subscription_request
+        inputs = { access_token: }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        header('Authorization', "Bearer #{access_token}")
+        post_json(inquire_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
       end
 
       it 'adds inquire and pended tags' do
