@@ -26,6 +26,10 @@ module DaVinciPASTestKit
         url: 'https://github.com/inferno-framework/davinci-pas-test-kit/'
       },
       {
+        label: 'Download',
+        url: 'https://github.com/inferno-framework/davinci-pas-test-kit/releases'
+      },
+      {
         label: 'Implementation Guide',
         url: 'https://hl7.org/fhir/us/davinci-pas/STU2/'
       }
