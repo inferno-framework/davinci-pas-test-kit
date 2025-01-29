@@ -3,7 +3,6 @@
 source "https://rubygems.org"
 
 gemspec
-gem 'inferno_core', git: 'git@gitlab.mitre.org:inferno/inferno-core.git', branch: 'main'
 
 gem "rubocop"
 gem 'rubocop-rspec', require: false
