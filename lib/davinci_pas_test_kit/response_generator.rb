@@ -24,7 +24,7 @@ module DaVinciPASTestKit
     # - timestamps on the Bundle and ClaimResponse (can't predict the processing time)
     # - reference to the submitted Claim (may not have control of created id). NOTE: this is likely
     #   incomplete - when the Claim is included, there are other things that
-    #   need to be in the Bundle that may also not be controled
+    #   need to be in the Bundle that may also not be controlled
     def update_tester_provided_response(user_inputted_response, claim_full_url)
       response_bundle = FHIR.from_contents(user_inputted_response)
       return user_inputted_response unless response_bundle.present?

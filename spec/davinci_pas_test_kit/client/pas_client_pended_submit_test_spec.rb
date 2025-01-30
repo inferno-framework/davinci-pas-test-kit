@@ -58,7 +58,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       expect(result.result).to eq('pass')
     end
 
-    describe 'when receiving $submit requets' do
+    describe 'when receiving $submit requests' do
       it 'keeps waiting' do
         allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
           .to receive(:perform).and_return(nil)

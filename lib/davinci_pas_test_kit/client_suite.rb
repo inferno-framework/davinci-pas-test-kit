@@ -79,7 +79,7 @@ module DaVinciPASTestKit
       group do
         title 'PAS Subscription Setup'
         description %(
-          These tests verify that the client can create a Subscription intance
+          These tests verify that the client can create a Subscription instance
           that will tell the Payer how to notify the client when pended claims
           are updated.
         )

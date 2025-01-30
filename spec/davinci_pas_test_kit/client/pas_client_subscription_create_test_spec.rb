@@ -90,7 +90,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
 
     it 'triggers a handshake after Subscription Create requests' do
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake)
-        .to receive(:await_subcription_creation).and_return(nil) # disable subscription verification
+        .to receive(:await_subscription_creation).and_return(nil) # disable subscription verification
       handshake_request = stub_request(:post, 'https://subscriptions.argo.run/fhir/r4/$subscription-hook')
         .to_return(status: 200)
       continue_pass_request = stub_request(:get, 'http://example.org/custom/davinci_pas_client_suite_v201/resume_pass?token=1234')
@@ -109,7 +109,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
 
     it 'sends the client_endpoint_access_token on the handshake after Subscription Create requests' do
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake)
-        .to receive(:await_subcription_creation).and_return(nil) # disable subscription verification
+        .to receive(:await_subscription_creation).and_return(nil) # disable subscription verification
       handshake_request = stub_request(:post, 'https://subscriptions.argo.run/fhir/r4/$subscription-hook')
         .with(
           headers: {

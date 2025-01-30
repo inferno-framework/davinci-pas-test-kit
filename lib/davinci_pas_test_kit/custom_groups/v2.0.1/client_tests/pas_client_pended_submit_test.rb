@@ -44,7 +44,7 @@ module DaVinciPASTestKit
             optional: true,
             description: %(
               If provided, this JSON will be sent in response to $submit requests during this test
-              to indicate that the request has been pended awaaiting a final decision.
+              to indicate that the request has been pended awaiting a final decision.
               It will be updated to make creation timestamps current.
               If not provided, a pended response will be generated from the submitted Claim.
               In either case the response will be validated against the PAS Response Bundle profile.

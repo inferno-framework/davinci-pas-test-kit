@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "380599c2-6a7d-402a-aef7-f98487c0c6a8",
 		"name": "PAS Client Test Suite Demo",
-		"description": "The variables tab in this collection control the base URL for inferno and how requests get associated with a test session\n\n- url_prefix: points to a running instance of inferno. Typical values will be\n    \n    - Inferno production: [https://inferno.healthit.gov/suites](https://inferno.healthit.gov/suites)\n        \n    - Inferno QA: [https://inferno-qa.healthit.gov/suites](https://inferno-qa.healthit.gov/suites)\n        \n    - Local docker: [http://localhost](http://localhost)\n        \n    - Local development: [http://localhost:4657](http://localhost:4657)\n        \n- client_id: random, tester chosen value that must match the client_id input within Inferno",
+		"description": "The variables tab in this collection control the base URL for inferno and how requests get associated with a test session\n\n- url_prefix: points to a running instance of inferno. Typical values will be\n    \n    - Inferno production: [https://inferno.healthit.gov/suites](https://inferno.healthit.gov/suites)\n        \n    - Inferno QA: [https://inferno-qa.healthit.gov/suites](https://inferno-qa.healthit.gov/suites)\n        \n    - Local docker: [http://localhost](http://localhost)\n        \n    - Local development: [http://localhost:4567](http://localhost:4567)\n        \n- client_id: random, tester chosen value that must match the client_id input within Inferno",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32597978"
 	},

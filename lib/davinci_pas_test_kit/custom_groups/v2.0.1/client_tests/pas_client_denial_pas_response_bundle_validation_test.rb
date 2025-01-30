@@ -53,7 +53,7 @@ module DaVinciPASTestKit
         load_tagged_requests(DENIAL_WORKFLOW_TAG, SUBMIT_TAG)
         skip_if requests.empty?, 'No responses to verify because no submit requests made.'
         message = if user_inputted_response? :denial_json_response
-                    "Invalid reponse generated from provided input '#{input_title(:denial_json_response)}':"
+                    "Invalid response generated from provided input '#{input_title(:denial_json_response)}':"
                   else
                     'Invalid response generated from the submitted claim:'
                   end

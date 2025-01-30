@@ -52,7 +52,7 @@ only to know the bearer token that the client will send on requests, for which t
     3. In the "Access Token" input field, enter the bearer token that will be sent by the client under test
        in the Authorization HTTP header (format: `Bearer <provided value>`) for all requests to Inferno.
     4. Click the '*Submit*' button at the bottom of the dialog.
-2. If you want to use a Client ID to obtain an access token, then
+2. If you want to use a Client ID to obtain an access token, then:
     1. Click the '*Run All Tests*' button on the right.
     2. Provide the client's registered id "Client ID" input field (NOTE: Inferno doesn't support the
         registration API, so this must be obtained from another system or configured manually).
@@ -151,7 +151,7 @@ conformant mocked `$submit` and `$inquire` operation responses and Subscription 
 However, the simple mocked messages may not drive the workflows of real systems in a way that allows
 them to demonstrate their implementation of the PAS specification. Thus, Inferno also allows each message
 returned or initiated by Inferno to be specified by the tester. These messages must themselves be
-conform to PAS specification requirements and additional test requirements in order for a test run to
+conformant to PAS specification requirements and additional test requirements in order for a test run to
 serve as a demonstration of a conformant implementation.
 
 The rest of this section provides details on how Inferno determines the content to use in responses
@@ -159,7 +159,7 @@ and notifications.
 
 ### Inferno Modifications of Tester-provided Responses and Notifications
 
-Requests provided by testers will be modified by Inferno to try and populated details that testers won't
+Requests provided by testers will be modified by Inferno to try and populate details that testers won't
 know ahead of time. These modifications fall into two categories:
 - **Timestamps**: creation timestamps, such as those on Bundles, ClaimResponses, and event notifications,
   will be updated or populated by Inferno so that they are in sync with the time the message is sent.
@@ -188,7 +188,7 @@ and working messages for Inferno to use.
 ### Tester-provided Response and Notification Inputs
 
 The following test inputs control Inferno messaging behavior:
-- **Claim approved response JSON**: If populated, this used in the **2.2.1** "Demonstrate Approval Workflow" tests
+- **Claim approved response JSON**: If populated, this is used in the **2.2.1** "Demonstrate Approval Workflow" tests
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been approved.
 - **Claim denied response JSON**: If populated, this used in the **2.2.2** "Demonstrate Denial Workflow" tests
@@ -198,7 +198,7 @@ The following test inputs control Inferno messaging behavior:
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been pended.
 - **Claim updated notification JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow" tests
-  as the event notification sent for the Subscription indicating that a decision has been finalize for the
+  as the event notification sent for the Subscription indicating that a decision has been finalized for the
   pended prior auth request. The content of the notification needs to match the details of the Subscription
   provided in the **2.1** "Subscription Setup" tests.
 - **Inquire approved response JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow"
