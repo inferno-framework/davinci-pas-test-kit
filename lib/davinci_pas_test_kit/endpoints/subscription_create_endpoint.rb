@@ -47,7 +47,7 @@ module DaVinciPASTestKit
       response.status = 201
       response.body = subscription_hash.to_json
 
-      # Kick off notification job
+      # Kick off handshake job
       subscription_url = "#{request.url}/#{subscription_id}"
       client_endpoint = subscription.channel.endpoint
       bearer_token = client_access_token_input(result)

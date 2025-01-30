@@ -28,13 +28,8 @@ module DaVinciPASTestKit
         sleep 1
         return unless test_still_waiting?
 
-        response = send_handshake_notification
-
-        if response.status == 200
-          test_suite_connection.get(RESUME_PASS_PATH.delete_prefix('/'), { token: @test_run_identifier })
-        else
-          test_suite_connection.get(RESUME_FAIL_PATH.delete_prefix('/'), { token: @test_run_identifier })
-        end
+        send_handshake_notification
+        test_suite_connection.get(RESUME_PASS_PATH.delete_prefix('/'), { token: @test_run_identifier })
       end
 
       def default_notification_base_json
