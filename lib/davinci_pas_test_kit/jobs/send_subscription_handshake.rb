@@ -24,7 +24,7 @@ module DaVinciPASTestKit
         @test_run_identifier = test_run_identifier
         @test_suite_base_url = test_suite_base_url
 
-        await_subcription_creation
+        await_subscription_creation
         sleep 1
         return unless test_still_waiting?
 
@@ -99,7 +99,7 @@ module DaVinciPASTestKit
         results_repo.find_waiting_result(test_run_id: @test_run_id)
       end
 
-      def await_subcription_creation
+      def await_subscription_creation
         sleep 0.5 until subscription.present?
       end
 
