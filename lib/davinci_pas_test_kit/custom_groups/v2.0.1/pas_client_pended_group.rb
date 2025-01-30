@@ -3,7 +3,7 @@ require_relative 'client_tests/pas_client_response_attest'
 require_relative 'client_tests/pas_client_pas_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_pas_inquire_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_pas_request_bundle_validation_test'
-require_relative 'client_tests/pas_client_pas_inquiry_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_pas_inquire_request_bundle_validation_test'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
