@@ -8,11 +8,10 @@ module DaVinciPASTestKit
       include URLs
 
       id :pas_client_v201_pas_request_bundle_validation_test
-      title 'Request Bundle is valid'
+      title 'Submit Request Bundle is valid'
       description %(
-        This test validates the conformity of the
-        client's request to the
-        [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle)
+        This test verifies the conformity of the client's submit request body to the
+        [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
         structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
@@ -36,20 +35,12 @@ module DaVinciPASTestKit
         for additional details.
       )
 
-      def resource_type
-        'Bundle'
-      end
-
-      def request_type
-        'submit'
+      def workflow_tag
+        config.options[:workflow_tag]
       end
 
       def request_type_tag
         SUBMIT_TAG
-      end
-
-      def workflow_tag
-        config.options[:workflow_tag]
       end
 
       run do
@@ -58,15 +49,15 @@ module DaVinciPASTestKit
         else
           load_tagged_requests(request_type_tag)
         end
-        skip_if !request.present?, "No #{request_type} requests received."
+        skip_if !request.present?, 'No submit requests received.'
 
         validate_pas_bundle_json(
           request.request_body,
           'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
           '2.0.1',
-          request_type,
+          'submit',
           'request_bundle',
-          message: 'The submit Bundle request provided for the Claim/$submit operation is invalid:'
+          message: 'The Bundle provided for the Claim/$submit operation is invalid:'
         )
       end
     end

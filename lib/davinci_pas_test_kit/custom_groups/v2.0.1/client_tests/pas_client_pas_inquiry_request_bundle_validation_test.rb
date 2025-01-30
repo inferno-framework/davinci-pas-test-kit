@@ -3,18 +3,16 @@ require_relative '../../../urls'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientPendedPasInquiryRequestBundleValidationTest < Inferno::Test
+    class ClientPasInquireRequestBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include URLs
 
-      id :pas_client_v201_pended_pas_inquiry_request_bundle_validation_test
-      title 'Inquiry Request Bundle is valid'
+      id :pas_client_v201_pas_inquire_request_bundle_validation_test
+      title 'Inquire Request Bundle is valid'
       description %(
-        This test validates the conformity of the
-        client's request to the
-        [PAS Inquiry Request
-        Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-request-bundle) structure.
-        It also checks that other conformance requirements defined in the [PAS Formal
+        This test verifies the conformity of the client's request body to the
+        [PAS Inquiry Request Bundle](http://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+        structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
         conformance of those instances to the appropriate profiles, are met.
@@ -37,14 +35,6 @@ module DaVinciPASTestKit
         for additional details.
       )
 
-      def resource_type
-        'Bundle'
-      end
-
-      def request_type
-        'inquire'
-      end
-
       def request_type_tag
         INQUIRE_TAG
       end
@@ -59,15 +49,15 @@ module DaVinciPASTestKit
         else
           load_tagged_requests(request_type_tag)
         end
-        skip_if !request.present?, "No #{request_type} requests received."
+        skip_if !request.present?, 'No inquire requests received.'
 
         validate_pas_bundle_json(
           request.request_body,
           'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-request-bundle',
           '2.0.1',
-          request_type,
+          'inquire',
           'request_bundle',
-          message: 'The inquire Bundle request provided for the Claim/$inquire operation is invalid:'
+          message: 'The Bundle provided for the Claim/$inquire operation is invalid:'
         )
       end
     end

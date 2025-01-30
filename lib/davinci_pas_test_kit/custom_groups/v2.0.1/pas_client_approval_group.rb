@@ -1,7 +1,7 @@
 require_relative 'client_tests/pas_client_approval_submit_test'
-require_relative 'client_tests/pas_client_approval_submit_response_attest'
+require_relative 'client_tests/pas_client_response_attest'
 require_relative 'client_tests/pas_client_pas_request_bundle_validation_test'
-require_relative 'client_tests/pas_client_approval_pas_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_pas_response_bundle_validation_test'
 require_relative '../../tags'
 
 module DaVinciPASTestKit
@@ -15,11 +15,24 @@ module DaVinciPASTestKit
       )
       run_as_group
 
+      input :approval_json_response, optional: true
+
       test from: :pas_client_v201_approval_submit_test
       test from: :pas_client_v201_pas_request_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
-      test from: :pas_client_v201_approval_pas_response_bundle_validation_test
-      test from: :pas_client_v201_approval_submit_response_attest
+      test from: :pas_client_v201_pas_response_bundle_validation_test,
+           config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
+      test from: :pas_client_v201_response_attest,
+           title: 'Check that the client registers the request as approved (Attestation)',
+           description: %(
+             This test provides the tester an opportunity to observe their client following
+             the receipt of the approved response and attest that users are able to determine
+             that the response has been approved.
+           ),
+           config: { options: {
+             workflow_tag: APPROVAL_WORKFLOW_TAG,
+             attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
+           } }
     end
   end
 end

@@ -4,20 +4,24 @@ require_relative '../../../response_generator'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientApprovalPasResponseBundleValidationTest < Inferno::Test
+    class ClientPasResponseBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include UserInputResponse
       include ResponseGenerator
 
-      id :pas_client_v201_approval_pas_response_bundle_validation_test
-      title '[USER INPUT VALIDATION] Response Bundle is valid'
+      id :pas_client_v201_pas_response_bundle_validation_test
+      title '[USER INPUT VERIFICATION] Submit Response Bundle is valid'
       description %(
-        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
+        **USER INPUT VERIFICATION**: This test verifies input provided by the tester instead of the system under test.
         Errors encountered will be treated as a skip instead of a failure.
 
-        This test validates the conformity of the
-        user input to the
-        [PAS Response Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle)
+        This test verifies the conformity of the submit response sent by Inferno, which will have been
+        either:
+        - the response body provided by the tester in the corresponding input, or
+        - created by Inferno from the $submit Bundle.
+
+        In either case, this test verifies the conformity of the response body to the
+        [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-response-bundle.html)
         structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
@@ -41,19 +45,30 @@ module DaVinciPASTestKit
         for additional details.
       )
 
-      def resource_type
-        'Bundle'
-      end
-
       def request_type
         'submit'
       end
 
+      def workflow_tag
+        config.options[:workflow_tag]
+      end
+
+      def target_user_input
+        case workflow_tag
+        when APPROVAL_WORKFLOW_TAG
+          :approval_json_response
+        when DENIAL_WORKFLOW_TAG
+          :denial_json_response
+        when PENDED_WORKFLOW_TAG
+          :pended_json_response
+        end
+      end
+
       run do
-        load_tagged_requests(APPROVAL_WORKFLOW_TAG, SUBMIT_TAG)
+        load_tagged_requests(workflow_tag, SUBMIT_TAG)
         skip_if requests.empty?, 'No responses to verify because no submit requests made.'
-        message = if user_inputted_response? :approval_json_response
-                    "Invalid response generated from provided input '#{input_title(:approval_json_response)}':"
+        message = if user_inputted_response? target_user_input
+                    "Invalid response generated from provided input '#{input_title(target_user_input)}':"
                   else
                     'Invalid response generated from the submitted claim:'
                   end

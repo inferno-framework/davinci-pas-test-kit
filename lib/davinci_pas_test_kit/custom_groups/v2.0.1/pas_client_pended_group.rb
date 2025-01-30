@@ -1,11 +1,9 @@
 require_relative 'client_tests/pas_client_pended_submit_test'
-require_relative 'client_tests/pas_client_pended_submit_response_attest'
-require_relative 'client_tests/pas_client_pended_inquire_test'
-require_relative 'client_tests/pas_client_pended_inquire_response_attest'
-require_relative 'client_tests/pas_client_pended_pas_response_bundle_validation_test'
-require_relative 'client_tests/pas_client_pended_inquire_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_response_attest'
+require_relative 'client_tests/pas_client_pas_response_bundle_validation_test'
+require_relative 'client_tests/pas_client_pas_inquire_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_pas_request_bundle_validation_test'
-require_relative 'client_tests/pas_client_pended_pas_inquiry_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_pas_inquiry_request_bundle_validation_test'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
@@ -22,6 +20,9 @@ module DaVinciPASTestKit
         and making an inquiry request to retrieve the final result.
       )
       run_as_group
+
+      input :pended_json_response, optional: true
+      input :inquire_json_response, optional: true
 
       group do
         title 'Perform the pended workflow'
@@ -43,8 +44,19 @@ module DaVinciPASTestKit
 
         test from: :pas_client_v201_pas_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v201_pended_pas_response_bundle_validation_test
-        test from: :pas_client_v201_pended_submit_response_attest
+        test from: :pas_client_v201_pas_response_bundle_validation_test,
+             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
+        test from: :pas_client_v201_response_attest,
+             title: 'Check that the client registers the request as pended (Attestation)',
+             description: %(
+              This test provides the tester an opportunity to observe their client following
+              the receipt of the pended response and attest that users are able to determine
+              that the response has been pended and a decision will be forth coming.
+             ),
+             config: { options: {
+               workflow_tag: PENDED_WORKFLOW_TAG,
+               attest_message: "I attest that following the receipt of the 'pended' response to the submitted claim, the client system indicates to users that a final decision on request has not yet been made." # rubocop:disable Layout/LineLength
+             } }
       end
 
       group do
@@ -57,7 +69,12 @@ module DaVinciPASTestKit
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, is conformant
                to Subscription Backport IG requirements.
-             )
+             ),
+             config: {
+               inputs: {
+                 notification_bundle: { optional: true } # doesn't use the input (bug in Subscriptions)
+               }
+             }
         test from: :subscriptions_r4_client_notification_input_payload_verification,
              title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle matches the Subscription',
              description: %(
@@ -65,7 +82,12 @@ module DaVinciPASTestKit
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
                requested in the Subscription provided during the **2.1** "PAS Subscription Setup" tests.
-             )
+             ),
+             config: {
+               inputs: {
+                 notification_bundle: { optional: true } # doesn't use the input (bug in Subscriptions)
+               }
+             }
         # test for PAS-specific requirements? Current decision: no, there isn't anything hard in the spec
         # and testers have to demonstrate and attest that their systems work, which will require some
         # correspondence.
@@ -79,10 +101,21 @@ module DaVinciPASTestKit
       group do
         title 'Verify $inquire interaction'
 
-        test from: :pas_client_v201_pended_pas_inquiry_request_bundle_validation_test,
+        test from: :pas_client_v201_pas_inquire_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v201_pended_inquire_response_bundle_validation_test
-        test from: :pas_client_v201_pended_inquire_response_attest
+        test from: :pas_client_v201_pas_inquire_response_bundle_validation_test,
+             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
+        test from: :pas_client_v201_response_attest,
+             title: 'Check that the client registers the request as approved (Attestation)',
+             description: %(
+              This test provides the tester an opportunity to observe their client following
+              the receipt of the inquiry response with a final decision and attest that users
+              are able to determine that the response has been approved in full.
+             ),
+             config: { options: {
+               workflow_tag: PENDED_WORKFLOW_TAG,
+               attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
+             } }
       end
     end
   end

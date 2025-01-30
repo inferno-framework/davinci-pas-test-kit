@@ -2,7 +2,7 @@
   "resourceType" : "Bundle",
   "id" : "ReferralAuthorizationResponseBundleExample",
   "meta" : {
-    "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle"]
+    "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle"]
   },
   "type" : "collection",
   "timestamp" : "2005-05-02T11:02:00+05:00",
@@ -12,7 +12,7 @@
       "resourceType" : "ClaimResponse",
       "id" : "ReferralAuthorizationResponseExample",
       "meta" : {
-        "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse"]
+        "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse"]
       },
       "identifier" : [{
         "system" : "https://prior-auth.davinci.hl7.org/PATIENT_EVENT_TRACE_NUMBER",

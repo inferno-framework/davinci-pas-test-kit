@@ -180,7 +180,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
         expect(continue_pass_request).to have_been_made.times(1)
       end
 
-      it 'causes a fail if unsuccessful' do
+      it 'causes a pass if unsuccessful' do
+        # NOTE: failure checked later, and failure here didn't have
+        # any context to say why there was a failure
         inputs = { access_token: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
@@ -188,7 +190,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
         create_subscription_request
         handshake_request = stub_request(:post, 'https://subscriptions.argo.run/fhir/r4/$subscription-hook')
           .to_return(status: 400)
-        continue_fail_request = stub_request(:get, 'http://example.com/resume_fail?token=1234')
+        continue_pass_request = stub_request(:get, 'http://example.com/resume_pass?token=1234')
           .to_return(status: 200)
 
         DaVinciPASTestKit::Jobs::SendSubscriptionHandshake.new.perform(
@@ -204,7 +206,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
           'http://example.com/'
         )
         expect(handshake_request).to have_been_made.times(1)
-        expect(continue_fail_request).to have_been_made.times(1)
+        expect(continue_pass_request).to have_been_made.times(1)
       end
     end
   end
