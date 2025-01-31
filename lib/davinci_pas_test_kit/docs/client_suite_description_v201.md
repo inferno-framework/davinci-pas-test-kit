@@ -179,7 +179,7 @@ that Inferno needs to make the modifications, then the raw input will be used.
 Beyond the minor modifications described above, Inferno does not modify provided content to ensure that
 they are consistent with each other or the time they are executed. For example, in the pended
 workflow, it is up to the tester to ensure that if they provide responses for the `$submit` and `$inquire`
-operations that they share whatever details, such as indentifiers, needed to connect them together and drive
+operations that they share whatever details, such as identifiers, needed to connect them together and drive
 the workflow in their system. Timestamps not associated with messaging time such as when a prior authorization
 response is valid are also not modified by Inferno. Unlike details that Inferno modifies as described above,
 testers should have control over and/or knowledge of the necessary details and values to construct consistent
@@ -288,7 +288,7 @@ specification](https://hl7.org/fhir/us/davinci-pas/STU2.1/specification.html#sub
 makes significant changes, including requiring `full-resource` and updating details such as
 the filter criteria.
 
-Based on the immaturity of the 2.0.1 requirments around Subscriptions, these tests implement and check for
+Based on the immaturity of the 2.0.1 requirements around Subscriptions, these tests implement and check for
 the mechanics of Subscriptions and notifications, but do not look closely at the details. For example,
 `id-only` and `full-resource` are supported and the filter criteria format is not checked. Future versions
 of these tests may be more stringent.

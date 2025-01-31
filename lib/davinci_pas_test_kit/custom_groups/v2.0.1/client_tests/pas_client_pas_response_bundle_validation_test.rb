@@ -66,7 +66,7 @@ module DaVinciPASTestKit
 
       run do
         load_tagged_requests(workflow_tag, SUBMIT_TAG)
-        skip_if requests.empty?, 'No responses to verify because no submit requests made.'
+        skip_if requests.empty?, 'No responses to verify because no submit requests were made.'
         message = if user_inputted_response? target_user_input
                     "Invalid response generated from provided input '#{input_title(target_user_input)}':"
                   else
