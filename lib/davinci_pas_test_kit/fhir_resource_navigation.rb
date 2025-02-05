@@ -20,7 +20,7 @@ module DaVinciPASTestKit
       end.compact
     end
 
-    def find_a_value_at(element, path, include_dar: false, &block)
+    def find_a_value_at(element, path, include_dar: false, &)
       return nil if element.nil?
 
       elements = Array.wrap(element)
@@ -32,7 +32,7 @@ module DaVinciPASTestKit
           end
         end
 
-        return elements.find(&block) if block_given?
+        return elements.find(&) if block_given?
 
         return elements.first
       end
