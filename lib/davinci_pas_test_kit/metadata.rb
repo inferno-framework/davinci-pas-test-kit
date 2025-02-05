@@ -78,7 +78,7 @@ module DaVinciPASTestKit
     DESCRIPTION
     suite_ids [:davinci_pas_server_suite_v201, :davinci_pas_client_suite_v201]
     tags ['Da Vinci', 'PAS']
-    last_updated '2025-01-27'
+    last_updated LAST_UPDATED
     version VERSION
     maturity 'Low'
     authors ['Inferno Team']
