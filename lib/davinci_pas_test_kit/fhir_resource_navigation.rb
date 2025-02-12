@@ -52,7 +52,7 @@ module DaVinciPASTestKit
       elements.each do |elmt|
         child = get_next_value(elmt, segment)
         element_found = if block_given?
-                          find_a_value_at(child, remaining_path, include_dar:, &block)
+                          find_a_value_at(child, remaining_path, include_dar:, &)
                         else
                           find_a_value_at(child, remaining_path, include_dar:)
                         end
