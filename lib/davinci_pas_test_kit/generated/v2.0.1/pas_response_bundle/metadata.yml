@@ -62,10 +62,6 @@
 :tests:
 - :id: pas_server_v201_pas_response_bundle_validation_test
   :file_name: server_pas_response_bundle_validation_test.rb
-- :id: pas_client_v201_denial_pas_response_bundle_validation_test
-  :file_name: client_denial_pas_response_bundle_validation_test.rb
-- :id: pas_client_v201_pended_pas_response_bundle_validation_test
-  :file_name: client_pended_pas_response_bundle_validation_test.rb
 - :id: pas_server_submit_response_v201_pas_response_bundle_must_support_test
   :file_name: server_submit_response_pas_response_bundle_must_support_test.rb
 :delayed_references: []

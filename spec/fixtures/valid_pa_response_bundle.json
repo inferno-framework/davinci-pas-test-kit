@@ -14,10 +14,6 @@
       "meta" : {
         "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse"]
       },
-      "text" : {
-        "status" : "extensions",
-        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: ClaimResponse</b><a name=\"ReferralAuthorizationResponseExample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource ClaimResponse &quot;ReferralAuthorizationResponseExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-claimresponse.html\">PAS Claim Response</a></p></div><p><b>identifier</b>: id:\u00a0111099</p><p><b>status</b>: active</p><p><b>type</b>: Professional <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.0.0/CodeSystem-claim-type.html\">Claim Type Codes</a>#professional)</span></p><p><b>use</b>: preauthorization</p><p><b>patient</b>: <a href=\"#Patient_SubscriberExample\">See above (Patient/SubscriberExample)</a></p><p><b>created</b>: 2005-05-02 11:02:00+0500</p><p><b>insurer</b>: <a href=\"#Organization_InsurerExample\">See above (Organization/InsurerExample)</a></p><p><b>requestor</b>: <a href=\"#Organization_UMOExample\">See above (Organization/UMOExample)</a></p><p><b>outcome</b>: complete</p><blockquote><p><b>item</b></p><p><b>ItemRequestedServiceDate</b>: 2005-05-02 --&gt; 2005-06-02</p><p><b>ItemPreAuthIssueDate</b>: 2005-05-02</p><p><b>ItemPreAuthPeriod</b>: 2005-05-02 --&gt; 2005-06-02</p><blockquote><p><b>ItemAuthorizedProvider</b></p><blockquote><p><b>url</b></p><code>provider</code></blockquote><p><b>value</b>: <a href=\"Practitioner-ReferralPractitionerExample.html\">Practitioner/ReferralPractitionerExample</a> &quot; WATSON&quot;</p></blockquote><blockquote><p><b>ItemAuthorizedDetail</b></p><blockquote><p><b>url</b></p><code>productOrServiceCode</code></blockquote><p><b>value</b>: Consultation <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (1365#3)</span></p><blockquote><p><b>url</b></p><code>unitPrice</code></blockquote><p><b>value</b>: <span title=\"US Dollar\">US$100.00</span> (USD)</p><blockquote><p><b>url</b></p><code>quantity</code></blockquote><p><b>value</b>: 1</p></blockquote><p><b>itemSequence</b>: 1</p><h3>Adjudications</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Extension</b></td><td><b>Category</b></td></tr><tr><td style=\"display: none\">*</td><td/><td>Submitted Amount <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.0.0/CodeSystem-adjudication.html\">Adjudication Value Codes</a>#submitted)</span></td></tr></table></blockquote></div>"
-      },
       "identifier" : [{
         "system" : "https://prior-auth.davinci.hl7.org/PATIENT_EVENT_TRACE_NUMBER",
         "value" : "111099",
@@ -138,10 +134,6 @@
       "meta" : {
         "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor"]
       },
-      "text" : {
-        "status" : "generated",
-        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Organization</b><a name=\"UMOExample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Organization &quot;UMOExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-requestor.html\">PAS Requestor Organization</a></p></div><p><b>identifier</b>: id:\u00a0&lt;a href=&quot;http://terminology.hl7.org/5.0.0/NamingSystem-npi.html&quot;&gt;NPI&lt;/a&gt;#8189991234</p><p><b>active</b>: true</p><p><b>type</b>: X3 <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#X3)</span></p><p><b>name</b>: DR. JOE SMITH CORPORATION</p><p><b>address</b>: 111 1ST STREET SAN DIEGO CA 92101 US </p></div>"
-      },
       "identifier" : [{
         "system" : "http://hl7.org/fhir/sid/us-npi",
         "value" : "8189991234"
@@ -171,10 +163,6 @@
       "meta" : {
         "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer"]
       },
-      "text" : {
-        "status" : "generated",
-        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Organization</b><a name=\"InsurerExample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Organization &quot;InsurerExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-insurer.html\">PAS Insurer Organization</a></p></div><p><b>identifier</b>: id:\u00a0&lt;a href=&quot;http://terminology.hl7.org/5.0.0/NamingSystem-npi.html&quot;&gt;NPI&lt;/a&gt;#789312</p><p><b>active</b>: true</p><p><b>type</b>: PR <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#PR)</span></p><p><b>name</b>: MARYLAND CAPITAL INSURANCE COMPANY</p></div>"
-      },
       "identifier" : [{
         "system" : "http://hl7.org/fhir/sid/us-npi",
         "value" : "789312"
@@ -196,10 +184,6 @@
       "id" : "SubscriberExample",
       "meta" : {
         "profile" : ["http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber"]
-      },
-      "text" : {
-        "status" : "extensions",
-        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Patient</b><a name=\"SubscriberExample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Patient &quot;SubscriberExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-subscriber.html\">PAS Subscriber Patient</a></p></div><p><b>MilitaryStatus</b>: RU <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (584#RU)</span></p><p><b>identifier</b>: id:\u00a012345678901</p><p><b>name</b>: JOE SMITH </p><p><b>gender</b>: male</p></div>"
       },
       "extension" : [{
         "url" : "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-militaryStatus",
@@ -230,10 +214,6 @@
         "profile": [
           "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitioner"
         ]
-      },
-      "text": {
-        "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"ReferralPractitionerExample\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-practitioner.html\">PAS Practitioner</a></p></div><p><b>identifier</b>: id: 987654321</p><p><b>name</b>: SUSAN WATSON </p><p><b>telecom</b>: ph: 4029993456</p></div>"
       },
       "identifier": [
         {

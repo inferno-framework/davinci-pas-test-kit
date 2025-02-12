@@ -1,0 +1,146 @@
+{
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/ClaimResponse/ReferralAuthorizationResponseExample",
+      "resource": {
+        "id": "ReferralAuthorizationResponseExample",
+        "identifier": [
+          {
+            "system": "https://prior-auth.davinci.hl7.org/PATIENT_EVENT_TRACE_NUMBER",
+            "value": "111099",
+            "assigner": {
+              "identifier": {
+                "system": "https://prior-auth.davinci.hl7.org/USER_ASSIGNED",
+                "value": "9012345678"
+              }
+            }
+          }
+        ],
+        "status": "active",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+              "code": "professional"
+            }
+          ]
+        },
+        "use": "preauthorization",
+        "patient": {
+          "reference": "Patient/SubscriberExample"
+        },
+        "insurer": {
+          "reference": "Organization/InsurerExample"
+        },
+        "requestor": {
+          "reference": "Organization/UMOExample"
+        },
+        "outcome": "complete",
+        "item": [
+          {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemRequestedServiceDate",
+                "valuePeriod": {
+                  "start": "2005-05-02",
+                  "end": "2005-06-02"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthIssueDate",
+                "valueDate": "2005-05-02"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthPeriod",
+                "valuePeriod": {
+                  "start": "2005-05-02",
+                  "end": "2005-06-02"
+                }
+              },
+              {
+                "extension": [
+                  {
+                    "url": "provider",
+                    "valueReference": {
+                      "reference": "Practitioner/ReferralPractitionerExample"
+                    }
+                  }
+                ],
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider"
+              },
+              {
+                "extension": [
+                  {
+                    "url": "productOrServiceCode",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "system": "https://codesystem.x12.org/005010/1365",
+                          "code": "3",
+                          "display": "Consultation"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "url": "unitPrice",
+                    "valueMoney": {
+                      "value": 100,
+                      "currency": "USD"
+                    }
+                  },
+                  {
+                    "url": "quantity",
+                    "valueQuantity": {
+                      "value": 1
+                    }
+                  }
+                ],
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedDetail"
+              }
+            ],
+            "itemSequence": 1,
+            "adjudication": [
+              {
+                "extension": [
+                  {
+                    "extension": [
+                      {
+                        "url": "number",
+                        "valueString": "AUTH0001"
+                      },
+                      {
+                        "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode",
+                        "valueCodeableConcept": {
+                          "coding": [
+                            {
+                              "system": "https://codesystem.x12.org/005010/306",
+                              "code": "A1",
+                              "display": "Certified in total"
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction"
+                  }
+                ],
+                "category": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/adjudication",
+                      "code": "submitted"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "resourceType": "ClaimResponse"
+      }
+    }
+  ],
+  "resourceType": "Bundle"
+}

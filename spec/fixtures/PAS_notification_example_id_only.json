@@ -1,0 +1,74 @@
+{
+    "type": "history",
+    "timestamp": "2024-01-30T13:44:30Z",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4"
+        ]
+    },
+    "entry": [
+        {
+            "fullUrl": "urn:uuid:2d5afc69-6ef2-420f-a8d1-8500c99eb96c",
+            "resource": {
+                "resourceType": "Parameters",
+                "id": "2d5afc69-6ef2-420f-a8d1-8500c99eb96c",
+                "meta": {
+                    "profile": [
+                        "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4"
+                    ]
+                },
+                "parameter": [
+                    {
+                        "name": "subscription",
+                        "valueReference": {
+                            "reference": "https://example.org/fhir/Subscription/admission"
+                        }
+                    },
+                    {
+                        "name": "topic",
+                        "valueCanonical": "http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic"
+                    },
+                    {
+                        "name": "status",
+                        "valueCode": "active"
+                    },
+                    {
+                        "name": "type",
+                        "valueCode": "event-notification"
+                    },
+                    {
+                        "name": "events-since-subscription-start",
+                        "valueString": "1"
+                    },
+                    {
+                        "name": "notification-event",
+                        "part": [
+                            {
+                                "name": "event-number",
+                                "valueString": "1"
+                            },
+                            {
+                                "name": "timestamp",
+                                "valueInstant": "2020-05-29T11:44:13.1882432-05:00"
+                            },
+                            {
+                                "name": "focus",
+                                "valueReference": {
+                                    "reference": "urn:uuid:482fd012-7825-423d-83de-69d09920198b"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "request": {
+                "method": "GET",
+                "url": "https://example.org/fhir/Subscription/admission/$status"
+            },
+            "response": {
+                "status": "200"
+            }
+        }
+    ],
+    "resourceType": "Bundle"
+}
