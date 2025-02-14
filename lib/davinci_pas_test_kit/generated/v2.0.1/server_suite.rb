@@ -1,6 +1,5 @@
 require_relative '../../validator_suppressions'
 require_relative '../../custom_groups/v2.0.1/pas_error_group'
-require_relative '../../version'
 require_relative 'pas_server_approval_use_case_group'
 require_relative 'pas_server_denial_use_case_group'
 require_relative 'pas_server_pended_use_case_group'
@@ -11,7 +10,6 @@ module DaVinciPASTestKit
     class ServerSuite < Inferno::TestSuite
       id :davinci_pas_server_suite_v201
       title 'Da Vinci PAS Server Suite v2.0.1'
-      version DaVinciPASTestKit::VERSION
       description File.read(File.join(__dir__, '..', '..', 'docs', 'server_suite_description_v201.md'))
 
       links [
@@ -22,6 +20,10 @@ module DaVinciPASTestKit
         {
           label: 'Open Source',
           url: 'https://github.com/inferno-framework/davinci-pas-test-kit/'
+        },
+        {
+          label: 'Download',
+          url: 'https://github.com/inferno-framework/davinci-pas-test-kit/releases'
         },
         {
           label: 'Implementation Guide',

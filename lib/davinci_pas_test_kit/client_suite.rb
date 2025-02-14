@@ -9,13 +9,11 @@ require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
 require_relative 'custom_groups/v2.0.1/pas_client_pended_group'
 require_relative 'generated/v2.0.1/pas_client_submit_must_support_use_case_group'
 require_relative 'generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
-require_relative 'version'
 
 module DaVinciPASTestKit
   class ClientSuite < Inferno::TestSuite
     id :davinci_pas_client_suite_v201
     title 'Da Vinci PAS Client Suite v2.0.1'
-    version VERSION
     description File.read(File.join(__dir__, 'docs', 'client_suite_description_v201.md'))
 
     links [
@@ -26,6 +24,10 @@ module DaVinciPASTestKit
       {
         label: 'Open Source',
         url: 'https://github.com/inferno-framework/davinci-pas-test-kit/'
+      },
+      {
+        label: 'Download',
+        url: 'https://github.com/inferno-framework/davinci-pas-test-kit/releases'
       },
       {
         label: 'Implementation Guide',
