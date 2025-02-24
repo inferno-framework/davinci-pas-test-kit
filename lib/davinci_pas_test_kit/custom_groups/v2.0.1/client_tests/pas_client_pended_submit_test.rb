@@ -1,11 +1,13 @@
 require_relative '../../../urls'
 require_relative '../../../user_input_response'
 require_relative '../../../pas_bundle_validation'
+require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientPendedSubmitTest < Inferno::Test
       include URLs
+      include SessionIdentification
       include UserInputResponse
       include PasBundleValidation
 
@@ -25,12 +27,10 @@ module DaVinciPASTestKit
                             'hl7.fhir.us.davinci-pas_2.0.1@203'
 
       config options: { accepts_multiple_requests: true }
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
+      input :client_id,
+            optional: true
+      input :session_url_path,
+            optional: true
       input :notification_bundle,
             title: 'Claim updated notification JSON',
             type: 'textarea',
@@ -120,17 +120,18 @@ module DaVinciPASTestKit
           ))
         end
 
+        wait_identifier = inputs_to_wait_identifier(client_id, session_url_path)
+        submit_endpoint = inputs_to_session_endpont(:submit, client_id, session_url_path)
+
         wait(
-          identifier: access_token,
+          identifier: wait_identifier,
           timeout: 600,
           message: %(
             **Pended Workflow Test**:
 
             1. Submit a PAS request to
 
-            `#{submit_url}`
-
-            The request must have an `Authorization` header with the value `Bearer #{access_token}`.
+            `#{submit_endpoint}`
 
             If the optional '**#{input_title(:pended_json_response)}**' input is populated, it will
             be returned, updated with current timestamps. Otherwise, a pended response will
@@ -145,8 +146,6 @@ module DaVinciPASTestKit
             3. Once the notification has been received, submit a PAS inquiry request to
 
             `#{inquire_url}`
-
-            The request must have an `Authorization` header with the value `Bearer #{access_token}`.
 
             If the optional '**#{input_title(:inquire_json_response)}**' input is populated, it will
             be returned, updated with current timestamps. Otherwise, an approval response will

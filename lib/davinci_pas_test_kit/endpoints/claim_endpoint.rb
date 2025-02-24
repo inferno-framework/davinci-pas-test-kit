@@ -1,4 +1,5 @@
 require_relative '../user_input_response'
+require_relative 'mock_udap_server'
 require_relative '../response_generator'
 require_relative '../urls'
 require_relative '../jobs/send_pas_subscription_notification'
@@ -16,7 +17,9 @@ module DaVinciPASTestKit
     end
 
     def test_run_identifier
-      request.headers['authorization']&.delete_prefix('Bearer ')
+      return request.params[:session_path] if request.params[:session_path].present?
+
+      MockUdapServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
     end
 
     def tags

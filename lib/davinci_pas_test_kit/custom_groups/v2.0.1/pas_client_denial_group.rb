@@ -1,5 +1,6 @@
 require_relative 'client_tests/pas_client_denial_submit_test'
 require_relative 'client_tests/pas_client_response_attest'
+require_relative 'client_tests/pas_client_request_auth_verification_test'
 require_relative 'client_tests/pas_client_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_request_bundle_validation_test'
 require_relative '../../user_input_response'
@@ -19,9 +20,15 @@ module DaVinciPASTestKit
 
       input :denial_json_response, optional: true
 
+      input_order :denial_json_response,
+                  :client_id,
+                  :session_url_path
+
       test from: :pas_client_v201_denial_submit_test
       test from: :pas_client_v201_request_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
+      test from: :pas_client_v201_request_auth_verification_test,
+           uses_request: :denial_claim
       test from: :pas_client_v201_response_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
       test from: :pas_client_v201_response_attest,
