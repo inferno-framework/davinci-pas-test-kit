@@ -3,10 +3,11 @@ require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
 require_relative 'endpoints/claim_endpoint'
-require_relative 'endpoints/token_endpoint'
+require_relative 'endpoints/mock_udap_server'
+require_relative 'endpoints/mock_udap_server/registration'
+require_relative 'endpoints/mock_udap_server/token'
 require_relative 'endpoints/subscription_create_endpoint'
 require_relative 'endpoints/subscription_status_endpoint'
-require_relative 'custom_groups/v2.0.1/pas_client_authentication_group'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
 require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
 require_relative 'custom_groups/v2.0.1/pas_client_pended_group'
@@ -14,6 +15,8 @@ require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_crea
 require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_pas_conformance_test'
 require_relative 'generated/v2.0.1/pas_client_submit_must_support_use_case_group'
 require_relative 'generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
+require_relative 'custom_groups/v2.0.1/pas_client_registration_group'
+require_relative 'custom_groups/v2.0.1/pas_client_auth_group'
 
 module DaVinciPASTestKit
   class ClientSuite < Inferno::TestSuite
@@ -50,9 +53,15 @@ module DaVinciPASTestKit
       end
     end
 
-    suite_endpoint :post, TOKEN_PATH, TokenEndpoint
+    route(:get, UDAP_DISCOVERY_PATH, MockUdapServer.method(:udap_server_metadata))
+
+    suite_endpoint :post, REGISTRATION_PATH, MockUdapServer::RegistrationEndpoint
+    suite_endpoint :post, TOKEN_PATH, MockUdapServer::TokenEndpoint
+
     suite_endpoint :post, SUBMIT_PATH, ClaimEndpoint
+    suite_endpoint :post, SESSION_SUBMIT_PATH, ClaimEndpoint
     suite_endpoint :post, INQUIRE_PATH, ClaimEndpoint
+    suite_endpoint :post, SESSION_INQUIRE_PATH, ClaimEndpoint
     suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
     suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
     suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
@@ -67,7 +76,7 @@ module DaVinciPASTestKit
       request.query_parameters['token']
     end
 
-    group from: :pas_client_v201_authentication_group
+    group from: :pas_client_v201_registration
     group do
       title 'PAS Client Validation'
       description %(
@@ -75,7 +84,7 @@ module DaVinciPASTestKit
         For requests to be recognized by Inferno to be part of this test session
         they must include the configured bearer token
         (user provided or generated during the authorization tests)
-        in the Authorization HTTP header with prefix "Bearer: ".
+        in the Authorization HTTP header with prefix "Bearer ".
       )
       group do
         title 'PAS Subscription Setup'
@@ -99,6 +108,27 @@ module DaVinciPASTestKit
           authorization interactions, initiating requests and reacting appropriately to the
           responses returned.
         )
+
+        input :client_id,
+              title: 'Client Id',
+              type: 'text',
+              optional: true,
+              description: %(
+                Client Id which the client under test is registered as with the Inferno simulated
+                authentication server.
+              )
+        input :session_url_path,
+              title: 'Session-specific URL path extension',
+              type: 'text',
+              optional: true,
+              description: %(
+                Ignored if a Client Id is present. If demonstrating PAS
+                interactions without authentication, Inferno will use this value to
+                setup a session-specific FHIR endpoints to use during these tests.
+                If not provided, and no auth configuration is included in the inputs,
+                a value will be generated.
+              )
+
         group from: :pas_client_v201_approval_group
         group from: :pas_client_v201_denial_group
         group from: :pas_client_v201_pended_group
@@ -121,9 +151,31 @@ module DaVinciPASTestKit
           the workflow group of tests, so only profiles and must support elements not demonstrated during
           those tests need to be submitted as a part of these.
         )
+
+        input :client_id,
+              title: 'Client Id',
+              type: 'text',
+              optional: true,
+              description: %(
+                Client Id which the client under test is registered as with the Inferno simulated
+                authentication server.
+              )
+        input :session_url_path,
+              title: 'Session-specific URL path extension',
+              type: 'text',
+              optional: true,
+              description: %(
+                Ignored if a Client Id is present. If demonstrating PAS
+                interactions without authentication, Inferno will use this value to
+                setup a session-specific FHIR endpoints to use during these tests.
+                If not provided, and no auth configuration is included in the inputs,
+                a value will be generated.
+              )
+
         group from: :pas_client_v201_submit_must_support_use_case
         group from: :pas_client_v201_inquiry_must_support_use_case
       end
     end
+    group from: :pas_client_v201_auth
   end
 end
