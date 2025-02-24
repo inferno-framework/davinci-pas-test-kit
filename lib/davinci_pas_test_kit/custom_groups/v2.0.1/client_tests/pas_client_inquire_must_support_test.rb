@@ -1,9 +1,11 @@
 require_relative '../../../urls'
+require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientInquireMustSupportTest < Inferno::Test
       include URLs
+      include SessionIdentification
 
       id :pas_client_inquire_v201_must_support_test
       title 'Client inquires about claims using the $inquire operation to demonstrate coverage of must support elements'
@@ -11,17 +13,18 @@ module DaVinciPASTestKit
         This test allows the client to send $inquire requests in addition to any already sent in previous test groups
         for Inferno to evaluate coverage of must support elements.
       )
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
+      input :client_id,
+            optional: true
+      input :session_url_path,
+            optional: true
       config options: { accepts_multiple_requests: true }
 
       run do
+        wait_identifier = inputs_to_wait_identifier(client_id, session_url_path)
+        inquire_endpoint = inputs_to_session_endpont(:inquire, client_id, session_url_path)
+
         wait(
-          identifier: access_token,
+          identifier: wait_identifier,
           message: %(
             The client system may now make multiple $inquire requests before continuing. These requests should
             cumulatively demonstrate coverage of all required profiles and all must support elements within those
@@ -40,9 +43,9 @@ module DaVinciPASTestKit
 
             Submit PAS requests to
 
-            `#{inquire_url}`
+            `#{inquire_endpoint}`
 
-            and [click here](#{resume_pass_url}?token=#{access_token}) when done.
+            and [click here](#{resume_pass_url}?token=#{wait_identifier}) when done.
           )
         )
       end
