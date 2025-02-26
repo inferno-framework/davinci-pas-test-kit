@@ -12,7 +12,7 @@ module DaVinciPASTestKit
 
     # override the one from URLs
     def suite_id
-      :davinci_pas_client_suite_v201 # TODO: don't hard-code the id here...
+      request.path.split('/')[2] # request.path = /custom/{suite_id}/...
     end
 
     def test_run_identifier
@@ -107,7 +107,7 @@ module DaVinciPASTestKit
       notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
 
       Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, test_run.id, test_run.test_session_id, result.id,
-                            notification_bearer_token, notification_contents, test_run_identifier)
+                            notification_bearer_token, notification_contents, test_run_identifier, suite_id)
     end
 
     def notification_json(response_bundle_json, decision, generated_claim_response_uuid)

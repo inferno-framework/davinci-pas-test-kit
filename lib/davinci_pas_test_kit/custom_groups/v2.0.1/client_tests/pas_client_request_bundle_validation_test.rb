@@ -3,11 +3,11 @@ require_relative '../../../urls'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientPasRequestBundleValidationTest < Inferno::Test
+    class PasClientRequestBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include URLs
 
-      id :pas_client_v201_pas_request_bundle_validation_test
+      id :pas_client_v201_request_bundle_validation_test
       title 'Submit Request Bundle is valid'
       description %(
         This test verifies the conformity of the client's submit request body to the

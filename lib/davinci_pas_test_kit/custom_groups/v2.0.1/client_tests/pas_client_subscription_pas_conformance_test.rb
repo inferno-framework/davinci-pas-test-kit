@@ -9,8 +9,7 @@ module DaVinciPASTestKit
         This test verifies that the Subscription created by the client under test
         is conformant to PAS requirements on the Subscription, including
         - The use of the [PAS-defined Subscription
-          Topic](https://hl7.org/fhir/us/davinci-pas/STU2/SubscriptionTopic-PASSubscriptionTopic.html)
-          (`http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic`), and
+          Topic](https://hl7.org/fhir/us/davinci-pas/STU2/SubscriptionTopic-PASSubscriptionTopic.html), and
         - Inclusion of filter criteria for the client's organization.
       )
 

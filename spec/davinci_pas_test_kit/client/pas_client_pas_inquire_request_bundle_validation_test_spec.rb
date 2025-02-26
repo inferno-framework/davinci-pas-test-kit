@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::ClientPasInquireRequestBundleValidationTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:access_token) { '1234' }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
@@ -20,7 +20,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::ClientPasInquireRequestBundleV
     File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_inquire_bundle_v110.json'))
   end
   let(:approval_test) do
-    Class.new(DaVinciPASTestKit::DaVinciPASV201::ClientPasInquireRequestBundleValidationTest) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest) do
       fhir_resource_validator do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
@@ -37,7 +37,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::ClientPasInquireRequestBundleV
     end
   end
   let(:no_workflow_test) do
-    Class.new(DaVinciPASTestKit::DaVinciPASV201::ClientPasInquireRequestBundleValidationTest) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest) do
       fhir_resource_validator do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 

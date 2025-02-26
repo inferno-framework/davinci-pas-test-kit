@@ -4,12 +4,12 @@ require_relative '../../../response_generator'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientPasInquireResponseBundleValidationTest < Inferno::Test
+    class PasClientInquireResponseBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include UserInputResponse
       include ResponseGenerator
 
-      id :pas_client_v201_pas_inquire_response_bundle_validation_test
+      id :pas_client_v201_inquire_response_bundle_validation_test
       title '[USER INPUT VERIFICATION] Inquire Response Bundle is valid'
       description %(
         **USER INPUT VERIFICATION**: This test verifies input provided by the tester instead of the system under test.

@@ -18,9 +18,9 @@ module DaVinciPASTestKit
       input :approval_json_response, optional: true
 
       test from: :pas_client_v201_approval_submit_test
-      test from: :pas_client_v201_pas_request_bundle_validation_test,
+      test from: :pas_client_v201_request_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
-      test from: :pas_client_v201_pas_response_bundle_validation_test,
+      test from: :pas_client_v201_response_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
       test from: :pas_client_v201_response_attest,
            title: 'Check that the client registers the request as approved (Attestation)',

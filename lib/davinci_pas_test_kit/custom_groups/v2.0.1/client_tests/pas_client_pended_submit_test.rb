@@ -32,8 +32,10 @@ module DaVinciPASTestKit
             description: %(
               If provided, this JSON will be sent as the notification for the
               PAS Subscription to tell the client that a decision has been made on the pended claim.
-              It will be updated to make creation timestamps current refer to the correct
-              ClaimResponse id if it was mocked by Inferno.
+              Before sending, Inferno will update the provided notification with details that the tester cannot
+              know ahead of time, including timestamps corresponding to the notification trigger time, and the id of
+              the triggering ClaimResponse if Inferno mocks that ClaimResponse because it is not provided by the
+              tester through the *Claim pended response JSON* input.
               If not provided, a notification will be generated from the returned ClaimResponse.
               In either case the response will be validated to ensure that the notification
               is conformant.

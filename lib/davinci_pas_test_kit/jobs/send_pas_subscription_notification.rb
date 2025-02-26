@@ -13,18 +13,20 @@ module DaVinciPASTestKit
 
       # override the one from URLs
       def suite_id
-        :davinci_pas_client_suite_v201 # TODO: don't hard-code the id here...
+        @notification_suite_id
       end
 
       sidekiq_options retry: false
 
-      def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token)
+      def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token,
+                  notification_suite_id)
         @test_run_id = test_run_id
         @test_session_id = test_session_id
         @result_id = result_id
         @notification_bearer_token = notification_bearer_token
         @notification_json = notification_json
         @resume_token = resume_token
+        @notification_suite_id = notification_suite_id
 
         await_subscription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
         sleep 1
@@ -101,10 +103,6 @@ module DaVinciPASTestKit
         event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic, 1).to_json
         response = send_notification(event_json)
         persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
-      end
-
-      def resume_inferno_test
-        test_suite_connection.get(RESUME_PASS_PATH.delete_prefix('/'), { token: @resume_token })
       end
 
       def send_notification(request_body)

@@ -42,9 +42,9 @@ module DaVinciPASTestKit
       group do
         title 'Verify $submit interaction'
 
-        test from: :pas_client_v201_pas_request_bundle_validation_test,
+        test from: :pas_client_v201_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v201_pas_response_bundle_validation_test,
+        test from: :pas_client_v201_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
              title: 'Check that the client registers the request as pended (Attestation)',
@@ -101,9 +101,9 @@ module DaVinciPASTestKit
       group do
         title 'Verify $inquire interaction'
 
-        test from: :pas_client_v201_pas_inquire_request_bundle_validation_test,
+        test from: :pas_client_v201_inquire_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v201_pas_inquire_response_bundle_validation_test,
+        test from: :pas_client_v201_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
              title: 'Check that the client registers the request as approved (Attestation)',

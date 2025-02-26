@@ -20,9 +20,9 @@ module DaVinciPASTestKit
       input :denial_json_response, optional: true
 
       test from: :pas_client_v201_denial_submit_test
-      test from: :pas_client_v201_pas_request_bundle_validation_test,
+      test from: :pas_client_v201_request_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
-      test from: :pas_client_v201_pas_response_bundle_validation_test,
+      test from: :pas_client_v201_response_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
       test from: :pas_client_v201_response_attest,
            title: 'Check that the client registers the request as denied (Attestation)',
