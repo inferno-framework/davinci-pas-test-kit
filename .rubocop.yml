@@ -6,7 +6,7 @@ require:
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.3.6
   Exclude:
     - 'Gemfile'
     - 'lib/davinci_pas_test_kit/generated/**/*'

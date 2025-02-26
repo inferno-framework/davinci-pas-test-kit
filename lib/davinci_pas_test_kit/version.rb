@@ -2,4 +2,5 @@
 
 module DaVinciPASTestKit
   VERSION = '0.11.2'
+  LAST_UPDATED = '2025-02-04' # TODO: update next release
 end

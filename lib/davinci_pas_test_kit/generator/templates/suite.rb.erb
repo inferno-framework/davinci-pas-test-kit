@@ -1,7 +1,6 @@
 require 'subscriptions_test_kit'
 require_relative '../../validator_suppressions'
 require_relative '<%= error_group_file_name %>'
-require_relative '../../version'
 <% group_file_list.each do |file_name| %>require_relative '<%= file_name %>'
 <% end %>
 module DaVinciPASTestKit
@@ -9,7 +8,6 @@ module DaVinciPASTestKit
     class <%= class_name %> < Inferno::TestSuite
       id :<%= suite_id %>
       title '<%= title %>'
-      version DaVinciPASTestKit::VERSION
       description File.read(File.join(__dir__, '..', '..', 'docs', 'server_suite_description_<%= ig_metadata.reformatted_version %>.md'))
 
       links [
@@ -20,6 +18,10 @@ module DaVinciPASTestKit
         {
           label: 'Open Source',
           url: 'https://github.com/inferno-framework/davinci-pas-test-kit/'
+        },
+        {
+          label: 'Download',
+          url: 'https://github.com/inferno-framework/davinci-pas-test-kit/releases'
         },
         {
           label: 'Implementation Guide',
