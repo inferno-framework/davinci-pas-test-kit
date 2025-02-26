@@ -1,3 +1,16 @@
+# 0.12.0
+
+### Breaking Changes by @vanessuniq in https://github.com/inferno-framework/davinci-pas-test-kit/pull/24:
+* **Ruby Version Update:** Upgraded Ruby to `3.3.6`.
+* **Inferno Core Update:** Bumped to version `0.6`.
+* **Gemspec Updates:**
+  * Switched to `git` for specifying files.
+  * Added `presets` to the gem package.
+  * Updated any test kit dependencies
+* **Test Kit Metadata:** Implemented Test Kit metadata for Inferno Platform.
+* **Environment Updates:** Updated Ruby version in the Dockerfile and GitHub Actions workflow.
+
+
 # 0.11.1
 
 * FI-3301: SuiteEndpoints by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/21
