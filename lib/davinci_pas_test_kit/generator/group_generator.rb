@@ -383,7 +383,7 @@ module DaVinciPASTestKit
               during which the final decision is pending. This includes demonstrating
               the ability of the server to
 
-              - Respond to a prior authorization request with an `pended` status.
+              - Respond to a prior authorization request with a `pended` status.
               - Accept a Subscription creation request and send a notification when
                 the pended claim has been finalized.
               - Respond to a subsequent inquiry request with a final decision for the request.

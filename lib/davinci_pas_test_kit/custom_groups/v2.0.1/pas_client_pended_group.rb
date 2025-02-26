@@ -51,7 +51,7 @@ module DaVinciPASTestKit
              description: %(
               This test provides the tester an opportunity to observe their client following
               the receipt of the pended response and attest that users are able to determine
-              that the response has been pended and a decision will be forth coming.
+              that the response has been pended and a decision will be forthcoming.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
