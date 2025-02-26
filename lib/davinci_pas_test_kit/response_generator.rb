@@ -288,31 +288,33 @@ module DaVinciPASTestKit
         name: 'events-since-subscription-start',
         valueString: '1'
       )
-      event = FHIR::Parameters::Parameter.new(
-        name: 'notification-event'
-      )
-      status_parameters.parameter << event
-      event.part << FHIR::Parameters::Parameter.new(
-        name: 'event-number',
-        valueString: '1'
-      )
-      event.part << FHIR::Parameters::Parameter.new(
-        name: 'timestamp',
-        valueInstant: timestamp.iso8601
-      )
-      event.part << FHIR::Parameters::Parameter.new(
-        name: 'focus',
-        valueReference: FHIR::Reference.new(
-          reference: claim_response_reference
+      if claim_response_reference.present?
+        event = FHIR::Parameters::Parameter.new(
+          name: 'notification-event'
         )
-      )
-      additional_context_references&.each do |reference|
+        status_parameters.parameter << event
         event.part << FHIR::Parameters::Parameter.new(
-          name: 'additional-context',
+          name: 'event-number',
+          valueString: '1'
+        )
+        event.part << FHIR::Parameters::Parameter.new(
+          name: 'timestamp',
+          valueInstant: timestamp.iso8601
+        )
+        event.part << FHIR::Parameters::Parameter.new(
+          name: 'focus',
           valueReference: FHIR::Reference.new(
-            reference:
+            reference: claim_response_reference
           )
         )
+        additional_context_references&.each do |reference|
+          event.part << FHIR::Parameters::Parameter.new(
+            name: 'additional-context',
+            valueReference: FHIR::Reference.new(
+              reference:
+            )
+          )
+        end
       end
       status_parameters
     end

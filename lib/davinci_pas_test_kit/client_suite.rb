@@ -5,6 +5,7 @@ require_relative 'urls'
 require_relative 'endpoints/claim_endpoint'
 require_relative 'endpoints/token_endpoint'
 require_relative 'endpoints/subscription_create_endpoint'
+require_relative 'endpoints/subscription_status_endpoint'
 require_relative 'custom_groups/v2.0.1/pas_client_authentication_group'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
 require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
@@ -54,9 +55,9 @@ module DaVinciPASTestKit
     suite_endpoint :post, INQUIRE_PATH, ClaimEndpoint
     suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
     suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
-    suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionsTestKit::SubscriptionStatusEndpoint
-    suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionsTestKit::SubscriptionStatusEndpoint
-    suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionsTestKit::SubscriptionStatusEndpoint
+    suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
+    suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
+    suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
 
     resume_test_route :get, RESUME_PASS_PATH do |request|
       request.query_parameters['token']

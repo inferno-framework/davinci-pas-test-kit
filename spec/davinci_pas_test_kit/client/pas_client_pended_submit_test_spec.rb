@@ -11,12 +11,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
     let(:subscription_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
     let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
     let(:inquire_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::INQUIRE_PATH}" }
+    let(:status_instance_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH}" }
+    let(:status_resource_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH}" }
     let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{access_token}" }
     let(:subscription_create_response_full_resource) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
     end
     let(:submit_request_json) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
+    end
+    let(:notification_bundle) do
+      File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_notification_example_id_only.json'))
     end
 
     def create_subscription_request
@@ -245,7 +250,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
               ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'
             end
             expect(review_action_code).to_not be_nil
-            expect(review_action_code.valueCodeableConcept&.coding&.dig(0)&.code).to eq('A1')
+            expect(review_action_code.valueCodeableConcept.coding&.dig(0)&.code).to eq('A1')
           end
         end
 
@@ -374,6 +379,98 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           result = run(test, inputs)
           expect(result.result).to eq('fail')
           expect(result.result_message).to match(/must be valid JSON/)
+        end
+      end
+    end
+
+    describe 'when receiving Subscription $status requests' do
+      describe 'on instance-level requests (get)' do
+        it 'generates a status from user input when provided' do
+          create_subscription_request
+          inputs = { access_token:, notification_bundle: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          header('Authorization', "Bearer #{access_token}")
+          get(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
+
+          fhir_body = FHIR.from_contents(last_response.body)
+          expect(fhir_body).to be_a(FHIR::Bundle)
+          expect(fhir_body.entry.length).to be 1
+        end
+
+        it 'creates a status itself when input not provided' do
+          create_subscription_request
+          inputs = { access_token: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          header('Authorization', "Bearer #{access_token}")
+          get(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
+
+          fhir_body = FHIR.from_contents(last_response.body)
+          expect(fhir_body).to be_a(FHIR::Bundle)
+          expect(fhir_body.entry.length).to be 1
+        end
+      end
+
+      describe 'on instance-level requests (post)' do
+        it 'generates a status from user input when provided' do
+          create_subscription_request
+          inputs = { access_token:, notification_bundle: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          header('Authorization', "Bearer #{access_token}")
+          post(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
+
+          fhir_body = FHIR.from_contents(last_response.body)
+          expect(fhir_body).to be_a(FHIR::Bundle)
+          expect(fhir_body.entry.length).to be 1
+        end
+
+        it 'creates a status itself when input not provided' do
+          create_subscription_request
+          inputs = { access_token: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          header('Authorization', "Bearer #{access_token}")
+          post(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
+
+          fhir_body = FHIR.from_contents(last_response.body)
+          expect(fhir_body).to be_a(FHIR::Bundle)
+          expect(fhir_body.entry.length).to be 1
+        end
+      end
+
+      describe 'on resource-level requests' do
+        it 'generates a status from user input when provided' do
+          create_subscription_request
+          inputs = { access_token:, notification_bundle: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          header('Authorization', "Bearer #{access_token}")
+          post_json(status_resource_url, FHIR::Parameters.new.to_json)
+
+          fhir_body = FHIR.from_contents(last_response.body)
+          expect(fhir_body).to be_a(FHIR::Bundle)
+          expect(fhir_body.entry.length).to be 1
+        end
+
+        it 'creates a status itself when input not provided' do
+          create_subscription_request
+          inputs = { access_token: }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          header('Authorization', "Bearer #{access_token}")
+          post_json(status_resource_url, FHIR::Parameters.new.to_json)
+
+          fhir_body = FHIR.from_contents(last_response.body)
+          expect(fhir_body).to be_a(FHIR::Bundle)
+          expect(fhir_body.entry.length).to be 1
         end
       end
     end

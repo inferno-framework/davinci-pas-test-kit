@@ -4,6 +4,7 @@ require 'subscriptions_test_kit'
 module DaVinciPASTestKit
   class SubscriptionStatusEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
+    include ResponseGenerator
 
     def test_run_identifier
       request.headers['authorization']&.delete_prefix('Bearer ')
@@ -30,23 +31,36 @@ module DaVinciPASTestKit
           return
         end
 
-        unless subscription_params_match?(params)
+        unless subscription_params_match?(params, subscription)
           not_found
           return
         end
       end
 
-      notification_json = notification_bundle_input(result)
       subscription_url = "#{base_subscription_url}/#{subscription.id}"
       subscription_topic = subscription.criteria
       status_code = determine_subscription_status_code(subscription_id)
       event_count = determine_event_count(test_run.test_session_id)
-      response.status = 200
+
+      notification_json = notification_bundle_input(result)
+      if notification_json.blank?
+        notification_timestamp = Time.now.utc
+        mock_status_bundle = FHIR::Bundle.new(
+          id: SecureRandom.uuid,
+          timestamp: notification_timestamp.iso8601,
+          type: 'history'
+        )
+        mock_notification_status = build_mock_notification_status(notification_timestamp, subscription_url,
+                                                                  subscription_topic, nil, nil)
+        mock_status_bundle.entry << build_mock_notification_status_entry(mock_notification_status, subscription_url)
+        notification_json = mock_status_bundle.to_json
+      end
       response.body = derive_status_bundle(notification_json, subscription_url, subscription_topic, status_code,
                                            event_count, request.url).to_json
+      response.status = 200
     end
 
-    def subscription_params_match?(params)
+    def subscription_params_match?(params, subscription)
       id_params = find_params(params, 'id')
 
       return false if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
