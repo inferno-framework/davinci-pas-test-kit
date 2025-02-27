@@ -12,7 +12,7 @@ module DaVinciPASTestKit
 
     # override the one from URLs
     def suite_id
-      request.path.split('/')[2] # request.path = /custom/{suite_id}/...
+      request.path.split('/custom/')[1].split('/')[0] # request.path = {base inferno path}/custom/{suite_id}/...
     end
 
     def test_run_identifier
