@@ -1,12 +1,17 @@
+require 'subscriptions_test_kit'
 require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
 require_relative 'endpoints/claim_endpoint'
 require_relative 'endpoints/token_endpoint'
+require_relative 'endpoints/subscription_create_endpoint'
+require_relative 'endpoints/subscription_status_endpoint'
 require_relative 'custom_groups/v2.0.1/pas_client_authentication_group'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
 require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
 require_relative 'custom_groups/v2.0.1/pas_client_pended_group'
+require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_create_test'
+require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_pas_conformance_test'
 require_relative 'generated/v2.0.1/pas_client_submit_must_support_use_case_group'
 require_relative 'generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
 
@@ -48,6 +53,11 @@ module DaVinciPASTestKit
     suite_endpoint :post, TOKEN_PATH, TokenEndpoint
     suite_endpoint :post, SUBMIT_PATH, ClaimEndpoint
     suite_endpoint :post, INQUIRE_PATH, ClaimEndpoint
+    suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
+    suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
+    suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
+    suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
+    suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
 
     resume_test_route :get, RESUME_PASS_PATH do |request|
       request.query_parameters['token']
@@ -67,6 +77,20 @@ module DaVinciPASTestKit
         (user provided or generated during the authorization tests)
         in the Authorization HTTP header with prefix "Bearer: ".
       )
+      group do
+        title 'PAS Subscription Setup'
+        description %(
+          These tests verify that the client can create a Subscription instance
+          that will tell the Payer how to notify the client when pended claims
+          are updated.
+        )
+        run_as_group
+
+        test from: :pas_client_v201_subscription_create_test
+        test from: :subscriptions_r4_client_subscription_verification
+        test from: :pas_client_v201_subscription_pas_conformance_test
+        test from: :subscriptions_r4_client_handshake_notification_verification
+      end
 
       group do
         title 'Demonstrate Workflow Support'

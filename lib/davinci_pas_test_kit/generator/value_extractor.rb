@@ -17,7 +17,10 @@ module DaVinciPASTestKit
       end
 
       def bound_systems(the_element)
-        value_set(the_element)&.compose&.include&.reject { |code| code.concept.nil? }
+        vs = value_set(the_element)
+        return unless vs.present?
+
+        vs.compose&.include&.reject { |code| code.concept.nil? }
       end
 
       def values_from_value_set_binding(the_element)

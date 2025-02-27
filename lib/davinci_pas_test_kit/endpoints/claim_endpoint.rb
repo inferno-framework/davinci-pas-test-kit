@@ -1,24 +1,53 @@
 require_relative '../user_input_response'
+require_relative '../response_generator'
+require_relative '../urls'
+require_relative '../jobs/send_pas_subscription_notification'
+require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
   class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
+    include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
+    include ResponseGenerator
+    include URLs
+
+    # override the one from URLs
+    def suite_id
+      request.path.split('/custom/')[1].split('/')[0] # request.path = {base inferno path}/custom/{suite_id}/...
+    end
+
     def test_run_identifier
       request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
     def tags
-      [operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG]
+      operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
+      workflow_tag = WORKFLOW_TAG_MAP[workflow]
+
+      return [operation_tag, workflow_tag] if workflow_tag.present?
+
+      [operation_tag]
     end
+
+    def workflow
+      case test.id
+      when /.*pended.*/
+        :pended
+      when /.*denial.*/
+        :denial
+      when /.*approval.*/
+        :approval
+      end
+    end
+
+    WORKFLOW_TAG_MAP = {
+      pended: PENDED_WORKFLOW_TAG,
+      denial: DENIAL_WORKFLOW_TAG,
+      approval: APPROVAL_WORKFLOW_TAG
+    }.freeze
 
     def make_response
       response.status = 200
       response.format = :json
-
-      user_inputted_response = UserInputResponse.user_inputted_response(test, result)
-      if user_inputted_response.present?
-        response.body = user_inputted_response
-        return
-      end
 
       req_bundle = FHIR.from_contents(request.body.string)
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
@@ -28,27 +57,26 @@ module DaVinciPASTestKit
         return
       end
 
-      root_url = base_url(claim_full_url)
-      claim_response = mock_claim_response(claim_entry.resource, req_bundle, root_url)
+      user_inputted_response = UserInputResponse.user_inputted_response(test, operation, result)
+      if user_inputted_response.present?
+        generated_claim_response_uuid = nil
+        response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url)
+      else
+        decision = # always use the workflow, except for pended when the inquire will get approved
+          if operation == 'inquire' && workflow == :pended
+            :approval
+          else
+            workflow
+          end
+        generated_claim_response_uuid = SecureRandom.uuid
+        response_bundle_json = mock_response_bundle(req_bundle, operation, decision, generated_claim_response_uuid)
+      end
 
-      res_bundle = FHIR::Bundle.new(
-        id: SecureRandom.uuid,
-        meta: FHIR::Meta.new(profile: if operation == 'submit'
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'
-                                      else
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle'
-                                      end),
-        timestamp: Time.now.utc.iso8601,
-        type: 'collection',
-        entry: [
-          FHIR::Bundle::Entry.new(fullUrl: "urn:uuid:#{claim_response.id}",
-                                  resource: claim_response)
-        ]
-      )
+      response.body = response_bundle_json
 
-      res_bundle.entry.concat(referenced_entities(claim_response, req_bundle.entry, root_url))
+      return unless workflow == :pended && operation == 'submit'
 
-      response.body = res_bundle.to_json
+      start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
     end
 
     def update_result
@@ -56,78 +84,6 @@ module DaVinciPASTestKit
     end
 
     private
-
-    # Note that references from the claim to other resources in the bundle need to be changed to absolute URLs
-    # if they are relative, because the ClaimResponse's fullUrl is a urn:uuid
-    #
-    # @private
-    def mock_claim_response(claim, bundle, root_url)
-      return FHIR::ClaimResponse.new(id: SecureRandom.uuid) if claim.blank?
-
-      now = Time.now.utc
-
-      FHIR::ClaimResponse.new(
-        id: SecureRandom.uuid,
-        meta: FHIR::Meta.new(profile: if operation == 'submit'
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse'
-                                      else
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'
-                                      end),
-        identifier: claim.identifier,
-        type: claim.type,
-        status: claim.status,
-        use: claim.use,
-        patient: absolute_reference(claim.patient, bundle.entry, root_url),
-        created: now.iso8601,
-        insurer: absolute_reference(claim.insurer, bundle.entry, root_url),
-        requestor: absolute_reference(claim.provider, bundle.entry, root_url),
-        outcome: 'complete',
-        item: claim.item.map do |item|
-          FHIR::ClaimResponse::Item.new(
-            extension: [
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthIssueDate',
-                valueDate: now.strftime('%Y-%m-%d')
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthPeriod',
-                valuePeriod: FHIR::Period.new(start: now.strftime('%Y-%m-%d'),
-                                              end: (now + 1.month).strftime('%Y-%m-%d'))
-              )
-            ],
-            itemSequence: item.sequence,
-            adjudication: [
-              FHIR::ClaimResponse::Item::Adjudication.new(
-                extension: [
-                  FHIR::Extension.new(
-                    url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
-                    extension: [
-                      FHIR::Extension.new(
-                        url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode',
-                        valueCodeableConcept: FHIR::CodeableConcept.new(
-                          coding: [
-                            FHIR::Coding.new(
-                              system: 'https://codesystem.x12.org/005010/306',
-                              code: 'A1',
-                              display: 'Certified in total'
-                            )
-                          ]
-                        )
-                      )
-                    ]
-                  )
-                ],
-                category: FHIR::CodeableConcept.new(
-                  coding: [
-                    FHIR::Coding.new(system: 'http://terminology.hl7.org/CodeSystem/adjudication', code: 'submitted')
-                  ]
-                )
-              )
-            ]
-          )
-        end
-      )
-    end
 
     def handle_missing_required_elements(claim_entry, response)
       response.status = 400
@@ -146,49 +102,44 @@ module DaVinciPASTestKit
       request.url&.split('$')&.last
     end
 
-    # Drop the last two segments of a URL, i.e. the resource type and ID of a FHIR resource
-    # e.g. http://example.org/fhir/Patient/123 -> http://example.org/fhir
-    # @private
-    def base_url(url)
-      return unless url&.start_with?('http://', 'https://')
+    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid)
+      notification_bearer_token = client_access_token_input(result)
+      notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
 
-      # Drop everything after the second to last '/', ignoring a trailing slash
-      url.sub(%r{/[^/]*/[^/]*(/)?\z}, '')
+      Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, test_run.id, test_run.test_session_id, result.id,
+                            notification_bearer_token, notification_contents, test_run_identifier, suite_id)
     end
 
-    def referenced_entities(resource, entries, root_url)
-      matches = []
-      attributes = resource&.source_hash&.keys
-      attributes.each do |attr|
-        value = resource.send(attr.to_sym)
-        if value.is_a?(FHIR::Reference) && value.reference.present?
-          match = find_matching_entry(value.reference, entries, root_url)
-          if match.present? && matches.none?(match)
-            value.reference = match.fullUrl
-            matches.concat([match], referenced_entities(match.resource, entries, root_url))
-          end
-        elsif value.is_a?(Array) && value.all? { |elmt| elmt.is_a?(FHIR::Model) }
-          value.each { |val| matches.concat(referenced_entities(val, entries, root_url)) }
-        end
+    def notification_json(response_bundle_json, decision, generated_claim_response_uuid)
+      user_inputted_notification_json =
+        JSON.parse(result.input_json).find { |i| i['name'] == 'notification_bundle' }['value']
+
+      if user_inputted_notification_json.present?
+        update_tester_provided_notification(user_inputted_notification_json, generated_claim_response_uuid)
+      else
+        generate_notification(response_bundle_json, decision)
       end
-
-      matches
     end
 
-    def absolute_reference(ref, entries, root_url)
-      url = find_matching_entry(ref&.reference, entries, root_url)&.fullUrl
-      ref.reference = url if url
-      ref
+    def generate_notification(response_bundle_json, decision)
+      subscription = find_subscription(test_run.test_session_id, as_json: true)
+      subscription_reference = "#{fhir_subscription_url}/#{subscription['id']}"
+      subscription_topic = subscription['criteria']
+
+      if find_subscription_content_type(subscription) == 'full-resource'
+        mock_full_resource_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
+                                               decision)
+      else # assume id-only since empty not allowed - if asked for empty, other failures will occur
+        mock_id_only_notification_bundle(response_bundle_json, subscription_reference, subscription_topic)
+      end
     end
 
-    def find_matching_entry(ref, entries, root_url = '')
-      ref = "#{root_url}/#{ref}" if relative_reference?(ref) && root_url&.present?
-
-      entries&.find { |entry| entry&.fullUrl == ref }
-    end
-
-    def relative_reference?(ref)
-      ref&.count('/') == 1
+    def find_subscription_content_type(subscription)
+      content_ext = subscription['channel']['_payload']['extension']
+        .find do |ext|
+          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
+        end
+      content_ext['valueCode'] if content_ext.present?
     end
   end
 end

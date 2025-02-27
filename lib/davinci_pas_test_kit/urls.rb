@@ -4,6 +4,10 @@ module DaVinciPASTestKit
   TOKEN_PATH = '/mock_auth/token'
   SUBMIT_PATH = '/fhir/Claim/$submit'
   INQUIRE_PATH = '/fhir/Claim/$inquire'
+  FHIR_SUBSCRIPTION_PATH = '/fhir/Subscription'
+  FHIR_SUBSCRIPTION_INSTANCE_PATH = '/fhir/Subscription/:id'
+  FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH = '/fhir/Subscription/:id/$status'
+  FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH = '/fhir/Subscription/$status'
   RESUME_PASS_PATH = '/resume_pass'
   RESUME_FAIL_PATH = '/resume_fail'
 
@@ -22,6 +26,10 @@ module DaVinciPASTestKit
 
     def inquire_url
       @inquire_url ||= base_url + INQUIRE_PATH
+    end
+
+    def fhir_subscription_url
+      @fhir_subscription_url ||= base_url + FHIR_SUBSCRIPTION_PATH
     end
 
     def resume_pass_url

@@ -13,12 +13,13 @@ module DaVinciPASTestKit
       title 'Successful Pended Workflow'
       description %(
         Demonstrate a complete prior authorization workflow including a period
-        during which the final decision is pending. This includes
+        during which the final decision is pending. This includes demonstrating
+        the ability of the server to
         
-        - Demonstrating the ability of the server to respond to a prior
-          authorization request with an `pended` status.
-        - Demonstrating the ability of the server to respond to a subsequent
-          inquiry request with a final decision for the request
+        - Respond to a prior authorization request with a `pended` status.
+        - Accept a Subscription creation request and send a notification when
+          the pended claim has been finalized.
+        - Respond to a subsequent inquiry request with a final decision for the request.
         
       )
 

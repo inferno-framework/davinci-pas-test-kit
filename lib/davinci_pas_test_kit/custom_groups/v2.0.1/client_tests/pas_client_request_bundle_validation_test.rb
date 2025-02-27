@@ -1,37 +1,33 @@
 require_relative '../../../pas_bundle_validation'
-require_relative '../../../user_input_response'
+require_relative '../../../urls'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ClientPendedPasResponseBundleValidationTest < Inferno::Test
+    class PasClientRequestBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
-      include UserInputResponse
+      include URLs
 
-      id :pas_client_v201_pended_pas_response_bundle_validation_test
-      title '[USER INPUT VALIDATION] Response Bundle is valid'
+      id :pas_client_v201_request_bundle_validation_test
+      title 'Submit Request Bundle is valid'
       description %(
-        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
-        Errors encountered will be treated as a skip instead of a failure.
-        
-        This test validates the conformity of the
-        user input to the
-        [PAS Response Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle) structure.
-        It also checks that other conformance requirements defined in the [PAS Formal
+        This test verifies the conformity of the client's submit request body to the
+        [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
+        structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
         such as the presence of all referenced instances within the bundle and the
         conformance of those instances to the appropriate profiles, are met.
-        
+
         It verifies the presence of mandatory elements and that elements with
         required bindings contain appropriate values. CodeableConcept element
         bindings will fail if none of their codings have a code/system belonging
         to the bound ValueSet. Quantity, Coding, and code element bindings will
         fail if their code/system are not found in the valueset.
-        
+
         Note that because X12 value sets are not public, elements bound to value
         sets containing X12 codes are not validated.
-        
+
         **Limitations**
-        
+
         Due to recognized errors in the PAS IG around extension context definitions,
         this test may not pass due to spurious errors of the form "The extension
         [extension url] is not allowed at this point". See [this
@@ -39,24 +35,29 @@ module DaVinciPASTestKit
         for additional details.
       )
 
-      def resource_type
-        'Bundle'
+      def workflow_tag
+        config.options[:workflow_tag]
       end
 
-      def request_type
-        'submit'
+      def request_type_tag
+        SUBMIT_TAG
       end
 
       run do
-        check_user_inputted_response :pended_json_response
+        if workflow_tag.present?
+          load_tagged_requests(request_type_tag, workflow_tag)
+        else
+          load_tagged_requests(request_type_tag)
+        end
+        skip_if !request.present?, 'No submit requests received.'
+
         validate_pas_bundle_json(
-          pended_json_response,
-          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle',
+          request.request_body,
+          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
           '2.0.1',
-          request_type,
-          'response_bundle',
-          skips: true,
-          message: "Invalid input for '#{input_title(:pended_json_response)}':"
+          'submit',
+          'request_bundle',
+          message: 'The Bundle provided for the Claim/$submit operation is invalid:'
         )
       end
     end

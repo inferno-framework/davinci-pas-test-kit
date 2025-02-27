@@ -68,8 +68,6 @@
 :tests:
 - :id: pas_server_v201_pas_request_bundle_validation_test
   :file_name: server_pas_request_bundle_validation_test.rb
-- :id: pas_client_v201_pas_request_bundle_validation_test
-  :file_name: client_pas_request_bundle_validation_test.rb
 - :id: pas_server_submit_request_v201_pas_request_bundle_must_support_test
   :file_name: server_submit_request_pas_request_bundle_must_support_test.rb
 - :id: pas_client_submit_request_v201_pas_request_bundle_must_support_test

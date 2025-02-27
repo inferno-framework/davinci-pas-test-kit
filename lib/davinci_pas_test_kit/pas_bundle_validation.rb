@@ -171,7 +171,7 @@ module DaVinciPASTestKit
       bundle_entry = bundle.entry
 
       root_entry = bundle_entry.find do |entry|
-        entry.resource.resourceType == 'Claim' || entry.resource.resourceType == 'ClaimResponse'
+        ['Claim', 'ClaimResponse'].include?(entry.resource.resourceType)
       end
 
       if root_entry.present?
@@ -331,7 +331,9 @@ module DaVinciPASTestKit
     # @param bundle_entry [Array] The bundle.entry contents.
     # @param version [String] The IG version.
     def add_declared_profiles(instance, bundle_entry, version)
-      instance.resource&.meta&.profile&.each do |url|
+      return unless instance.resource.present?
+
+      instance.resource.meta&.profile&.each do |url|
         next if bundle_resources_target_profile_map[instance.fullUrl][:profile_urls].include?(url)
 
         bundle_resources_target_profile_map[instance.fullUrl][:profile_urls] << url
@@ -462,11 +464,10 @@ module DaVinciPASTestKit
         return if ref.blank?
 
         absolute_ref = absolute_url(ref, base_url)
-        resource_type, resource_id = ref.split('/')
         matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
 
         if matching_resources.length != 1
-          validation_error_messages << resource_shall_appear_once_message(resource_type, resource_id,
+          validation_error_messages << resource_shall_appear_once_message(absolute_ref,
                                                                           matching_resources.length)
         end
 
@@ -525,10 +526,10 @@ module DaVinciPASTestKit
     #
     # This method generates an error message when a referenced resource appears more than once
     # in a FHIR bundle, which is not allowed.
-    def resource_shall_appear_once_message(reference_resource_type, reference_resource_id, total_matches)
+    def resource_shall_appear_once_message(absolute_ref, total_matches)
       "
-        The referenced #{reference_resource_type}/#{reference_resource_id} resource
-        SHALL only appear once in the Bundle, but found #{total_matches}.
+        The referenced #{absolute_ref} resource
+        SHALL appear exactly once in the Bundle, but found #{total_matches}.
       "
     end
 

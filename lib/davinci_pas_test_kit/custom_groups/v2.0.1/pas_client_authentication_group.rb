@@ -23,7 +23,7 @@ module DaVinciPASTestKit
 
         Finally, make a valid token request that includes the specified `client_id`
         to indicated token endpoint. This should be a POST of an `x-www-form-encoded`
-        body containing keys for `grant_type` with a value of `client_crendials` and
+        body containing keys for `grant_type` with a value of `client_credentials` and
         `client_id` with a value of the configured `client_id` value. For example, if
         the `client_id` value was `123`, then the body of the request would be:
 
@@ -38,7 +38,7 @@ module DaVinciPASTestKit
         the "Authorization" HTTP header with prefix "Bearer: ". In this example, the
         Authorization HTTP header would have value:
 
-        ```Bearer: 97e792038d922bc3cf388b608e45c318```
+        ```Bearer 97e792038d922bc3cf388b608e45c318```
       )
       run_as_group
 
