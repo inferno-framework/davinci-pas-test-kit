@@ -9,7 +9,7 @@ module DaVinciPASTestKit
       title 'Successful Denial Workflow'
       description %(
         Demonstrate the ability of the server to respond to a prior
-        authorization request with an `denied` decision.
+        authorization request with a `denied` decision.
         
       )
 

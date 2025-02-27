@@ -171,7 +171,7 @@ module DaVinciPASTestKit
       bundle_entry = bundle.entry
 
       root_entry = bundle_entry.find do |entry|
-        entry.resource.resourceType == 'Claim' || entry.resource.resourceType == 'ClaimResponse'
+        ['Claim', 'ClaimResponse'].include?(entry.resource.resourceType)
       end
 
       if root_entry.present?
@@ -331,7 +331,9 @@ module DaVinciPASTestKit
     # @param bundle_entry [Array] The bundle.entry contents.
     # @param version [String] The IG version.
     def add_declared_profiles(instance, bundle_entry, version)
-      instance.resource&.meta&.profile&.each do |url|
+      return unless instance.resource.present?
+
+      instance.resource.meta&.profile&.each do |url|
         next if bundle_resources_target_profile_map[instance.fullUrl][:profile_urls].include?(url)
 
         bundle_resources_target_profile_map[instance.fullUrl][:profile_urls] << url

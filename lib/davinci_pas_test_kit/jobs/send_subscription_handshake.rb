@@ -76,7 +76,9 @@ module DaVinciPASTestKit
       end
 
       def subscription_headers
-        @subscription_headers ||= subscription&.channel&.header&.each_with_object({}) do |header, hash|
+        return {} unless subscription.present?
+
+        @subscription_headers ||= subscription.channel&.header&.each_with_object({}) do |header, hash|
           header_name, header_value = header.split(': ', 2)
           hash[header_name] = header_value
         end || {}

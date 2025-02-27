@@ -173,9 +173,10 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
     describe 'and populating item.adjudiction' do
       it 'includes an ClaimResponse.item for each item in the submitted claim' do
         request_bundle = FHIR.from_contents(submit_request_multiple_items_string)
-        request_item_count = request_bundle.entry.find do |entry|
-                               entry.resource.is_a?(FHIR::Claim)
-                             end&.resource&.item&.length
+        request_item_count =
+          request_bundle.entry.find do |entry|
+            entry.resource.is_a?(FHIR::Claim)
+          end.resource.item.length
 
         returned_response_string = module_instance.mock_response_bundle(
           request_bundle,
@@ -186,10 +187,11 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
 
         response_bundle = FHIR.from_contents(returned_response_string)
         expect(response_bundle).to_not be_nil
-        response_item_count = response_bundle.entry.find do |entry|
+        claim_response = response_bundle.entry.find do |entry|
           entry.resource.is_a?(FHIR::ClaimResponse)
-        end&.resource&.item&.length
-        expect(response_item_count).to be(request_item_count)
+        end
+        expect(claim_response).to_not be_nil
+        expect(claim_response.resource&.item&.length).to be(request_item_count)
       end
 
       it 'can use an approved decision' do
@@ -213,7 +215,9 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
           item.adjudication.each do |adjudication|
             review_action_ext = adjudication.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction' }
             review_action_code_ext = review_action_ext&.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode' }
-            approved_review_action_code = review_action_code_ext&.valueCodeableConcept&.coding&.find do |coding|
+            next unless review_action_code_ext.present?
+
+            approved_review_action_code = review_action_code_ext.valueCodeableConcept&.coding&.find do |coding|
               coding.code == 'A1'
             end
             break if approved_review_action_code.present?
@@ -243,7 +247,9 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
           item.adjudication.each do |adjudication|
             review_action_ext = adjudication.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction' }
             review_action_code_ext = review_action_ext&.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode' }
-            denied_review_action_code = review_action_code_ext&.valueCodeableConcept&.coding&.find do |coding|
+            next unless review_action_code_ext.present?
+
+            denied_review_action_code = review_action_code_ext.valueCodeableConcept&.coding&.find do |coding|
               coding.code == 'A3'
             end
             break if denied_review_action_code.present?
@@ -273,7 +279,9 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
           item.adjudication.each do |adjudication|
             review_action_ext = adjudication.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction' }
             review_action_code_ext = review_action_ext&.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode' }
-            pended_review_action_code = review_action_code_ext&.valueCodeableConcept&.coding&.find do |coding|
+            next unless review_action_code_ext.present?
+
+            pended_review_action_code = review_action_code_ext.valueCodeableConcept&.coding&.find do |coding|
               coding.code == 'A4'
             end
             break if pended_review_action_code.present?
@@ -303,7 +311,9 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
           item.adjudication.each do |adjudication|
             review_action_ext = adjudication.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction' }
             review_action_code_ext = review_action_ext&.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode' }
-            approved_review_action_code = review_action_code_ext&.valueCodeableConcept&.coding&.find do |coding|
+            next unless review_action_code_ext.present?
+
+            approved_review_action_code = review_action_code_ext.valueCodeableConcept&.coding&.find do |coding|
               coding.code == 'A1'
             end
             break if approved_review_action_code.present?

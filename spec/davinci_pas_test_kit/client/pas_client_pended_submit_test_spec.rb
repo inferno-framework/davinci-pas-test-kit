@@ -135,7 +135,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
               ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'
             end
             expect(review_action_code).to_not be_nil
-            expect(review_action_code.valueCodeableConcept&.coding&.dig(0)&.code).to eq('A4')
+            expect(review_action_code.valueCodeableConcept).to_not be_nil
+            expect(review_action_code.valueCodeableConcept.coding&.dig(0)&.code).to eq('A4')
           end
         end
 

@@ -130,7 +130,9 @@ module DaVinciPASTestKit
       end
 
       def conformance_expectation
-        resource_capabilities&.extension&.first&.valueCode
+        return unless resource_capabilities.present?
+
+        resource_capabilities.extension&.first&.valueCode
       end
 
       def profile_name
@@ -155,7 +157,8 @@ module DaVinciPASTestKit
           resource_capabilities.interaction.map do |interaction|
             {
               code: interaction.code,
-              expectation: interaction&.extension&.first&.valueCode # TODO: fix expectation extension finding
+              # TODO: fix expectation extension finding
+              expectation: interaction.present? ? interaction.extension&.first&.valueCode : nil
             }
           end
       end
@@ -165,7 +168,8 @@ module DaVinciPASTestKit
           resource_capabilities.operation.map do |operation|
             {
               code: operation.name,
-              expectation: operation&.extension&.first&.valueCode # TODO: fix expectation extension finding
+              # TODO: fix expectation extension finding
+              expectation: operation.present? ? operation.extension&.first&.valueCode : nil
             }
           end
       end

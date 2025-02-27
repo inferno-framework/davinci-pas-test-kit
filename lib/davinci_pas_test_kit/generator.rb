@@ -38,7 +38,7 @@ module DaVinciPASTestKit
     end
 
     def load_ig_package
-      FHIR.logger = Logger.new('/dev/null')
+      FHIR.logger = Logger.new(File::NULL)
       self.ig_resources = IGLoader.new(ig_file_name).load
     end
 

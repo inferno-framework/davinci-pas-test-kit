@@ -276,7 +276,7 @@ module DaVinciPASTestKit
                             else
                               client_inquiry_request_must_support_test_ids
                             end
-                          elsif use_case == 'approval' || use_case == 'denial'
+                          elsif ['approval', 'denial'].include?(use_case)
                             grouped_approval_denial_test_ids
                           elsif use_case == 'pended'
                             grouped_pended_test_ids
@@ -292,7 +292,7 @@ module DaVinciPASTestKit
                               else
                                 client_inquiry_request_must_support_test_file_list
                               end
-                            elsif use_case == 'approval' || use_case == 'denial'
+                            elsif ['approval', 'denial'].include?(use_case)
                               approval_denial_test_file_list
                             elsif use_case == 'pended'
                               pended_test_file_list
@@ -375,7 +375,7 @@ module DaVinciPASTestKit
           when 'denial'
             <<~DESCRIPTION
               Demonstrate the ability of the server to respond to a prior
-              authorization request with an `denied` decision.
+              authorization request with a `denied` decision.
             DESCRIPTION
           when 'pended'
             <<~DESCRIPTION
