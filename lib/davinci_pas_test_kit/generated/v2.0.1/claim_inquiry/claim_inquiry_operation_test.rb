@@ -18,6 +18,23 @@ module DaVinciPASTestKit
             description: 'Insert Bundle to be sent for PAS Inquire Request',
             type: 'textarea',
             optional: true
+      input :server_endpoint,
+            title: 'FHIR Server Endpoint URL',
+            description: 'Insert the FHIR server endpoint URL for PAS'
+      input :smart_credentials,
+            title: 'OAuth Credentials',
+            type: :auth_info,
+            options: {
+              mode: 'access',
+              components: [
+                {
+                  name: :auth_type,
+                  default: 'backend_services'
+                }
+              ]
+            },
+            optional: true
+      
       input_order :server_endpoint, :smart_credentials
       
       makes_request :pa_inquire

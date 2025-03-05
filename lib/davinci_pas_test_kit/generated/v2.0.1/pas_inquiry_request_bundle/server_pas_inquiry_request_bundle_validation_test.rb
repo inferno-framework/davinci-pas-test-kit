@@ -45,8 +45,6 @@ module DaVinciPASTestKit
             description: 'Insert Bundle to be sent for PAS Inquire Request',
             type: 'textarea',
             optional: true
-
-      input_order :server_endpoint, :smart_credentials
       output :dar_code_found, :dar_extension_found
 
       def resource_type

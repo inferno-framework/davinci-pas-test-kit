@@ -15,9 +15,7 @@ module DaVinciPASTestKit
             title: 'PAS <%= request_type.humanize.titleize%> Payload',
             description: 'Insert Bundle to be sent for PAS <%= request_type.humanize.titleize%>',
             type: 'textarea',
-            optional: true
-
-      input_order :server_endpoint, :smart_credentials<% end %>
+            optional: true<% end %>
       output :dar_code_found, :dar_extension_found
 
       def resource_type
