@@ -1,6 +1,6 @@
 require_relative '../../../tags'
 require_relative '../../../urls'
-require_relative '../../../endpoints/mock_udap_server'
+require_relative '../../../endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -27,8 +27,8 @@ module DaVinciPASTestKit
         verified_request = requests.last
 
         # TODO: - implement more stuff in here
-        parsed_body = MockUdapServer.parsed_request_body(verified_request)
-        ss_claims = MockUdapServer.jwt_claims(parsed_body&.dig('software_statement'))
+        parsed_body = MockUdapSmartServer.parsed_request_body(verified_request)
+        ss_claims = MockUdapSmartServer.jwt_claims(parsed_body&.dig('software_statement'))
         assert ss_claims&.dig('aud') == udap_discovery_url,
                "`aud` expected to be '#{udap_discovery_url}', got '#{ss_claims&.dig('aud')}'"
       end

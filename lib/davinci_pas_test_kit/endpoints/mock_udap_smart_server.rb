@@ -1,5 +1,5 @@
 module DaVinciPASTestKit
-  module MockUdapServer
+  module MockUdapSmartServer
     SUPPORTED_SCOPES = ['openid', 'system/*.read', 'user/*.read', 'patient/*.read'].freeze
 
     module_function

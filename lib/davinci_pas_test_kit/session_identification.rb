@@ -1,4 +1,4 @@
-require_relative 'endpoints/mock_udap_server'
+require_relative 'endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
   module SessionIdentification
@@ -32,7 +32,7 @@ module DaVinciPASTestKit
     # - if structured like a token returned by the simulated Auth server, return the client URI
     # - otherwise, use the raw token (provided token)
     def bearer_token_to_wait_identifier(token)
-      client_id = MockUdapServer.token_to_client_id(token)
+      client_id = MockUdapSmartServer.token_to_client_id(token)
       return client_id if client_id.present?
 
       token
