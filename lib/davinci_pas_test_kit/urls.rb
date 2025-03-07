@@ -16,6 +16,8 @@ module DaVinciPASTestKit
   RESUME_FAIL_PATH = '/resume_fail'
   RESUME_SKIP_PATH = '/resume_skip'
   AUTH_SERVER_PATH = '/auth'
+  SMART_DISCOVERY_PATH = "#{FHIR_PATH}/.well-known/smart-configuration".freeze
+  SMART_JWKS_PATH = "#{FHIR_PATH}/.well-known/jwk".freeze
   UDAP_DISCOVERY_PATH = "#{FHIR_PATH}/.well-known/udap".freeze
   TOKEN_PATH = "#{AUTH_SERVER_PATH}/token".freeze
   REGISTRATION_PATH = "#{AUTH_SERVER_PATH}/register".freeze
