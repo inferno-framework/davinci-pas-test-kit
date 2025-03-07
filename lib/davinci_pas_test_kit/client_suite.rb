@@ -1,5 +1,4 @@
 require 'subscriptions_test_kit'
-require 'smart_app_launch_test_kit'
 require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
@@ -56,9 +55,6 @@ module DaVinciPASTestKit
 
     route(:get, UDAP_DISCOVERY_PATH, MockUdapSmartServer.method(:udap_server_metadata))
     route(:get, SMART_DISCOVERY_PATH, MockUdapSmartServer.method(:smart_server_metadata))
-    route(:get, SMART_JWKS_PATH, lambda { |_env|
-      [200, { 'Content-Type' => 'application/json' }, [SMARTAppLaunch::JWKS.jwks_json]]
-    })
 
     suite_endpoint :post, REGISTRATION_PATH, MockUdapSmartServer::RegistrationEndpoint
     suite_endpoint :post, TOKEN_PATH, MockUdapSmartServer::TokenEndpoint
