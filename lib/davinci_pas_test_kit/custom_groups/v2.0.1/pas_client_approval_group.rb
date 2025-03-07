@@ -1,6 +1,5 @@
 require_relative 'client_tests/pas_client_approval_submit_test'
 require_relative 'client_tests/pas_client_response_attest'
-require_relative 'client_tests/pas_client_request_auth_verification_test'
 require_relative 'client_tests/pas_client_request_bundle_validation_test'
 require_relative 'client_tests/pas_client_response_bundle_validation_test'
 require_relative '../../tags'
@@ -21,8 +20,6 @@ module DaVinciPASTestKit
       test from: :pas_client_v201_approval_submit_test
       test from: :pas_client_v201_request_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
-      test from: :pas_client_v201_request_auth_verification_test,
-           uses_request: :approval_claim
 
       test from: :pas_client_v201_response_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
