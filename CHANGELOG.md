@@ -1,3 +1,8 @@
+# 0.12.1
+
+* Add Client Subscriptions tests by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/23
+
+
 # 0.12.0
 
 ### Breaking Changes by @vanessuniq in https://github.com/inferno-framework/davinci-pas-test-kit/pull/24:
