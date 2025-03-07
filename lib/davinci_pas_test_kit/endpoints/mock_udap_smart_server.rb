@@ -13,7 +13,6 @@ module DaVinciPASTestKit
         token_endpoint_auth_signing_alg_values_supported: ['RS256'],
         capabilities: ['client-confidential-asymmetric', 'udap_authz'],
         code_challenge_methods_supported: ['S256'],
-        jwks_uri: base_url + SMART_JWKS_PATH,
         token_endpoint_auth_methods_supported: ['private_key_jwt'],
         issuer: base_url + FHIR_PATH,
         grant_types_supported: ['client_credentials'],
