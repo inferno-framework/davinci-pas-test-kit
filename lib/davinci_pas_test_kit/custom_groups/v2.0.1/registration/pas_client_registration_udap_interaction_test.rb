@@ -1,5 +1,5 @@
 require_relative '../../../urls'
-require_relative '../../../endpoints/mock_udap_server'
+require_relative '../../../endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -22,7 +22,7 @@ module DaVinciPASTestKit
         omit_if udap_client_uri.blank?,
                 'Not configured for UDAP authentication.'
 
-        generated_client_id = MockUdapServer.client_uri_to_client_id(udap_client_uri)
+        generated_client_id = MockUdapSmartServer.client_uri_to_client_id(udap_client_uri)
         output client_id: generated_client_id
 
         wait(

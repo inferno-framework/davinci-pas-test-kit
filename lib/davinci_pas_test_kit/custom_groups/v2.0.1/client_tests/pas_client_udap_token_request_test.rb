@@ -1,6 +1,6 @@
 require_relative '../../../tags'
 require_relative '../../../urls'
-require_relative '../../../endpoints/mock_udap_server'
+require_relative '../../../endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
   module DaVinciPASV201

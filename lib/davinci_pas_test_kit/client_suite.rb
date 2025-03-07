@@ -3,9 +3,9 @@ require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
 require_relative 'endpoints/claim_endpoint'
-require_relative 'endpoints/mock_udap_server'
-require_relative 'endpoints/mock_udap_server/registration'
-require_relative 'endpoints/mock_udap_server/token'
+require_relative 'endpoints/mock_udap_smart_server'
+require_relative 'endpoints/mock_udap_smart_server/registration'
+require_relative 'endpoints/mock_udap_smart_server/token'
 require_relative 'endpoints/subscription_create_endpoint'
 require_relative 'endpoints/subscription_status_endpoint'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
@@ -53,10 +53,10 @@ module DaVinciPASTestKit
       end
     end
 
-    route(:get, UDAP_DISCOVERY_PATH, MockUdapServer.method(:udap_server_metadata))
+    route(:get, UDAP_DISCOVERY_PATH, MockUdapSmartServer.method(:udap_server_metadata))
 
-    suite_endpoint :post, REGISTRATION_PATH, MockUdapServer::RegistrationEndpoint
-    suite_endpoint :post, TOKEN_PATH, MockUdapServer::TokenEndpoint
+    suite_endpoint :post, REGISTRATION_PATH, MockUdapSmartServer::RegistrationEndpoint
+    suite_endpoint :post, TOKEN_PATH, MockUdapSmartServer::TokenEndpoint
 
     suite_endpoint :post, SUBMIT_PATH, ClaimEndpoint
     suite_endpoint :post, SESSION_SUBMIT_PATH, ClaimEndpoint

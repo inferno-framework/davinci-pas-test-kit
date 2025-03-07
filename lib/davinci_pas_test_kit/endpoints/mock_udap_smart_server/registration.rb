@@ -2,27 +2,27 @@
 
 require_relative '../../urls'
 require_relative '../../tags'
-require_relative '../mock_udap_server'
+require_relative '../mock_udap_smart_server'
 
 module DaVinciPASTestKit
-  module MockUdapServer
+  module MockUdapSmartServer
     class RegistrationEndpoint < Inferno::DSL::SuiteEndpoint
       def test_run_identifier
-        MockUdapServer.client_uri_to_client_id(
-          client_uri_from_registration_payload(MockUdapServer.parsed_io_body(request))
+        MockUdapSmartServer.client_uri_to_client_id(
+          client_uri_from_registration_payload(MockUdapSmartServer.parsed_io_body(request))
         )
       end
 
       def make_response
-        parsed_body = MockUdapServer.parsed_io_body(request)
-        client_id = MockUdapServer.client_uri_to_client_id(client_uri_from_registration_payload(parsed_body))
+        parsed_body = MockUdapSmartServer.parsed_io_body(request)
+        client_id = MockUdapSmartServer.client_uri_to_client_id(client_uri_from_registration_payload(parsed_body))
         ss_jwt = request_software_statement_jwt(parsed_body)
 
         response_body = {
           client_id:,
           software_statement: ss_jwt
         }
-        response_body.merge!(MockUdapServer.jwt_claims(ss_jwt).except(['iss', 'sub', 'exp', 'iat', 'jti']))
+        response_body.merge!(MockUdapSmartServer.jwt_claims(ss_jwt).except(['iss', 'sub', 'exp', 'iat', 'jti']))
 
         response.body = response_body.to_json
         response.headers['Cache-Control'] = 'no-store'
@@ -46,7 +46,7 @@ module DaVinciPASTestKit
         software_statement_jwt = request_software_statement_jwt(reg_body)
         return unless software_statement_jwt.present?
 
-        MockUdapServer.jwt_claims(software_statement_jwt)&.dig('iss')
+        MockUdapSmartServer.jwt_claims(software_statement_jwt)&.dig('iss')
       end
 
       def request_software_statement_jwt(reg_body)
