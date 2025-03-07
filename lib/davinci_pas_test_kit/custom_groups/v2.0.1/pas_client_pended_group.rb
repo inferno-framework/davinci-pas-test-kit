@@ -4,7 +4,6 @@ require_relative 'client_tests/pas_client_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_inquire_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_request_bundle_validation_test'
 require_relative 'client_tests/pas_client_inquire_request_bundle_validation_test'
-require_relative 'client_tests/pas_client_request_auth_verification_test'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
@@ -68,10 +67,6 @@ module DaVinciPASTestKit
       group do
         title 'Verify notification interaction'
 
-        test from: :pas_client_v201_request_auth_verification_test,
-             id: :pas_client_v201_submit_auth_verification_test,
-             title: 'Verify $submit Requst Authorization Header',
-             uses_request: :pended_claim
         test from: :subscriptions_r4_client_notification_input_verification,
              title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle is conformant',
              description: %(
@@ -111,10 +106,6 @@ module DaVinciPASTestKit
       group do
         title 'Verify $inquire interaction'
 
-        test from: :pas_client_v201_request_auth_verification_test,
-             id: :pas_client_v201_inquiry_auth_verification_test,
-             title: 'Verify $inquire Requst Authorization Header',
-             uses_request: :pended_inquiry
         test from: :pas_client_v201_inquire_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_inquire_response_bundle_validation_test,
