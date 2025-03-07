@@ -1,8 +1,28 @@
+require 'udap_security_test_kit'
+require_relative '../urls'
+
 module DaVinciPASTestKit
   module MockUdapSmartServer
     SUPPORTED_SCOPES = ['openid', 'system/*.read', 'user/*.read', 'patient/*.read'].freeze
 
     module_function
+
+    def smart_server_metadata(env)
+      base_url = env_base_url(env, UDAP_DISCOVERY_PATH)
+      response_body = {
+        token_endpoint_auth_signing_alg_values_supported: ['RS256'],
+        capabilities: ['client-confidential-asymmetric', 'udap_authz'],
+        code_challenge_methods_supported: ['S256'],
+        jwks_uri: base_url + SMART_JWKS_PATH,
+        token_endpoint_auth_methods_supported: ['private_key_jwt'],
+        issuer: base_url + FHIR_PATH,
+        grant_types_supported: ['client_credentials'],
+        scopes_supported: SUPPORTED_SCOPES,
+        token_endpoint: base_url + TOKEN_PATH
+      }.to_json
+
+      [200, { 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' }, [response_body]]
+    end
 
     def udap_server_metadata(env)
       base_url = env_base_url(env, UDAP_DISCOVERY_PATH)
@@ -28,8 +48,8 @@ module DaVinciPASTestKit
 
     def udap_signed_metadata_jwt(base_url)
       jwt_claim_hash = {
-        iss: base_url + FHIR_BASE_PATH,
-        sub: base_url + FHIR_BASE_PATH,
+        iss: base_url + FHIR_PATH,
+        sub: base_url + FHIR_PATH,
         exp: 5.minutes.from_now.to_i,
         iat: Time.now.to_i,
         jti: SecureRandom.hex(32),
