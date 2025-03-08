@@ -1,5 +1,7 @@
 require_relative 'client_tests/pas_client_udap_token_request_test'
 require_relative 'client_tests/pas_client_udap_token_use_test'
+require_relative 'client_tests/pas_client_smart_token_request_test'
+require_relative 'client_tests/pas_client_smart_token_use_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -15,6 +17,7 @@ module DaVinciPASTestKit
             title: 'Client Id',
             type: 'text',
             optional: true,
+            locked: true,
             description: %(
         Client Id which the client under test is registered as with the Inferno simulated
         authentication server.
@@ -32,9 +35,8 @@ module DaVinciPASTestKit
         id :pas_client_v201_auth_smart
         title 'Verify SMART Authentication'
 
-        run do
-          omit_if true, 'implement me!'
-        end
+        test from: :pas_client_v201_smart_token_request_test
+        test from: :pas_client_v201_smart_token_use_test
       end
 
       # verify token requests

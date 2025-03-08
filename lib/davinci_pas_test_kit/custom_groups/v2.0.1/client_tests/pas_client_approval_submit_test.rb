@@ -20,9 +20,11 @@ module DaVinciPASTestKit
                             'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
 
       input :client_id,
-            optional: true
+            optional: true,
+            locked: true
       input :session_url_path,
-            optional: true
+            optional: true,
+            locked: true
       input :approval_json_response,
             title: 'Claim approved response JSON',
             type: 'textarea',

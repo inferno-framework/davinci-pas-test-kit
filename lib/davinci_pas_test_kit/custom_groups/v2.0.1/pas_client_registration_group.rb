@@ -2,16 +2,17 @@ require_relative 'registration/pas_client_registration_configuration_display_tes
 require_relative 'registration/pas_client_registration_other_auth_attest_test'
 require_relative 'registration/pas_client_registration_udap_interaction_test'
 require_relative 'registration/pas_client_registration_udap_verification_test'
+require_relative 'registration/pas_client_registration_smart_verification_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientRegistrationGroup < Inferno::TestGroup
       id :pas_client_v201_registration
-      title 'Demonstrate Client Registration'
+      title 'Client Registration'
       description %(
-        Demonstrate the ability of the client to register with Inferno's simulated PAS Server,
-        including configuring the system under test to hit the correct endpoints and
-        enable authentication.
+        Register the client under test with Inferno's simulated PAS Server,
+        including configuration of the system under test to hit the correct endpoints and
+        enable authentication and authorization of PAS requests.
 
         When running these tests there are 4 options for authentication:
         1. **UDAP B2B client credentials flow**: the system under test will dynamically register
@@ -87,9 +88,7 @@ module DaVinciPASTestKit
           If SMART authentication will be demonstrated, perform the SMART registration.
         )
 
-        run do
-          omit_if true, 'Implement me!'
-        end
+        test from: :pas_client_v201_reg_smart_verification
       end
 
       group do

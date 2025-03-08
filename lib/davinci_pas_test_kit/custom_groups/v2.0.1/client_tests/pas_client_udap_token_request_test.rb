@@ -14,14 +14,15 @@ module DaVinciPASTestKit
       )
 
       input :client_id,
-            optional: true
+            optional: true,
+            locked: true
 
       run do
         omit_if client_id.blank?, 'Auth not demonstrated as a part of this test session.'
 
-        load_tagged_requests([TOKEN_TAG])
+        load_tagged_requests(TOKEN_TAG, UDAP_TAG)
 
-        skip_if requests.blank?, 'No token requests made.'
+        skip_if requests.blank?, 'No UDAP token requests made.'
 
         requests.each_with_index do |token_request, index|
           assert_valid_json(token_request.request_body)
@@ -32,6 +33,10 @@ module DaVinciPASTestKit
                       "Token request #{index} had an incorrect `grant_type`: expected 'client_credentials', " \
                       "but got '#{token_request_body['grant_type']}'")
         end
+
+        assert messages.none? { |msg|
+          msg[:type] == 'error'
+        }, 'Invalid token requests detected. See messages for details.'
       end
     end
   end

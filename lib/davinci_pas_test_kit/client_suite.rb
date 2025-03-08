@@ -114,20 +114,20 @@ module DaVinciPASTestKit
               title: 'Client Id',
               type: 'text',
               optional: true,
+              locked: true,
               description: %(
-                Client Id which the client under test is registered as with the Inferno simulated
-                authentication server.
+                The registered client id for the system under test to use if auth is being used in this session.
+                Run the Client Registration group to populate.
               )
+
         input :session_url_path,
               title: 'Session-specific URL path extension',
               type: 'text',
               optional: true,
+              locked: true,
               description: %(
-                Ignored if a Client Id is present. If demonstrating PAS
-                interactions without authentication, Inferno will use this value to
-                setup a session-specific FHIR endpoints to use during these tests.
-                If not provided, and no auth configuration is included in the inputs,
-                a value will be generated.
+                The additional path used in session-specific FHIR endpoints to use if auth is not being used
+                in this session. Run the Client Registration group to populate.
               )
 
         group from: :pas_client_v201_approval_group
@@ -157,21 +157,21 @@ module DaVinciPASTestKit
               title: 'Client Id',
               type: 'text',
               optional: true,
+              locked: true,
               description: %(
-                Client Id which the client under test is registered as with the Inferno simulated
-                authentication server.
-              )
+          The registered client id for the system under test to use if auth is being used in this session.
+          Run the Client Registration group to populate.
+        )
+
         input :session_url_path,
               title: 'Session-specific URL path extension',
               type: 'text',
               optional: true,
+              locked: true,
               description: %(
-                Ignored if a Client Id is present. If demonstrating PAS
-                interactions without authentication, Inferno will use this value to
-                setup a session-specific FHIR endpoints to use during these tests.
-                If not provided, and no auth configuration is included in the inputs,
-                a value will be generated.
-              )
+          The additional path used in session-specific FHIR endpoints to use if auth is not being used
+          in this session. Run the Client Registration group to populate.
+        )
 
         group from: :pas_client_v201_submit_must_support_use_case
         group from: :pas_client_v201_inquiry_must_support_use_case
