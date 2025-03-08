@@ -1,8 +1,11 @@
+require 'jwt'
+require 'faraday'
 require 'udap_security_test_kit'
 require_relative '../urls'
 
 module DaVinciPASTestKit
   module MockUdapSmartServer
+    include Inferno::DSL::HTTPClient
     SUPPORTED_SCOPES = ['openid', 'system/*.read', 'user/*.read', 'patient/*.read'].freeze
 
     module_function
@@ -10,8 +13,8 @@ module DaVinciPASTestKit
     def smart_server_metadata(env)
       base_url = env_base_url(env, UDAP_DISCOVERY_PATH)
       response_body = {
-        token_endpoint_auth_signing_alg_values_supported: ['RS256'],
-        capabilities: ['client-confidential-asymmetric', 'udap_authz'],
+        token_endpoint_auth_signing_alg_values_supported: ['RS384', 'ES384'],
+        capabilities: ['client-confidential-asymmetric'],
         code_challenge_methods_supported: ['S256'],
         token_endpoint_auth_methods_supported: ['private_key_jwt'],
         issuer: base_url + FHIR_PATH,
@@ -36,9 +39,9 @@ module DaVinciPASTestKit
         scopes_supported: SUPPORTED_SCOPES,
         token_endpoint: base_url + TOKEN_PATH,
         token_endpoint_auth_methods_supported: ['private_key_jwt'],
-        token_endpoint_auth_signing_alg_values_supported: ['RS256'],
+        token_endpoint_auth_signing_alg_values_supported: ['RS384', 'ES384'],
         registration_endpoint: base_url + REGISTRATION_PATH,
-        registration_endpoint_jwt_signing_alg_values_supported: ['RS256'],
+        registration_endpoint_jwt_signing_alg_values_supported: ['RS384', 'ES384'],
         signed_metadata: udap_signed_metadata_jwt(base_url)
       }.to_json
 
@@ -143,6 +146,46 @@ module DaVinciPASTestKit
 
     def token_to_client_id(token)
       decode_token(token)&.dig('client_id')
+    end
+
+    def jwk_set(jku, warning_messages = [])
+      jwk_set = JWT::JWK::Set.new
+
+      jwk_body = # try as raw jwk set
+        begin
+          JSON.parse(jku)
+        rescue JSON::ParserError
+          nil
+        end
+
+      if jwk_body.blank?
+        retrieved = Faraday.get(jku) # try as url pointing to a jwk set
+        jwk_body =
+          begin
+            JSON.parse(retrieved.body)
+          rescue JSON::ParserError
+            warning_messages << "Failed to fetch valid json from jwks uri #{jwk_set}."
+            nil
+          end
+      else
+        warning_messages << 'Providing the JWK Set directly is strongly discouraged.'
+      end
+
+      return jwk_set if jwk_body.blank?
+
+      jwk_body['keys']&.each_with_index do |key_hash, index|
+        parsed_key =
+          begin
+            JWT::JWK.new(key_hash)
+          rescue JWT::JWKError => e
+            id = key_hash['kid'] | index
+            warning_messages << "Key #{id} invalid: #{e}"
+            nil
+          end
+        jwk_set << parsed_key unless parsed_key.blank?
+      end
+
+      jwk_set
     end
   end
 end

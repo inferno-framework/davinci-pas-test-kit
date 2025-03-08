@@ -28,9 +28,11 @@ module DaVinciPASTestKit
 
       config options: { accepts_multiple_requests: true }
       input :client_id,
-            optional: true
+            optional: true,
+            locked: true
       input :session_url_path,
-            optional: true
+            optional: true,
+            locked: true
       input :notification_bundle,
             title: 'Claim updated notification JSON',
             type: 'textarea',
