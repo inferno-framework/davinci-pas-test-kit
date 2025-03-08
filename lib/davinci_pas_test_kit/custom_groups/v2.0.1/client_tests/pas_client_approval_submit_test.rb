@@ -18,9 +18,11 @@ module DaVinciPASTestKit
       )
 
       input :client_id,
-            optional: true
+            optional: true,
+            locked: true
       input :session_url_path,
-            optional: true
+            optional: true,
+            locked: true
       input :approval_json_response,
             title: 'Claim approved response JSON',
             type: 'textarea',

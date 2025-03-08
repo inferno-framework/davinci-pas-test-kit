@@ -17,9 +17,11 @@ module DaVinciPASTestKit
         provided denial response.
       )
       input :client_id,
-            optional: true
+            optional: true,
+            locked: true
       input :session_url_path,
-            optional: true
+            optional: true,
+            locked: true
       input :denial_json_response,
             title: 'Claim denied response JSON',
             type: 'textarea',

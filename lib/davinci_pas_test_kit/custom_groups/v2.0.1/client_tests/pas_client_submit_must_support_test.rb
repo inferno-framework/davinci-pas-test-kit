@@ -14,9 +14,11 @@ module DaVinciPASTestKit
         for Inferno to evaluate coverage of must support elements.
       )
       input :client_id,
-            optional: true
+            optional: true,
+            locked: true
       input :session_url_path,
-            optional: true
+            optional: true,
+            locked: true
       config options: { accepts_multiple_requests: true }
 
       run do
