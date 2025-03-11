@@ -1,4 +1,5 @@
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../user_input_response'
 require_relative '../../../session_identification'
 
@@ -17,11 +18,17 @@ module DaVinciPASTestKit
         provided denial response.
       )
       input :client_id,
+            title: 'Client Id',
+            type: 'text',
             optional: true,
-            locked: true
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
       input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
             optional: true,
-            locked: true
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
       input :denial_json_response,
             title: 'Claim denied response JSON',
             type: 'textarea',

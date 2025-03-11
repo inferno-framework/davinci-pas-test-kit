@@ -26,6 +26,13 @@ Inferno will seek to observe conformant handling of PAS requirements, including
     - The ability to handle responses that contain all PAS profiles and all must support elements on those
     profiles (not included in the current version of these tests)
 
+All requests and responses will be checked for conformance to the PAS
+IG requirements individually and used in aggregate to determine whether
+required features and functionality are present. HL7® FHIR® resources are
+validated with the Java validator using `tx.fhir.org` as the terminology server.
+
+### Responses
+
 Inferno contains basic logic to generate approval, denial, and pended responses, along with a
 notification that a final decision was made, as a part of the above workflows.
 These responses are based on examples available in the PAS Implementation Guide
@@ -34,40 +41,55 @@ testers may provide Inferno with specific responses for Inferno to echo. If resp
 are provided, Inferno will check them for conformance to ensure that they demonstrate
 a fully conformant exchange.
 
-All requests and responses will be checked for conformance to the PAS
-IG requirements individually and used in aggregate to determine whether
-required features and functionality are present. HL7® FHIR® resources are
-validated with the Java validator using `tx.fhir.org` as the terminology server.
+### Authentication
+
+The [Privacy and Security section](https://hl7.org/fhir/us/davinci-pas/STU2/privacy.html) of the PAS
+Implementation Guide states that payers must "require that the provider system authenticates"
+itself when making PAS requests against the payer system. However, the specific method of authentication
+is left to the Da Vinci HRex IG, which [provides recommendations and potential 
+approaches](https://hl7.org/fhir/us/davinci-hrex/STU1/security.html#exchange-security) for
+authentication, but does not require a specific one to be used. Inferno requires some
+authentication approach to be used in order for it to be able to identify which incoming
+requests are from the client under test.
+
+Inferno's simulated payer server includes a simulation of two standard authentication approaches:
+- SMART Backend Services
+- UDAP B2B client credentials flow, including dynamic registration
+
+Clients under test can register with the authorization server and request tokens for use
+when making PAS requests. In this case, Inferno will verify that the client's interactions with
+the simulated authorization server are conformant and that the provided tokens are used.
+
+If the client under test does not support either of these methods of authentication, the tester
+may instead attest to other authentication capabilities. In this case, the client will authenticate
+by sending requests to dedicated PAS endpoints created by Inferno for use during the testing session.
+To reduce configuration burden, the dedicated endpoints can be reused in subsequent sessions.
 
 ## Running the Tests
 
 ### Quick Start
 
-For Inferno to simulate a server that returns mocked conformant responses, it needs
-only to know the bearer token that the client will send on requests, for which there are two options.
+The easiest way to run the tests is to perform an approval workflow using
+inferno-generated responses and dedicated session-specific endpoints:
 
-1. If you want to choose your own bearer token, then:
-    1. Select the **2.** PAS Client Validation test from the list on the left.
-    2. Click the '*Run All Tests*' button on the right.
-    3. In the "Access Token" input field, enter the bearer token that will be sent by the client under test
-       in the Authorization HTTP header (format: `Bearer <provided value>`) for all requests to Inferno.
-    4. Click the '*Submit*' button at the bottom of the dialog.
-2. If you want to use a Client ID to obtain an access token, then:
-    1. Click the '*Run All Tests*' button on the right.
-    2. Provide the client's registered id "Client ID" input field (NOTE: Inferno doesn't support the
-        registration API, so this must be obtained from another system or configured manually).
-    3. Click the '*Submit*' button at the bottom of the dialog.
-    4. Make a token request that includes the specified Client ID to the
-       `<inferno host>/custom/davinci_pas_client_suite_v201/mock_auth/token` endpoint to get
-       an access token from Inferno which the client will need to provide in the 
-       Authorization HTTP header (format: `Bearer <provided value>`) for all subsequent 
-       requests to Inferno for this test session. See the documentation in the 
-       **1.** Demonstration Authorization test for details on the supported access token request.
+1. Select the "**3.1** Approval Workflow" group from the list at the left.
+2. Click the "RUN TESTS" button in the upper right.
+3. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
+4. Submit a PAS prior authorization request to the endpoint shown in the wait
+   dialog that appears.
+5. When another wait dialog appears, check your system to see whether Inferno's response
+   was interpreted as an approval or not and click the appropriate link in the dialog.
+6. Review the results including any errors or warnings found when checking the conformance
+   of the request or the generated response.
 
-In either case, the tests will continue from that point, requesting the tester to
-direct the client to make certain requests to demonstrate PAS client capabilities.
-
-Note: authentication options for these tests have not been finalized and are subject to change.
+Group "**3.2** Denial Workflow" can be run in the same manner. Other tests require additional setup:
+- To run the "**3.3** Pended Workflow" group, first run the "**2** Subscription Setup" group, during
+  which the client system will submit a Subscription so that Inferno knows how and where to
+  send a notification that a decision has been rendered on a pended prior authorization request.
+- To setup up standards-based authentication, run the "**1** Client Registration" group as described in the
+  **Authentication Configuration** section below. This test must be run along with at least one
+  workflow test using the configured authentication approach before running the
+  "**5** Authentication Interactions" group.
 
 ### Postman-based Demo
 
@@ -132,7 +154,7 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    requests to demonstrate must support elements. This demo does not have any additional requests
    and does not attempt to demonstrate all must support elements, so click the link to indicate
    you are done submitting requests for each. Note that requests submitted during the workflow section
-   will be evaluated and you can inspect the results under test **3.2** *Demonstrate Element Support*
+   will be evaluated and you can inspect the results under test **3.2** Demonstrate Element Support
    to see both passing and failing tests.
 1. Once Inferno finishes evaluating the requests, the test will complete allowing you to review the
    results, including warning and error messages as well as requests associated with each test.
@@ -143,6 +165,8 @@ This demo uses `id-only` notifications for Pended workflow. To see a demonstrati
 notifications, replace the string `id-only` in the "Create Subscription Request" entry under the 
 "Subscription Setup" folder in the collection with the string `full-resource` (found in an extension
 under the `_payload` element).
+
+## Configuration Details
 
 ## Response and Notification Content
 
@@ -188,21 +212,21 @@ and working messages for Inferno to use.
 ### Tester-provided Response and Notification Inputs
 
 The following test inputs control Inferno messaging behavior:
-- **Claim approved response JSON**: If populated, this is used in the **2.2.1** "Demonstrate Approval Workflow" tests
+- **Claim approved response JSON**: If populated, this is used in the "**2.2.1** Approval Workflow" group
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been approved.
-- **Claim denied response JSON**: If populated, this used in the **2.2.2** "Demonstrate Denial Workflow" tests
+- **Claim denied response JSON**: If populated, this used in the "**2.2.2** Denial Workflow" group
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been denied.
-- **Claim pended response JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow" tests
+- **Claim pended response JSON**: If populated, this used in the "**2.2.3** Pended Workflow" group
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been pended.
-- **Claim updated notification JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow" tests
+- **Claim updated notification JSON**: If populated, this used in the "**2.2.3** Pended Workflow" group
   as the event notification sent for the Subscription indicating that a decision has been finalized for the
   pended prior auth request. The content of the notification needs to match the details of the Subscription
-  provided in the **2.1** "Subscription Setup" tests.
-- **Inquire approved response JSON**: If populated, this used in the **2.2.3** "Demonstrate Pended Workflow"
-  tests to respond to `$inquire` requests. The response needs to indicate to the system that the
+  provided in the "**2.1** Subscription Setup" group.
+- **Inquire approved response JSON**: If populated, this used in the "**2.2.3** Pended Workflow"
+  group to respond to `$inquire` requests. The response needs to indicate to the system that the
   prior auth request has been approved.
 
 ### Generation Logic

@@ -14,6 +14,10 @@ module DaVinciPASTestKit
         including configuration of the system under test to hit the correct endpoints and
         enable authentication and authorization of PAS requests.
 
+        If this set of tests is not run before the other tests, Inferno will default to use
+        the **Dedicated Endpoints** approach using the session identifier to create the custom
+        endpoints.
+
         When running these tests there are 4 options for authentication:
         1. **UDAP B2B client credentials flow**: the system under test will dynamically register
            with Inferno and request access tokens used to access FHIR endpoints
@@ -25,7 +29,7 @@ module DaVinciPASTestKit
            and a UDAP client, using the same client id for both. If this path is chosen
            both authentication approaches will need to be demonstrated during the
            subsequent tests.
-        4. **No Auth**: Inferno will create a dedicated set of FHIR endpoints for this session
+        4. **Dedicated Endpoints**: Inferno will create a dedicated set of FHIR endpoints for this session
            so that the system under test does not need to get access tokens or provide
            them during these tests. Since PAS requires authentication of client systems,
            testers will be asked to attest that their system supports another form of
