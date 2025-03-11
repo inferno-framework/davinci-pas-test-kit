@@ -14,6 +14,8 @@ module DaVinciPASTestKit
         from the client. Upon receipt, Inferno will respond with the
         provided denial response.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@70'
+
       input :access_token,
             title: 'Access Token',
             description: %(

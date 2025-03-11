@@ -12,6 +12,7 @@ module DaVinciPASTestKit
           Topic](https://hl7.org/fhir/us/davinci-pas/STU2/SubscriptionTopic-PASSubscriptionTopic.html), and
         - Inclusion of filter criteria for the client's organization.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@143'
 
       run do
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)

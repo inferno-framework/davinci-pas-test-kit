@@ -44,6 +44,7 @@ module DaVinciPASTestKit
         * ClaimResponse.requestor
         * ClaimResponse.status
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
 
       id :pas_server_inquire_response_v201_claiminquiryresponse_must_support_test
 

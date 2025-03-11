@@ -12,6 +12,7 @@ module DaVinciPASTestKit
         
         
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@119'
 
       input :pa_inquire_request_payload,
             title: 'PAS Inquire Request Payload',

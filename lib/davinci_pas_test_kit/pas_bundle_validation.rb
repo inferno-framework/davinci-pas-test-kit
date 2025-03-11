@@ -70,7 +70,7 @@ module DaVinciPASTestKit
     # referenced in the Claim resource are included in the bundle. It ensures that the first
     # entry in the Bundle is a Claim resource and additional entries are populated
     # with referenced resources, following the traversal of references.
-    # Duplicate resources are handled as required( appearing only once
+    # Duplicate resources are handled as required (appearing only once
     # in the bundle entry).
     def validate_pa_request_payload_structure(bundle, request_type)
       bundle_entry_resources = bundle.entry.map(&:resource)
@@ -299,7 +299,7 @@ module DaVinciPASTestKit
     # Processes the profiles associated with a given instance in a FHIR bundle.
     # It adds the instance's profiles to the resource target profile map and handles recursive profile extraction.
     # The profiles collected here are possible profiles the given instance may conform to.
-    # The conformance validation will ensure that the resource is comformant to at least one of the target profiles.
+    # The conformance validation will ensure that the resource is conformant to at least one of the target profiles.
     # @param instance [Object] The instance whose profiles are to be processed.
     # @param bundle_entry [Array] The bundle.entry contents.
     # @param reference_element [Hash] The reference element related to the instance.
@@ -342,7 +342,7 @@ module DaVinciPASTestKit
     end
 
     # Adds a specific profile URL to an instance in the resource target profile map.
-    # It recursively processes the instance for further profilce extraction.
+    # It recursively processes the instance for further profile extraction.
     # @param instance [Object] The instance to which the profile URL is added.
     # @param profile_url [String] The profile URL to be added.
     # @param bundle_entry [Array] The bundle.entry contents.
@@ -455,7 +455,7 @@ module DaVinciPASTestKit
     # as required by the PAS IG.
     # @param target_resource [FHIR::Model] The FHIR resource to traverse and validate.
     # @param base_url [String] The server base url.
-    # @param resources_to_match [Array<FHIR:Bundel:Entry] The list of FHIR bundle entries to match references against.
+    # @param resources_to_match [Array<FHIR:Bundle:Entry] The list of FHIR bundle entries to match references against.
     def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match)
       return if target_resource.blank?
 

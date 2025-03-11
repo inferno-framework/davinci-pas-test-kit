@@ -34,6 +34,12 @@ module DaVinciPASTestKit
         issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
         for additional details.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@59', 'hl7.fhir.us.davinci-pas_2.0.1@60',
+                            'hl7.fhir.us.davinci-pas_2.0.1@62', 'hl7.fhir.us.davinci-pas_2.0.1@74',
+                            'hl7.fhir.us.davinci-pas_2.0.1@76', 'hl7.fhir.us.davinci-pas_2.0.1@77',
+                            'hl7.fhir.us.davinci-pas_2.0.1@78', 'hl7.fhir.us.davinci-pas_2.0.1@80',
+                            'hl7.fhir.us.davinci-pas_2.0.1@81', 'hl7.fhir.us.davinci-pas_2.0.1@83',
+                            'hl7.fhir.us.davinci-pas_2.0.1@85', 'hl7.fhir.us.davinci-pas_2.0.1@86'
 
       def workflow_tag
         config.options[:workflow_tag]
