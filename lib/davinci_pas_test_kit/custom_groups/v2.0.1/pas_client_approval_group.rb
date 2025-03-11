@@ -8,10 +8,10 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientApprovalGroup < Inferno::TestGroup
       id :pas_client_v201_approval_group
-      title 'Demonstrate Approval Workflow'
+      title 'Approval Workflow'
       description %(
-        Demonstrate the ability of the client to initiate a prior authorization
-        request and respond appropriately to an 'approved' decision.
+        During these tests, the client will initiate a prior authorization
+        request and show it can respond appropriately to an 'approved' decision.
       )
       run_as_group
 
@@ -32,7 +32,8 @@ module DaVinciPASTestKit
            ),
            config: { options: {
              workflow_tag: APPROVAL_WORKFLOW_TAG,
-             attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
+             attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning " \
+                             'that the user can proceed with ordering or providing the requested service.'
            } }
     end
   end

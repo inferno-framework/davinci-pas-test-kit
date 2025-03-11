@@ -11,7 +11,7 @@ module DaVinciPASTestKit
     module_function
 
     def smart_server_metadata(env)
-      base_url = env_base_url(env, UDAP_DISCOVERY_PATH)
+      base_url = env_base_url(env, SMART_DISCOVERY_PATH)
       response_body = {
         token_endpoint_auth_signing_alg_values_supported: ['RS384', 'ES384'],
         capabilities: ['client-confidential-asymmetric'],
@@ -30,7 +30,7 @@ module DaVinciPASTestKit
       base_url = env_base_url(env, UDAP_DISCOVERY_PATH)
       response_body = {
         udap_versions_supported: ['1'],
-        udap_profiles_supported: ['udap_dcr', 'udap_authz'],
+        udap_profiles_supported: ['udap_dcr', 'udap_authn', 'udap_authz'],
         udap_authorization_extensions_supported: ['hl7-b2b'],
         udap_authorization_extensions_required: [],
         udap_certifications_supported: [],

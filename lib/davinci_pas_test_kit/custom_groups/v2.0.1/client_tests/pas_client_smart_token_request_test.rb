@@ -1,6 +1,7 @@
 require 'jwt'
 require_relative '../../../tags'
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
@@ -15,18 +16,20 @@ module DaVinciPASTestKit
       )
 
       input :client_id,
-            optional: true,
-            locked: true
-      input :jwk_set,
+            title: 'Client Id',
+            type: 'text',
             optional: true,
             locked: true,
-            description: %(
-              JWK Set to use when validating client assertions. Run the Client Registration group
-              to populate.
-            )
+            description: INPUT_CLIENT_ID_LOCKED
+      input :jwk_set,
+            title: 'JSON Web Key Set (JWKS)',
+            type: 'textarea',
+            optional: true,
+            locked: true,
+            description: INPUT_JWK_SET_LOCKED
 
       run do
-        omit_if jwk_set.blank?, 'SMART backend services auth not demonstrated as a part of this test session.'
+        omit_if jwk_set.blank?, 'SMART Backend Services authentication not demonstrated as a part of this test session.'
 
         load_tagged_requests(TOKEN_TAG, SMART_TAG)
         skip_if requests.blank?, 'No SMART token requests made.'

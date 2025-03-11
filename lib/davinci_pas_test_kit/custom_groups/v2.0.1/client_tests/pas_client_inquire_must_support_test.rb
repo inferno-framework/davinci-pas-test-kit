@@ -1,4 +1,5 @@
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
@@ -14,11 +15,17 @@ module DaVinciPASTestKit
         for Inferno to evaluate coverage of must support elements.
       )
       input :client_id,
+            title: 'Client Id',
+            type: 'text',
             optional: true,
-            locked: true
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
       input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
             optional: true,
-            locked: true
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
       config options: { accepts_multiple_requests: true }
 
       run do

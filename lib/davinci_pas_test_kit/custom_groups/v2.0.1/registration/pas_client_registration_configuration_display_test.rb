@@ -24,9 +24,10 @@ module DaVinciPASTestKit
       output :session_url_path
 
       run do
-        identifier = SecureRandom.hex(32)
         new_session_url_path = nil
         if client_id.present?
+          wait_identifier = client_id
+
           # blank out the session_url_path if an auth approach is configured
           if session_url_path.present?
             add_message('info',
@@ -49,24 +50,25 @@ module DaVinciPASTestKit
             - Client Id (#{udap_smart_or_both}): `#{client_id}`
             - Token endpoint: `#{token_url}`
 
-            [Click here](#{resume_pass_url}?token=#{identifier}) once you have configured
+            [Click here](#{resume_pass_url}?token=#{wait_identifier}) once you have configured
             the client to connect to Inferno at the above endpoints.
           )
         else
           new_session_url_path = test_session_id if session_url_path.blank?
+          wait_identifier = session_url_path || new_session_url_path
           wait_message = %(
             **Inferno Simulated Server Details**:
 
-            FHIR Base URL: `#{session_fhir_base_url(session_url_path || new_session_url_path)}`
+            FHIR Base URL: `#{session_fhir_base_url(wait_identifier)}`
 
-            [Click here](#{resume_pass_url}?token=#{identifier}) once you have configured
+            [Click here](#{resume_pass_url}?token=#{wait_identifier}) once you have configured
             the client to connect to Inferno at the above endpoints.
           )
         end
         output(session_url_path: new_session_url_path) unless new_session_url_path.nil?
 
         wait(
-          identifier:,
+          identifier: wait_identifier,
           message: wait_message
         )
       end

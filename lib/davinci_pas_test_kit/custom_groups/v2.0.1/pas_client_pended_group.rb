@@ -12,10 +12,10 @@ module DaVinciPASTestKit
     class PASClientPendedGroup < Inferno::TestGroup
       include UserInputResponse
       id :pas_client_v201_pended_group
-      title 'Demonstrate Pended Workflow'
+      title 'Pended Workflow'
       description %(
-        Demonstrate the ability of the client to initiate a prior authorization
-        request and respond appropriately to a 'pended' decision, including
+        During these tests, the client will initiate a prior authorization
+        request and show it can respond appropriately to a 'pended' decision, including
         waiting for a notification that an update has been made
         and making an inquiry request to retrieve the final result.
       )
@@ -60,7 +60,9 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that following the receipt of the 'pended' response to the submitted claim, the client system indicates to users that a final decision on request has not yet been made." # rubocop:disable Layout/LineLength
+               attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
+                               'claim, the client system indicates to users that a final decision on request ' \
+                               'has not yet been made.'
              } }
       end
 

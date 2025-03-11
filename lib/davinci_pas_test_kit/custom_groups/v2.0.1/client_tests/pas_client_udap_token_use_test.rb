@@ -1,5 +1,6 @@
 require_relative '../../../tags'
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
@@ -15,12 +16,17 @@ module DaVinciPASTestKit
       )
 
       input :client_id,
+            title: 'Client Id',
+            type: 'text',
             optional: true,
-            locked: true
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
 
       run do
-        omit_if client_id.blank?, 'Auth not demonstrated as a part of this test session.'
+        load_tagged_requests(REGISTRATION_TAG, UDAP_TAG)
+        omit_if requests.blank?, 'UDAP Authentication not demonstrated as a part of this test session.'
 
+        requests.clear
         token_requests = load_tagged_requests(TOKEN_TAG, UDAP_TAG)
         prior_auth_requests = load_tagged_requests(SUBMIT_TAG) + load_tagged_requests(INQUIRE_TAG)
 
