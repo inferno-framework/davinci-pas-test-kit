@@ -1,5 +1,6 @@
 require_relative '../../../tags'
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../endpoints/mock_udap_smart_server'
 
 module DaVinciPASTestKit
@@ -14,24 +15,28 @@ module DaVinciPASTestKit
       )
 
       input :client_id,
+            title: 'Client Id',
+            type: 'text',
             optional: true,
-            locked: true
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
 
       run do
-        omit_if client_id.blank?, 'Auth not demonstrated as a part of this test session.'
+        load_tagged_requests(REGISTRATION_TAG, UDAP_TAG)
+        omit_if requests.blank?, 'UDAP Authentication not demonstrated as a part of this test session.'
 
+        requests.clear
         load_tagged_requests(TOKEN_TAG, UDAP_TAG)
 
         skip_if requests.blank?, 'No UDAP token requests made.'
 
         requests.each_with_index do |token_request, index|
-          assert_valid_json(token_request.request_body)
-          token_request_body = JSON.parse(token_request.request_body)
-          next unless token_request_body['grant_type'] != 'client_credentials'
+          request_params = URI.decode_www_form(token_request.request_body).to_h
+          next unless request_params['grant_type'] != 'client_credentials'
 
           add_message('error',
                       "Token request #{index} had an incorrect `grant_type`: expected 'client_credentials', " \
-                      "but got '#{token_request_body['grant_type']}'")
+                      "but got '#{request_params['grant_type']}'")
         end
 
         assert messages.none? { |msg|

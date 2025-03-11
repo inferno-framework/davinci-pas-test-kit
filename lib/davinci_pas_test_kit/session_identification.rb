@@ -6,8 +6,9 @@ module DaVinciPASTestKit
       # look at test config and determine the wait identifier to use
       # at somepoint this would be an inferno type, for now, just two options
       return client_id if client_id.present?
+      return session_url_path if session_url_path.present?
 
-      session_url_path
+      test_session_id
     end
 
     def inputs_to_session_endpont(endpoint, client_id, session_url_path)
@@ -25,6 +26,8 @@ module DaVinciPASTestKit
         session_submit_url(path)
       when :inquire
         session_inquire_url(path)
+      when :subscription
+        session_fhir_subscription_url(path)
       end
     end
 

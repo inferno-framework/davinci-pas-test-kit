@@ -7,7 +7,9 @@ module DaVinciPASTestKit
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
 
     def test_run_identifier
-      request.headers['authorization']&.delete_prefix('Bearer ')
+      return request.params[:session_path] if request.params[:session_path].present?
+
+      MockUdapSmartServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
     end
 
     def make_response
@@ -52,6 +54,9 @@ module DaVinciPASTestKit
       client_endpoint = subscription.channel.endpoint
       bearer_token = client_access_token_input(result)
       test_suite_base_url = request.url.chomp('/').chomp(FHIR_SUBSCRIPTION_PATH)
+      if request.params[:session_path].present?
+        test_suite_base_url = test_suite_base_url.chomp(request.params[:session_path]).chomp('/')
+      end
       Inferno::Jobs.perform(Jobs::SendSubscriptionHandshake, test_run.id, test_run.test_session_id, result.id,
                             subscription_id, subscription_url, client_endpoint, bearer_token, notification_json,
                             test_run_identifier, test_suite_base_url)

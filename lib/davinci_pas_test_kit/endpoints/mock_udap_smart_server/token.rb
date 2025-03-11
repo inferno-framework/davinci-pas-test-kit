@@ -20,8 +20,8 @@ module DaVinciPASTestKit
           token_type: 'Bearer',
           expires_in: 60 * exp_min
         }
-        if !request.params['udap'].present? && request.params['scopes'].present?
-          response_body['scopes'] = request.params['scopes']
+        if !request.params[:udap].present? && request.params[:scope].present?
+          response_body['scope'] = request.params[:scope]
         end
 
         response.body = response_body.to_json
@@ -29,7 +29,7 @@ module DaVinciPASTestKit
         response.headers['Pragma'] = 'no-cache'
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.content_type = 'application/json'
-        response.status = 201
+        response.status = 200
       end
 
       def update_result
@@ -37,7 +37,7 @@ module DaVinciPASTestKit
       end
 
       def tags
-        type_tag = request.params['udap'].present? ? UDAP_TAG : SMART_TAG
+        type_tag = request.params[:udap].present? ? UDAP_TAG : SMART_TAG
         [TOKEN_TAG, type_tag]
       end
 

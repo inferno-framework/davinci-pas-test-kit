@@ -29,8 +29,8 @@ module DaVinciPASTestKit
         # TODO: - implement more stuff in here
         parsed_body = MockUdapSmartServer.parsed_request_body(verified_request)
         ss_claims = MockUdapSmartServer.jwt_claims(parsed_body&.dig('software_statement'))
-        assert ss_claims&.dig('aud') == udap_discovery_url,
-               "`aud` expected to be '#{udap_discovery_url}', got '#{ss_claims&.dig('aud')}'"
+        assert ss_claims&.dig('aud') == registration_url,
+               "`aud` expected to be '#{registration_url}', got '#{ss_claims&.dig('aud')}'"
       end
     end
   end

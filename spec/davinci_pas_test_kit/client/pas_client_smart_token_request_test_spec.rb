@@ -128,6 +128,15 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     expect(result_messages.find { |m| /no `kid` header/.match(m.message) }).to_not be_nil
   end
 
+  it 'fails when a jti value is used multiple times' do
+    create_token_request(token_request_body_valid)
+    create_token_request(token_request_body_valid)
+    result = run(test, client_id:, jwk_set: jwks_valid)
+    expect(result.result).to eq('fail')
+    result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+    expect(result_messages.find { |m| /`jti` claim that was previouly used/.match(m.message) }).to_not be_nil
+  end
+
   it 'passes when a valid jku is provided' do
     stub_request(:get, jwks_url_valid)
       .to_return(status: 200, body: jwks_valid)

@@ -17,27 +17,25 @@ module DaVinciPASTestKit
             optional: true
       input :jwk_set,
             optional: true
-      input :session_url_path,
-            optional: true
 
       run do
-        unless udap_client_uri.present? || jwk_set.present?
-          identifier = SecureRandom.hex(32)
-          wait(
-            identifier:,
-            message: %(
-              **Other Authentication Attestation**:
+        omit_if udap_client_uri.present? || jwk_set.present?, 'Standards-based authentication details were provided.'
 
-              I attest that the client system can authenticate itself with a PAS server using
-              a mechanism other than the SMART Backend Services or UDAP B2B client credentials
-              fliows.
+        identifier = SecureRandom.hex(32)
+        wait(
+          identifier:,
+          message: %(
+            **Other Authentication Attestation**:
 
-              [Click here](#{resume_pass_url}?token=#{identifier}) if the above statement is true.
+            I attest that the client system can authenticate itself with a PAS server using
+            a mechanism other than the SMART Backend Services or UDAP B2B client credentials
+            fliows.
 
-              [Click here](#{resume_fail_url}?token=#{identifier}) if the above statement is false.
-            )
+            [Click here](#{resume_pass_url}?token=#{identifier}) if the above statement is true.
+
+            [Click here](#{resume_fail_url}?token=#{identifier}) if the above statement is false.
           )
-        end
+        )
       end
     end
   end
