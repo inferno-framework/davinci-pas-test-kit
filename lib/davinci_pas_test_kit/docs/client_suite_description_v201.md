@@ -60,7 +60,7 @@ Clients under test can register with the authorization server and request tokens
 when making PAS requests. In this case, Inferno will verify that the client's interactions with
 the simulated authorization server are conformant and that the provided tokens are used.
 
-If the client under test does not support either of these methods of authentication, the tester
+If the client under test does not support either of these standards-based methods of authentication, the tester
 may instead attest to other authentication capabilities. In this case, the client will authenticate
 by sending requests to dedicated PAS endpoints created by Inferno for use during the testing session.
 To reduce configuration burden, the dedicated endpoints can be reused in subsequent sessions.
