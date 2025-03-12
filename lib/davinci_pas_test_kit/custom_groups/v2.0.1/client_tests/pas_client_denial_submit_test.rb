@@ -1,10 +1,13 @@
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../user_input_response'
+require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientDenialSubmitTest < Inferno::Test
       include URLs
+      include SessionIdentification
       include UserInputResponse
 
       id :pas_client_v201_denial_submit_test
@@ -14,12 +17,18 @@ module DaVinciPASTestKit
         from the client. Upon receipt, Inferno will respond with the
         provided denial response.
       )
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
+      input :client_id,
+            title: 'Client Id',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
+      input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
       input :denial_json_response,
             title: 'Claim denied response JSON',
             type: 'textarea',
@@ -44,16 +53,17 @@ module DaVinciPASTestKit
           ))
         end
 
+        wait_identifier = inputs_to_wait_identifier(client_id, session_url_path)
+        submit_endpoint = inputs_to_session_endpont(:submit, client_id, session_url_path)
+
         wait(
-          identifier: access_token,
+          identifier: wait_identifier,
           message: %(
             **Denial Workflow Test**:
 
             Submit a PAS request to
 
-            `#{submit_url}`
-
-            The request must have an `Authorization` header with the value `Bearer #{access_token}`.
+            `#{submit_endpoint}`
 
             If the optional '**#{input_title(:denial_json_response)}**' input is populated, it will
             be returned, updated with current timestamps. Otherwise, a denial response will

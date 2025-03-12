@@ -12,12 +12,6 @@ module DaVinciPASTestKit
         the receipt of response and attest that users are able to see the appropriate
         updates to the corresponding prior authorization request in their system.
       )
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
 
       def workflow_tag
         config.options[:workflow_tag]
@@ -39,16 +33,17 @@ module DaVinciPASTestKit
       end
 
       run do
+        identifier = SecureRandom.hex(32)
         wait(
-          identifier: access_token,
+          identifier:,
           message: %(
             **#{workflow_name} Workflow Test**:
 
             #{attest_message}
 
-            [Click here](#{resume_pass_url}?token=#{access_token}) if the above statement is **true**.
+            [Click here](#{resume_pass_url}?token=#{identifier}) if the above statement is **true**.
 
-            [Click here](#{resume_fail_url}?token=#{access_token}) if the above statement is **false**.
+            [Click here](#{resume_fail_url}?token=#{identifier}) if the above statement is **false**.
           )
         )
       end

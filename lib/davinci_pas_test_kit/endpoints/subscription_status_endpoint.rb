@@ -7,7 +7,9 @@ module DaVinciPASTestKit
     include ResponseGenerator
 
     def test_run_identifier
-      request.headers['authorization']&.delete_prefix('Bearer ')
+      return request.params[:session_path] if request.params[:session_path].present?
+
+      MockUdapSmartServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
     end
 
     def make_response
