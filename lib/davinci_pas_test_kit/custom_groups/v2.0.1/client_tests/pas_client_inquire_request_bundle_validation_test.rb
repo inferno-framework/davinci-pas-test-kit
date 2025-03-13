@@ -34,6 +34,10 @@ module DaVinciPASTestKit
         issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
         for additional details.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@75', 'hl7.fhir.us.davinci-pas_2.0.1@121',
+                            'hl7.fhir.us.davinci-pas_2.0.1@122', 'hl7.fhir.us.davinci-pas_2.0.1@123',
+                            'hl7.fhir.us.davinci-pas_2.0.1@125', 'hl7.fhir.us.davinci-pas_2.0.1@126',
+                            'hl7.fhir.us.davinci-pas_2.0.1@127', 'hl7.fhir.us.davinci-pas_2.0.1@128'
 
       def request_type_tag
         INQUIRE_TAG

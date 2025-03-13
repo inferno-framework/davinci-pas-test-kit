@@ -11,6 +11,9 @@ module DaVinciPASTestKit
         Inferno will wait for a Subscription Creation request
         and then perform a handshake to activate the Subscription.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@137', 'hl7.fhir.us.davinci-pas_2.0.1@140',
+                            'hl7.fhir.us.davinci-pas_2.0.1@142'
+
       input :access_token,
             title: 'Access Token',
             description: %(
