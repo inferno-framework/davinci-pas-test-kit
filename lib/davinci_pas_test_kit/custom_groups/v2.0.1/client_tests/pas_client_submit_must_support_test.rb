@@ -11,7 +11,8 @@ module DaVinciPASTestKit
         This test allows the client to send $submit requests in addition to any already sent in previous test groups
         for Inferno to evaluate coverage of must support elements.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@70'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
+                            'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
 
       input :access_token,
             title: 'Access Token',
