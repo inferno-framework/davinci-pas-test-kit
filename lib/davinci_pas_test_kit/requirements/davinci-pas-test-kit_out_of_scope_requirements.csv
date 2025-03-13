@@ -1,2 +1,11 @@
 ﻿Req Set,ID,Reason,Details
+hl7.fhir.us.davinci-pas_2.0.1,12,Not Tested,Details of X12 messages will not be tested by Inferno.
+hl7.fhir.us.davinci-pas_2.0.1,13,Not Tested,Details of X12 messages will not be tested by Inferno.
+hl7.fhir.us.davinci-pas_2.0.1,14,Not Tested,Details of X12 messages will not be tested by Inferno.
+hl7.fhir.us.davinci-pas_2.0.1,15,Not Tested,Details of X12 messages will not be tested by Inferno.
+hl7.fhir.us.davinci-pas_2.0.1,96,Not Tested,Details of X12 messages will not be tested by Inferno.
+hl7.fhir.us.davinci-pas_2.0.1,108,Not Verifiable,The specification does not provide clear details on the indicated responses (unclear diagram)
 hl7.fhir.us.davinci-pas_2.0.1,109,Not Verifiable,The specification does not provide clear details on the indicated responses (unclear diagram)
+hl7.fhir.us.davinci-pas_2.0.1,124,Not Tested,The rules for determining matching claims are specified in a proprietary X12 specification.
+hl7.fhir.us.davinci-pas_2.0.1,132,Not Tested,How to request a subset of information is not detailed in the specification and lives in priopietary X12 specifications and mappings.
+hl7.fhir.us.davinci-pas_2.0.1,191,Not Tested,Details of payer business rules will not be tested by Inferno.

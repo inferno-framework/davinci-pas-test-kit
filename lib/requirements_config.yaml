@@ -6,7 +6,7 @@ suites:
     suite_actor: Client
   - id: davinci_pas_server_suite_v201
     class_name: DaVinciPASTestKit::DaVinciPASV201::ServerSuite
-    suite_actor: Client
+    suite_actor: Server
 
 requirement_sets:
   - id: hl7.fhir.us.davinci-pas_2.0.1
