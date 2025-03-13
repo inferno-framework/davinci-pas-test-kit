@@ -66,6 +66,7 @@ module DaVinciPASTestKit
         * Claim.supportingInfo.sequence
         * Claim.supportingInfo.timing[x]
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'
 
       id :pas_client_inquire_request_v201_claim_inquiry_must_support_test
 
