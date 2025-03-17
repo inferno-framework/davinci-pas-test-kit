@@ -2,22 +2,21 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
-    let(:access_token) { '1234' }
+    let(:session_url_path) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
     let(:test) { described_class }
     let(:results_repo) { Inferno::Repositories::Results.new }
     let(:requests_repo) { Inferno::Repositories::Requests.new }
-    let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
+    let(:submit_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::SUBMIT_PATH}" }
     let(:submit_request_json) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
     end
 
     it 'passes when a submit request received' do
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(submit_url, submit_request_json)
 
       result = results_repo.find(result.id)
@@ -25,22 +24,20 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
     end
 
     it 'returns HTTP status 200 when a submit request received' do
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(submit_url, submit_request_json)
 
       expect(last_response.status).to be(200)
     end
 
     it 'tags submit requests' do
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(submit_url, submit_request_json)
 
       requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBMIT_TAG,
@@ -50,12 +47,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
 
     describe 'when the tester does not provide a response body' do
       it 'generates an approved response body' do
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
         allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
-        header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
         fhir_body = FHIR.from_contents(last_response.body)
         expect(fhir_body).to be_a(FHIR::Bundle)
@@ -77,7 +73,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
       end
 
       it 'logs an info message' do
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
@@ -94,12 +90,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
       end
 
       it 'echoes the response body' do
-        inputs = { access_token:, approval_json_response: approved_response_json }
+        inputs = { session_url_path:, approval_json_response: approved_response_json }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
         allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
-        header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
         fhir_body = FHIR.from_contents(last_response.body)
         expect(fhir_body).to be_a(FHIR::Bundle)
@@ -109,7 +104,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :
       end
 
       it 'fails when a non-json response provided' do
-        inputs = { access_token:, approval_json_response: 'not json' }
+        inputs = { session_url_path:, approval_json_response: 'not json' }
         result = run(test, inputs)
         expect(result.result).to eq('fail')
         expect(result.result_message).to match(/must be valid JSON/)
