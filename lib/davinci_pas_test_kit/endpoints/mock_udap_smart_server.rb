@@ -3,6 +3,7 @@ require 'faraday'
 require 'time'
 require 'udap_security_test_kit'
 require_relative '../urls'
+require_relative '../tags'
 
 module DaVinciPASTestKit
   module MockUdapSmartServer
@@ -73,6 +74,14 @@ module DaVinciPASTestKit
         ENV.fetch('UDAP_ROOT_CA_CERT_FILE',
                   File.join(__dir__, '..',
                             'certs', 'infernoCA.pem'))
+      )
+    end
+
+    def root_ca_private_key
+      File.read(
+        ENV.fetch('UDAP_ROOT_CA_PRIVATE_KEY_FILE',
+                  File.join(__dir__, '..',
+                            'certs', 'infernoCA.key'))
       )
     end
 
@@ -213,7 +222,7 @@ module DaVinciPASTestKit
       ).to_json
     end
 
-    def smart_token_signature_verification(token, key_set_input)
+    def smart_assertion_signature_verification(token, key_set_input)
       encoded_token = nil
       if token.is_a?(JWT::EncodedToken)
         encoded_token = token
@@ -228,7 +237,7 @@ module DaVinciPASTestKit
       return 'missing `alg` header' if encoded_token.header['alg'].blank?
       return 'missing `kid` header' if encoded_token.header['kid'].blank?
 
-      jwk = identify_signing_key(encoded_token.header['kid'], encoded_token.header['jku'], key_set_input)
+      jwk = identify_smart_signing_key(encoded_token.header['kid'], encoded_token.header['jku'], key_set_input)
       return "no key found with `kid` '#{encoded_token.header['kid']}'" if jwk.blank?
 
       begin
@@ -240,10 +249,43 @@ module DaVinciPASTestKit
       nil
     end
 
-    def identify_signing_key(kid, jku, key_set_input)
+    def identify_smart_signing_key(kid, jku, key_set_input)
       key_set = jku.present? ? jku : key_set_input
       parsed_key_set = jwk_set(key_set)
       parsed_key_set&.find { |key| key.kid == kid }
+    end
+
+    def udap_assertion_signature_verification(assertion_jwt, registration_jwt = nil)
+      _assertion_body, assertion_header = JWT.decode(assertion_jwt, nil, false)
+      return 'missing `x5c` header' if assertion_header['x5c'].blank?
+      return 'missing `alg` header' if assertion_header['alg'].blank?
+
+      leaf_cert_der = Base64.decode64(assertion_header['x5c'].first)
+      leaf_cert = OpenSSL::X509::Certificate.new(leaf_cert_der)
+      signature_validation_result = UDAPSecurityTestKit::UDAPJWTValidator.validate_signature(
+        assertion_jwt,
+        assertion_header['alg'],
+        leaf_cert
+      )
+      return signature_validation_result[:error_message] unless signature_validation_result[:success]
+      return unless registration_jwt
+
+      # check trust
+      _registration_body, registration_header = JWT.decode(registration_jwt, nil, false)
+      unless assertion_header['x5c'].first == registration_header['x5c'].first
+        return 'signing cert does not match registration cert'
+      end
+
+      nil
+    end
+
+    def udap_registration_software_statement(test_session_id)
+      registration_requests =
+        Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [UDAP_TAG, REGISTRATION_TAG])
+      return unless registration_requests.present?
+
+      parsed_body = MockUdapSmartServer.parsed_request_body(registration_requests.last)
+      parsed_body&.dig('software_statement')
     end
 
     def update_response_for_invalid_assertion(response, error_message)
