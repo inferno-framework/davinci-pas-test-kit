@@ -9,9 +9,8 @@ module DaVinciPASTestKit
         the /Claim/$inquire endpoint.
         This test submits a Prior Authorization Inquiry request to the server and verifies that a
         response is returned with HTTP status 2XX.
-        
-        
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@111', 'hl7.fhir.us.davinci-pas_2.0.1@208'
 
       input :pa_inquire_request_payload,
             title: 'PAS Inquire Request Payload',
