@@ -4,6 +4,7 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:test) { suite.children[2].children[0].children[0] }
   let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:dummy_result) { repo_create(:result, test_session_id: test_session.id) }
   let(:client_id) { 'cid' }
   let(:jwks_valid) do
     File.read(File.join(__dir__, '../..', 'fixtures', 'smart_jwks.json'))
@@ -41,6 +42,67 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
       client_assertion_type: 'invalid',
       client_assertion: client_assertion_sig_valid }
   end
+  let(:udap_client_id) { 'aHR0cDovL2xvY2FsaG9zdDo0NTY3L2N1c3RvbS9nMzNfdGVzdF9zdWl0ZS9maGly' }
+  let(:udap_payload_invalid) do
+    {
+      iss: udap_client_id,
+      sub: 'different',
+      aud: 'http://localhost:4567/custom/davinci_pas_client_suite_v201/auth/token',
+      exp: 60.minutes.from_now.to_i,
+      iat: Time.now.to_i,
+      jti: '96a86a90d27090e8ab3835403fb64fec973977a63d7af5e7cf99064d6bb32092',
+      extensions: '{"hl7-b2b":{"version":"1","subject_name":"UDAP Test Kit","organization_name":"Inferno Framework","organization_id":"https://inferno-framework.github.io/","purpose_of_use":["SYSDEV"]}}' # rubocop:disable Layout/LineLength
+    }
+  end
+  let(:root_cert) do
+    File.read(File.join(__dir__, '..', '..', '..', 'lib', 'davinci_pas_test_kit', 'certs', 'infernoCA.pem'))
+  end
+  let(:root_key) do
+    File.read(File.join(__dir__, '..', '..', '..', 'lib', 'davinci_pas_test_kit', 'certs', 'infernoCA.key'))
+  end
+  let(:leaf_cert) do
+    File.read(File.join(__dir__, '..', '..', '..', 'lib', 'davinci_pas_test_kit', 'certs', 'TestKit.pem'))
+  end
+  let(:leaf_key) do
+    File.read(File.join(__dir__, '..', '..', '..', 'lib', 'davinci_pas_test_kit', 'certs', 'TestKitPrivateKey.key'))
+  end
+  let(:udap_reg_request_valid) do
+    File.read(File.join(__dir__, '../..', 'fixtures', 'udap_reg_request_valid.json'))
+  end
+  let(:udap_assertion_correct_cert) do
+    UDAPSecurityTestKit::UDAPJWTBuilder.encode_jwt_with_x5c_header(
+      udap_payload_invalid,
+      leaf_key,
+      'RS256',
+      [leaf_cert]
+    )
+  end
+  let(:udap_assertion_wrong_cert) do
+    UDAPSecurityTestKit::UDAPJWTBuilder.encode_jwt_with_x5c_header(
+      udap_payload_invalid,
+      root_key,
+      'RS256',
+      [root_cert]
+    )
+  end
+  let(:udap_token_request_body_sig_invalid) do
+    { grant_type: 'invalid',
+      client_assertion_type: 'invalid',
+      client_assertion: "#{udap_assertion_correct_cert}bad",
+      udap: 1 }
+  end
+  let(:udap_token_request_body_sig_valid) do
+    { grant_type: 'invalid',
+      client_assertion_type: 'invalid',
+      client_assertion: udap_assertion_correct_cert,
+      udap: 1 }
+  end
+  let(:udap_token_request_body_wrong_cert) do
+    { grant_type: 'invalid',
+      client_assertion_type: 'invalid',
+      client_assertion: udap_assertion_wrong_cert,
+      udap: 1 }
+  end
 
   def make_jwt(payload, header, alg, jwk)
     token = JWT::Token.new(payload:, header:)
@@ -48,7 +110,20 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
     token.jwt
   end
 
-  describe 'when generating token responses' do
+  def create_reg_request(body)
+    repo_create(
+      :request,
+      direction: 'incoming',
+      url: 'test',
+      result: dummy_result,
+      test_session_id: test_session.id,
+      request_body: body,
+      status: 200,
+      tags: [DaVinciPASTestKit::REGISTRATION_TAG, DaVinciPASTestKit::UDAP_TAG]
+    )
+  end
+
+  describe 'when generating token responses for SMART' do
     it 'returns 401 when the signature is bad or cannot be verified' do
       inputs = { client_id:, jwk_set: jwks_valid }
       result = run(test, inputs)
@@ -70,6 +145,61 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
       expect(result.result).to eq('wait')
 
       post_json(token_url, token_request_body_sig_valid)
+      expect(last_response.status).to eq(200)
+
+      result = results_repo.find(result.id)
+      expect(result.result).to eq('wait')
+    end
+  end
+
+  describe 'when generating token responses for UDAP' do
+    it 'returns 401 when the signature is invalid' do
+      create_reg_request(udap_reg_request_valid)
+      inputs = { client_id: udap_client_id }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(token_url, udap_token_request_body_sig_invalid)
+      expect(last_response.status).to eq(401)
+      expect(last_response.body).to match(/Signature verification failed/)
+
+      result = results_repo.find(result.id)
+      expect(result.result).to eq('wait')
+    end
+
+    it 'returns 401 when the signatured used a cert that was not registered' do
+      create_reg_request(udap_reg_request_valid)
+      inputs = { client_id: udap_client_id }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(token_url, udap_token_request_body_wrong_cert)
+      expect(last_response.status).to eq(401)
+      expect(last_response.body).to match(/signing cert does not match registration cert/)
+
+      result = results_repo.find(result.id)
+      expect(result.result).to eq('wait')
+    end
+
+    it 'returns 200 when no prior registration' do
+      inputs = { client_id: udap_client_id }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(token_url, udap_token_request_body_sig_valid)
+      expect(last_response.status).to eq(200)
+
+      result = results_repo.find(result.id)
+      expect(result.result).to eq('wait')
+    end
+
+    it 'returns 200 when signature valid even if other issues' do
+      create_reg_request(udap_reg_request_valid)
+      inputs = { client_id: udap_client_id }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(token_url, udap_token_request_body_sig_valid)
       expect(last_response.status).to eq(200)
 
       result = results_repo.find(result.id)

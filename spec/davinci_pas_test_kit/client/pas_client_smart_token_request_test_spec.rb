@@ -105,7 +105,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     expect(result_messages.find { |m| /incorrect `sub` claim/.match(m.message) }).to_not be_nil
     expect(result_messages.find { |m| /missing the `exp` claim/.match(m.message) }).to_not be_nil
     expect(result_messages.find { |m| /missing the `jti` claim/.match(m.message) }).to_not be_nil
-    expect(result_messages.find { |m| /invalid signature/.match(m.message) }).to_not be_nil
+    expect(result_messages.find { |m| /Signature verification failed/.match(m.message) }).to_not be_nil
   end
 
   it 'fails for an invalid request with no alg header' do

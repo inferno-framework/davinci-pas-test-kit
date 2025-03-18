@@ -117,7 +117,7 @@ module DaVinciPASTestKit
       end
 
       def check_jwt_signature(encoded_token, index)
-        error = MockUdapSmartServer.smart_token_signature_verification(encoded_token, jwk_set)
+        error = MockUdapSmartServer.smart_assertion_signature_verification(encoded_token, jwk_set)
 
         return unless error.present?
 
