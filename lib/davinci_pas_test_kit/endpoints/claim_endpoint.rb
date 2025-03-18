@@ -49,6 +49,8 @@ module DaVinciPASTestKit
     }.freeze
 
     def make_response
+      return if response.status == 401 # set in update_result
+
       response.status = 200
       response.format = :json
 
@@ -83,6 +85,11 @@ module DaVinciPASTestKit
     end
 
     def update_result
+      if MockUdapSmartServer.request_has_expired_token?(request)
+        MockUdapSmartServer.update_response_for_expired_token(response)
+        return
+      end
+
       results_repo.update_result(result.id, 'pass') unless test.config.options[:accepts_multiple_requests]
     end
 

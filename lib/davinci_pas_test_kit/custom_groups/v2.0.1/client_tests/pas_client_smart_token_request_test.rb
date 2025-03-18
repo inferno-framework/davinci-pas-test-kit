@@ -117,34 +117,11 @@ module DaVinciPASTestKit
       end
 
       def check_jwt_signature(encoded_token, index)
-        error_prefix = "Signature validation failed on token request #{index}:"
+        error = MockUdapSmartServer.smart_token_signature_verification(encoded_token, jwk_set)
 
-        if encoded_token.header['alg'].blank?
-          add_message('error', "#{error_prefix} no `alg` header to use for signature validation.")
-          return
-        end
-        if encoded_token.header['kid'].blank?
-          add_message('error', "#{error_prefix} no `kid` header to idenitfy the JWK for signature validation.")
-          return
-        end
+        return unless error.present?
 
-        jwk = identify_key(encoded_token.header['kid'], encoded_token.header['jku'])
-        if jwk.blank?
-          add_message('error', "#{error_prefix} no key found with `kid` '#{encoded_token.header['kid']}'")
-          return
-        end
-
-        begin
-          encoded_token.verify_signature!(algorithm: encoded_token.header['alg'], key: jwk.verify_key)
-        rescue StandardError => e
-          add_message('error', "#{error_prefix} invalid signature - #{e}")
-        end
-      end
-
-      def identify_key(kid, jku)
-        key_set = jku.present? ? jku : jwk_set
-        parsed_key_set = MockUdapSmartServer.jwk_set(key_set)
-        parsed_key_set.find { |key| key.kid == kid }
+        add_message('error', "Signature validation failed on token request #{index}: #{error}")
       end
     end
   end

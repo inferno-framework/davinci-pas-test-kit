@@ -1,5 +1,6 @@
 require 'jwt'
 require 'faraday'
+require 'time'
 require 'udap_security_test_kit'
 require_relative '../urls'
 
@@ -151,6 +152,11 @@ module DaVinciPASTestKit
     def jwk_set(jku, warning_messages = [])
       jwk_set = JWT::JWK::Set.new
 
+      if jku.blank?
+        warning_messages << 'No key set input.'
+        return jwk_set
+      end
+
       jwk_body = # try as raw jwk set
         begin
           JSON.parse(jku)
@@ -186,6 +192,64 @@ module DaVinciPASTestKit
       end
 
       jwk_set
+    end
+
+    def request_has_expired_token?(request)
+      return false if request.params[:session_path].present?
+
+      token = request.headers['authorization']&.delete_prefix('Bearer ')
+      decoded_token = decode_token(token)
+      return false unless decoded_token&.dig('expiration').present?
+
+      decoded_token['expiration'] < Time.now.to_i
+    end
+
+    def update_response_for_expired_token(response)
+      response.status = 401
+      response.format = :json
+      response.body = FHIR::OperationOutcome.new(
+        issue: FHIR::OperationOutcome::Issue.new(severity: 'fatal', code: 'expired',
+                                                 details: FHIR::CodeableConcept.new(text: 'Bearer token has expired'))
+      ).to_json
+    end
+
+    def smart_token_signature_verification(token, key_set_input)
+      encoded_token = nil
+      if token.is_a?(JWT::EncodedToken)
+        encoded_token = token
+      else
+        begin
+          encoded_token = JWT::EncodedToken.new(token)
+        rescue StandardError => e
+          return "invalid token structure: #{e}"
+        end
+      end
+      return 'invalid token' unless encoded_token.present?
+      return 'missing `alg` header' if encoded_token.header['alg'].blank?
+      return 'missing `kid` header' if encoded_token.header['kid'].blank?
+
+      jwk = identify_signing_key(encoded_token.header['kid'], encoded_token.header['jku'], key_set_input)
+      return "no key found with `kid` '#{encoded_token.header['kid']}'" if jwk.blank?
+
+      begin
+        encoded_token.verify_signature!(algorithm: encoded_token.header['alg'], key: jwk.verify_key)
+      rescue StandardError => e
+        return e
+      end
+
+      nil
+    end
+
+    def identify_signing_key(kid, jku, key_set_input)
+      key_set = jku.present? ? jku : key_set_input
+      parsed_key_set = jwk_set(key_set)
+      parsed_key_set&.find { |key| key.kid == kid }
+    end
+
+    def update_response_for_invalid_assertion(response, error_message)
+      response.status = 401
+      response.format = :json
+      response.body = { error: 'invalid_client', error_description: error_message }.to_json
     end
   end
 end
