@@ -17,6 +17,17 @@ module DaVinciPASTestKit
         from the client. Upon receipt, Inferno will respond with the
         provided denial response.
       )
+      input :denial_json_response,
+            title: 'Claim denied response JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent in response to $submit requests during this test
+              to indicate that the request has been denied.
+              It will be updated to make creation timestamps current.
+              If not provided, a denial response will be generated from the submitted Claim.
+              In either case, the response will be validated against the PAS Response Bundle profile.
+            )
       input :client_id,
             title: 'Client Id',
             type: 'text',
@@ -29,17 +40,12 @@ module DaVinciPASTestKit
             optional: true,
             locked: true,
             description: INPUT_SESSION_URL_PATH_LOCKED
-      input :denial_json_response,
-            title: 'Claim denied response JSON',
+      input :jwk_set,
+            title: 'JSON Web Key Set (JWKS)',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be sent in response to $submit requests during this test
-              to indicate that the request has been denied.
-              It will be updated to make creation timestamps current.
-              If not provided, a denial response will be generated from the submitted Claim.
-              In either case, the response will be validated against the PAS Response Bundle profile.
-            )
+            locked: true,
+            description: INPUT_JWK_SET_LOCKED
       submit_respond_with :denial_json_response
 
       run do

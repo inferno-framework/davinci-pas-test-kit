@@ -18,6 +18,17 @@ module DaVinciPASTestKit
         response with an approved status.
       )
 
+      input :approval_json_response,
+            title: 'Claim approved response JSON',
+            type: 'textarea',
+            optional: true,
+            description: %(
+              If provided, this JSON will be sent in response to $submit requests during this test
+              to indicate that the request has been approved.
+              It will be updated to make creation timestamps current.
+              If not provided, an approval response will be generated from the submitted Claim.
+              In either case, the response will be validated against the PAS Response Bundle profile.
+            )
       input :client_id,
             title: 'Client Id',
             type: 'text',
@@ -30,17 +41,13 @@ module DaVinciPASTestKit
             optional: true,
             locked: true,
             description: INPUT_SESSION_URL_PATH_LOCKED
-      input :approval_json_response,
-            title: 'Claim approved response JSON',
+      input :jwk_set,
+            title: 'JSON Web Key Set (JWKS)',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be sent in response to $submit requests during this test
-              to indicate that the request has been approved.
-              It will be updated to make creation timestamps current.
-              If not provided, an approval response will be generated from the submitted Claim.
-              In either case, the response will be validated against the PAS Response Bundle profile.
-            )
+            locked: true,
+            description: INPUT_JWK_SET_LOCKED
+
       submit_respond_with :approval_json_response
 
       run do
