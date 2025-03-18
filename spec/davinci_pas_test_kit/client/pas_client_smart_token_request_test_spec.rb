@@ -115,7 +115,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     result = run(test, client_id:, jwk_set: jwks_valid)
     expect(result.result).to eq('fail')
     result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
-    expect(result_messages.find { |m| / no `alg` header/.match(m.message) }).to_not be_nil
+    expect(result_messages.find { |m| /missing `alg` header/.match(m.message) }).to_not be_nil
   end
 
   it 'fails for an invalid request with no kid header' do
@@ -125,7 +125,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     result = run(test, client_id:, jwk_set: jwks_valid)
     expect(result.result).to eq('fail')
     result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
-    expect(result_messages.find { |m| /no `kid` header/.match(m.message) }).to_not be_nil
+    expect(result_messages.find { |m| /missing `kid` header/.match(m.message) }).to_not be_nil
   end
 
   it 'fails when a jti value is used multiple times' do

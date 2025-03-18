@@ -13,6 +13,11 @@ module DaVinciPASTestKit
     end
 
     def make_response
+      if MockUdapSmartServer.request_has_expired_token?(request)
+        update_response_for_expired_token(response)
+        return
+      end
+
       response.format = :json
       subscription = find_subscription(test_run.test_session_id)
 

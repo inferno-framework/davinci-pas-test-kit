@@ -28,18 +28,6 @@ module DaVinciPASTestKit
                             'hl7.fhir.us.davinci-pas_2.0.1@203'
 
       config options: { accepts_multiple_requests: true }
-      input :client_id,
-            title: 'Client Id',
-            type: 'text',
-            optional: true,
-            locked: true,
-            description: INPUT_CLIENT_ID_LOCKED
-      input :session_url_path,
-            title: 'Session-specific URL path extension',
-            type: 'text',
-            optional: true,
-            locked: true,
-            description: INPUT_SESSION_URL_PATH_LOCKED
       input :notification_bundle,
             title: 'Claim updated notification JSON',
             type: 'textarea',
@@ -86,6 +74,25 @@ module DaVinciPASTestKit
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
+      input :client_id,
+            title: 'Client Id',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
+      input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
+      input :jwk_set,
+            title: 'JSON Web Key Set (JWKS)',
+            type: 'textarea',
+            optional: true,
+            locked: true,
+            description: INPUT_JWK_SET_LOCKED
+
       submit_respond_with :pended_json_response
       inquire_respond_with :inquire_json_response
 

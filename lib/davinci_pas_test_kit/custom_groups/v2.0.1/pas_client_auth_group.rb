@@ -7,7 +7,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientAuthGroup < Inferno::TestGroup
       id :pas_client_v201_auth
-      title 'Authentication Interactions'
+      title 'Review Authentication Interactions'
       description %(
         During these tests, Inferno will verify that the client interacted with Inferno's
         simulated authorization server in a conformant manner when requesting access tokens
