@@ -1,3 +1,8 @@
+# 0.12.2
+
+* FI-3818: Add verifies_requirements to client suite by @elsaperelli in https://github.com/inferno-framework/davinci-pas-test-kit/pull/28
+* Upgrade Subscriptions Test Kit for AuthInfo and endpoint URL bug fix by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/30
+
 # 0.12.1
 
 * Add Client Subscriptions tests by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/23
