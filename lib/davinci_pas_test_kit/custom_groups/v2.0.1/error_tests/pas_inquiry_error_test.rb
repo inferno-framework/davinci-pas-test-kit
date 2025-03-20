@@ -19,6 +19,7 @@ module DaVinciPASTestKit
         via the error capability.
       )
       makes_request :pa_invalid_inquiry
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@112', 'hl7.fhir.us.davinci-pas_2.0.1@113'
 
       run do
         file_path = File.join(File.dirname(__FILE__), 'nonconformant_pas_bundle.json')
