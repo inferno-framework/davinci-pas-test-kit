@@ -71,7 +71,7 @@ module DaVinciPASTestKit
 
     def root_ca_cert
       File.read(
-        ENV.fetch('UDAP_ROOT_CA_CERT_FILE',
+        ENV.fetch('PAS_ROOT_CA_CERT_FILE',
                   File.join(__dir__, '..',
                             'certs', 'infernoCA.pem'))
       )
@@ -79,7 +79,7 @@ module DaVinciPASTestKit
 
     def root_ca_private_key
       File.read(
-        ENV.fetch('UDAP_ROOT_CA_PRIVATE_KEY_FILE',
+        ENV.fetch('PAS_ROOT_CA_PRIVATE_KEY_FILE',
                   File.join(__dir__, '..',
                             'certs', 'infernoCA.key'))
       )
@@ -87,7 +87,7 @@ module DaVinciPASTestKit
 
     def test_kit_cert
       File.read(
-        ENV.fetch('UDAP_TEST_KIT_CERT_FILE',
+        ENV.fetch('PAS_TEST_KIT_CERT_FILE',
                   File.join(__dir__, '..',
                             'certs', 'TestKit.pem'))
       )
@@ -95,7 +95,7 @@ module DaVinciPASTestKit
 
     def test_kit_private_key
       File.read(
-        ENV.fetch('UDAP_TEST_KIT_PRIVATE_KEY_FILE',
+        ENV.fetch('PAS_TEST_KIT_PRIVATE_KEY_FILE',
                   File.join(__dir__, '..',
                             'certs', 'TestKitPrivateKey.key'))
       )
