@@ -1,4 +1,5 @@
 require_relative 'endpoints/mock_udap_smart_server'
+require_relative 'urls'
 
 module DaVinciPASTestKit
   module SessionIdentification
