@@ -64,6 +64,7 @@ module DaVinciPASTestKit
       )
 
       id :pas_server_v201_must_support_use_case
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@33'
       
   
       def use_case
@@ -143,6 +144,7 @@ module DaVinciPASTestKit
         end
         group do
           title '[USER INPUT VALIDATION] Submit Request Must Support'
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'
           
           test from: :pas_server_submit_v201_must_support_requirement
           test from: :pas_server_submit_request_v201_pas_request_bundle_must_support_test
@@ -235,6 +237,7 @@ module DaVinciPASTestKit
         end
         group do
           title '[USER INPUT VALIDATION] Inquiry Request Must Support'
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'
           
           test from: :pas_server_inquire_request_v201_pas_inquiry_request_bundle_must_support_test
           test from: :pas_server_inquire_request_v201_claim_inquiry_must_support_test

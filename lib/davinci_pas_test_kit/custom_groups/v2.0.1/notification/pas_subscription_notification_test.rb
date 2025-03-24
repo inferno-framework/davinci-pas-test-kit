@@ -13,6 +13,7 @@ module DaVinciPASTestKit
         to the availability of updates to the prior authorization request (see details on this limitation
         [here](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)).
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@141'
 
       run do
         token = SecureRandom.hex(32)

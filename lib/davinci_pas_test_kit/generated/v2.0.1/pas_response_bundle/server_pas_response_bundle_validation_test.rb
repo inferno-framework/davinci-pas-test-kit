@@ -35,6 +35,9 @@ module DaVinciPASTestKit
         issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
         for additional details.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@64', 'hl7.fhir.us.davinci-pas_2.0.1@100',
+                            'hl7.fhir.us.davinci-pas_2.0.1@101', 'hl7.fhir.us.davinci-pas_2.0.1@102',
+                            'hl7.fhir.us.davinci-pas_2.0.1@103', 'hl7.fhir.us.davinci-pas_2.0.1@107'
       
       output :dar_code_found, :dar_extension_found
 
@@ -55,12 +58,10 @@ module DaVinciPASTestKit
         scratch[:submit_request_response_pair][:all] ||= []
       end
 
-      
-
       run do
         skip_if target_request_response_pairs.blank?, 'No submit response to validate. Either no submit request was made in a previous test or it resulted in a server error.'
         target_pairs = target_request_response_pairs
-        # Clean request/response pair after validatation
+        # Clean request/response pair after validation
         scratch[:submit_request_response_pair][:all] = []
 
         response_bundles = target_pairs.map { |pair| pair[:response_bundle] }
