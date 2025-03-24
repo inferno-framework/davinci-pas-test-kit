@@ -1,7 +1,7 @@
-require_relative 'client_tests/pas_client_udap_token_request_test'
-require_relative 'client_tests/pas_client_udap_token_use_test'
-require_relative 'client_tests/pas_client_smart_token_request_test'
-require_relative 'client_tests/pas_client_smart_token_use_test'
+require_relative 'auth/pas_client_udap_token_request_test'
+require_relative 'auth/pas_client_udap_token_use_test'
+require_relative 'auth/pas_client_smart_token_request_test'
+require_relative 'auth/pas_client_smart_token_use_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201

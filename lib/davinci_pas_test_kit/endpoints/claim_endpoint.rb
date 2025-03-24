@@ -49,7 +49,7 @@ module DaVinciPASTestKit
     }.freeze
 
     def make_response
-      return if response.status == 401 # set in update_result
+      return if response.status == 401 # set in update_result (expired token handling there)
 
       response.status = 200
       response.format = :json
