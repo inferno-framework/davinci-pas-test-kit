@@ -190,13 +190,18 @@ module DaVinciPASTestKit
           inquiry_operation_test_ids + inquiry_response_validation_test_ids
       end
 
+      def subscription_notification_conformance_test_ids
+        ['subscriptions_r4_server_notification_conformance', 'subscriptions_r4_server_id_only_conformance']
+      end
+
       def grouped_pended_test_ids
         inquiry_operation = [inquiry_notification_test_id] +
+                            subscription_notification_conformance_test_ids +
                             inquiry_request_validation_test_ids +
                             inquiry_operation_test_ids +
                             inquiry_response_validation_test_ids
         inquiry_tests = {
-          'Server can respond to claims submitted for inquiry' => inquiry_operation
+          'Server can notify client of updates and respond to claims submitted for inquiry' => inquiry_operation
         }
 
         grouped_approval_denial_test_ids.merge(inquiry_tests)

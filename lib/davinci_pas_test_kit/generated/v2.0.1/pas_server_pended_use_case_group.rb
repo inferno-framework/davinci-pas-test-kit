@@ -59,9 +59,14 @@ module DaVinciPASTestKit
         test from: :prior_auth_claim_response_decision_validation
       end
       group do
-        title 'Server can respond to claims submitted for inquiry'
+        title 'Server can notify client of updates and respond to claims submitted for inquiry'
         
         test from: :prior_auth_claim_response_update_notification_validation
+        test from: :subscriptions_r4_server_notification_conformance do
+          config options: { subscription_type: 'id-only' }
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@145'
+        end
+        test from: :subscriptions_r4_server_id_only_conformance
         test from: :pas_server_v201_pas_inquiry_request_bundle_validation_test
         test from: :pas_v201_claim_inquiry_operation_test do
           id :pas_v201_claim_inquiry_operation_test_pended

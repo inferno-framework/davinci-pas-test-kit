@@ -1,0 +1,95 @@
+{
+	"info": {
+		"_postman_id": "73e245b8-a8c9-48e9-b3a6-238029cdd800",
+		"name": "PAS Server Test Suite Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2481890"
+	},
+	"item": [
+		{
+			"name": "Subscription Event Notification",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{notification_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/fhir+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"r4-notification-id-only\",\n  \"meta\": {\n    \"profile\": [\n      \"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4\"\n    ]\n  },\n  \"type\": \"history\",\n  \"timestamp\": \"2025-03-24T21:18:52Z\",\n  \"entry\": [\n    {\n      \"fullUrl\": \"urn:uuid:292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n      \"resource\": {\n        \"id\": \"292d3c72-edc1-4d8a-afaa-d85e19c7f563\",\n        \"meta\": {\n          \"profile\": [\n            \"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-status-r4\"\n          ]\n        },\n        \"parameter\": [\n          {\n            \"name\": \"subscription\",\n            \"valueReference\": {\n              \"reference\": \"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription/{{subscription_id}}\"\n            }\n          },\n          {\n            \"name\": \"topic\",\n            \"valueCanonical\": \"http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic\"\n          },\n          {\n            \"name\": \"status\",\n            \"valueCode\": \"active\"\n          },\n          {\n            \"name\": \"type\",\n            \"valueCode\": \"event-notification\"\n          },\n          {\n            \"name\": \"events-since-subscription-start\",\n            \"valueString\": \"1\"\n          },\n          {\n            \"name\": \"notification-event\",\n            \"part\": [\n              {\n                \"name\": \"event-number\",\n                \"valueString\": \"1\"\n              },\n              {\n                \"name\": \"timestamp\",\n                \"valueInstant\": \"2025-03-24T21:18:52Z\"\n              },\n              {\n                \"name\": \"focus\",\n                \"valueReference\": {\n                  \"reference\": \"https://example.org/fhir/Encounter/86009987-eabe-42bf-8c02-b112b18cb616\"\n                }\n              }\n            ]\n          }\n        ],\n        \"resourceType\": \"Parameters\"\n      },\n      \"request\": {\n        \"method\": \"GET\",\n        \"url\": \"http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir/Subscription/{{subscription_id}}/$status\"\n      },\n      \"response\": {\n        \"status\": \"200\"\n      }\n    }\n  ],\n  \"resourceType\": \"Bundle\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"custom",
+						"subscriptions_r5_backport_r4_server",
+						"subscription",
+						"channel",
+						"notification_listener"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://inferno.healthit.gov/suites",
+			"type": "string"
+		},
+		{
+			"key": "subscription_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "notification_token",
+			"value": "SAMPLE_TOKEN",
+			"type": "string"
+		}
+	]
+}

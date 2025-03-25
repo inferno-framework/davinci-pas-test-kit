@@ -34,6 +34,9 @@ module DaVinciPASTestKit
               }
             }
           )
+        end<% elsif id == 'subscriptions_r4_server_notification_conformance' %> do
+          config options: { subscription_type: 'id-only' }
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@145'
         end<% end %><% end %>
       end<% end %>
   <% else %>
