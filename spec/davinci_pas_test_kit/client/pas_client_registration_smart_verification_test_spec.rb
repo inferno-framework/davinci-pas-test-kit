@@ -14,7 +14,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientRegistrationSMARTVeri
   end
 
   it 'passes for a valid raw jwks' do
-    result = run(test, jwk_set: jwks_valid)
+    result = run(test, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('pass')
   end
 
@@ -22,7 +22,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientRegistrationSMARTVeri
     stub_request(:get, jwks_url_valid)
       .to_return(status: 200, body: jwks_valid)
 
-    result = run(test, jwk_set: jwks_url_valid)
+    result = run(test, smart_jwk_set: jwks_url_valid)
     expect(result.result).to eq('pass')
   end
 
@@ -30,7 +30,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientRegistrationSMARTVeri
     stub_request(:get, jwks_url_valid)
       .to_return(status: 404)
 
-    result = run(test, jwk_set: jwks_url_valid)
+    result = run(test, smart_jwk_set: jwks_url_valid)
     expect(result.result).to eq('fail')
   end
 end

@@ -45,7 +45,7 @@ module DaVinciPASTestKit
               Required if demonstrating the UDAP B2B client credentials flow. Must be the
               Client URI that will be used to register with Inferno's simulated UDAP server.
             )
-      input :jwk_set,
+      input :smart_jwk_set,
             title: 'JSON Web Key Set (JWKS)',
             type: 'textarea',
             optional: true,
