@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
+require_relative '../../../pas_subscription_verification'
+
 module DaVinciPASTestKit
   module DaVinciPASV201
     class SubscriptionPASConformanceTest < Inferno::Test
+      include PASSubscriptionVerification
+
       id :pas_client_v201_subscription_pas_conformance_test
       title 'Client Subscription PAS Conformance Verification'
       description %(
@@ -19,30 +23,7 @@ module DaVinciPASTestKit
         skip_if(requests.none?, 'Inferno did not receive a Subscription creation request')
         subscription_resource = request.request_body
 
-        assert_valid_json(subscription_resource)
-        subscription = JSON.parse(subscription_resource)
-
-        unless subscription['criteria'] == 'http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic'
-          add_message('error', %(
-            The created Subscription must use the PAS-defined Subscription topic
-            `http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic`
-            in the `Subscription.criteria` element.
-          ))
-        end
-
-        filter_criteria = subscription.dig('_criteria', 'extension')
-          &.select do |ext|
-            ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria'
-          end
-        unless filter_criteria&.length == 1
-          add_message('error', %(
-            The created Subscription must include a single filter on the submitting organization
-            in the `Subscription.criteria.extension` element.
-          ))
-        end
-
-        assert messages.none? { |msg| msg[:type] == 'error' },
-               'The Created Subscription does not conform to PAS requirements - see messages for details.'
+        verify_pas_subscription(subscription_resource)
       end
     end
   end

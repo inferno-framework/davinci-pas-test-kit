@@ -125,16 +125,6 @@ These limitations may be removed in future versions of these tests. In the meant
 requirements to be verified through attestation and should not represent their systems to have passed these tests
 if these requirements are not met.
 
-### Underspecified Subscription Details
-
-The current PAS specification around subscriptions and notifications
-is not detailed enough to support testing. Notably, 
-- There are no examples of what a notification payload looks like
-- There is no instruction on how to turn the notification payload into an inquiry
-
-Once these details have been clarified, validation of the notification workflows
-will be added to these tests.
-
 ### Future Details
 
 The PAS IG places additional requirements on servers that are not currently tested by this test kit, including
