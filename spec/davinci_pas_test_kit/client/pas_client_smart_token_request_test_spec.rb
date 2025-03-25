@@ -82,19 +82,19 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
   end
 
   it 'skips if no token requests' do
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('skip')
   end
 
   it 'passes for a valid request' do
     create_token_request(token_request_body_valid)
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('pass')
   end
 
   it 'fails for an invalid request' do
     create_token_request(token_request_body_invalid)
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('fail')
     result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
     expect(result_messages.find { |m| /incorrect `grant_type`/.match(m.message) }).to_not be_nil
@@ -112,7 +112,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     token_request_body_valid[:client_assertion] =
       "#{encoded_header_no_alg}.#{client_assertion_valid.split('.')[1..].join('.')}"
     create_token_request(token_request_body_valid)
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('fail')
     result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
     expect(result_messages.find { |m| /missing `alg` header/.match(m.message) }).to_not be_nil
@@ -122,7 +122,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     header_valid.delete(:kid)
     token_request_body_valid[:client_assertion] = make_jwt(payload_valid, header_valid, 'RS384', parsed_jwks.keys[3])
     create_token_request(token_request_body_valid)
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('fail')
     result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
     expect(result_messages.find { |m| /missing `kid` header/.match(m.message) }).to_not be_nil
@@ -131,7 +131,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
   it 'fails when a jti value is used multiple times' do
     create_token_request(token_request_body_valid)
     create_token_request(token_request_body_valid)
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('fail')
     result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
     expect(result_messages.find { |m| /`jti` claim that was previouly used/.match(m.message) }).to_not be_nil
@@ -143,7 +143,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSMARTTokenRequestTest
     header_valid[:jku] = jwks_url_valid
     token_request_body_valid[:client_assertion] = make_jwt(payload_valid, header_valid, 'RS384', parsed_jwks.keys[3])
     create_token_request(token_request_body_valid)
-    result = run(test, client_id:, jwk_set: jwks_valid)
+    result = run(test, client_id:, smart_jwk_set: jwks_valid)
     expect(result.result).to eq('pass')
   end
 end

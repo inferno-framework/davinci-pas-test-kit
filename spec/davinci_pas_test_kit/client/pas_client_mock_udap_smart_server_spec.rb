@@ -125,7 +125,7 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
 
   describe 'when generating token responses for SMART' do
     it 'returns 401 when the signature is bad or cannot be verified' do
-      inputs = { client_id:, jwk_set: jwks_valid }
+      inputs = { client_id:, smart_jwk_set: jwks_valid }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
@@ -140,7 +140,7 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
     end
 
     it 'returns 200 when the signature is correct even if header is bad' do
-      inputs = { client_id:, jwk_set: jwks_valid }
+      inputs = { client_id:, smart_jwk_set: jwks_valid }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
@@ -215,7 +215,7 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
         nonce: SecureRandom.hex(8)
       }.to_json)
 
-      inputs = { client_id:, jwk_set: jwks_valid }
+      inputs = { client_id:, smart_jwk_set: jwks_valid }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
@@ -238,7 +238,7 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
 
       allow(Time).to receive(:now).and_return(Time.at(exp_timestamp - 10))
 
-      inputs = { client_id:, jwk_set: jwks_valid }
+      inputs = { client_id:, smart_jwk_set: jwks_valid }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
@@ -256,7 +256,7 @@ RSpec.describe DaVinciPASTestKit::MockUdapSmartServer, :request, :runnable do # 
         nonce: SecureRandom.hex(8)
       }.to_json)
 
-      inputs = { client_id:, jwk_set: jwks_valid }
+      inputs = { client_id:, smart_jwk_set: jwks_valid }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
