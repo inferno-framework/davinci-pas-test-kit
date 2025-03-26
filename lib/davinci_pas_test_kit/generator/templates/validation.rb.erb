@@ -9,7 +9,7 @@ module DaVinciPASTestKit
       title '<%= title %>'
       description %(
         <%=description.strip.gsub("\n", "\n" + " "*8) %>
-      )
+      )<%=verifies_requirements %>
       <% if request_type.include?('request') %>
       input :pa_<%= request_type %>_payload,
             title: 'PAS <%= request_type.humanize.titleize%> Payload',
@@ -35,9 +35,7 @@ module DaVinciPASTestKit
       def target_request_response_pairs<% operation = request_type.split('_').first %>
         scratch[:<%= operation %>_request_response_pair] ||= {}
         scratch[:<%= operation %>_request_response_pair][:all] ||= []
-      end<% end %>
-
-      <%if request_type.include?('request')%>
+      end<% end %><%if request_type.include?('request')%>
       def request_bundles
         parsed_payload = JSON.parse(pa_<%= request_type %>_payload)
         fhir_resources = [parsed_payload].flatten.compact.uniq.map { |payload| FHIR.from_contents(payload.to_json)}.compact
@@ -68,7 +66,7 @@ module DaVinciPASTestKit
       <% else %>
         skip_if target_request_response_pairs.blank?, 'No <%= request_type.split('_').first%> response to validate. Either no <%= request_type.split('_').first%> request was made in a previous test or it resulted in a server error.'
         target_pairs = target_request_response_pairs
-        # Clean request/response pair after validatation
+        # Clean request/response pair after validation
         scratch[:<%= operation %>_request_response_pair][:all] = []
 
         response_bundles = target_pairs.map { |pair| pair[:response_bundle] }

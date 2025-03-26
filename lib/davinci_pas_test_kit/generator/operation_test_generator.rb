@@ -107,6 +107,20 @@ module DaVinciPASTestKit
         end
       end
 
+      def verifies_requirements
+        case test_id
+        when 'pas_v201_claim_inquiry_operation_test'
+          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@111',
+          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@208'"
+        when 'pas_v201_claim_operation_test'
+          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@66',
+          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@111', 'hl7.fhir.us.davinci-pas_2.0.1@136',
+          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@207'"
+        else
+          "\n"
+        end
+      end
+
       def generate
         FileUtils.mkdir_p(output_file_directory)
         File.write(output_file_name, output)
@@ -127,8 +141,7 @@ module DaVinciPASTestKit
           Server SHALL support PAS #{operation_name} requests: a POST interaction to
           the /Claim/$#{operation} endpoint.
           This test submits a Prior Authorization #{operation_name} request to the server and verifies that a
-          response is returned with HTTP status 2XX.
-          #{operation == 'submit' ? 'The server SHOULD respond within 15 seconds.' : ''}
+          response is returned with HTTP status 2XX.#{operation == 'submit' ? "\nThe server SHOULD respond within 15 seconds." : ''}
         DESCRIPTION
       end
     end

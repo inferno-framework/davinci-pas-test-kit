@@ -8,7 +8,7 @@ module DaVinciPASTestKit
         <%=description.gsub("\n", "\n" + " "*8) %>
       )
 
-      id :<%= group_id %>
+      id :<%= group_id %><%=verifies_requirements%>
       <% if run_as_group %>run_as_group<% end %>
   <% if system == 'client'%>
     <% test_id_list.each do |id| %>
@@ -17,8 +17,7 @@ module DaVinciPASTestKit
       def use_case
         '<%= use_case %>'
       end
-  <% if use_case != 'must_support'%>
-  <% test_id_list.each do |category, id_list| %>
+  <% if use_case != 'must_support'%><% test_id_list.each do |category, id_list| %>
       group do
         title '<%= category %>'
         <% id_list.each do |id| %>
