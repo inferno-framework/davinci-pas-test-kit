@@ -27,7 +27,7 @@ module DaVinciPASTestKit
       end
 
       def output
-        @output ||= ERB.new(template).result(binding)
+        @output ||= ERB.new(template, trim_mode: '-').result(binding)
       end
 
       def base_output_file_name
@@ -110,12 +110,12 @@ module DaVinciPASTestKit
       def verifies_requirements
         case test_id
         when 'pas_v201_claim_inquiry_operation_test'
-          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@111',
-          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@208'"
+          ['hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@111',
+           'hl7.fhir.us.davinci-pas_2.0.1@208']
         when 'pas_v201_claim_operation_test'
-          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@66',
-          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@111', 'hl7.fhir.us.davinci-pas_2.0.1@136',
-          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@207'"
+          ['hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@66',
+           'hl7.fhir.us.davinci-pas_2.0.1@111', 'hl7.fhir.us.davinci-pas_2.0.1@136',
+           'hl7.fhir.us.davinci-pas_2.0.1@207']
         else
           "\n"
         end

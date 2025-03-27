@@ -35,7 +35,7 @@ module DaVinciPASTestKit
         issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
         for additional details.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@131'
+      verifies_requirements %w[hl7.fhir.us.davinci-pas_2.0.1@131]
       
       output :dar_code_found, :dar_extension_found
 

@@ -9,7 +9,10 @@ module DaVinciPASTestKit
       title '<%= title %>'
       description %(
         <%=description.strip.gsub("\n", "\n" + " "*8) %>
-      )<%=verifies_requirements %>
+      )
+      <%- if verifies_requirements -%>
+      verifies_requirements %w[<%= verifies_requirements.join(' ') %>]
+      <%- end -%>
       <% if request_type.include?('request') %>
       input :pa_<%= request_type %>_payload,
             title: 'PAS <%= request_type.humanize.titleize%> Payload',

@@ -10,8 +10,7 @@ module DaVinciPASTestKit
         This test submits a Prior Authorization Inquiry request to the server and verifies that a
         response is returned with HTTP status 2XX.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@111',
-                            'hl7.fhir.us.davinci-pas_2.0.1@208'
+      verifies_requirements %w[hl7.fhir.us.davinci-pas_2.0.1@5 hl7.fhir.us.davinci-pas_2.0.1@111 hl7.fhir.us.davinci-pas_2.0.1@208]
 
       input :pa_inquire_request_payload,
             title: 'PAS Inquire Request Payload',

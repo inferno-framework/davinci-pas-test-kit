@@ -36,7 +36,7 @@ module DaVinciPASTestKit
       end
 
       def output
-        @output ||= ERB.new(template).result(binding)
+        @output ||= ERB.new(template, trim_mode: '-').result(binding)
       end
 
       def base_output_file_name
@@ -370,7 +370,7 @@ module DaVinciPASTestKit
       def verifies_requirements
         case group_id
         when 'pas_server_v201_must_support_use_case'
-          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@33'"
+          ['hl7.fhir.us.davinci-pas_2.0.1@33']
         end
       end
 

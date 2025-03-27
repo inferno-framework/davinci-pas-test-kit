@@ -8,7 +8,10 @@ module DaVinciPASTestKit
         <%=description.gsub("\n", "\n" + " "*8) %>
       )
 
-      id :<%= group_id %><%=verifies_requirements%>
+      id :<%= group_id %>
+      <%- if verifies_requirements -%>
+      verifies_requirements %w[<%= verifies_requirements.join(' ') %>]
+      <%- end -%>
       <% if run_as_group %>run_as_group<% end %>
   <% if system == 'client'%>
     <% test_id_list.each do |id| %>

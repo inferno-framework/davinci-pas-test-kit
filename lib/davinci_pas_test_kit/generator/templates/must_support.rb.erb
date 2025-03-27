@@ -38,7 +38,11 @@ module DaVinciPASTestKit
         must support elements are observed:<% end %>
 
 <%= must_support_list_string %>
-      )<%=verifies_requirements %>
+      )
+      <%- if verifies_requirements -%>
+      verifies_requirements %w[<%= verifies_requirements.join(' ') %>]
+      <%- end -%>
+
       id :<%= test_id %>
 
       def resource_type

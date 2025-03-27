@@ -48,7 +48,7 @@ module DaVinciPASTestKit
       end
 
       def output
-        @output ||= ERB.new(template).result(binding)
+        @output ||= ERB.new(template, trim_mode: '-').result(binding)
       end
 
       def base_output_file_name
@@ -138,16 +138,14 @@ module DaVinciPASTestKit
       end
 
       def verifies_requirements
-        case test_id
+        case test_id # rubocop:disable Style/HashLikeCase
         when 'pas_client_inquire_request_v201_claim_inquiry_must_support_test'
-          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'\n"
+          ['hl7.fhir.us.davinci-pas_2.0.1@36']
         when 'pas_server_submit_response_v201_claimresponse_must_support_test'
-          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@37', 'hl7.fhir.us.davinci-pas_2.0.1@39',
-          #{' ' * 18}'hl7.fhir.us.davinci-pas_2.0.1@110'\n"
+          ['hl7.fhir.us.davinci-pas_2.0.1@37', 'hl7.fhir.us.davinci-pas_2.0.1@39',
+           'hl7.fhir.us.davinci-pas_2.0.1@110']
         when 'pas_server_inquire_response_v201_claiminquiryresponse_must_support_test'
-          "\n#{' ' * 6}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@38', 'hl7.fhir.us.davinci-pas_2.0.1@40'\n"
-        else
-          "\n"
+          ['hl7.fhir.us.davinci-pas_2.0.1@38', 'hl7.fhir.us.davinci-pas_2.0.1@40']
         end
       end
 
