@@ -36,7 +36,7 @@ module DaVinciPASTestKit
       end
 
       def output
-        @output ||= ERB.new(template).result(binding)
+        @output ||= ERB.new(template, trim_mode: '-').result(binding)
       end
 
       def base_output_file_name
@@ -217,12 +217,16 @@ module DaVinciPASTestKit
         {
           '$submit Element Support' => {
             'Submission of claims to the $submit operation for must support validation' => submit_tests,
-            '[USER INPUT VALIDATION] Submit Request Must Support' => submit_request_must_support_test_ids,
+            "[USER INPUT VALIDATION] Submit Request Must Support'" \
+            "\n#{' ' * 10}verifies_requirements " \
+            "'hl7.fhir.us.davinci-pas_2.0.1@35" => submit_request_must_support_test_ids,
             'Submit Response Must Support' => submit_response_must_support_test_ids
           },
           '$inquire Element Support' => {
             'Submission of claims to the $inquire operation for must support validation' => inquiry_operation,
-            '[USER INPUT VALIDATION] Inquiry Request Must Support' => inquiry_request_must_support_test_ids,
+            "[USER INPUT VALIDATION] Inquiry Request Must Support'" \
+            "\n#{' ' * 10}verifies_requirements " \
+            "'hl7.fhir.us.davinci-pas_2.0.1@36" => inquiry_request_must_support_test_ids,
             'Inquiry Response Must Support' => inquiry_response_must_support_test_ids
           }
         }
@@ -361,6 +365,13 @@ module DaVinciPASTestKit
       def pas_client_must_support_test_file
         request_type = use_case.include?('submit') ? 'submit' : 'inquire'
         "../../custom_groups/#{ig_metadata.ig_version}/client_tests/pas_client_#{request_type}_must_support_test"
+      end
+
+      def verifies_requirements
+        case group_id
+        when 'pas_server_v201_must_support_use_case'
+          ['hl7.fhir.us.davinci-pas_2.0.1@33']
+        end
       end
 
       def description
