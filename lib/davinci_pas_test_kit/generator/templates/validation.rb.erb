@@ -11,7 +11,7 @@ module DaVinciPASTestKit
         <%=description.strip.gsub("\n", "\n" + " "*8) %>
       )
       <%- if verifies_requirements -%>
-      verifies_requirements %w[<%= verifies_requirements.join(' ') %>]
+      verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
       <%- end -%>
       <% if request_type.include?('request') %>
       input :pa_<%= request_type %>_payload,

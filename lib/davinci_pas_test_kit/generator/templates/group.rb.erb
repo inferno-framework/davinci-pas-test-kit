@@ -10,7 +10,7 @@ module DaVinciPASTestKit
 
       id :<%= group_id %>
       <%- if verifies_requirements -%>
-      verifies_requirements %w[<%= verifies_requirements.join(' ') %>]
+      verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
       <%- end -%>
       <% if run_as_group %>run_as_group<% end %>
   <% if system == 'client'%>

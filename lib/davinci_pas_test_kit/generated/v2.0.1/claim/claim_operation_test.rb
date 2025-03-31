@@ -11,7 +11,7 @@ module DaVinciPASTestKit
         response is returned with HTTP status 2XX.
         The server SHOULD respond within 15 seconds.
       )
-      verifies_requirements %w[hl7.fhir.us.davinci-pas_2.0.1@5 hl7.fhir.us.davinci-pas_2.0.1@66 hl7.fhir.us.davinci-pas_2.0.1@111 hl7.fhir.us.davinci-pas_2.0.1@136 hl7.fhir.us.davinci-pas_2.0.1@207]
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@66', 'hl7.fhir.us.davinci-pas_2.0.1@111', 'hl7.fhir.us.davinci-pas_2.0.1@136', 'hl7.fhir.us.davinci-pas_2.0.1@207'
 
       input :pa_submit_request_payload,
             title: 'PAS Submit Request Payload',
