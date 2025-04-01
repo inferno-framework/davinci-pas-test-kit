@@ -1,8 +1,7 @@
 require_relative 'registration/pas_client_registration_configuration_display_test'
 require_relative 'registration/pas_client_registration_other_auth_attest_test'
-require_relative 'registration/pas_client_registration_udap_interaction_test'
-require_relative 'registration/pas_client_registration_udap_verification_test'
-require_relative 'registration/pas_client_registration_smart_verification_test'
+require 'udap_security_test_kit'
+require 'smart_app_launch_test_kit'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -81,8 +80,8 @@ module DaVinciPASTestKit
           If UDAP authentication will be demonstrated, perform the UDAP registration.
         )
 
-        test from: :pas_client_v201_reg_udap_interaction
-        test from: :pas_client_v201_reg_udap_verification
+        test from: :udap_client_registration_interaction
+        test from: :udap_client_registration_verification
       end
 
       group do
@@ -92,7 +91,7 @@ module DaVinciPASTestKit
           If SMART authentication will be demonstrated, perform the SMART registration.
         )
 
-        test from: :pas_client_v201_reg_smart_verification
+        test from: :smart_client_registration_verification
       end
 
       group do

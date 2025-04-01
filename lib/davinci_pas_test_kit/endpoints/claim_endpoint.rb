@@ -1,9 +1,9 @@
 require_relative '../user_input_response'
-require_relative 'mock_udap_smart_server'
 require_relative '../response_generator'
 require_relative '../urls'
 require_relative '../jobs/send_pas_subscription_notification'
 require 'subscriptions_test_kit'
+require 'udap_security_test_kit'
 
 module DaVinciPASTestKit
   class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
@@ -19,7 +19,7 @@ module DaVinciPASTestKit
     def test_run_identifier
       return request.params[:session_path] if request.params[:session_path].present?
 
-      MockUdapSmartServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
+      UDAPSecurityTestKit::MockUDAPServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
     end
 
     def tags
@@ -85,8 +85,8 @@ module DaVinciPASTestKit
     end
 
     def update_result
-      if MockUdapSmartServer.request_has_expired_token?(request)
-        MockUdapSmartServer.update_response_for_expired_token(response)
+      if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+        UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response)
         return
       end
 

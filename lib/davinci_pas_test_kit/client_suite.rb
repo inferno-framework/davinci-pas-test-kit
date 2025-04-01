@@ -1,11 +1,11 @@
 require 'subscriptions_test_kit'
+require 'udap_security_test_kit'
+require 'smart_app_launch_test_kit'
 require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
 require_relative 'endpoints/claim_endpoint'
-require_relative 'endpoints/mock_udap_smart_server'
-require_relative 'endpoints/mock_udap_smart_server/registration'
-require_relative 'endpoints/mock_udap_smart_server/token'
+require_relative 'endpoints/token'
 require_relative 'endpoints/subscription_create_endpoint'
 require_relative 'endpoints/subscription_status_endpoint'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
@@ -54,10 +54,10 @@ module DaVinciPASTestKit
       end
     end
 
-    route(:get, UDAP_DISCOVERY_PATH, MockUdapSmartServer.method(:udap_server_metadata))
-    route(:get, SMART_DISCOVERY_PATH, MockUdapSmartServer.method(:smart_server_metadata))
+    route(:get, UDAP_DISCOVERY_PATH, UDAPSecurityTestKit::MockUDAPServer.method(:udap_server_metadata))
+    route(:get, SMART_DISCOVERY_PATH, SMARTAppLaunch::MockSMARTServer.method(:smart_server_metadata))
 
-    suite_endpoint :post, REGISTRATION_PATH, MockUdapSmartServer::RegistrationEndpoint
+    suite_endpoint :post, REGISTRATION_PATH, UDAPSecurityTestKit::MockUDAPServer::RegistrationEndpoint
     suite_endpoint :post, TOKEN_PATH, MockUdapSmartServer::TokenEndpoint
 
     suite_endpoint :post, SUBMIT_PATH, ClaimEndpoint
