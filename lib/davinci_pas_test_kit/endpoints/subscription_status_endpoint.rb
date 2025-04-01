@@ -9,11 +9,11 @@ module DaVinciPASTestKit
     def test_run_identifier
       return request.params[:session_path] if request.params[:session_path].present?
 
-      MockUdapSmartServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
+      UDAPSecurityTestKit::MockUDAPServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
     end
 
     def make_response
-      if MockUdapSmartServer.request_has_expired_token?(request)
+      if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
         update_response_for_expired_token(response)
         return
       end
