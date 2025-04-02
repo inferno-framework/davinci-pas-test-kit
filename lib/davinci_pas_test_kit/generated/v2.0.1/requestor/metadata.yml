@@ -17,13 +17,15 @@
 :must_supports:
   :extensions: []
   :slices:
-  - :name: Organization.identifier:NPI
+  - :slice_id: Organization.identifier:NPI
+    :slice_name: NPI
     :path: identifier
     :discriminator:
       :type: patternIdentifier
       :path: ''
       :system: http://hl7.org/fhir/sid/us-npi
-  - :name: Organization.identifier:TIN
+  - :slice_id: Organization.identifier:TIN
+    :slice_name: TIN
     :path: identifier
     :discriminator:
       :type: patternIdentifier

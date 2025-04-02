@@ -66,7 +66,9 @@ module DaVinciPASTestKit
         * Claim.supportingInfo
         * Claim.supportingInfo.category
         * Claim.supportingInfo.sequence
-        * Claim.supportingInfo.timing[x]
+        * Claim.supportingInfo:AdmissionDates.timing[x]
+        * Claim.supportingInfo:DischargeDates.timing[x]
+        * Claim.supportingInfo:PatientEvent.timing[x]
       )
 
       id :pas_server_inquire_request_v201_claim_inquiry_must_support_test

@@ -30,6 +30,7 @@ module DaVinciPASTestKit
         'pended'
       end
   
+  
       group do
         title 'Server can respond to claims submitted for prior authorization'
         
@@ -58,7 +59,6 @@ module DaVinciPASTestKit
         test from: :pas_server_v201_pas_response_bundle_validation_test
         test from: :prior_auth_claim_response_decision_validation
       end
-      
       group do
         title 'Server can respond to claims submitted for inquiry'
         
