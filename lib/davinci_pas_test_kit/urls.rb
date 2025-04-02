@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'udap_security_test_kit'
+require 'smart_app_launch_test_kit'
+
 module DaVinciPASTestKit
   SESSION_PATH_PLACEHOLDER = '/:session_path'
   FHIR_PATH = '/fhir'
@@ -19,11 +22,6 @@ module DaVinciPASTestKit
   RESUME_PASS_PATH = '/resume_pass'
   RESUME_FAIL_PATH = '/resume_fail'
   RESUME_SKIP_PATH = '/resume_skip'
-  AUTH_SERVER_PATH = '/auth'
-  SMART_DISCOVERY_PATH = "#{FHIR_PATH}/.well-known/smart-configuration".freeze
-  UDAP_DISCOVERY_PATH = "#{FHIR_PATH}/.well-known/udap".freeze
-  TOKEN_PATH = "#{AUTH_SERVER_PATH}/token".freeze
-  REGISTRATION_PATH = "#{AUTH_SERVER_PATH}/register".freeze
 
   module URLs
     def base_url
@@ -83,15 +81,15 @@ module DaVinciPASTestKit
     end
 
     def udap_discovery_url
-      @udap_discovery_url ||= base_url + UDAP_DISCOVERY_PATH
+      @udap_discovery_url ||= base_url + UDAPSecurityTestKit::UDAP_DISCOVERY_PATH
     end
 
     def token_url
-      @token_url ||= base_url + TOKEN_PATH
+      @token_url ||= base_url + UDAPSecurityTestKit::TOKEN_PATH
     end
 
     def registration_url
-      @registration_url ||= base_url + REGISTRATION_PATH
+      @registration_url ||= base_url + UDAPSecurityTestKit::REGISTRATION_PATH
     end
 
     def suite_id
