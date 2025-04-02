@@ -16,7 +16,8 @@
 :must_supports:
   :extensions: []
   :slices:
-  - :name: Bundle.entry:Claim
+  - :slice_id: Bundle.entry:Claim
+    :slice_name: Claim
     :path: entry
     :discriminator:
       :type: type

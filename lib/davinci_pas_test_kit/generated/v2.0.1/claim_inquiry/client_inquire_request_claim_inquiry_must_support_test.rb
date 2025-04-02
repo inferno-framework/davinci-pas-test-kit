@@ -64,7 +64,9 @@ module DaVinciPASTestKit
         * Claim.supportingInfo
         * Claim.supportingInfo.category
         * Claim.supportingInfo.sequence
-        * Claim.supportingInfo.timing[x]
+        * Claim.supportingInfo:AdmissionDates.timing[x]
+        * Claim.supportingInfo:DischargeDates.timing[x]
+        * Claim.supportingInfo:PatientEvent.timing[x]
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'
 

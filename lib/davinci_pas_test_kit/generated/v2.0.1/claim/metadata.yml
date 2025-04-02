@@ -81,25 +81,29 @@
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService
   :slices:
-  - :name: Claim.supportingInfo:AdditionalInformation
+  - :slice_id: Claim.supportingInfo:AdditionalInformation
+    :slice_name: AdditionalInformation
     :path: supportingInfo
     :discriminator:
-      :type: value
-      :values:
-      - :path: category
-        :value:
-  - :name: Claim.supportingInfo:MessageText
+      :type: patternCodeableConcept
+      :path: category
+      :code: additionalInformation
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
+  - :slice_id: Claim.supportingInfo:MessageText
+    :slice_name: MessageText
     :path: supportingInfo
     :discriminator:
-      :type: value
-      :values:
-      - :path: category
-        :value:
+      :type: patternCodeableConcept
+      :path: category
+      :code: freeFormMessage
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
   :elements:
   - :path: identifier
   - :path: insurer
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
   - :path: provider
     :types:
     - Reference
@@ -111,14 +115,19 @@
   - :path: careTeam.role
   - :path: careTeam.qualification
   - :path: supportingInfo
-  - :path: supportingInfo.category
-  - :path: supportingInfo.timing[x]
-  - :path: supportingInfo.category.coding.code
-    :fixed_value: additionalInformation
   - :path: supportingInfo.sequence
-  - :path: supportingInfo.category.coding.code
-    :fixed_value: freeFormMessage
-  - :path: supportingInfo.value[x]
+  - :path: supportingInfo.category
+  - :path: supportingInfo:PatientEvent.timing[x]
+  - :path: supportingInfo:AdmissionDates.timing[x]
+  - :path: supportingInfo:DischargeDates.timing[x]
+  - :path: supportingInfo:AdditionalInformation.sequence
+  - :path: supportingInfo:AdditionalInformation.category
+  - :path: supportingInfo:AdditionalInformation.value[x]
+    :types:
+    - Reference
+  - :path: supportingInfo:MessageText.sequence
+  - :path: supportingInfo:MessageText.category
+  - :path: supportingInfo:MessageText.value[x]
   - :path: diagnosis
   - :path: diagnosis.sequence
   - :path: diagnosis.diagnosis[x]
@@ -128,6 +137,8 @@
   - :path: insurance.coverage
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-coverage
   - :path: accident
   - :path: accident.date
   - :path: accident.type

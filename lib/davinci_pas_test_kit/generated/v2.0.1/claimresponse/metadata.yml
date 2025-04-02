@@ -62,16 +62,22 @@
   - :path: patient
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary
   - :path: created
   - :path: insurer
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
   - :path: requestor
     :types:
     - Reference
   - :path: request
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim
   - :path: outcome
   - :path: preAuthPeriod
   - :path: item
@@ -80,6 +86,8 @@
   - :path: communicationRequest
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-communicationrequest
   - :path: error
   - :path: error.code
 :mandatory_elements:
