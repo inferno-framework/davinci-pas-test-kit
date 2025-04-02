@@ -80,8 +80,18 @@ module DaVinciPASTestKit
           If UDAP authentication will be demonstrated, perform the UDAP registration.
         )
 
-        test from: :udap_client_registration_interaction
-        test from: :udap_client_registration_verification
+        test from: :udap_client_registration_interaction,
+             config: {
+               inputs: {
+                 udap_client_uri: { optional: true }
+               }
+             }
+        test from: :udap_client_registration_verification,
+             config: {
+               inputs: {
+                 udap_client_uri: { optional: true }
+               }
+             }
       end
 
       group do
@@ -91,7 +101,12 @@ module DaVinciPASTestKit
           If SMART authentication will be demonstrated, perform the SMART registration.
         )
 
-        test from: :smart_client_registration_verification
+        test from: :smart_client_registration_verification,
+             config: {
+               inputs: {
+                 smart_jwk_set: { optional: true }
+               }
+             }
       end
 
       group do

@@ -34,10 +34,17 @@ module DaVinciPASTestKit
         id :pas_client_v201_auth_smart
         title 'Verify SMART Authentication'
 
-        test from: :smart_client_token_request_verification
+        test from: :smart_client_token_request_verification,
+             config: {
+               inputs: {
+                 smart_jwk_set: { optional: true }
+               }
+             }
+
         test from: :smart_client_token_use_verification,
              config: {
-               options: { access_request_tags: [SUBMIT_TAG, INQUIRE_TAG] }
+               options: { access_request_tags: [SUBMIT_TAG, INQUIRE_TAG] },
+               inputs: { smart_jwk_set: { optional: true } }
              }
       end
     end
