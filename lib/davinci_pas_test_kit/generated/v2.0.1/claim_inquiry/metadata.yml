@@ -80,6 +80,8 @@
   - :path: insurer
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
   - :path: provider
     :types:
     - Reference
@@ -93,7 +95,9 @@
   - :path: supportingInfo
   - :path: supportingInfo.sequence
   - :path: supportingInfo.category
-  - :path: supportingInfo.timing[x]
+  - :path: supportingInfo:PatientEvent.timing[x]
+  - :path: supportingInfo:AdmissionDates.timing[x]
+  - :path: supportingInfo:DischargeDates.timing[x]
   - :path: diagnosis
   - :path: diagnosis.sequence
   - :path: diagnosis.diagnosis[x]
@@ -103,6 +107,8 @@
   - :path: insurance.coverage
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-coverage
   - :path: accident
   - :path: accident.date
   - :path: accident.type

@@ -1,8 +1,42 @@
+GIT
+  remote: https://github.com/inferno-framework/inferno-core.git
+  revision: aea2cf25ac377171e4c38052ab3c6f4bc7094eac
+  branch: fi-3813-ms-fixes
+  specs:
+    inferno_core (0.6.8)
+      activesupport (~> 6.1.7.5)
+      base62-rb (= 0.3.1)
+      blueprinter (= 0.25.2)
+      concurrent-ruby (= 1.3.4)
+      dotenv (~> 2.7)
+      dry-configurable (= 1.0.0)
+      dry-container (= 0.10.0)
+      dry-core (= 1.0.0)
+      dry-inflector (= 1.0.0)
+      dry-system (= 1.0.0)
+      faraday (~> 1.2)
+      faraday_middleware (~> 1.2)
+      fhir_client (>= 5.0.3)
+      fhir_models (>= 4.2.2)
+      hanami-controller (= 2.0.0)
+      hanami-router (= 2.0.0)
+      oj (= 3.11.0)
+      pastel (~> 0.8.0)
+      pry
+      pry-byebug
+      puma (~> 5.6.7)
+      rake (~> 13.0)
+      sequel (~> 5.42.0)
+      sidekiq (~> 7.2.4)
+      sqlite3 (~> 1.4)
+      thor (~> 1.2.1)
+      tty-markdown (~> 0.7.1)
+
 PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.12.2)
-      inferno_core (~> 0.6.4)
+      inferno_core (~> 0.6.8)
       subscriptions_test_kit (~> 0.11.0)
 
 GEM
@@ -16,7 +50,7 @@ GEM
       zeitwerk (~> 2.3)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    ast (2.4.2)
+    ast (2.4.3)
     base62-rb (0.3.1)
     base64 (0.2.0)
     bcp47 (0.3.3)
@@ -136,40 +170,12 @@ GEM
       domain_name (~> 0.5)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    inferno_core (0.6.7)
-      activesupport (~> 6.1.7.5)
-      base62-rb (= 0.3.1)
-      blueprinter (= 0.25.2)
-      concurrent-ruby (= 1.3.4)
-      dotenv (~> 2.7)
-      dry-configurable (= 1.0.0)
-      dry-container (= 0.10.0)
-      dry-core (= 1.0.0)
-      dry-inflector (= 1.0.0)
-      dry-system (= 1.0.0)
-      faraday (~> 1.2)
-      faraday_middleware (~> 1.2)
-      fhir_client (>= 5.0.3)
-      fhir_models (>= 4.2.2)
-      hanami-controller (= 2.0.0)
-      hanami-router (= 2.0.0)
-      oj (= 3.11.0)
-      pastel (~> 0.8.0)
-      pry
-      pry-byebug
-      puma (~> 5.6.7)
-      rake (~> 13.0)
-      sequel (~> 5.42.0)
-      sidekiq (~> 7.2.4)
-      sqlite3 (~> 1.4)
-      thor (~> 1.2.1)
-      tty-markdown (~> 0.7.1)
     io-console (0.8.0)
     irb (1.15.1)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    json (2.10.1)
+    json (2.10.2)
     jwt (2.10.1)
       base64
     kramdown (2.5.1)
@@ -182,7 +188,6 @@ GEM
       logger
       mime-types-data (~> 3.2015)
     mime-types-data (3.2025.0318)
-    mini_portile2 (2.8.8)
     minitest (5.25.5)
     multi_json (1.15.0)
     multi_xml (0.7.1)
@@ -195,14 +200,21 @@ GEM
       mustermann (= 1.1.2)
     netrc (0.11.0)
     nio4r (2.7.4)
-    nokogiri (1.18.5)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.18.5-aarch64-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.18.5-aarch64-linux-musl)
+      racc (~> 1.4)
+    nokogiri (1.18.5-arm-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.18.5-arm-linux-musl)
       racc (~> 1.4)
     nokogiri (1.18.5-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.18.5-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.18.5-x86_64-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.18.5-x86_64-linux-musl)
       racc (~> 1.4)
     oauth2 (1.4.11)
       faraday (>= 0.17.3, < 3.0)
@@ -212,7 +224,7 @@ GEM
       rack (>= 1.2, < 4)
     oj (3.11.0)
     parallel (1.26.3)
-    parser (3.3.7.1)
+    parser (3.3.7.2)
       ast (~> 2.4.1)
       racc
     pastel (0.8.0)
@@ -220,12 +232,12 @@ GEM
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
-    pry (0.15.2)
+    pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-byebug (3.8.0)
+    pry-byebug (3.10.1)
       byebug (~> 11.0)
-      pry (~> 0.10)
+      pry (>= 0.13, < 0.15)
     psych (5.2.3)
       date
       stringio
@@ -265,7 +277,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
-    rubocop (1.73.0)
+    rubocop (1.74.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -276,8 +288,8 @@ GEM
       rubocop-ast (>= 1.38.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.38.1)
-      parser (>= 3.3.1.0)
+    rubocop-ast (1.41.0)
+      parser (>= 3.3.7.2)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     rubocop-rspec (3.5.0)
@@ -291,8 +303,8 @@ GEM
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
       redis-client (>= 0.19.0)
-    sqlite3 (1.7.3)
-      mini_portile2 (~> 2.8.0)
+    sqlite3 (1.7.3-aarch64-linux)
+    sqlite3 (1.7.3-arm-linux)
     sqlite3 (1.7.3-arm64-darwin)
     sqlite3 (1.7.3-x86_64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
@@ -319,18 +331,24 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.6.0)
     unicode_utils (1.4.0)
-    webmock (3.25.0)
+    webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     zeitwerk (2.7.2)
 
 PLATFORMS
-  arm64-darwin-21
-  ruby
-  x86_64-darwin-19
-  x86_64-darwin-20
+  aarch64-linux
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm-linux
+  arm-linux-gnu
+  arm-linux-musl
+  arm64-darwin
+  x86_64-darwin
   x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
 
 DEPENDENCIES
   database_cleaner-sequel (~> 1.8)
@@ -338,6 +356,7 @@ DEPENDENCIES
   debug
   factory_bot (~> 6.1)
   foreman
+  inferno_core!
   rack-test
   rspec (~> 3.10)
   rubocop
@@ -346,4 +365,4 @@ DEPENDENCIES
   webmock (~> 3.11)
 
 BUNDLED WITH
-   2.3.14
+   2.5.22

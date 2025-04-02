@@ -27,6 +27,8 @@
   - :path: for
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary
   - :path: requester
     :types:
     - Reference
@@ -40,6 +42,8 @@
   - :path: reasonReference
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim
   - :path: restriction.period
   - :path: input
 :mandatory_elements:
