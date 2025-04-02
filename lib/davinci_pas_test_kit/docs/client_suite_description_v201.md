@@ -69,8 +69,8 @@ To reduce configuration burden, the dedicated endpoints can be reused in subsequ
 
 ### Quick Start
 
-The easiest way to run the tests is to perform an approval workflow using
-inferno-generated responses and dedicated session-specific endpoints:
+To execute a simple set of tests with minimal setup and input, perform an approval workflow using
+inferno-generated responses and dedicated session-specific endpoints with the following steps:
 
 1. Select the "**3.1** Approval Workflow" group from the list at the left.
 2. Click the "RUN TESTS" button in the upper right.
@@ -91,45 +91,54 @@ Group "**3.2** Denial Workflow" can be run in the same manner. Other tests requi
   workflow test using the configured authentication approach before running the
   "**5** Authentication Interactions" group.
 
-### Postman-based Demo
+### Postman-based Demonstration
 
 If you do not have a PAS client but would like to try the tests out, you can use
-[this postman collection](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/config/PAS%20Test%20Kit%20Client%20Test%20Demo.postman_collection.json)
+[this postman collection](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
 to make requests against Inferno and see the mocked responses provided by Inferno. To use, load
 the collection into the [Postman app](https://www.postman.com/downloads/) and follow these steps:
 
-1. Select the *PAS Client Test Suite Demo* Collection in postman and go to the "Variables" tab 
-   (see the Overview tab for more details on what the variables control).
-1. Note the "Current value" of the **client_id** variable for use in configuring Inferno. Update it
-   to another value to use instead, if desired.
 1. Start a Da Vinci PAS Client Suite v2.0.1 session from the [PAS Test Kit page on 
-   inferno.healthit.gov](https://inferno.healthit.gov/test-kits/davinci-pas/). 
-1. Click the *Run All Tests* button in the upper right hand corner of the suite.
-1. In the **Client ID** input, enter the value from the **client_id** Postman variable and click the 
-   *Submit* button.
-1. When the "User Action" dialog appears, return to Postman and change to the Authorization tab. Scroll down 
-   to find the *Get New Access Token* button at the bottom and click it.
-1. When a success message appears, click the *Proceed* button and then the *Use Token* button.
-1. Back in Inferno, a new "User Action" dialog will appear requesting a Subscription. When it does, return to Postman,
-   open the "Create Subscription Request" entry under the "Subscription Setup" folder in the collection,
-   and click the *Send* button.
-1. Back in Inferno, an **Approval Workflow Test** "User Action" will appear. When it does, return to Postman,
-   open the "Prior Auth Request For Approval" entry under the "Approval Workflow Requests" folder in the
-   collection, and click the *Send* button.
-1. Back in Inferno, an attestation "User Action" will appear asking you to confirm that the prior auth
-   request is listed as approved in the client app based on Inferno's response to the request. Search
-   in the response returned to Postman for the string "Certified in total" which indicates the prior
-   auth request was approved and click the link in Inferno indicating the attestation statement is true.
-1. Next, a **Denial Workflow Test** "User Action" will appear. When it does, return to Postman,
-   open the "Prior Auth Request For Denial" entry under the "Denial Workflow Requests" folder in the
-   collection, and click the *Send* button.
-1. Back in Inferno, an attestation "User Action" will appear asking you to confirm that the prior auth
-   request is listed as denied in the client app based on Inferno's response to the request. Search
-   in the response returned to Postman for the string "Not Certified" which indicates the prior
-   auth request was denied and click the link in Inferno indicating the attestation statement is true.
-1. Next, a **Pended Workflow Test** "User Action" will appear. When it does, return to Postman,
-   open the "Prior Auth Request For Pended" entry under the "Pended Workflow Requests" folder in the
-   collection, and click the *Send* button.
+   inferno.healthit.gov](https://inferno.healthit.gov/test-kits/davinci-pas/).
+2. Click the *Run All Tests* button in the upper right hand corner of the suite.
+3. Client Registration
+   - In the **Session-specific URL path extension** input, put a short alpha string, such as `demo`
+   - In Postman, select the *PAS Client Suite Demonstration* Collection in postman and go to the "Variables" tab 
+     (see the collection's Overview tab for more details on what the variables control).
+   - In the current value for the **session_url_path** variable, put the same value as in the
+     **Session-specific URL path extension** input, surrounded by `/`, e.g., `/demo/`.
+   - Back in Inferno, click the "SUBMIT" button and click the links to continue the tests
+     in the next two wait dialogs until a **Subscription Creation Test** wait dialog appears.
+1. In Postman, select the *Create Subscription Request* in the *Subscription Setup* folder
+   and click the "Send" button in the upper right.
+1. Back in Inferno, the wait dialog should disappear and a new **Approval Workflow Test** wait
+   dialog will appear.
+1. In Postman, select the *Prior Auth Request For Approval* in the *Approval Workflow* folder
+   and click the "Send" button in the upper right.
+1. Back in Inferno, the wait dialog should disappear and a new attestation wait dialog will
+   appear asking to confirm the system's interpretation of the "Approved" response. Check that
+   the response from the last step in Postman contains the string "Certified in total" respond
+   to the attestation.
+1. In Postman, select the *Create Subscription Request* in the *Subscription Setup* folder
+   and click the "Send" button in the upper right.
+1. Back in Inferno, the wait dialog should disappear and a new **Approval Workflow Test** wait
+   dialog will appear.
+1. In Postman, select the *Prior Auth Request For Approval* in the *Approval Workflow* folder
+   and click the "Send" button in the upper right.
+1. Back in Inferno, the wait dialog should disappear and a new attestation wait dialog will
+   appear asking to confirm the system's interpretation of the "Approved" response. Check that
+   the response from the last step in Postman contains the string "Certified in total" and respond
+   to the attestation. The wait dialog should disappear and a new **Denial Workflow Test** wait
+   dialog will appear.
+1. In Postman, select the *Prior Auth Request For Denial* in the *Denial Workflow* folder
+   and click the "Send" button in the upper right.
+1. Back in Inferno, the wait dialog should disappear and a new attestation wait dialog will
+   appear asking to confirm the system's interpretation of the "Denied" response. Check that
+   the response from the last step in Postman contains the string "Not Certified" and respond
+   to the attestation. The wait dialog should disappear and a new **Pended Workflow Test** wait
+   dialog will appear.
+1. In Postman, select the *Prior Auth Request For Pended* entry under the *Pended Workflow* folder in the
+   and click the "Send" button in the upper right.
 1. Search in the response returned to Postman for the string "Pending" which indicates the prior
    auth request was pended and a final decision will be made later. You'll use this information in
    a later attestation.
@@ -141,15 +150,15 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    hosts a notification endpoint that is used to receive Subscription notifications for this demo.
    Note that when looking for recent notifications, **Received** timestamps are in UTC which is
    5 hours ahead of Eastern Standard Time (4 hours ahead of Eastern Daylight Time).
-1. Return to Postman, open the "Prior Auth Inquiry For Pended" entry under the "Pended Workflow Requests"
-   folder in the collection, and click the *Send* button.
+1. In Postman, select the *Prior Auth Inquiry for Pended* entry under the *Pended Workflow* folder in the
+   and click the "Send" button in the upper right.
 1. Search in the response returned to Postman for the string "Certified in total" which indicates the prior
    auth request was approved. You'll use this information in a later attestation.
-1. Return to Inferno, scroll down in the "User Action" dialog and click the "click here to complete the test"
+1. Back in Inferno, scroll down in wait dialog and click the "click here to complete the test"
    link to allow Inferno to evaluate the pended workflow.
-1. Two attestations will appear, the first stating that the prior auth request was registered in the
-   client as pended and that it was subsequently finalized. You checked these above and can use the
-   true link for both.
+1. The next two attestations ask whether the system displayed the claim as pended and approved at the
+   appropriate points in the workflow. Attest based on whether the correct strings were found in the
+   responses in the previous steps.
 1. Two additional "User Action" dialogs will appear requesting additional `$submit` and `$inquire`
    requests to demonstrate must support elements. This demo does not have any additional requests
    and does not attempt to demonstrate all must support elements, so click the link to indicate
@@ -159,14 +168,115 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
 1. Once Inferno finishes evaluating the requests, the test will complete allowing you to review the
    results, including warning and error messages as well as requests associated with each test.
 
-#### Optional Demo Modifications
+The tests are expected to pass with the exception of the Must Support tests in groups 4.1 and 4.2.
+
+#### Optional Demo Modification: full-resource Subscription
 
 This demo uses `id-only` notifications for Pended workflow. To see a demonstration of `full-resource`
 notifications, replace the string `id-only` in the "Create Subscription Request" entry under the 
 "Subscription Setup" folder in the collection with the string `full-resource` (found in an extension
 under the `_payload` element).
 
-## Configuration Details
+#### Optional Demo Modification: SMART Backend Services Auth
+
+To use SMART Backend Services with the demo, replace the 3. Client Registration steps above with the
+following:
+
+- In the **SMART JSON Web Key Set (JWKS)** input, put `https://inferno.healthit.gov/suites/custom/smart_stu2_2/.well-known/jwks.json`
+- In the **Client Id** input, put `pas_demo_smart`
+- Click the **SUBMIT** button
+- A wait dialog will display asking the tester to confirm configuration of the client. Note the
+  FHIR endpoint and client id details
+- Start an instance of the SMART App Launch STU2.2 test suite.
+- Select the **3** Backend Services group from the list at the left and the click the "RUN TESTS"
+  button in the upper right.
+- Fill in the following input values and then click "SUBMIT":
+  - **FHIR Endpoint**: from the wait dialog in the PAS Client suite
+  - **Scopes**: any scope string, e.g., `system/*.rs`
+  - **Client Id**: same value as in the corresponding input to the PAS Client tests, also displayed
+    in the wait dialog
+- Find the access token to use for the data access request by opening test **3.2.05** Authorization
+  request succeeds when supplied correct information, click on the "REQUESTS" tab, clicking on the "DETAILS"
+  button, and expanding the "Response Body". Copy the "access_token" value, which will be a ~100 character
+  string of letters and numbers (e.g., eyJjbGllbnRfaWQiOiJzbWFydF9jbGllbnRfdGVzdF9kZW1vIiwiZXhwaXJhdGlvbiI6MTc0MzUxNDk4Mywibm9uY2UiOiJlZDI5MWIwNmZhMTE4OTc4In0)
+- In Postman, select the *PAS Client Suite Demonstration* Collection in postman and go to the "Variables" tab 
+  (see the collection's Overview tab for more details on what the variables control).
+- In the current value for the **access_token** variable, put access token value copied from the SMART tests.
+  Make sure that the **session_url_path** variable has a current value of `/`.
+- Back in Inferno, click link in the wait dialog confirming the configuration to continue the tests.
+- A **Subscription Creation Test** wait dialog will appear.
+
+Continue the tests according to step 4 around Subscription creation in the above instructions.
+
+In this demonstration, test **5.2.01** Verify SMART Token Requests will also fail due to invalid
+token requests sent intentionally by the SMART Backend Services tests.
+
+#### Optional Demo Modification: UDAP Client Credentials Auth
+
+To use the UDAP Client Credentials with the demo, replace the 3. Client Registration steps above with the
+following:
+
+- In the **UDAP Client URI** input, put `http://localhost:4567/custom/udap_security/fhir`
+- Click the **SUBMIT** button and a wait dialog will display asking the tester to perform UDAP dynamic
+  registration. Note the FHIR server endpoint displayed in the dialog.
+- Start an instance of the UDAP Security Server test suite.
+- Select the "Demo: Run Against the UDAP Security Client Suite" preset from the dropdown in the upper left.
+- Select the **2** UDAP Client Credentials Flow group from the list at the left and the click the "RUN ALL TESTS"
+  button in the upper right.
+- Update the **FFHIR Server Base URL** input value to be the FHIR server endpoint from the wait dialog
+  in the PAS Client suite and then click "SUBMIT"
+- Once the tests have completed, find the access token to use for the data access request by opening
+  test **2.3.01** OAuth token exchange request succeeds when supplied correct information, click
+  on the "REQUESTS" tab, clicking on the "DETAILS" button, and expanding the "Response Body".
+  Copy the "access_token" value, which will be a ~100 character string of letters and numbers (e.g., eyJjbGllbnRfaWQiOiJzbWFydF9jbGllbnRfdGVzdF9kZW1vIiwiZXhwaXJhdGlvbiI6MTc0MzUxNDk4Mywibm9uY2UiOiJlZDI5MWIwNmZhMTE4OTc4In0)
+- In Postman, select the *PAS Client Suite Demonstration* Collection in postman and go to the "Variables" tab 
+  (see the collection's Overview tab for more details on what the variables control).
+- In the current value for the **access_token** variable, put access token value copied from the SMART tests.
+  Make sure that the **session_url_path** variable has a current value of `/`.
+- In the PAS Client suite tab, click the link in the wait dialog to continue the tests. Do the same
+  for the next wait dialog that appears until a **Subscription Creation Test** wait dialog appears.
+
+Continue the tests according to step 4 around Subscription creation in the above instructions.
+
+In this demonstration, test **5.1.01** Verify UDAP Token Requests may fail due to expired signatures
+if the test session has taken long enough.
+
+## Auth Configuration Details
+
+When running these tests there are 4 options for authentication or allowing 
+Inferno to identify which session the requests are for. Inputs that setup these
+options will be provided by the tester as a part of running the **1**
+Client Registration group. For all other groups, the authentication-related inputs are locked
+so that they cannot be changed. Running the  **1** Client Registration group again will
+enable updates.
+
+The options and the related inputs are:
+1. **UDAP B2B client credentials flow**: the system under test will dynamically register
+   with Inferno and request access tokens used to access FHIR endpoints
+   as per the UDAP specification. It requires the **UDAP Client URI** input
+   to be populated with the URI that the client will use when dynamically
+   registering with Inferno. This will be used to generate a client id.
+2. **SMART Backend Services**: the system under test will manually register
+   with Inferno and request access token used to access FHIR endpoints
+   as per the SMART Backend Services specification. It requires the
+   **SMART JSON Web Key Set (JWKS)** to be populated with either a URL that resolves
+   to a JWKS or a raw JWKS in JSON format. Additionally, testers may provide
+   a **Client Id** if they want to use a specific one.
+3. **Both UDAP and SMART**: the system under test will register as both a SMART
+   and a UDAP client, using the same client id for both. If this path is chosen
+   both authentication approaches will need to be demonstrated during the
+   subsequent tests. The inputs for both options 1 and 2 are needed. In this case,
+   the tester cannot specify a **Client Id** as the one generated for UDAP will
+   be used.
+4. **Dedicated Endpoints**: Inferno will create a dedicated set of FHIR endpoints for this session
+   so that the system under test does not need to get access tokens or provide
+   them during these tests. Since PAS requires authentication of client systems,
+   testers will be asked to attest that their system supports another form of
+   authentication, such as mutual authentication TLS. This approach requires the
+   **Session-specific URL path extension** input to be populated with a string
+   used to create a session-specific URL. This value can be re-used across sessions.
+   If not provided, a default will be generated. If the inputs associated with the
+   SMART or UDAP approaches are populated, this one will be blanked out.
 
 ## Response and Notification Content
 
