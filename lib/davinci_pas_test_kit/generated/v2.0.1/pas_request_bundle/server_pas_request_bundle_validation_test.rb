@@ -61,8 +61,6 @@ module DaVinciPASTestKit
         'submit'
       end
       
-
-      
       def request_bundles
         parsed_payload = JSON.parse(pa_submit_request_payload)
         fhir_resources = [parsed_payload].flatten.compact.uniq.map { |payload| FHIR.from_contents(payload.to_json)}.compact

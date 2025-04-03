@@ -39,6 +39,9 @@ module DaVinciPASTestKit
 
 <%= must_support_list_string %>
       )
+      <%- if verifies_requirements -%>
+      verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
+      <%- end -%>
 
       id :<%= test_id %>
 

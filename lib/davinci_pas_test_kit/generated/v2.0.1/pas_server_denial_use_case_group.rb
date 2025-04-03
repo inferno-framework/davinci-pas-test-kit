@@ -20,7 +20,6 @@ module DaVinciPASTestKit
         'denial'
       end
   
-  
       group do
         title 'Server can respond to claims submitted for prior authorization'
         

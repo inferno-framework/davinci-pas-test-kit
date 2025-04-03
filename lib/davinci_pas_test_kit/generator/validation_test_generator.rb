@@ -26,7 +26,7 @@ module DaVinciPASTestKit
       end
 
       def output
-        @output ||= ERB.new(template).result(binding)
+        @output ||= ERB.new(template, trim_mode: '-').result(binding)
       end
 
       def base_output_file_name
@@ -115,6 +115,17 @@ module DaVinciPASTestKit
 
       def user_input?
         request_type.include?('request')
+      end
+
+      def verifies_requirements
+        case test_id
+        when 'pas_server_v201_pas_inquiry_response_bundle_validation_test'
+          ['hl7.fhir.us.davinci-pas_2.0.1@131']
+        when 'pas_server_v201_pas_response_bundle_validation_test'
+          ['hl7.fhir.us.davinci-pas_2.0.1@64', 'hl7.fhir.us.davinci-pas_2.0.1@100',
+           'hl7.fhir.us.davinci-pas_2.0.1@101', 'hl7.fhir.us.davinci-pas_2.0.1@102',
+           'hl7.fhir.us.davinci-pas_2.0.1@103', 'hl7.fhir.us.davinci-pas_2.0.1@107']
+        end
       end
 
       def description

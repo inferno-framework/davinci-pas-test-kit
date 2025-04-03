@@ -5,8 +5,11 @@ module DaVinciPASTestKit
       id :<%= test_id %>
       title '<%= title %>'
       description %(
-        <%=description.gsub("\n", "\n" + " "*8) %>
+        <%=description.chomp.gsub("\n", "\n" + " "*8) %>
       )
+      <%- if verifies_requirements -%>
+      verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
+      <%- end -%>
 
       input :pa_<%= request_type %>_payload,
             title: 'PAS <%= request_type.humanize.titleize%> Payload',
