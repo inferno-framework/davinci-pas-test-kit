@@ -1,6 +1,6 @@
 {
-  "title": "Subscription Creation Against Subscriptions Client Tests",
-  "id": "pas-server-subscription-creation-against-subscriptions-client-tests",
+  "title": "Subscription Creation Against PAS Client Tests",
+  "id": "pas-server-subscription-creation-against-pas-client-tests",
   "test_suite_id": "davinci_pas_server_suite_v201",
   "inputs": [
     {
@@ -8,7 +8,7 @@
       "description": "Insert the FHIR server endpoint URL for PAS",
       "title": "FHIR Server Endpoint URL",
       "type": "text",
-      "value": "http://localhost:4567/custom/subscriptions_r5_backport_r4_client/fhir"
+      "value": "http://localhost:4567/custom/davinci_pas_client_suite_v201/fhir"
     },
     {
       "name": "smart_credentials",

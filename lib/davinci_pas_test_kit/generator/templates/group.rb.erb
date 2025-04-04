@@ -37,7 +37,9 @@ module DaVinciPASTestKit
         end<% elsif id == 'subscriptions_r4_server_notification_conformance' %> do
           config options: { subscription_type: 'id-only' }
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@145'
-        end<% end %><% end %>
+          input :pended_pa_submit_request_payload
+        end<% elsif ['prior_auth_claim_response_update_notification_validation', 'subscriptions_r4_server_id_only_conformance'].include?(id) %>,
+             input: :pended_pa_submit_request_payload<% end %><% end %>
       end<% end %>
   <% else %>
     <% test_id_list.each do |group, subgroup|%>
