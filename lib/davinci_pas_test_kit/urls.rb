@@ -10,6 +10,7 @@ module DaVinciPASTestKit
   FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH = '/fhir/Subscription/$status'
   RESUME_PASS_PATH = '/resume_pass'
   RESUME_FAIL_PATH = '/resume_fail'
+  RESUME_SKIP_PATH = '/resume_skip'
 
   module URLs
     def base_url
@@ -38,6 +39,10 @@ module DaVinciPASTestKit
 
     def resume_fail_url
       @resume_fail_url ||= base_url + RESUME_FAIL_PATH
+    end
+
+    def resume_skip_url
+      @resume_skip_url ||= base_url + RESUME_SKIP_PATH
     end
 
     def suite_id

@@ -1,0 +1,32 @@
+{
+  "title": "Subscription Creation Against PAS Client Tests",
+  "id": "pas-server-subscription-creation-against-pas-client-tests",
+  "test_suite_id": "davinci_pas_server_suite_v201",
+  "inputs": [
+    {
+      "name": "server_endpoint",
+      "description": "Insert the FHIR server endpoint URL for PAS",
+      "title": "FHIR Server Endpoint URL",
+      "type": "text",
+      "value": "http://localhost:4567/custom/davinci_pas_client_suite_v201/fhir"
+    },
+    {
+      "name": "smart_credentials",
+      "type": "auth_info",
+      "title": "OAuth Credentials",
+      "value": "{\"access_token\":\"SAMPLE_TOKEN\"}"
+    },
+    {
+      "name": "access_token",
+      "type": "text",
+      "title": "Access Token",
+      "value": "SAMPLE_TOKEN"
+    },
+    {
+      "name": "subscription_resource",
+      "type": "textarea",
+      "title": "Workflow Subscription Resource",
+      "value": "{\n  \"resourceType\" : \"Subscription\",\n  \"meta\" : {\n    \"profile\" : [\"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription\"]\n  },\n  \"status\" : \"requested\",\n  \"end\" : \"2020-12-31T12:00:00Z\",\n  \"reason\" : \"R4 Topic-Based Workflow Subscription for Patient Admission\",\n  \"criteria\" : \"http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic\",\n  \"_criteria\" : {\n    \"extension\" : [{\n      \"url\" : \"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria\",\n      \"valueString\" : \"Encounter.patient=Patient/123\"\n    }]\n  },\n  \"channel\" : {\n    \"extension\" : [{\n      \"url\" : \"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-timeout\",\n      \"valueUnsignedInt\" : 60\n    },\n    {\n      \"url\" : \"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-max-count\",\n      \"valuePositiveInt\" : 20\n    }],\n    \"type\" : \"rest-hook\",\n    \"header\": [\"Authorization: Bearer SAMPLE_TOKEN\"],\n    \"endpoint\" : \"http://localhost:4567/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener\",\n    \"payload\" : \"application/fhir+json\",\n    \"_payload\" : {\n      \"extension\" : [{\n        \"url\" : \"http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content\",\n        \"valueCode\" : \"id-only\"\n      }]\n    }\n  }\n}"
+    }
+  ]
+}
