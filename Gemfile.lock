@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/inferno-framework/smart-app-launch-test-kit.git
-  revision: a1bb63d7c9967251e3fe56e2ba8363ebcc06ab56
+  revision: bf2021977c5ee2e9bdef32ee77d29a4f9e4f1e60
   branch: client-backend-services-suite
   specs:
     smart_app_launch_test_kit (0.6.0)
@@ -11,7 +11,7 @@ GIT
 
 GIT
   remote: https://github.com/inferno-framework/udap-security-test-kit.git
-  revision: c85db0ab569b1d1885b9f558a0085dc5a2f36437
+  revision: 0042497b03cd0e0c259b5348bd4eaf6c896c52a9
   branch: client-b2b-cc-suite
   specs:
     udap_security_test_kit (0.11.2)
@@ -189,7 +189,7 @@ GEM
       thor (~> 1.2.1)
       tty-markdown (~> 0.7.1)
     io-console (0.8.0)
-    irb (1.15.1)
+    irb (1.15.2)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
@@ -274,7 +274,7 @@ GEM
     redis-client (0.24.0)
       connection_pool
     regexp_parser (2.10.0)
-    reline (0.6.0)
+    reline (0.6.1)
       io-console (~> 0.5)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
@@ -296,7 +296,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.2)
-    rubocop (1.75.1)
+    rubocop (1.75.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -304,10 +304,10 @@ GEM
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 2.9.3, < 3.0)
-      rubocop-ast (>= 1.43.0, < 2.0)
+      rubocop-ast (>= 1.44.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 4.0)
-    rubocop-ast (1.43.0)
+    rubocop-ast (1.44.0)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
     rubocop-rake (0.6.0)
