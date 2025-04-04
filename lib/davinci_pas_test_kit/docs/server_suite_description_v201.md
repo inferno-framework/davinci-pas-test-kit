@@ -87,6 +87,27 @@ For single-request fields (e.g., “PAS Submit Request Payload for Approval Resp
 
 For multiple-request fields (e.g., “Additional PAS Submit Request Payloads”), the input must be a json array of json-encoded FHIR bundles (e.g., [fhir-bundle-1, fhir-bundle-2, …] where each fhir-bundle-n is a full bundle).
 
+### Subscription
+
+To provide updates on prior authorization requests that have been pended because a final answer will take longer than
+the allowed response window, servers need to support FHIR Subscriptions. Subscriptions are made at the level of the
+Organization submitting the prior authorization requests and so is expected to be performed once when a provider
+system registers with a specific payer.
+
+Inferno supports that workflow by splitting out Subscription setup tests into a group that can be run before the
+pended workflow group. Inferno assumes that the Subscriptions API is located under the same FHIR base URL as
+the `Claim/$submit` operation and that it uses the same authentication. Testers will provide the following inputs:
+- **Pended Prior Authorization Subscription**: A Subscription body for Inferno to submit to the server under test. 
+  When submitted to the server under test, it should cause notifications to be generated when pended prior
+  authorization requests submitted by Inferno are updated. Inferno will modify it to ensure that it points to
+  the correct Inferno notification endpoint.
+- **Notification Access Token**: An access token that the server under test will send to Inferno on notifications
+  so that the request gets associated with this test session. The token must be provided as a Bearer token in the
+  Authorization header of HTTP requests sent to Inferno.
+
+During the pended workflow test, testers will demonstrate that an update to the submitted and pended prior authorization
+request causes the Subscription to trigger and send a notification to Inferno.
+
 ## Testing Limitations
 
 ### Private X12 details
