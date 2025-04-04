@@ -2,18 +2,22 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
-    let(:access_token) { '1234' }
+    let(:session_url_path) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
     let(:test) { described_class }
     let(:results_repo) { Inferno::Repositories::Results.new }
     let(:result) { repo_create(:result, test_session_id: test_session.id) }
     let(:requests_repo) { Inferno::Repositories::Requests.new }
-    let(:subscription_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
-    let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
-    let(:inquire_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::INQUIRE_PATH}" }
-    let(:status_instance_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH}" }
-    let(:status_resource_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH}" }
-    let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{access_token}" }
+    let(:subscription_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
+    let(:submit_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::SUBMIT_PATH}" }
+    let(:inquire_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::INQUIRE_PATH}" }
+    let(:status_instance_url) do
+      "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH}"
+    end
+    let(:status_resource_url) do
+      "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH}"
+    end
+    let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{session_url_path}" }
     let(:subscription_create_response_full_resource) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
     end
@@ -25,13 +29,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
     end
 
     def create_subscription_request
-      headers ||= [
-        {
-          type: 'request',
-          name: 'Authorization',
-          value: "Bearer #{access_token}"
-        }
-      ]
       repo_create(
         :request,
         direction: 'incoming',
@@ -40,13 +37,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
         result:,
         response_body: subscription_create_response_full_resource.to_json,
         tags: [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG],
-        status: 201,
-        headers:
+        status: 201
       )
     end
 
     it 'skips if no subscription' do
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(/no Subscription/)
@@ -54,7 +50,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
     it 'continues after a resume request' do
       create_subscription_request
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
@@ -68,11 +64,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
         allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
           .to receive(:perform).and_return(nil)
         create_subscription_request
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
 
         result = results_repo.find(result.id)
@@ -83,11 +78,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
         allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
           .to receive(:perform).and_return(nil)
         create_subscription_request
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
 
         expect(last_response.status).to be(200)
@@ -97,11 +91,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
         allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
           .to receive(:perform).and_return(nil)
         create_subscription_request
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        header('Authorization', "Bearer #{access_token}")
         post_json(submit_url, submit_request_json)
 
         requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBMIT_TAG,
@@ -114,12 +107,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
             .to receive(:perform).and_return(nil)
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
           allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
-          header('Authorization', "Bearer #{access_token}")
           post_json(submit_url, submit_request_json)
           fhir_body = FHIR.from_contents(last_response.body)
           expect(fhir_body).to be_a(FHIR::Bundle)
@@ -142,7 +134,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'logs an info message' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
@@ -163,12 +155,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
             .to receive(:perform).and_return(nil)
           create_subscription_request
-          inputs = { access_token:, pended_json_response: pended_response_json }
+          inputs = { session_url_path:, pended_json_response: pended_response_json }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
           allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
-          header('Authorization', "Bearer #{access_token}")
           post_json(submit_url, submit_request_json)
           fhir_body = FHIR.from_contents(last_response.body)
           expect(fhir_body).to be_a(FHIR::Bundle)
@@ -179,7 +170,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'fails when a non-json response provided' do
           create_subscription_request
-          inputs = { access_token:, pended_json_response: 'not json' }
+          inputs = { session_url_path:, pended_json_response: 'not json' }
           result = run(test, inputs)
           expect(result.result).to eq('fail')
           expect(result.result_message).to match(/must be valid JSON/)
@@ -187,14 +178,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       end
     end
 
-    describe 'when receiving $inquire requets' do
+    describe 'when receiving $inquire requests' do
       it 'keeps waiting' do
         create_subscription_request
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        header('Authorization', "Bearer #{access_token}")
         post_json(inquire_url, submit_request_json)
 
         result = results_repo.find(result.id)
@@ -203,11 +193,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
       it 'returns HTTP status 200' do
         create_subscription_request
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        header('Authorization', "Bearer #{access_token}")
         post_json(inquire_url, submit_request_json)
 
         expect(last_response.status).to be(200)
@@ -215,11 +204,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
       it 'adds inquire and pended tags' do
         create_subscription_request
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        header('Authorization', "Bearer #{access_token}")
         post_json(inquire_url, submit_request_json)
 
         requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::INQUIRE_TAG,
@@ -230,12 +218,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       describe 'and the tester does not provide an inquire response body' do
         it 'generates an approved response body' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
           allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
-          header('Authorization', "Bearer #{access_token}")
           post_json(inquire_url, submit_request_json)
           fhir_body = FHIR.from_contents(last_response.body)
           expect(fhir_body).to be_a(FHIR::Bundle)
@@ -257,7 +244,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'logs an info message' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
@@ -278,12 +265,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
             .to receive(:perform).and_return(nil)
           create_subscription_request
-          inputs = { access_token:, inquire_json_response: approval_response_json }
+          inputs = { session_url_path:, inquire_json_response: approval_response_json }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
           allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
-          header('Authorization', "Bearer #{access_token}")
           post_json(inquire_url, submit_request_json)
           fhir_body = FHIR.from_contents(last_response.body)
           expect(fhir_body).to be_a(FHIR::Bundle)
@@ -294,7 +280,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'fails when a non-json response provided' do
           create_subscription_request
-          inputs = { access_token:, inquire_json_response: 'not json' }
+          inputs = { session_url_path:, inquire_json_response: 'not json' }
           result = run(test, inputs)
           expect(result.result).to eq('fail')
           expect(result.result_message).to match(/must be valid JSON/)
@@ -306,7 +292,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       describe 'and the tester does not provide a notification body' do
         it 'generates a notification' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
@@ -316,7 +302,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
           allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
             .to receive(:rand).with(5..10).and_return(0)
-          header('Authorization', "Bearer #{access_token}")
           post_json(submit_url, submit_request_json)
 
           expect(notification_request).to have_been_made.times(1)
@@ -330,7 +315,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'logs an info message' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
@@ -349,7 +334,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'echoes the notification' do
           create_subscription_request
-          inputs = { access_token:, notification_bundle: notification_json_bundle }
+          inputs = { session_url_path:, notification_bundle: notification_json_bundle }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
@@ -359,7 +344,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
           allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
             .to receive(:rand).with(5..10).and_return(0)
-          header('Authorization', "Bearer #{access_token}")
           post_json(submit_url, submit_request_json)
 
           expect(notification_request).to have_been_made.times(1)
@@ -376,7 +360,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'fails when a non-json notification provided' do
           create_subscription_request
-          inputs = { access_token:, notification_bundle: 'not json' }
+          inputs = { session_url_path:, notification_bundle: 'not json' }
           result = run(test, inputs)
           expect(result.result).to eq('fail')
           expect(result.result_message).to match(/must be valid JSON/)
@@ -388,11 +372,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       describe 'on instance-level requests (get)' do
         it 'generates a status from user input when provided' do
           create_subscription_request
-          inputs = { access_token:, notification_bundle: }
+          inputs = { session_url_path:, notification_bundle: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
-          header('Authorization', "Bearer #{access_token}")
           get(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
 
           fhir_body = FHIR.from_contents(last_response.body)
@@ -402,11 +385,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'creates a status itself when input not provided' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
-          header('Authorization', "Bearer #{access_token}")
           get(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
 
           fhir_body = FHIR.from_contents(last_response.body)
@@ -418,11 +400,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       describe 'on instance-level requests (post)' do
         it 'generates a status from user input when provided' do
           create_subscription_request
-          inputs = { access_token:, notification_bundle: }
+          inputs = { session_url_path:, notification_bundle: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
-          header('Authorization', "Bearer #{access_token}")
           post(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
 
           fhir_body = FHIR.from_contents(last_response.body)
@@ -432,11 +413,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'creates a status itself when input not provided' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
-          header('Authorization', "Bearer #{access_token}")
           post(status_instance_url.gsub(':id', subscription_create_response_full_resource['id']))
 
           fhir_body = FHIR.from_contents(last_response.body)
@@ -448,11 +428,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       describe 'on resource-level requests' do
         it 'generates a status from user input when provided' do
           create_subscription_request
-          inputs = { access_token:, notification_bundle: }
+          inputs = { session_url_path:, notification_bundle: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
-          header('Authorization', "Bearer #{access_token}")
           post_json(status_resource_url, FHIR::Parameters.new.to_json)
 
           fhir_body = FHIR.from_contents(last_response.body)
@@ -462,11 +441,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
         it 'creates a status itself when input not provided' do
           create_subscription_request
-          inputs = { access_token: }
+          inputs = { session_url_path: }
           result = run(test, inputs)
           expect(result.result).to eq('wait')
 
-          header('Authorization', "Bearer #{access_token}")
           post_json(status_resource_url, FHIR::Parameters.new.to_json)
 
           fhir_body = FHIR.from_contents(last_response.body)

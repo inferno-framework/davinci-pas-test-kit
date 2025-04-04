@@ -1,11 +1,11 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientResponseAttest, :request do # rubocop:disable RSpec/SpecFilePathFormat
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
-  let(:access_token) { '1234' }
+  let(:random_id) { '1234' }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{access_token}" }
-  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{access_token}" }
+  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{random_id}" }
+  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{random_id}" }
   let(:approval_attest_test) do
     described_class.config(options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
                                       attest_message: 'blah blah' })
@@ -28,8 +28,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientResponseAttest, :requ
 
   describe 'When asking for an attestation' do
     it 'passes when responding true' do
-      inputs = { access_token: }
-      result = run(approval_attest_test, inputs)
+      allow(SecureRandom).to receive(:hex).with(32).and_return(random_id)
+      result = run(approval_attest_test)
       expect(result.result).to eq('wait')
 
       get continue_pass_url
@@ -38,8 +38,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientResponseAttest, :requ
     end
 
     it 'passes when responding false' do
-      inputs = { access_token: }
-      result = run(approval_attest_test, inputs)
+      allow(SecureRandom).to receive(:hex).with(32).and_return(random_id)
+      result = run(approval_attest_test)
       expect(result.result).to eq('wait')
 
       get continue_fail_url
