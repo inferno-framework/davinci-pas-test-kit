@@ -1,5 +1,4 @@
 require 'subscriptions_test_kit'
-require 'smart_app_launch_test_kit'
 require_relative '../../validator_suppressions'
 require_relative '../../custom_groups/v2.0.1/pas_error_group'
 require_relative '../../custom_groups/v2.0.1/pas_server_subscription_input_conformance'
