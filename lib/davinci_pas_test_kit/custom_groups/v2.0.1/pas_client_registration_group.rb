@@ -1,4 +1,5 @@
 require_relative 'registration/pas_client_registration_udap_interaction_test'
+require_relative 'registration/pas_client_registration_udap_verification_test'
 require_relative 'registration/pas_client_registration_configuration_display_test'
 require_relative 'registration/pas_client_registration_other_auth_attest_test'
 require 'udap_security_test_kit'
@@ -87,7 +88,7 @@ module DaVinciPASTestKit
                  udap_client_uri: { optional: true }
                }
              }
-        test from: :udap_client_registration_verification,
+        test from: :pas_client_v201_reg_udap_verification,
              config: {
                inputs: {
                  udap_client_uri: { optional: true }

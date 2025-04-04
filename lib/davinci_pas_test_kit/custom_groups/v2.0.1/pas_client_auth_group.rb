@@ -1,5 +1,7 @@
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
+require_relative 'auth/pas_client_token_smart_verification_test'
+require_relative 'auth/pas_client_token_udap_verification_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -23,7 +25,7 @@ module DaVinciPASTestKit
         id :pas_client_v201_auth_udap
         title 'Verify UDAP Authentication'
 
-        test from: :udap_client_token_request_verification
+        test from: :pas_client_v201_token_udap_verification
         test from: :udap_client_token_use_verification,
              config: {
                options: { access_request_tags: [SUBMIT_TAG, INQUIRE_TAG] }
@@ -34,7 +36,7 @@ module DaVinciPASTestKit
         id :pas_client_v201_auth_smart
         title 'Verify SMART Authentication'
 
-        test from: :smart_client_token_request_verification,
+        test from: :pas_client_v201_token_smart_verification,
              config: {
                inputs: {
                  smart_jwk_set: { optional: true }
