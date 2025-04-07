@@ -1,29 +1,11 @@
-GIT
-  remote: https://github.com/inferno-framework/smart-app-launch-test-kit.git
-  revision: 15ad117d658f52755237ca091cf251e9662a3433
-  branch: client-backend-services-suite
-  specs:
-    smart_app_launch_test_kit (0.6.0)
-      inferno_core (>= 0.6.3)
-      json-jwt (~> 1.15.3)
-      jwt (~> 2.6)
-      tls_test_kit (~> 0.3.0)
-
-GIT
-  remote: https://github.com/inferno-framework/udap-security-test-kit.git
-  revision: f4cb69401ee56430ccd4c597894781c18b1ad67c
-  branch: client-b2b-cc-suite
-  specs:
-    udap_security_test_kit (0.11.2)
-      inferno_core (>= 0.6.1)
-      jwt (~> 2.3)
-
 PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.12.2)
       inferno_core (~> 0.6.4)
+      smart_app_launch_test_kit (~> 0.6.1)
       subscriptions_test_kit (~> 0.11.0)
+      udap_security_test_kit (~> 0.11.3)
 
 GEM
   remote: https://rubygems.org/
@@ -323,6 +305,11 @@ GEM
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
       redis-client (>= 0.19.0)
+    smart_app_launch_test_kit (0.6.1)
+      inferno_core (>= 0.6.3)
+      json-jwt (~> 1.15.3)
+      jwt (~> 2.6)
+      tls_test_kit (~> 0.3.0)
     sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
     sqlite3 (1.7.3-arm64-darwin)
@@ -351,6 +338,9 @@ GEM
     tty-screen (0.8.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    udap_security_test_kit (0.11.3)
+      inferno_core (>= 0.6.1)
+      jwt (~> 2.3)
     unicode-display_width (2.6.0)
     unicode_utils (1.4.0)
     webmock (3.25.1)
@@ -377,8 +367,6 @@ DEPENDENCIES
   rubocop
   rubocop-rake (~> 0.6.0)
   rubocop-rspec
-  smart_app_launch_test_kit!
-  udap_security_test_kit!
   webmock (~> 3.11)
 
 BUNDLED WITH

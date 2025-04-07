@@ -223,7 +223,7 @@ following:
 - Select the "Demo: Run Against the UDAP Security Client Suite" preset from the dropdown in the upper left.
 - Select the **2** UDAP Client Credentials Flow group from the list at the left and the click the "RUN ALL TESTS"
   button in the upper right.
-- Update the **FFHIR Server Base URL** input value to be the FHIR server endpoint from the wait dialog
+- Update the **FHIR Server Base URL** input value to be the FHIR server endpoint from the wait dialog
   in the PAS Client suite and then click "SUBMIT"
 - Once the tests have completed, find the access token to use for the data access request by opening
   test **2.3.01** OAuth token exchange request succeeds when supplied correct information, click
