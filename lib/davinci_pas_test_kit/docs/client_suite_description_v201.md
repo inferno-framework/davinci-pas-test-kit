@@ -106,19 +106,10 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    - In Postman, select the *PAS Client Suite Demonstration* Collection in postman and go to the "Variables" tab 
      (see the collection's Overview tab for more details on what the variables control).
    - In the current value for the **session_url_path** variable, put the same value as in the
-     **Session-specific URL path extension** input, surrounded by `/`, e.g., `/demo/`.
+     **Session-specific URL path extension** input, surrounded by `/`, e.g., `/demo/` and
+     save the collection.
    - Back in Inferno, click the "SUBMIT" button and click the links to continue the tests
      in the next two wait dialogs until a **Subscription Creation Test** wait dialog appears.
-1. In Postman, select the *Create Subscription Request* in the *Subscription Setup* folder
-   and click the "Send" button in the upper right.
-1. Back in Inferno, the wait dialog should disappear and a new **Approval Workflow Test** wait
-   dialog will appear.
-1. In Postman, select the *Prior Auth Request For Approval* in the *Approval Workflow* folder
-   and click the "Send" button in the upper right.
-1. Back in Inferno, the wait dialog should disappear and a new attestation wait dialog will
-   appear asking to confirm the system's interpretation of the "Approved" response. Check that
-   the response from the last step in Postman contains the string "Certified in total" respond
-   to the attestation.
 1. In Postman, select the *Create Subscription Request* in the *Subscription Setup* folder
    and click the "Send" button in the upper right.
 1. Back in Inferno, the wait dialog should disappear and a new **Approval Workflow Test** wait

@@ -3,7 +3,7 @@ require_relative 'urls'
 
 module DaVinciPASTestKit
   module SessionIdentification
-    def inputs_to_wait_identifier(client_id, session_url_path)
+    def session_wait_identifier(client_id, session_url_path)
       # look at test config and determine the wait identifier to use
       # at somepoint this would be an inferno type, for now, just two options
       return client_id if client_id.present?
@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       test_session_id
     end
 
-    def inputs_to_session_endpont(endpoint, client_id, session_url_path)
+    def session_endpont_url(endpoint, client_id, session_url_path)
       path =
         if client_id.present?
           ''

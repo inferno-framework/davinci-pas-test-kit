@@ -6,7 +6,7 @@ module DaVinciPASTestKit
       include URLs
 
       id :pas_client_v201_reg_other_auth_attest
-      title 'Verify that the client supports an approach for authenticating itself to the server'
+      title 'Verify that the client supports an approach for authenticating itself to the server (Attestation)'
       description %(
         If authentication details are not provided, then authentication will not be tested.
         In that case, this test provides testers with an opportunity to attest to their

@@ -39,7 +39,8 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_token_smart_verification,
              config: {
                inputs: {
-                 smart_jwk_set: { optional: true }
+                 smart_jwk_set: { optional: true },
+                 client_id: { optional: true }
                }
              }
 

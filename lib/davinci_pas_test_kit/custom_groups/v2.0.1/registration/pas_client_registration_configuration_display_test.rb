@@ -46,6 +46,7 @@ module DaVinciPASTestKit
             **Inferno Simulated Server Details**:
 
             FHIR Base URL: `#{fhir_base_url}`
+
             Authentication Details:
             - Client Id (#{udap_smart_or_both}): `#{client_id}`
             - Token endpoint: `#{token_url}`

@@ -71,7 +71,7 @@ module DaVinciPASTestKit
             description: %(
               Ignored if a UDAP Client URI or SMART JWKS is provided. If demonstrating PAS
               interactions without authentication, Inferno will use this value to
-              setup session-specific FHIR endpoints to use during these tests.
+              setup dedicated session-specific FHIR endpoints to use during these tests.
               If not provided, and no auth configuration is included in the inputs,
               a value will be generated.
             )

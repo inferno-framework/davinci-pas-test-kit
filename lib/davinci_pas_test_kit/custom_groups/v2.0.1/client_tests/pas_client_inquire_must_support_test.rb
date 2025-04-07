@@ -29,8 +29,8 @@ module DaVinciPASTestKit
       config options: { accepts_multiple_requests: true }
 
       run do
-        wait_identifier = inputs_to_wait_identifier(client_id, session_url_path)
-        inquire_endpoint = inputs_to_session_endpont(:inquire, client_id, session_url_path)
+        wait_identifier = session_wait_identifier(client_id, session_url_path)
+        inquire_endpoint = session_endpont_url(:inquire, client_id, session_url_path)
 
         wait(
           identifier: wait_identifier,
