@@ -2,7 +2,7 @@ test_kit_id: davinci_pas_test_kit
 
 suites:
   - id: davinci_pas_client_suite_v201
-    class_name: DaVinciPASTestKit::ClientSuite
+    class_name: DaVinciPASTestKit::DaVinciPASV201::ClientSuite
     suite_actor: Client
   - id: davinci_pas_server_suite_v201
     class_name: DaVinciPASTestKit::DaVinciPASV201::ServerSuite
