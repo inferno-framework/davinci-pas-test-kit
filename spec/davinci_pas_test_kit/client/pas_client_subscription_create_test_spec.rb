@@ -2,12 +2,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'when responding to requests from the client under tests' do
-    let(:access_token) { '1234' }
+    let(:session_url_path) { '1234' }
+    let(:notification_access_token) { '1234' }
     let(:test) { described_class }
     let(:results_repo) { Inferno::Repositories::Results.new }
     let(:result) { repo_create(:result, test_session_id: test_session.id) }
     let(:requests_repo) { Inferno::Repositories::Requests.new }
-    let(:subscription_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
+    let(:subscription_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
     let(:subscription_create_response_full_resource) do
       JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
     end
@@ -19,11 +20,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake) # skip handshake
         .to receive(:perform).and_return(nil)
 
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, subscription_create_response_full_resource)
 
       result = results_repo.find(result.id)
@@ -34,11 +34,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake) # skip handshake
         .to receive(:perform).and_return(nil)
 
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, subscription_create_response_full_resource)
 
       expect(last_response.status).to be(201)
@@ -48,11 +47,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake) # skip handshake
         .to receive(:perform).and_return(nil)
 
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, notification_json_bundle)
 
       expect(last_response.status).to be(400)
@@ -62,11 +60,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake) # skip handshake
         .to receive(:perform).and_return(nil)
 
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, subscription_create_response_full_resource)
       post_json(subscription_url, subscription_create_response_full_resource)
 
@@ -77,11 +74,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake) # skip handshake
         .to receive(:perform).and_return(nil)
 
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, subscription_create_response_full_resource)
 
       requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG])
@@ -96,11 +92,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       continue_pass_request = stub_request(:get, 'http://example.org/custom/davinci_pas_client_suite_v201/resume_pass?token=1234')
         .to_return(status: 200) # look for request, not status update
 
-      inputs = { access_token: }
+      inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, subscription_create_response_full_resource)
 
       expect(handshake_request).to have_been_made.once
@@ -113,18 +108,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       handshake_request = stub_request(:post, 'https://subscriptions.argo.run/fhir/r4/$subscription-hook')
         .with(
           headers: {
-            'Authorization' => "Bearer #{access_token}"
+            'Authorization' => "Bearer #{notification_access_token}"
           }
         )
         .to_return(status: 200)
       continue_pass_request = stub_request(:get, 'http://example.org/custom/davinci_pas_client_suite_v201/resume_pass?token=1234')
         .to_return(status: 200) # look for request, not status update
 
-      inputs = { access_token:, client_endpoint_access_token: access_token }
+      inputs = { session_url_path:, client_endpoint_access_token: notification_access_token }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
 
-      header('Authorization', "Bearer #{access_token}")
       post_json(subscription_url, subscription_create_response_full_resource)
 
       expect(handshake_request).to have_been_made.once
@@ -133,13 +127,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
 
     describe 'triggering a handshake' do
       def create_subscription_request
-        headers ||= [
-          {
-            type: 'request',
-            name: 'Authorization',
-            value: "Bearer #{access_token}"
-          }
-        ]
         repo_create(
           :request,
           direction: 'incoming',
@@ -148,13 +135,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
           result:,
           response_body: subscription_create_response_full_resource.to_json,
           tags: [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG],
-          status: 201,
-          headers:
+          status: 201
         )
       end
 
       it 'causes a pass if successful' do
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
@@ -173,7 +159,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
           'https://subscriptions.argo.run/fhir/r4/$subscription-hook',
           nil,
           notification_json_bundle,
-          access_token,
+          notification_access_token,
           'http://example.com/'
         )
         expect(handshake_request).to have_been_made.times(1)
@@ -183,7 +169,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
       it 'causes a pass if unsuccessful' do
         # NOTE: failure checked later, and failure here didn't have
         # any context to say why there was a failure
-        inputs = { access_token: }
+        inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
@@ -202,7 +188,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTes
           'https://subscriptions.argo.run/fhir/r4/$subscription-hook',
           nil,
           notification_json_bundle,
-          access_token,
+          notification_access_token,
           'http://example.com/'
         )
         expect(handshake_request).to have_been_made.times(1)

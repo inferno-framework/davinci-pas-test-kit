@@ -1,11 +1,14 @@
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../user_input_response'
 require_relative '../../../pas_bundle_validation'
+require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientPendedSubmitTest < Inferno::Test
       include URLs
+      include SessionIdentification
       include UserInputResponse
       include PasBundleValidation
 
@@ -25,12 +28,6 @@ module DaVinciPASTestKit
                             'hl7.fhir.us.davinci-pas_2.0.1@203'
 
       config options: { accepts_multiple_requests: true }
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
       input :notification_bundle,
             title: 'Claim updated notification JSON',
             type: 'textarea',
@@ -77,6 +74,25 @@ module DaVinciPASTestKit
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
+      input :client_id,
+            title: 'Client Id',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
+      input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
+      input :smart_jwk_set,
+            title: 'JSON Web Key Set (JWKS)',
+            type: 'textarea',
+            optional: true,
+            locked: true,
+            description: INPUT_JWK_SET_LOCKED
+
       submit_respond_with :pended_json_response
       inquire_respond_with :inquire_json_response
 
@@ -120,17 +136,19 @@ module DaVinciPASTestKit
           ))
         end
 
+        wait_identifier = session_wait_identifier(client_id, session_url_path)
+        submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
+        inquire_endpoint = session_endpont_url(:inquire, client_id, session_url_path)
+
         wait(
-          identifier: access_token,
+          identifier: wait_identifier,
           timeout: 600,
           message: %(
             **Pended Workflow Test**:
 
             1. Submit a PAS request to
 
-            `#{submit_url}`
-
-            The request must have an `Authorization` header with the value `Bearer #{access_token}`.
+            `#{submit_endpoint}`
 
             If the optional '**#{input_title(:pended_json_response)}**' input is populated, it will
             be returned, updated with current timestamps. Otherwise, a pended response will
@@ -144,9 +162,7 @@ module DaVinciPASTestKit
 
             3. Once the notification has been received, submit a PAS inquiry request to
 
-            `#{inquire_url}`
-
-            The request must have an `Authorization` header with the value `Bearer #{access_token}`.
+            `#{inquire_endpoint}`
 
             If the optional '**#{input_title(:inquire_json_response)}**' input is populated, it will
             be returned, updated with current timestamps. Otherwise, an approval response will
@@ -158,7 +174,7 @@ module DaVinciPASTestKit
             to be able to faithfully answer the attestations.
 
             Once the client has completed these steps,
-            [click here to complete the test](#{resume_pass_url}?token=#{access_token})
+            [click here to complete the test](#{resume_pass_url}?token=#{wait_identifier})
             and continue Inferno's evaluation of the interaction.
           )
         )

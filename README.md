@@ -94,7 +94,7 @@ the test home pages include instructions for trying out the tests, including
 
 - For server testing: a [public reference implementation](https://prior-auth.davinci.hl7.org/fhir)
   ([code on github](https://github.com/HL7-DaVinci/prior-auth))
-- For client testing: a [sample postman collection](config/PAS%20Test%20Kit%20Client%20Test%20Demo.postman_collection.json)
+- For client testing: a [sample postman collection](lib/davinci_pas_test_kit/docs/demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
 
 Detailed instructions can be found in the suite descriptions when the tests
 are run, or within this repository for the 

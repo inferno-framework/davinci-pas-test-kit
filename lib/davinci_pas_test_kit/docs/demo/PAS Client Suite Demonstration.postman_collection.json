@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "380599c2-6a7d-402a-aef7-f98487c0c6a8",
-		"name": "PAS Client Test Suite Demo",
-		"description": "The variables tab in this collection control the base URL for inferno and how requests get associated with a test session\n\n- base_url: points to a running instance of inferno. Typical values will be\n    \n    - Inferno production: [https://inferno.healthit.gov/suites](https://inferno.healthit.gov/suites)\n        \n    - Inferno QA: [https://inferno-qa.healthit.gov/suites](https://inferno-qa.healthit.gov/suites)\n        \n    - Local docker: [http://localhost](http://localhost)\n        \n    - Local development: [http://localhost:4657](http://localhost:4657)\n        \n- client_id: random, tester chosen value that must match the client_id input within Inferno",
+		"_postman_id": "060a6bb3-0909-4735-98b3-b1eac864fc43",
+		"name": "PAS Client Suite Demonstration",
+		"description": "Details on Variables:\n\n- base_url: points to a running instance of inferno. Typical values will be\n    \n    - Inferno production: [https://inferno.healthit.gov/suites](https://inferno.healthit.gov/suites)\n        \n    - Inferno QA: [https://inferno-qa.healthit.gov/suites](https://inferno-qa.healthit.gov/suites)\n        \n    - Local docker: [http://localhost](http://localhost)\n        \n    - Local development: [http://localhost:4567](http://localhost:4567)\n        \n- session_url_path: used when the client suite is configured to use dedicated session endpoints. This will be the **Session-specific URL path extension** input surrounded by '/' (e.g., if the input is 'xyz', then this variable will be '/xyz/'. If dedicated session endpoints are not in use, this this value must be '/'.\n    \n- access_token: used when the client suite is configured to use standards-based auth. Obtain the token using other means, e.g., the UDAP Security Server or SMART App Launch Servers tests, and then copy the resulting token into this variable.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32597978"
 	},
@@ -25,14 +25,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201/fhir/Subscription",
+							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201{{session_url_path}}fhir/Subscription",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"custom",
-								"davinci_pas_client_suite_v201",
-								"fhir",
+								"davinci_pas_client_suite_v201{{session_url_path}}fhir",
 								"Subscription"
 							]
 						}
@@ -42,7 +41,7 @@
 			]
 		},
 		{
-			"name": "Approval Workflow Requests",
+			"name": "Approval Workflow",
 			"item": [
 				{
 					"name": "Prior Auth Request For Approval",
@@ -65,14 +64,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201/fhir/Claim/$submit",
+							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201{{session_url_path}}fhir/Claim/$submit",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"custom",
-								"davinci_pas_client_suite_v201",
-								"fhir",
+								"davinci_pas_client_suite_v201{{session_url_path}}fhir",
 								"Claim",
 								"$submit"
 							]
@@ -83,7 +81,7 @@
 			]
 		},
 		{
-			"name": "Denial Workflow Requests",
+			"name": "Denial Workflow",
 			"item": [
 				{
 					"name": "Prior Auth Request For Denial",
@@ -106,14 +104,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201/fhir/Claim/$submit",
+							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201{{session_url_path}}fhir/Claim/$submit",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"custom",
-								"davinci_pas_client_suite_v201",
-								"fhir",
+								"davinci_pas_client_suite_v201{{session_url_path}}fhir",
 								"Claim",
 								"$submit"
 							]
@@ -124,7 +121,7 @@
 			]
 		},
 		{
-			"name": "Pended Workflow Requests",
+			"name": "Pended Workflow",
 			"item": [
 				{
 					"name": "Prior Auth Request For Pended",
@@ -147,14 +144,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201/fhir/Claim/$submit",
+							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201{{session_url_path}}fhir/Claim/$submit",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"custom",
-								"davinci_pas_client_suite_v201",
-								"fhir",
+								"davinci_pas_client_suite_v201{{session_url_path}}fhir",
 								"Claim",
 								"$submit"
 							]
@@ -183,14 +179,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201/fhir/Claim/$inquire",
+							"raw": "{{base_url}}/custom/davinci_pas_client_suite_v201{{session_url_path}}fhir/Claim/$inquire",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"custom",
-								"davinci_pas_client_suite_v201",
-								"fhir",
+								"davinci_pas_client_suite_v201{{session_url_path}}fhir",
 								"Claim",
 								"$inquire"
 							]
@@ -202,63 +197,11 @@
 		}
 	],
 	"auth": {
-		"type": "oauth2",
-		"oauth2": [
+		"type": "bearer",
+		"bearer": [
 			{
-				"key": "clientId",
-				"value": "{{client_id}}",
-				"type": "string"
-			},
-			{
-				"key": "tokenName",
-				"value": "",
-				"type": "string"
-			},
-			{
-				"key": "refreshRequestParams",
-				"value": [],
-				"type": "any"
-			},
-			{
-				"key": "tokenRequestParams",
-				"value": [
-					{
-						"key": "",
-						"value": "",
-						"enabled": false,
-						"send_as": "request_body"
-					}
-				],
-				"type": "any"
-			},
-			{
-				"key": "authRequestParams",
-				"value": [],
-				"type": "any"
-			},
-			{
-				"key": "challengeAlgorithm",
-				"value": "S256",
-				"type": "string"
-			},
-			{
-				"key": "grant_type",
-				"value": "client_credentials",
-				"type": "string"
-			},
-			{
-				"key": "addTokenTo",
-				"value": "header",
-				"type": "string"
-			},
-			{
-				"key": "client_authentication",
-				"value": "body",
-				"type": "string"
-			},
-			{
-				"key": "accessTokenUrl",
-				"value": "{{base_url}}/custom/davinci_pas_client_suite_v201/mock_auth/token",
+				"key": "token",
+				"value": "{{access_token}}",
 				"type": "string"
 			}
 		]
@@ -290,8 +233,14 @@
 			"type": "string"
 		},
 		{
-			"key": "client_id",
-			"value": "8e065803bfd3"
+			"key": "session_url_path",
+			"value": "/",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "tbd",
+			"type": "string"
 		}
 	]
 }

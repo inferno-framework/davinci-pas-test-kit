@@ -1,11 +1,14 @@
 require_relative '../../../urls'
+require_relative '../../../descriptions'
 require_relative '../../../user_input_response'
+require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientApprovalSubmitTest < Inferno::Test
       include URLs
       include UserInputResponse
+      include SessionIdentification
 
       id :pas_client_v201_approval_submit_test
       title 'Client submits a claim using the $submit operation'
@@ -17,12 +20,6 @@ module DaVinciPASTestKit
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
                             'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
 
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
       input :approval_json_response,
             title: 'Claim approved response JSON',
             type: 'textarea',
@@ -34,6 +31,25 @@ module DaVinciPASTestKit
               If not provided, an approval response will be generated from the submitted Claim.
               In either case, the response will be validated against the PAS Response Bundle profile.
             )
+      input :client_id,
+            title: 'Client Id',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
+      input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
+      input :smart_jwk_set,
+            title: 'JSON Web Key Set (JWKS)',
+            type: 'textarea',
+            optional: true,
+            locked: true,
+            description: INPUT_JWK_SET_LOCKED
+
       submit_respond_with :approval_json_response
 
       run do
@@ -47,16 +63,17 @@ module DaVinciPASTestKit
           ))
         end
 
+        wait_identifier = session_wait_identifier(client_id, session_url_path)
+        submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
+
         wait(
-          identifier: access_token,
+          identifier: wait_identifier,
           message: %(
             **Approval Workflow Test**:
 
             Submit a PAS request to
 
-            `#{submit_url}`
-
-            The request must have an `Authorization` header with the value `Bearer #{access_token}`.
+            `#{submit_endpoint}`
 
             If the optional '**#{input_title(:approval_json_response)}**' input is populated, it will
             be returned, updated with current timestamps. Otherwise, an approval response will

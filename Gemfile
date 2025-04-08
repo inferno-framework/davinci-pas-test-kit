@@ -15,5 +15,4 @@ group :development, :test do
   # This should not be necessary but we are including it to address internal team issue
   # where the Ruby method of running tests don't work without it.
   gem 'foreman'
-  gem 'rack-test'
 end

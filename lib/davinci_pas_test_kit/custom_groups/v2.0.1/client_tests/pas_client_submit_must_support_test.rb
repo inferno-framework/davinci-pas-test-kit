@@ -1,9 +1,12 @@
 require_relative '../../../urls'
+require_relative '../../../descriptions'
+require_relative '../../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientSubmitMustSupportTest < Inferno::Test
       include URLs
+      include SessionIdentification
 
       id :pas_client_submit_v201_must_support_test
       title 'Client submits claims using the $submit operation to demonstrate coverage of must support elements'
@@ -14,17 +17,26 @@ module DaVinciPASTestKit
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
                             'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
 
-      input :access_token,
-            title: 'Access Token',
-            description: %(
-              Access token that the client will provide in the Authorization header of each request
-              made during this test.
-            )
+      input :client_id,
+            title: 'Client Id',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_CLIENT_ID_LOCKED
+      input :session_url_path,
+            title: 'Session-specific URL path extension',
+            type: 'text',
+            optional: true,
+            locked: true,
+            description: INPUT_SESSION_URL_PATH_LOCKED
       config options: { accepts_multiple_requests: true }
 
       run do
+        wait_identifier = session_wait_identifier(client_id, session_url_path)
+        submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
+
         wait(
-          identifier: access_token,
+          identifier: wait_identifier,
           message: %(
             The client system may now make multiple $submit requests before continuing. These requests should
             cumulatively demonstrate coverage of all required profiles and all must support elements within those
@@ -49,9 +61,9 @@ module DaVinciPASTestKit
 
             Submit PAS requests to
 
-            `#{submit_url}`
+            `#{submit_endpoint}`
 
-            and [click here](#{resume_pass_url}?token=#{access_token}) when done.
+            and [click here](#{resume_pass_url}?token=#{wait_identifier}) when done.
           )
         )
       end
