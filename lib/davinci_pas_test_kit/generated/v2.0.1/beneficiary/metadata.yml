@@ -25,7 +25,8 @@
     :path: extension
     :url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex
   :slices:
-  - :name: Patient.multipleBirth[x]:multipleBirthInteger
+  - :slice_id: Patient.multipleBirth[x]:multipleBirthInteger
+    :slice_name: multipleBirthInteger
     :path: multipleBirth[x]
     :discriminator:
       :type: type
