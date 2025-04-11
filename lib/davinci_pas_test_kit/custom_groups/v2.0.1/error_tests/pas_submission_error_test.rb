@@ -20,9 +20,9 @@ module DaVinciPASTestKit
 
         The server SHOULD respond within 15 seconds.
       }
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@104',
-                            'hl7.fhir.us.davinci-pas_2.0.1@105', 'hl7.fhir.us.davinci-pas_2.0.1@106',
-                            'hl7.fhir.us.davinci-pas_2.0.1@112', 'hl7.fhir.us.davinci-pas_2.0.1@113'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@104', 'hl7.fhir.us.davinci-pas_2.0.1@105',
+                            'hl7.fhir.us.davinci-pas_2.0.1@106', 'hl7.fhir.us.davinci-pas_2.0.1@112',
+                            'hl7.fhir.us.davinci-pas_2.0.1@113'
 
       output :response_time
       makes_request :pa_invalid_request
