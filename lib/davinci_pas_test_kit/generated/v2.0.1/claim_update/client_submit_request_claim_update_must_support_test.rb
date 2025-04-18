@@ -66,12 +66,18 @@ module DaVinciPASTestKit
         * Claim.provider
         * Claim.supportingInfo
         * Claim.supportingInfo.category
-        * Claim.supportingInfo.category.coding.code
         * Claim.supportingInfo.sequence
-        * Claim.supportingInfo.timing[x]
-        * Claim.supportingInfo.value[x]
         * Claim.supportingInfo:AdditionalInformation
+        * Claim.supportingInfo:AdditionalInformation.category
+        * Claim.supportingInfo:AdditionalInformation.sequence
+        * Claim.supportingInfo:AdditionalInformation.value[x]
+        * Claim.supportingInfo:AdmissionDates.timing[x]
+        * Claim.supportingInfo:DischargeDates.timing[x]
         * Claim.supportingInfo:MessageText
+        * Claim.supportingInfo:MessageText.category
+        * Claim.supportingInfo:MessageText.sequence
+        * Claim.supportingInfo:MessageText.value[x]
+        * Claim.supportingInfo:PatientEvent.timing[x]
       )
 
       id :pas_client_submit_request_v201_claim_update_must_support_test

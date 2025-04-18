@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Inferno Test Kit for the Da Vinci Prior Authorization Support IG'
   spec.homepage      = 'https://github.com/inferno-framework/davinci-pas-test-kit'
   spec.license       = 'Apache-2.0'
-  spec.add_dependency 'inferno_core', '~> 0.6.4'
+  spec.add_dependency 'inferno_core', '~> 0.6.9'
   spec.add_dependency 'smart_app_launch_test_kit', '~> 0.6.1'
   spec.add_dependency 'subscriptions_test_kit', '~> 0.11.0'
   spec.add_dependency 'udap_security_test_kit', '~> 0.11.3'
