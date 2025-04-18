@@ -1,7 +1,7 @@
 require_relative 'group_metadata'
 require_relative 'ig_metadata'
 require_relative 'terminology_binding_metadata_extractor'
-require 'inferno'
+require 'inferno/dsl/must_support_metadata_extractor'
 
 module DaVinciPASTestKit
   class Generator
