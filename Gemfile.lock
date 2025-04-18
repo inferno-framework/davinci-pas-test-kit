@@ -1,42 +1,8 @@
-GIT
-  remote: https://github.com/inferno-framework/inferno-core.git
-  revision: f6b3046637fcefd489abe95dedb8dcce5e9f1409
-  branch: fi-3813-ms-fixes
-  specs:
-    inferno_core (0.6.8)
-      activesupport (~> 6.1.7.5)
-      base62-rb (= 0.3.1)
-      blueprinter (= 0.25.2)
-      concurrent-ruby (= 1.3.4)
-      dotenv (~> 2.7)
-      dry-configurable (= 1.0.0)
-      dry-container (= 0.10.0)
-      dry-core (= 1.0.0)
-      dry-inflector (= 1.0.0)
-      dry-system (= 1.0.0)
-      faraday (~> 1.2)
-      faraday_middleware (~> 1.2)
-      fhir_client (>= 5.0.3)
-      fhir_models (>= 4.2.2)
-      hanami-controller (= 2.0.0)
-      hanami-router (= 2.0.0)
-      oj (= 3.11.0)
-      pastel (~> 0.8.0)
-      pry
-      pry-byebug
-      puma (~> 5.6.7)
-      rake (~> 13.0)
-      sequel (~> 5.42.0)
-      sidekiq (~> 7.2.4)
-      sqlite3 (~> 1.4)
-      thor (~> 1.2.1)
-      tty-markdown (~> 0.7.1)
-
 PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.12.2)
-      inferno_core (~> 0.6.8)
+      inferno_core (~> 0.6.9)
       smart_app_launch_test_kit (~> 0.6.1)
       subscriptions_test_kit (~> 0.11.0)
       udap_security_test_kit (~> 0.11.3)
@@ -64,7 +30,7 @@ GEM
     byebug (12.0.0)
     coderay (1.1.3)
     concurrent-ruby (1.3.4)
-    connection_pool (2.5.0)
+    connection_pool (2.5.1)
     crack (1.0.0)
       bigdecimal
       rexml
@@ -176,6 +142,34 @@ GEM
       mutex_m
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    inferno_core (0.6.9)
+      activesupport (~> 6.1.7.5)
+      base62-rb (= 0.3.1)
+      blueprinter (= 0.25.2)
+      concurrent-ruby (= 1.3.4)
+      dotenv (~> 2.7)
+      dry-configurable (= 1.0.0)
+      dry-container (= 0.10.0)
+      dry-core (= 1.0.0)
+      dry-inflector (= 1.0.0)
+      dry-system (= 1.0.0)
+      faraday (~> 1.2)
+      faraday_middleware (~> 1.2)
+      fhir_client (>= 5.0.3)
+      fhir_models (>= 4.2.2)
+      hanami-controller (= 2.0.0)
+      hanami-router (= 2.0.0)
+      oj (= 3.11.0)
+      pastel (~> 0.8.0)
+      pry
+      pry-byebug
+      puma (~> 5.6.7)
+      rake (~> 13.0)
+      sequel (~> 5.42.0)
+      sidekiq (~> 7.2.4)
+      sqlite3 (~> 1.4)
+      thor (~> 1.2.1)
+      tty-markdown (~> 0.7.1)
     io-console (0.8.0)
     irb (1.15.2)
       pp (>= 0.6.0)
@@ -198,7 +192,7 @@ GEM
     mime-types (3.6.2)
       logger
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2025.0408)
+    mime-types-data (3.2025.0415)
     minitest (5.25.5)
     multi_json (1.15.0)
     multi_xml (0.7.1)
@@ -380,7 +374,6 @@ DEPENDENCIES
   debug
   factory_bot (~> 6.1)
   foreman
-  inferno_core!
   rack-test
   rspec (~> 3.10)
   rubocop
