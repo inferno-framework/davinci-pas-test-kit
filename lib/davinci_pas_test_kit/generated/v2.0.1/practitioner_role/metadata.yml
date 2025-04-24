@@ -20,9 +20,13 @@
   - :path: practitioner
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitioner
   - :path: organization
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-organization
 :mandatory_elements:
 - PractitionerRole.practitioner
 - PractitionerRole.notAvailable.description

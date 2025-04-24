@@ -16,27 +16,33 @@
 :must_supports:
   :extensions: []
   :slices:
-  - :name: Coverage.relationship.coding:X12Code
+  - :slice_id: Coverage.relationship.coding:X12Code
+    :slice_name: X12Code
     :path: relationship.coding
     :discriminator:
-      :type: value
-      :values:
-      - :path: "$this"
-        :value:
+      :type: requiredBinding
+      :path: ''
+      :values: []
   :elements:
   - :path: identifier
   - :path: status
   - :path: subscriber
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber
   - :path: subscriberId
   - :path: beneficiary
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary
   - :path: relationship
   - :path: payor
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
 :mandatory_elements:
 - Coverage.status
 - Coverage.beneficiary

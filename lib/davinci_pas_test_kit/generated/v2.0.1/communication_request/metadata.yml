@@ -35,12 +35,16 @@
   - :path: requester
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer
   - :path: recipient
     :types:
     - Reference
   - :path: sender
     :types:
     - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor
 :mandatory_elements:
 - CommunicationRequest.status
 - CommunicationRequest.payload.content[x]
