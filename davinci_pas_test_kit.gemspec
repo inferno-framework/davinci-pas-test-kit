@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'smart_app_launch_test_kit', '~> 0.6.1'
   spec.add_dependency 'subscriptions_test_kit', '~> 0.11.0'
   spec.add_dependency 'udap_security_test_kit', '~> 0.11.3'
+  spec.add_dependency 'us_core_test_kit', '~> 0.11.1'
   spec.add_development_dependency 'database_cleaner-sequel', '~> 1.8'
   spec.add_development_dependency 'factory_bot', '~> 6.1'
   spec.add_development_dependency 'rspec', '~> 3.10'

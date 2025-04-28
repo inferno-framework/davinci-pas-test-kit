@@ -4,6 +4,7 @@ require_relative 'client_tests/pas_client_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_inquire_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_request_bundle_validation_test'
 require_relative 'client_tests/pas_client_inquire_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_review_submit_attest'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
@@ -63,6 +64,10 @@ module DaVinciPASTestKit
                attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
                                'claim, the client system indicates to users that a final decision on request ' \
                                'has not yet been made.'
+             } }
+        test from: :pas_client_v201_review_submit_attest,
+             config: { options: {
+               workflow_tag: PENDED_WORKFLOW_TAG
              } }
       end
 
