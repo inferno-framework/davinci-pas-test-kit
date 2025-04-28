@@ -1,6 +1,7 @@
 require 'subscriptions_test_kit'
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
+require 'us_core_test_kit/generated/v3.1.1/us_core_test_suite'
 require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
@@ -122,8 +123,8 @@ module DaVinciPASTestKit
       group do
         title 'Must Support Elements'
         description %(
-        During these tests, the client will show that it supports all PAS-defined profiles and the must support
-        elements defined in them. This includes
+        During these tests, the client will show that it supports all PAS-defined profiles and US Core R4 Profiles for
+        Condition, Observation, and Procedure and the must support elements defined in them. This includes
 
         - The ability to make prior authorization submission and inquiry requests that contain all
           PAS-defined profiles and their must support elements.
@@ -139,6 +140,22 @@ module DaVinciPASTestKit
 
         group from: :pas_client_v201_submit_must_support_use_case
         group from: :pas_client_v201_inquiry_must_support_use_case
+        group from: :us_core_v311_condition,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@45']
+        group from: :us_core_v311_procedure,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@47']
+        group from: :us_core_v311_bodyheight,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@49']
+        group from: :us_core_v311_bodytemp,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@49']
+        group from: :us_core_v311_bp,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@49']
+        group from: :us_core_v311_bodyweight,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@49']
+        group from: :us_core_v311_heartrate,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@49']
+        group from: :us_core_v311_resprate,
+              verifies_requirements: ['hl7.fhir.us.davinci-pas_2.0.1@49']
       end
       group from: :pas_client_v201_auth
     end

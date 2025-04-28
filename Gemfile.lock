@@ -6,6 +6,7 @@ PATH
       smart_app_launch_test_kit (~> 0.6.1)
       subscriptions_test_kit (~> 0.11.0)
       udap_security_test_kit (~> 0.11.3)
+      us_core_test_kit (~> 0.11.1)
 
 GEM
   remote: https://rubygems.org/
@@ -193,6 +194,7 @@ GEM
       logger
       mime-types-data (~> 3.2015)
     mime-types-data (3.2025.0415)
+    mini_portile2 (2.8.8)
     minitest (5.25.5)
     multi_json (1.15.0)
     multi_xml (0.7.1)
@@ -206,6 +208,9 @@ GEM
     mutex_m (0.3.0)
     netrc (0.11.0)
     nio4r (2.7.4)
+    nokogiri (1.18.7)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.7-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.7-aarch64-linux-musl)
@@ -316,6 +321,8 @@ GEM
       json-jwt (~> 1.15.3)
       jwt (~> 2.6)
       tls_test_kit (~> 0.3.0)
+    sqlite3 (1.7.3)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (1.7.3-aarch64-linux)
     sqlite3 (1.7.3-arm-linux)
     sqlite3 (1.7.3-arm64-darwin)
@@ -349,6 +356,10 @@ GEM
       jwt (~> 2.3)
     unicode-display_width (2.6.0)
     unicode_utils (1.4.0)
+    us_core_test_kit (0.11.1)
+      inferno_core (>= 0.6.8)
+      smart_app_launch_test_kit (>= 0.6.1)
+      tls_test_kit (~> 0.3.0)
     webmock (3.25.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -363,6 +374,7 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux
   x86_64-linux-gnu

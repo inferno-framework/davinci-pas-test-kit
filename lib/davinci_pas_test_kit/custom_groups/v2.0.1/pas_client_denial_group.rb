@@ -2,6 +2,7 @@ require_relative 'client_tests/pas_client_denial_submit_test'
 require_relative 'client_tests/pas_client_response_attest'
 require_relative 'client_tests/pas_client_response_bundle_validation_test'
 require_relative 'client_tests/pas_client_request_bundle_validation_test'
+require_relative 'client_tests/pas_client_review_submit_attest'
 require_relative '../../user_input_response'
 require_relative '../../tags'
 
@@ -40,6 +41,10 @@ module DaVinciPASTestKit
              attest_message: "I attest that the client system displays the submitted claim as 'denied', meaning " \
                              'that the user cannot proceed with ordering or providing the requested service without ' \
                              'making adjustments and submitting for further approval.'
+           } }
+      test from: :pas_client_v201_review_submit_attest,
+           config: { options: {
+             workflow_tag: DENIAL_WORKFLOW_TAG
            } }
     end
   end
