@@ -5,9 +5,10 @@ require_relative 'validator_suppressions'
 require_relative 'tags'
 require_relative 'urls'
 require_relative 'endpoints/claim_endpoint'
-require_relative 'endpoints/token'
+require_relative 'endpoints/token_endpoint'
 require_relative 'endpoints/subscription_create_endpoint'
 require_relative 'endpoints/subscription_status_endpoint'
+require_relative 'custom_groups/v2.0.1/client_options'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
 require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
 require_relative 'custom_groups/v2.0.1/pas_client_pended_group'
@@ -16,7 +17,8 @@ require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_pas_
 require_relative 'generated/v2.0.1/pas_client_submit_must_support_use_case_group'
 require_relative 'generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
 require_relative 'custom_groups/v2.0.1/pas_client_registration_group'
-require_relative 'custom_groups/v2.0.1/pas_client_auth_group'
+require_relative 'custom_groups/v2.0.1/pas_client_auth_smart_group'
+require_relative 'custom_groups/v2.0.1/pas_client_auth_udap_group'
 require_relative 'descriptions'
 
 module DaVinciPASTestKit
@@ -54,6 +56,23 @@ module DaVinciPASTestKit
           SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, ''))
         end
       end
+
+      suite_option :client_type,
+                   title: 'Client Security Type',
+                   list_options: [
+                     {
+                       label: 'SMART Backend Services',
+                       value: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+                     },
+                     {
+                       label: 'UDAP B2B Client Credentials',
+                       value: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+                     },
+                     {
+                       label: 'Other',
+                       value: PASClientOptions::DEDICATED_ENDPOINTS
+                     }
+                   ]
 
       route(:get, UDAPSecurityTestKit::UDAP_DISCOVERY_PATH, lambda { |_env|
         UDAPSecurityTestKit::MockUDAPServer.udap_server_metadata(id)
@@ -140,7 +159,15 @@ module DaVinciPASTestKit
         group from: :pas_client_v201_submit_must_support_use_case
         group from: :pas_client_v201_inquiry_must_support_use_case
       end
-      group from: :pas_client_v201_auth
+
+      group from: :pas_client_v201_auth_smart,
+            required_suite_options: {
+              client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+            }
+      group from: :pas_client_v201_auth_udap,
+            required_suite_options: {
+              client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+            }
     end
   end
 end

@@ -36,7 +36,7 @@ module DaVinciPASTestKit
     # - if structured like a token returned by the simulated Auth server, return the client URI
     # - otherwise, use the raw token (provided token)
     def bearer_token_to_wait_identifier(token)
-      client_id = UDAPSecurityTestKit::MockUDAPServer.token_to_client_id(token)
+      client_id = UDAPSecurityTestKit::MockUDAPServer.issued_token_to_client_id(token)
       return client_id if client_id.present?
 
       token

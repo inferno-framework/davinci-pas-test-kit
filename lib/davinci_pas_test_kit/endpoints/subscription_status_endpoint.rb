@@ -9,7 +9,7 @@ module DaVinciPASTestKit
     def test_run_identifier
       return request.params[:session_path] if request.params[:session_path].present?
 
-      UDAPSecurityTestKit::MockUDAPServer.token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
+      UDAPSecurityTestKit::MockUDAPServer.issued_token_to_client_id(request.headers['authorization']&.delete_prefix('Bearer '))
     end
 
     def make_response

@@ -86,12 +86,6 @@ module DaVinciPASTestKit
             optional: true,
             locked: true,
             description: INPUT_SESSION_URL_PATH_LOCKED
-      input :smart_jwk_set,
-            title: 'JSON Web Key Set (JWKS)',
-            type: 'textarea',
-            optional: true,
-            locked: true,
-            description: INPUT_JWK_SET_LOCKED
 
       submit_respond_with :pended_json_response
       inquire_respond_with :inquire_json_response
