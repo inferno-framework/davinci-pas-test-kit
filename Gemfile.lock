@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/inferno-framework/smart-app-launch-test-kit.git
-  revision: 393de824e4af9cc3adb4c2841563d8ecf12a4644
+  revision: e55aeb72d7d668f6c1f4898493306d6500f8eeeb
   branch: client_authorization_code_tests
   specs:
     smart_app_launch_test_kit (0.6.1)
@@ -266,7 +266,7 @@ GEM
     psych (5.2.3)
       date
       stringio
-    public_suffix (6.0.1)
+    public_suffix (6.0.2)
     puma (5.6.9)
       nio4r (~> 2.0)
     racc (1.8.1)

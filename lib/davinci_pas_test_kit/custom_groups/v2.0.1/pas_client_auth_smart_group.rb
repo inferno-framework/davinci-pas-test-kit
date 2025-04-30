@@ -1,5 +1,4 @@
 require 'smart_app_launch_test_kit'
-require_relative 'client_auth/token_smart_verification_test'
 require_relative 'client_options'
 require_relative '../../tags'
 
@@ -20,7 +19,10 @@ module DaVinciPASTestKit
       run_as_group
 
       # smart auth verification
-      test from: :pas_client_v201_token_smart_verification
+      test from: :smart_client_token_request_bsca_verification,
+           config: {
+             options: { endpoint_suite_id: :davinci_pas_client_suite_v201 }
+           }
       test from: :smart_client_token_use_verification,
            config: {
              options: { access_request_tags: [SUBMIT_TAG, INQUIRE_TAG] }
