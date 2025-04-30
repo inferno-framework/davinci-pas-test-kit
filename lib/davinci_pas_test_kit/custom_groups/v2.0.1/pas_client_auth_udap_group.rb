@@ -1,5 +1,5 @@
 require 'udap_security_test_kit'
-require_relative 'client_auth/token_udap_verification_test'
+require_relative '../../client_suite'
 require_relative '../../tags'
 
 module DaVinciPASTestKit
@@ -19,7 +19,10 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      test from: :pas_client_v201_token_udap_verification
+      test from: :udap_client_token_request_cc_verification,
+           config: {
+             options: { endpoint_suite_id: :davinci_pas_client_suite_v201 }
+           }
       test from: :udap_client_token_use_verification,
            config: {
              options: { access_request_tags: [SUBMIT_TAG, INQUIRE_TAG] }

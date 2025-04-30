@@ -1,8 +1,7 @@
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
+require_relative '../../client_suite'
 require_relative 'client_options'
-require_relative 'client_registration/udap_interaction_test'
-require_relative 'client_registration/udap_verification_test'
 require_relative 'client_registration/configuration_display_smart_test'
 require_relative 'client_registration/configuration_display_udap_test'
 require_relative 'client_registration/configuration_display_other_test'
@@ -52,13 +51,19 @@ module DaVinciPASTestKit
            }
 
       # udap registration tests
-      test from: :pas_client_v201_reg_udap_interaction,
+      test from: :udap_client_registration_interaction,
            required_suite_options: {
              client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+           },
+           config: {
+             options: { endpoint_suite_id: :davinci_pas_client_suite_v201 }
            }
-      test from: :pas_client_v201_reg_udap_verification,
+      test from: :udap_client_registration_cc_verification,
            required_suite_options: {
              client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+           },
+           config: {
+             options: { endpoint_suite_id: :davinci_pas_client_suite_v201 }
            }
       test from: :pas_client_v201_reg_config_udap_display,
            required_suite_options: {
