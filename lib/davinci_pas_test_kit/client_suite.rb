@@ -12,8 +12,7 @@ require_relative 'custom_groups/v2.0.1/client_options'
 require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
 require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
 require_relative 'custom_groups/v2.0.1/pas_client_pended_group'
-require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_create_test'
-require_relative 'custom_groups/v2.0.1/client_tests/pas_client_subscription_pas_conformance_test'
+require_relative 'custom_groups/v2.0.1/pas_client_subscription_setup_group'
 require_relative 'generated/v2.0.1/pas_client_submit_must_support_use_case_group'
 require_relative 'generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
 require_relative 'custom_groups/v2.0.1/pas_client_registration_group'
@@ -110,20 +109,7 @@ module DaVinciPASTestKit
 
       group from: :pas_client_v201_registration
 
-      group do
-        title 'Subscription Setup'
-        description %(
-        These tests verify that the client can create a Subscription instance
-        that will tell the Payer how to notify the client when pended claims
-        are updated.
-      )
-        run_as_group
-
-        test from: :pas_client_v201_subscription_create_test
-        test from: :subscriptions_r4_client_subscription_verification
-        test from: :pas_client_v201_subscription_pas_conformance_test
-        test from: :subscriptions_r4_client_handshake_notification_verification
-      end
+      group from: :pas_client_v201_subscription_setup
 
       group do
         title 'PAS Workflows'
