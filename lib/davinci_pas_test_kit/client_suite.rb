@@ -9,12 +9,9 @@ require_relative 'endpoints/token_endpoint'
 require_relative 'endpoints/subscription_create_endpoint'
 require_relative 'endpoints/subscription_status_endpoint'
 require_relative 'custom_groups/v2.0.1/client_options'
-require_relative 'custom_groups/v2.0.1/pas_client_approval_group'
-require_relative 'custom_groups/v2.0.1/pas_client_denial_group'
-require_relative 'custom_groups/v2.0.1/pas_client_pended_group'
+require_relative 'custom_groups/v2.0.1/pas_client_workflows_group'
+require_relative 'custom_groups/v2.0.1/pas_client_must_support_group'
 require_relative 'custom_groups/v2.0.1/pas_client_subscription_setup_group'
-require_relative 'generated/v2.0.1/pas_client_submit_must_support_use_case_group'
-require_relative 'generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
 require_relative 'custom_groups/v2.0.1/pas_client_registration_group'
 require_relative 'custom_groups/v2.0.1/pas_client_auth_smart_group'
 require_relative 'custom_groups/v2.0.1/pas_client_auth_udap_group'
@@ -109,41 +106,46 @@ module DaVinciPASTestKit
 
       group from: :pas_client_v201_registration
 
-      group from: :pas_client_v201_subscription_setup
-
-      group do
-        title 'PAS Workflows'
-        description %(
-        The workflow tests verify that the client can participate in complete end-to-end prior
-        authorization interactions, initiating requests and reacting appropriately to the
-        responses returned.
-      )
-
-        group from: :pas_client_v201_approval_group
-        group from: :pas_client_v201_denial_group
-        group from: :pas_client_v201_pended_group
+      # SMART test groups (with :session_url_path input removed)
+      group from: :pas_client_v201_subscription_setup, id: :pas_client_v201_subscription_setup_smart do
+        required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+      end
+      group from: :pas_client_v201_workflows, id: :pas_client_v201_workflows_smart do
+        required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+      end
+      group from: :pas_client_v201_must_support, id: :pas_client_v201_must_support_smart do
+        required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
       end
 
-      group do
-        title 'Must Support Elements'
-        description %(
-        During these tests, the client will show that it supports all PAS-defined profiles and the must support
-        elements defined in them. This includes
+      # UDAP test groups (with :session_url_path input removed)
+      group from: :pas_client_v201_subscription_setup, id: :pas_client_v201_subscription_setup_udap do
+        required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+      end
+      group from: :pas_client_v201_workflows, id: :pas_client_v201_workflows_udap do
+        required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+      end
+      group from: :pas_client_v201_must_support, id: :pas_client_v201_must_support_udap do
+        required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+      end
 
-        - The ability to make prior authorization submission and inquiry requests that contain all
-          PAS-defined profiles and their must support elements.
-        - The ability to receive in responses to those requests all PAS-defined profiles and their
-          must support elements and continue the prior authorization workflow as appropriate (not currently
-          implemented in these tests).
-
-        Clients under test will be asked to make additional requests to Inferno demonstrating coverage
-        of all must support items in the requests. Note that Inferno will consider requests made during
-        the workflow group of tests, so only profiles and must support elements not demonstrated during
-        those tests need to be submitted as a part of these.
-      )
-
-        group from: :pas_client_v201_submit_must_support_use_case
-        group from: :pas_client_v201_inquiry_must_support_use_case
+      # Dedicated Endpoints test groups (with :client_id input removed)
+      group from: :pas_client_v201_subscription_setup, id: :pas_client_v201_subscription_setup_no_auth do
+        required_suite_options client_type: PASClientOptions::DEDICATED_ENDPOINTS
+        PASClientOptions.recursive_remove_input(self, :client_id)
+      end
+      group from: :pas_client_v201_workflows, id: :pas_client_v201_workflows_no_auth do
+        required_suite_options client_type: PASClientOptions::DEDICATED_ENDPOINTS
+        PASClientOptions.recursive_remove_input(self, :client_id)
+      end
+      group from: :pas_client_v201_must_support, id: :pas_client_v201_must_support_no_auth do
+        required_suite_options client_type: PASClientOptions::DEDICATED_ENDPOINTS
+        PASClientOptions.recursive_remove_input(self, :client_id)
       end
 
       group from: :pas_client_v201_auth_smart,
