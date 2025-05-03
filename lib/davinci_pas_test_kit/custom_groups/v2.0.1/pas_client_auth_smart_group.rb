@@ -13,8 +13,8 @@ module DaVinciPASTestKit
         and that the client under test was able to use provided access tokens to make PAS
         requests.
 
-        Before running these tests, perform at least one PAS workflow group so that the client
-        will request an access token and use it on a PAS request.
+        Before running these tests, execute the tests for at least one "PAS workflows" sub-group
+        so that the client will request an access token and use it on a PAS request.
       )
       run_as_group
 

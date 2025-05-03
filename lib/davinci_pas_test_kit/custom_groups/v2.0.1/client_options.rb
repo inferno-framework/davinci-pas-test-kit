@@ -13,7 +13,7 @@ module DaVinciPASTestKit
         SMARTAppLaunch::SMARTClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
       UDAP_CLIENT_CREDENTIALS =
         UDAPSecurityTestKit::UDAPClientOptions::UDAP_CLIENT_CREDENTIALS
-      DEDICATED_ENDPOINTS = DEDICATED_ENDPOINTS_AUTH_TAG
+      OTHER_AUTH = OTHER_AUTH_TAG
 
       def recursive_remove_input(runnable, input)
         runnable.inputs.delete(input)

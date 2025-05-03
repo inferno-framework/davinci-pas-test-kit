@@ -65,8 +65,8 @@ module DaVinciPASTestKit
                        value: PASClientOptions::UDAP_CLIENT_CREDENTIALS
                      },
                      {
-                       label: 'Other',
-                       value: PASClientOptions::DEDICATED_ENDPOINTS
+                       label: 'Other Authentication',
+                       value: PASClientOptions::OTHER_AUTH
                      }
                    ]
 
@@ -110,42 +110,51 @@ module DaVinciPASTestKit
       group from: :pas_client_v201_subscription_setup, id: :pas_client_v201_subscription_setup_smart do
         required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
         PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
       end
       group from: :pas_client_v201_workflows, id: :pas_client_v201_workflows_smart do
         required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
         PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
       end
       group from: :pas_client_v201_must_support, id: :pas_client_v201_must_support_smart do
         required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
         PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
       end
 
       # UDAP test groups (with :session_url_path input removed)
       group from: :pas_client_v201_subscription_setup, id: :pas_client_v201_subscription_setup_udap do
         required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
         PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
       end
       group from: :pas_client_v201_workflows, id: :pas_client_v201_workflows_udap do
         required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
         PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
       end
       group from: :pas_client_v201_must_support, id: :pas_client_v201_must_support_udap do
         required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
         PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
       end
 
       # Dedicated Endpoints test groups (with :client_id input removed)
       group from: :pas_client_v201_subscription_setup, id: :pas_client_v201_subscription_setup_no_auth do
-        required_suite_options client_type: PASClientOptions::DEDICATED_ENDPOINTS
+        required_suite_options client_type: PASClientOptions::OTHER_AUTH
         PASClientOptions.recursive_remove_input(self, :client_id)
+        config(inputs: { session_url_path: { optional: false } })
       end
       group from: :pas_client_v201_workflows, id: :pas_client_v201_workflows_no_auth do
-        required_suite_options client_type: PASClientOptions::DEDICATED_ENDPOINTS
+        required_suite_options client_type: PASClientOptions::OTHER_AUTH
         PASClientOptions.recursive_remove_input(self, :client_id)
+        config(inputs: { session_url_path: { optional: false } })
       end
       group from: :pas_client_v201_must_support, id: :pas_client_v201_must_support_no_auth do
-        required_suite_options client_type: PASClientOptions::DEDICATED_ENDPOINTS
+        required_suite_options client_type: PASClientOptions::OTHER_AUTH
         PASClientOptions.recursive_remove_input(self, :client_id)
+        config(inputs: { session_url_path: { optional: false } })
       end
 
       group from: :pas_client_v201_auth_smart,
