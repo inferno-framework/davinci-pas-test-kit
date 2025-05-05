@@ -1,5 +1,5 @@
 require 'smart_app_launch_test_kit'
-require_relative 'client_options'
+require_relative 'pas_client_options'
 require_relative '../../tags'
 
 module DaVinciPASTestKit

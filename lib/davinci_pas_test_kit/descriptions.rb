@@ -7,7 +7,4 @@ module DaVinciPASTestKit
   INPUT_SESSION_URL_PATH_LOCKED =
     'The additional path used to create session-specific endpoints. Run the ' \
     '**1** Client Registration group to configure this input.'
-  INPUT_JWK_SET_LOCKED =
-    'Either a publicly accessible url pointing to the JSON Web Key Set (JWKS), or the ' \
-    'raw JWKS. Run the **1** Client Registration group to configure this input.'
 end

@@ -95,7 +95,7 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 Group "Denial Workflow" can be run in the same manner. To run the "Pended Workflow" group,
 first run the "Subscription Setup" group, during which the client system will submit a
 Subscription so that Inferno knows how and where to send a notification that a decision has
-been rendered on a pended prior authorization request. The proceed to execute the 
+been rendered on a pended prior authorization request. Then proceed to execute the 
 "Pended Workflow" group and follow the instructions in the dialogs that appear.
 
 ### Postman-based Demonstration

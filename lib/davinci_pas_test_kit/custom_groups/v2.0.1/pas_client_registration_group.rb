@@ -1,10 +1,10 @@
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
 require_relative '../../client_suite'
-require_relative 'client_options'
-require_relative 'client_registration/configuration_display_smart_test'
-require_relative 'client_registration/configuration_display_udap_test'
-require_relative 'client_registration/configuration_display_other_test'
+require_relative 'pas_client_options'
+require_relative 'client_registration/configuration_smart_display_test'
+require_relative 'client_registration/configuration_udap_display_test'
+require_relative 'client_registration/configuration_other_display_test'
 require_relative 'client_registration/other_auth_attest_test'
 
 module DaVinciPASTestKit
