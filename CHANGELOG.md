@@ -1,3 +1,15 @@
+# 0.13.0
+
+This incorporates SMART and UDAP authentication, Subscriptions, requirements documentation, and Inferno Core updates.
+
+* FI-3828: Add PAS Server verifies_requirements by @elsaperelli in https://github.com/inferno-framework/davinci-pas-test-kit/pull/29
+* Add verifies_requirements to the generator by @elsaperelli in https://github.com/inferno-framework/davinci-pas-test-kit/pull/32
+* FI-3625: Incorporate subscriptions into server suite by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/31
+* Client auth by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/27
+* Remove client verifies_requirements from server tests by @elsaperelli in https://github.com/inferno-framework/davinci-pas-test-kit/pull/34
+* FI-3813: Use core MustSupport features by @dehall in https://github.com/inferno-framework/davinci-pas-test-kit/pull/33
+* FI-4053: Suite options for client auth by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/36
+
 # 0.12.2
 
 * FI-3818: Add verifies_requirements to client suite by @elsaperelli in https://github.com/inferno-framework/davinci-pas-test-kit/pull/28

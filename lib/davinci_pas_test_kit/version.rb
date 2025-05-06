@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module DaVinciPASTestKit
-  VERSION = '0.12.2'
-  LAST_UPDATED = '2025-03-19'
+  VERSION = '0.13.0'
+  LAST_UPDATED = '2025-05-06'
 end
