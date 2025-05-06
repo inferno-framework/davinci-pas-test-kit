@@ -8,15 +8,18 @@ require_relative '../tags'
 module DaVinciPASTestKit
   module MockUdapSmartServer
     class TokenEndpoint < Inferno::DSL::SuiteEndpoint
+      include SMARTAppLaunch::MockSMARTServer::SMARTTokenResponseCreation
+      include UDAPSecurityTestKit::MockUDAPServer::UDAPTokenResponseCreation
+
       def test_run_identifier
         UDAPSecurityTestKit::MockUDAPServer.client_id_from_client_assertion(request.params[:client_assertion])
       end
 
       def make_response
         if request.params[:udap].present?
-          UDAPSecurityTestKit::MockUDAPServer.make_udap_token_response(request, response, test_run.test_session_id)
+          make_udap_client_credential_token_response
         else
-          SMARTAppLaunch::MockSMARTServer.make_smart_token_response(request, response, result)
+          make_smart_client_credential_token_response
         end
       end
 
@@ -26,7 +29,7 @@ module DaVinciPASTestKit
 
       def tags
         type_tag = request.params[:udap].present? ? UDAPSecurityTestKit::UDAP_TAG : SMARTAppLaunch::SMART_TAG
-        [UDAPSecurityTestKit::TOKEN_TAG, type_tag]
+        [UDAPSecurityTestKit::TOKEN_TAG, UDAPSecurityTestKit::CLIENT_CREDENTIALS_TAG, type_tag]
       end
     end
   end

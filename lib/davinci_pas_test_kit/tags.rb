@@ -13,4 +13,5 @@ module DaVinciPASTestKit
   SUBSCRIPTION_STATUS_TAG = 'subscription_status'
   REST_HOOK_HANDSHAKE_NOTIFICATION_TAG = 'rest_hook_handshake_notification'
   REST_HOOK_EVENT_NOTIFICATION_TAG = 'rest_hook_event_notification'
+  OTHER_AUTH_TAG = 'other_auth'
 end

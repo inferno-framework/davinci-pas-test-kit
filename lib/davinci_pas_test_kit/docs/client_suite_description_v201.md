@@ -72,24 +72,31 @@ To reduce configuration burden, the dedicated endpoints can be reused in subsequ
 To execute a simple set of tests with minimal setup and input, perform an approval workflow using
 inferno-generated responses and dedicated session-specific endpoints with the following steps:
 
-1. Select the "**3.1** Approval Workflow" group from the list at the left.
-2. Click the "RUN TESTS" button in the upper right.
-3. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
-4. Submit a PAS prior authorization request to the endpoint shown in the wait
+1. Create a Da Vinci PAS Client Suite v2.0.1 session using the "Other Authentication" option
+   for the Client Security Type.
+1. Select the "Client Registration" group from the list at the left and and click
+   the "RUN TESTS" button in the upper right.
+1. Optionally provide a value for the **Session-specific URL path extension** input to
+   specify the extra path for the dedicated session endpoint or leave blank to let
+   Inferno generate a value for you. Then click the "SUBMIT" button at the bottom right.
+1. Attest to an alternate authentication approach in the wait dialog that appears and
+   then configure your client to connect to the Inferno FHIR server subsequently displayed
+   and click the link continue.
+1. Select the "Approval Workflow" group from the list at the left and click
+   the "RUN TESTS" button in the upper right.
+1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
+1. Submit a PAS prior authorization request to the endpoint shown in the wait
    dialog that appears.
-5. When another wait dialog appears, check your system to see whether Inferno's response
+1. When another wait dialog appears, check your system to see whether Inferno's response
    was interpreted as an approval or not and click the appropriate link in the dialog.
-6. Review the results including any errors or warnings found when checking the conformance
+1. Review the results including any errors or warnings found when checking the conformance
    of the request or the generated response.
 
-Group "**3.2** Denial Workflow" can be run in the same manner. Other tests require additional setup:
-- To run the "**3.3** Pended Workflow" group, first run the "**2** Subscription Setup" group, during
-  which the client system will submit a Subscription so that Inferno knows how and where to
-  send a notification that a decision has been rendered on a pended prior authorization request.
-- To setup up standards-based authentication, run the "**1** Client Registration" group as described in the
-  **Authentication Configuration** section below. This test must be run along with at least one
-  workflow test using the configured authentication approach before running the
-  "**5** Authentication Interactions" group.
+Group "Denial Workflow" can be run in the same manner. To run the "Pended Workflow" group,
+first run the "Subscription Setup" group, during which the client system will submit a
+Subscription so that Inferno knows how and where to send a notification that a decision has
+been rendered on a pended prior authorization request. Then proceed to execute the 
+"Pended Workflow" group and follow the instructions in the dialogs that appear.
 
 ### Postman-based Demonstration
 
@@ -99,7 +106,8 @@ to make requests against Inferno and see the mocked responses provided by Infern
 the collection into the [Postman app](https://www.postman.com/downloads/) and follow these steps:
 
 1. Start a Da Vinci PAS Client Suite v2.0.1 session from the [PAS Test Kit page on 
-   inferno.healthit.gov](https://inferno.healthit.gov/test-kits/davinci-pas/).
+   inferno.healthit.gov](https://inferno.healthit.gov/test-kits/davinci-pas/),
+   choosing the "Other Authentication" option for the Client Security Type.
 2. Click the *Run All Tests* button in the upper right hand corner of the suite.
 3. Client Registration
    - In the **Session-specific URL path extension** input, put a short alpha string, such as `demo`
@@ -154,12 +162,12 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    requests to demonstrate must support elements. This demo does not have any additional requests
    and does not attempt to demonstrate all must support elements, so click the link to indicate
    you are done submitting requests for each. Note that requests submitted during the workflow section
-   will be evaluated and you can inspect the results under test **3.2** Demonstrate Element Support
+   will be evaluated and you can inspect the results under the Demonstrate Element Support test
    to see both passing and failing tests.
 1. Once Inferno finishes evaluating the requests, the test will complete allowing you to review the
    results, including warning and error messages as well as requests associated with each test.
 
-The tests are expected to pass with the exception of the Must Support tests in groups 4.1 and 4.2.
+The tests are expected to pass with the exception of the Must Support tests.
 
 #### Optional Demo Modification: full-resource Subscription
 
@@ -170,8 +178,8 @@ under the `_payload` element).
 
 #### Optional Demo Modification: SMART Backend Services Auth
 
-To use SMART Backend Services with the demo, replace the 3. Client Registration steps above with the
-following:
+To use SMART Backend Services with the demo, choose the "SMART Backend Services" Client Security Type
+option and replace the 3. Client Registration steps above with the following:
 
 - In the **SMART JSON Web Key Set (JWKS)** input, put `https://inferno.healthit.gov/suites/custom/smart_stu2_2/.well-known/jwks.json`
 - In the **Client Id** input, put `pas_demo_smart`
@@ -199,13 +207,13 @@ following:
 
 Continue the tests according to step 4 around Subscription creation in the above instructions.
 
-In this demonstration, test **5.2.01** Verify SMART Token Requests will also fail due to invalid
-token requests sent intentionally by the SMART Backend Services tests.
+In this demonstration, the "Verify SMART Token Requests" test will also fail due to invalid
+token requests sent intentionally by the SMART Backend Services server tests.
 
 #### Optional Demo Modification: UDAP Client Credentials Auth
 
-To use the UDAP Client Credentials with the demo, replace the 3. Client Registration steps above with the
-following:
+To use the UDAP Client Credentials with the demo, choose the "UDAP B2B Client Credentials" Client
+Security Type option and replace the 3. Client Registration steps above with the following:
 
 - In the **UDAP Client URI** input, put `http://localhost:4567/custom/udap_security/fhir`
 - Click the **SUBMIT** button and a wait dialog will display asking the tester to perform UDAP dynamic
@@ -229,45 +237,36 @@ following:
 
 Continue the tests according to step 4 around Subscription creation in the above instructions.
 
-In this demonstration, test **5.1.01** Verify UDAP Token Requests may fail due to expired signatures
-if the test session has taken long enough.
+In this demonstration, the "Verify UDAP Client Credentials Token Requests" test may fail due
+to expired signatures if the test session has taken long enough.
 
 ## Auth Configuration Details
 
-When running these tests there are 4 options for authentication or allowing 
-Inferno to identify which session the requests are for. Inputs that setup these
-options will be provided by the tester as a part of running the **1**
-Client Registration group. For all other groups, the authentication-related inputs are locked
-so that they cannot be changed. Running the  **1** Client Registration group again will
-enable updates.
+When running these tests there are 3 options for authentication, which also allows 
+Inferno to identify which session the requests are for. The choice is made when the
+session is created with the selected Client Security Type option, which determines
+what details the tester needs to provide during the Client Registration tests:
 
-The options and the related inputs are:
-1. **UDAP B2B client credentials flow**: the system under test will dynamically register
-   with Inferno and request access tokens used to access FHIR endpoints
-   as per the UDAP specification. It requires the **UDAP Client URI** input
-   to be populated with the URI that the client will use when dynamically
-   registering with Inferno. This will be used to generate a client id.
-2. **SMART Backend Services**: the system under test will manually register
-   with Inferno and request access token used to access FHIR endpoints
-   as per the SMART Backend Services specification. It requires the
-   **SMART JSON Web Key Set (JWKS)** to be populated with either a URL that resolves
-   to a JWKS or a raw JWKS in JSON format. Additionally, testers may provide
-   a **Client Id** if they want to use a specific one.
-3. **Both UDAP and SMART**: the system under test will register as both a SMART
-   and a UDAP client, using the same client id for both. If this path is chosen
-   both authentication approaches will need to be demonstrated during the
-   subsequent tests. The inputs for both options 1 and 2 are needed. In this case,
-   the tester cannot specify a **Client Id** as the one generated for UDAP will
-   be used.
-4. **Dedicated Endpoints**: Inferno will create a dedicated set of FHIR endpoints for this session
-   so that the system under test does not need to get access tokens or provide
-   them during these tests. Since PAS requires authentication of client systems,
-   testers will be asked to attest that their system supports another form of
-   authentication, such as mutual authentication TLS. This approach requires the
-   **Session-specific URL path extension** input to be populated with a string
-   used to create a session-specific URL. This value can be re-used across sessions.
-   If not provided, a default will be generated. If the inputs associated with the
-   SMART or UDAP approaches are populated, this one will be blanked out.
+- **SMART Backend Services**: the system under test will manually register
+  with Inferno and request access token used to access FHIR endpoints
+  as per the SMART Backend Services specification. It requires the
+  **SMART JSON Web Key Set (JWKS)** input to be populated with either a URL that resolves
+  to a JWKS or a raw JWKS in JSON format. Additionally, testers may provide
+  a **Client Id** if they want their client assigned a specific one.
+- **UDAP B2B Client Credentials**: the system under test will dynamically register
+  with Inferno and request access tokens used to access FHIR endpoints
+  as per the UDAP specification. It requires the **UDAP Client URI** input
+  to be populated with the URI that the client will use when dynamically
+  registering with Inferno. This will be used to generate a client id (each
+  unique UDAP Client URI will always get the same client id).
+- **Other Authentication**: Inferno will create a dedicated set of FHIR endpoints for this session
+  so that the system under test does not need to get access tokens or provide
+  them when interacting with Inferno during these tests. Since PAS requires
+  authentication of client systems, testers will be asked to attest that their
+  system supports another form of authentication, such as mutual authentication TLS.
+  This approach uses the **Session-specific URL path extension** input to create a
+  session-specific URL. This input can be provided for re-use across sessions, or
+  left blank to have Inferno generate a value.
 
 ## Response and Notification Content
 
@@ -297,7 +296,7 @@ know ahead of time. These modifications fall into two categories:
     then Inferno will update the focus to use the ClaimResponse id that it generates.
 
 If the tester provides an input that is malformed in some way such that Inferno cannot get the details
-that Inferno needs to make the modifications, then the raw input will be used.
+that it needs to make the modifications, then the raw input will be used.
 
 ### Response and Notification Correspondence Requirements
 
@@ -313,20 +312,20 @@ and working messages for Inferno to use.
 ### Tester-provided Response and Notification Inputs
 
 The following test inputs control Inferno messaging behavior:
-- **Claim approved response JSON**: If populated, this is used in the "**2.2.1** Approval Workflow" group
+- **Claim approved response JSON**: If populated, this is used in the "Approval Workflow" group
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been approved.
-- **Claim denied response JSON**: If populated, this used in the "**2.2.2** Denial Workflow" group
+- **Claim denied response JSON**: If populated, this used in the "Denial Workflow" group
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been denied.
-- **Claim pended response JSON**: If populated, this used in the "**2.2.3** Pended Workflow" group
+- **Claim pended response JSON**: If populated, this used in the "Pended Workflow" group
   to respond to `$submit` requests. The response needs to indicate to the system that the prior auth request has
   been pended.
-- **Claim updated notification JSON**: If populated, this used in the "**2.2.3** Pended Workflow" group
+- **Claim updated notification JSON**: If populated, this used in the "Pended Workflow" group
   as the event notification sent for the Subscription indicating that a decision has been finalized for the
   pended prior auth request. The content of the notification needs to match the details of the Subscription
-  provided in the "**2.1** Subscription Setup" group.
-- **Inquire approved response JSON**: If populated, this used in the "**2.2.3** Pended Workflow"
+  provided in the "Subscription Setup" group.
+- **Inquire approved response JSON**: If populated, this used in the "Pended Workflow"
   group to respond to `$inquire` requests. The response needs to indicate to the system that the
   prior auth request has been approved.
 
