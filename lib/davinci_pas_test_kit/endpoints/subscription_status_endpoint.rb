@@ -16,7 +16,7 @@ module DaVinciPASTestKit
 
     def make_response
       if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
-        update_response_for_expired_token(response)
+        UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response)
         return
       end
 
