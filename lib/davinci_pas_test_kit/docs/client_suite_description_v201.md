@@ -248,7 +248,7 @@ session is created with the selected Client Security Type option, which determin
 what details the tester needs to provide during the Client Registration tests:
 
 - **SMART Backend Services**: the system under test will manually register
-  with Inferno and request access token used to access FHIR endpoints
+  with Inferno and request access tokens for use when accessing FHIR endpoints
   as per the SMART Backend Services specification. It requires the
   **SMART JSON Web Key Set (JWKS)** input to be populated with either a URL that resolves
   to a JWKS or a raw JWKS in JSON format. Additionally, testers may provide
