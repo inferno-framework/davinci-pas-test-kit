@@ -1,3 +1,9 @@
+# 0.13.1
+* Fix expired token responses by @karlnaden in
+  https://github.com/inferno-framework/davinci-pas-test-kit/pull/38
+* FI-3497: Check for correct adjudication decision code by @tstrass in
+  https://github.com/inferno-framework/davinci-pas-test-kit/pull/39
+
 # 0.13.0
 
 This incorporates SMART and UDAP authentication, Subscriptions, requirements documentation, and Inferno Core updates.
