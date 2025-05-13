@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    davinci_pas_test_kit (0.13.0)
+    davinci_pas_test_kit (0.13.1)
       inferno_core (~> 0.6.8)
       smart_app_launch_test_kit (~> 0.6.2)
       subscriptions_test_kit (~> 0.11.0)
