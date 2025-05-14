@@ -1,7 +1,7 @@
 **[Documentation Home](Home)**
 
 **Using this Test Kit**
-*   [Getting Started](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/README.md#how-to-run)
+*   [Getting Started](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/README.md#getting-started)
 *   [Test Kit Overview](Overview)
 *   [Client Testing Walkthrough](Client-Walkthrough)
 *   [Server Testing Walkthrough](Server-Walkthrough)
