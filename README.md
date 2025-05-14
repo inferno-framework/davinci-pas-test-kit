@@ -21,7 +21,7 @@ Framework](https://inferno-framework.github.io/). The Inferno Framework is
 designed for reuse and aims to make it easier to build test kits for any
 FHIR-based data exchange.
 
-**For comprehensive documentation, including detailed guides, overviews, and technical references, please see our [Main Documentation Hub](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).**
+**For comprehensive documentation, including detailed guides, overviews, and technical references, please see our [Da Vinci PAS Test Kit Main Documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).**
 
 ## Status
 
@@ -65,9 +65,9 @@ are run, or within this repository for the
 [server](./tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#running-the-tests) and
 [client](./tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#running-the-tests).
 
-### ONC Hosted Instance
+### ASTP Hosted Instance
 
-You can run the PAS test kit via the [ONC Inferno](https://inferno.healthit.gov/test-kits/davinci-pas/) website by choosing the “Da Vinci Prior Authorization Support (PAS) v2.0.1” test kit.
+You can run the PAS test kit via the ASTP hosted public [Inferno on HealthIT.gov](https://inferno.healthit.gov/test-kits/davinci-pas/) site.
 
 ### Local Inferno Instance
 
@@ -85,18 +85,6 @@ We welcome feedback on the tests, including but not limited to the following are
 - User experience, such as confusing or missing information in the test UI.
 
 Please report any issues with this set of tests in the issues section of this repository.
-
-## Development
-
-To make updates and additions to this test kit, see the 
-[Inferno Framework Documentation](https://inferno-framework.github.io/docs/),
-particularly the instructions on 
-[development with Ruby](https://inferno-framework.github.io/docs/getting-started/#development-with-ruby).
-
-### Test Generation
-
-The DaVinci PAS Test Kit utilizes a test generator to create many of its tests from the IG's capability statement and profiles.
-For detailed instructions on how to use the generator to create tests for different IG versions, please see the [Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide).
 
 ## License
 
