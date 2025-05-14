@@ -76,7 +76,7 @@ When making changes to the test kit itself, it's important to ensure the changes
 *   **Follow Existing Patterns**: Try to adhere to the coding style and architectural patterns already present in the test kit and the Inferno Framework.
 *   **Write RSpec Tests**: For new logic or significant changes, add corresponding RSpec tests.
 *   **Keep Documentation Updated**: Ensure your contributions are reflected in the documentation.
-*   **Report Issues**: Use the [GitHub Issues page](https://github.com/HL7/davinci-pas-test-kit/issues) for the repository to report bugs or suggest enhancements.
+*   **Report Issues**: Use the [GitHub Issues page](https://github.com/inferno-framework/davinci-pas-test-kit/issues) for the repository to report bugs or suggest enhancements.
 *   **Pull Requests**: Submit changes via pull requests for review.
 *   **Update Documentation**: Please be sure to update all suite descriptions, test descriptions, the README, and the contents of the `./docs` folder of this repository along with code changes.
 
