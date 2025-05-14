@@ -59,8 +59,13 @@ module DaVinciPASTestKit
         request before submitting them
 
       For additional details on these and other areas where the tests may not align with
-      the IGs requirements, see documentation in the test kit source code ([client](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations), [server](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)), and [this requirements analysis
-      spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx).
+      the IGs requirements, see our detailed documentation:
+      - [Test Kit Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview#test-scope-and-limitations)
+      - [Client Suite Description](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations)
+      - [Server Suite Description](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
+      - [PAS Requirements Interpretation Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx)
+
+      The [main documentation site](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/) can be found on our GitHub Wiki.
 
       ### Known IG Issues
 
