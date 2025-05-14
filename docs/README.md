@@ -18,8 +18,8 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 ## Reference Documents
 
 *   **[PAS Requirements Interpretation](./PAS Requirements Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
-*   **[Client Test Suite Description (v2.0.1)](./client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
-*   **[Server Test Suite Description (v2.0.1)](./server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
+*   **[Client Test Suite Description (v2.0.1)](./lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
+*   **[Server Test Suite Description (v2.0.1)](./lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
 
 ## Support
 

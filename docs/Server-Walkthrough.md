@@ -60,4 +60,4 @@ This section details how to configure and run the tests against your own PAS ser
 6.  **Review Results**:
     *   After the tests complete, carefully review the results in Inferno. Pay close attention to any failures or warnings, as they indicate potential non-conformance with the PAS IG. The details of each test execution, including requests sent and responses received, can be inspected.
 
-Refer to the [Server Test Suite Description](./server_suite_description_v201.md) for more in-depth explanations of each input field, authentication, and specific testing limitations.
+Refer to the [Server Test Suite Description](./lib/davinci_pas_test_kit/docs/server_suite_description_v201.md) for more in-depth explanations of each input field, authentication, and specific testing limitations.
