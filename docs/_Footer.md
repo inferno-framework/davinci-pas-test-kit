@@ -1,4 +1,5 @@
----
-*This documentation is maintained in the `lib/davinci_pas_test_kit/docs/` directory of the [Da Vinci PAS Test Kit GitHub repository](https://github.com/HL7/davinci-pas-test-kit). Edits should be made there and will be automatically synchronized with the Wiki (if configured).*
-
-*Last updated: {{ GITHUB_PAGE_LAST_MODIFIED_DATE }}*
+_Test kit documentation is stored within the [./docs](../tree/main/docs) folder of
+this repository and is automatically synchronized to this wiki with each update
+to the `main` branch using the [Publish Docs Wiki
+workflow](../actions/workflows/publish-docs-wiki.yml).  Do not change content
+within this wiki directly as changes will be overwritten._

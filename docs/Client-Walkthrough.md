@@ -50,7 +50,7 @@ This example demonstrates a basic approval workflow with Inferno-generated respo
 
 If you don't have a PAS client ready, you can use the provided Postman collection to simulate client requests and interact with Inferno.
 
-*   **Postman Collection**: [PAS Client Suite Demonstration.postman_collection.json](./demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
+*   **Postman Collection**: [PAS Client Suite Demonstration.postman_collection.json](../lib/davinci_pas_test_kit/docs/demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
 *   **Postman App**: Download from [postman.com/downloads](https://www.postman.com/downloads/)
 
 **Steps:**
@@ -115,4 +115,4 @@ If you don't have a PAS client ready, you can use the provided Postman collectio
 9.  **Review Final Results**:
     *   Once Inferno finishes, review the complete test results. Some Must Support tests might fail if the demo requests didn't cover all elements.
 
-Refer to the [Client Test Suite Description](./client_suite_description_v201.md) for more details on authentication options (SMART, UDAP) and providing custom responses.
+Refer to the [Client Test Suite Description](../lib/davinci_pas_test_kit/docs/client_suite_description_v201.md) for more details on authentication options (SMART, UDAP) and providing custom responses.

@@ -4,7 +4,7 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 
 ## Using this Test Kit
 
-*   **[Getting Started](../README.md#getting-started)**: Instructions on how to set up and run the test kit. (Link to root README section)
+*   **[Getting Started](../README.md#how-to-run)**: Instructions on how to set up and run the test kit. (Link to root README section)
 *   **[Test Kit Overview](./Overview.md)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 *   **[Client Testing Walkthrough](./Client-Walkthrough.md)**: Step-by-step guide for testing client systems.
 *   **[Server Testing Walkthrough](./Server-Walkthrough.md)**: Step-by-step guide for testing server systems.
@@ -17,9 +17,9 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 
 ## Reference Documents
 
-*   **[PAS Requirements Interpretation](./PAS Requirements Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
-*   **[Client Test Suite Description (v2.0.1)](./lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
-*   **[Server Test Suite Description (v2.0.1)](./lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
+*   **[PAS Requirements Interpretation](./PAS%20Requirements%20Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
+*   **[Client Test Suite Description (v2.0.1)](../lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
+*   **[Server Test Suite Description (v2.0.1)](../lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
 
 ## Support
 
