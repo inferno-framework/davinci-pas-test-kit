@@ -4,22 +4,22 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 
 ## Using this Test Kit
 
-*   **[Getting Started](../README.md#how-to-run)**: Instructions on how to set up and run the test kit. (Link to root README section)
-*   **[Test Kit Overview](./Overview.md)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
-*   **[Client Testing Walkthrough](./Client-Walkthrough.md)**: Step-by-step guide for testing client systems.
-*   **[Server Testing Walkthrough](./Server-Walkthrough.md)**: Step-by-step guide for testing server systems.
-*   **[Frequently Asked Questions (FAQ)](./FAQ.md)**: Answers to common questions. (To be created)
+*   **[Getting Started](../tree/main/README.md#how-to-run)**: Instructions on how to set up and run the test kit. (Link to root README section)
+*   **[Test Kit Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
+*   **[Client Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough)**: Step-by-step guide for testing client systems.
+*   **[Server Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough)**: Step-by-step guide for testing server systems.
+*   **[Frequently Asked Questions (FAQ)](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/FAQ)**: Answers to common questions. (To be created)
 
 ## Contributing to this Test Kit
 
-*   **[Technical Overview](./Technical-Overview.md)**: An overview of the test kit's technical design and architecture for developers and contributors.
-*   **[Test Generation Guide](./Test-Generation-Guide.md)**: Information on how tests are generated and how to maintain this process.
+*   **[Technical Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
+*   **[Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide)**: Information on how tests are generated and how to maintain this process.
 
 ## Reference Documents
 
-*   **[PAS Requirements Interpretation](./PAS%20Requirements%20Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
-*   **[Client Test Suite Description (v2.0.1)](../lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
-*   **[Server Test Suite Description (v2.0.1)](../lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
+*   **[PAS Requirements Interpretation](../tree/main/lib/davinci_pas_test_kit/docs/PAS-Requirements-Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
+*   **[Client Test Suite Description (v2.0.1)](../tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
+*   **[Server Test Suite Description (v2.0.1)](../tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
 
 ## Support
 

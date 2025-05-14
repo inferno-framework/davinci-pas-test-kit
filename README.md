@@ -21,7 +21,7 @@ Framework](https://inferno-framework.github.io/). The Inferno Framework is
 designed for reuse and aims to make it easier to build test kits for any
 FHIR-based data exchange.
 
-**For comprehensive documentation, including detailed guides, overviews, and technical references, please see our [Main Documentation Hub](./docs/README.md).**
+**For comprehensive documentation, including detailed guides, overviews, and technical references, please see our [Main Documentation Hub](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).**
 
 ## Status
 
@@ -31,7 +31,7 @@ feedback on the tests. Future versions of these tests may validate other
 requirements and may change how these are tested.
 
 Additional details on the IG requirements that underlie this test kit, including those 
-that are not currently tested, can be found in [this spreadsheet](./docs/PAS%20Requirements%20Interpretation.xlsx). The spreadsheet includes
+that are not currently tested, can be found in [this spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/PAS-Requirements-Interpretation.xlsx). The spreadsheet includes
 
 - a list of requirements extracted from the IG.
 - the requirements tested by this DRAFT test kit.
@@ -43,8 +43,8 @@ Neither the server nor client test suite included test the full scope of the PAS
 A detailed discussion of the test scope, in-scope requirements, out-of-scope requirements, and known limitations (including those related to X12) can be found in the [Test Kit Overview](/inferno-framework/davinci-pas-test-kit/wiki/Overview) document.
 Briefly, documentation of what is currently tested and what is out of scope can also be
 found in the suite descriptions when the tests are run, or within this repository
-for the [server](./lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
-and [client](./lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations).
+for the [server](./tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
+and [client](./tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations).
 
 ## How to Run
 
@@ -54,16 +54,16 @@ the test home pages include instructions for trying out the tests, including
 
 - For server testing: a [public reference implementation](https://prior-auth.davinci.hl7.org/fhir)
   ([code on github](https://github.com/HL7-DaVinci/prior-auth))
-- For client testing: a [sample postman collection](./docs/demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
+- For client testing: a [sample postman collection](./tree/main/docs/demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
 
 Detailed step-by-step instructions for running the tests can be found in our walkthrough guides:
-- [Client Testing Walkthrough](./docs/Client-Walkthrough.md)
-- [Server Testing Walkthrough](./docs/Server-Walkthrough.md)
+- [Client Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough)
+- [Server Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough)
 
 Summary instructions are also available in the suite descriptions when the tests
 are run, or within this repository for the 
-[server](./docs/server_suite_description_v201.md#running-the-tests) and
-[client](./docs/client_suite_description_v201.md#running-the-tests).
+[server](./tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#running-the-tests) and
+[client](./tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#running-the-tests).
 
 ### ONC Hosted Instance
 
@@ -81,7 +81,7 @@ You can run the PAS test kit via the [ONC Inferno](https://inferno.healthit.gov/
 
 We welcome feedback on the tests, including but not limited to the following areas:
 - Validation logic, such as potential bugs, lax checks, and unexpected failures.
-- Requirements coverage, such as requirements that have been missed, tests that necessitate features that the IG does not require, or other issues with the [interpretation](./docs/PAS%20Requirements%20Interpretation.xlsx) of the IG's requirements.
+- Requirements coverage, such as requirements that have been missed, tests that necessitate features that the IG does not require, or other issues with the [interpretation](./tree/main/lib/da_vincipas_test_kit/docs/PAS-Requirements-Interpretation.xlsx) of the IG's requirements.
 - User experience, such as confusing or missing information in the test UI.
 
 Please report any issues with this set of tests in the issues section of this repository.
@@ -95,8 +95,8 @@ particularly the instructions on
 
 ### Test Generation
 
-The Davinci PAS Test Kit utilizes a test generator to create many of its tests from the IG's capability statement and profiles.
-For detailed instructions on how to use the generator to create tests for different IG versions, please see the [Test Generation Guide](./docs/Test-Generation-Guide.md).
+The DaVinci PAS Test Kit utilizes a test generator to create many of its tests from the IG's capability statement and profiles.
+For detailed instructions on how to use the generator to create tests for different IG versions, please see the [Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide).
 
 ## License
 

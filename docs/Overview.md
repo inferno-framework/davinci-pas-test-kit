@@ -77,8 +77,8 @@ This test kit is a **DRAFT**. While it covers many core aspects of the PAS IG, t
 *   **IG Issues**: Known issues in the PAS IG itself may cause false failures. These are typically documented in the test kit's issue tracker.
 
 For a detailed, up-to-date list of specific in-scope/out-of-scope requirements and known issues, please refer to:
-*   The "Testing Limitations" sections within the [Client Suite Description](../lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations) and [Server Suite Description](../lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations).
-*   The [PAS Requirements Interpretation Spreadsheet](./PAS%20Requirements%20Interpretation.xlsx).
+*   The "Testing Limitations" sections within the [Client Suite Description](../tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations) and [Server Suite Description](../tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations).
+*   The [PAS Requirements Interpretation Spreadsheet](../tree/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx).
 *   The [test kit's GitHub Issues page](https://github.com/HL7/davinci-pas-test-kit/issues) (especially those tagged 'source ig issue').
 
 ## Test Prerequisites
@@ -115,4 +115,4 @@ The test kit organizes tests into logical groups, typically corresponding to:
 *   **Error Handling**: (e.g., PAS Error Condition Tests for servers)
 *   **Must Support Validation**: Tests dedicated to ensuring all required profiles and elements are supported in requests and responses.
 
-Refer to the specific [Client Test Suite Description](../lib/davinci_pas_test_kit/docs/client_suite_description_v201.md) and [Server Test Suite Description](../lib/davinci_pas_test_kit/docs/server_suite_description_v201.md) for more granular details on test groups.
+Refer to the specific [Client Test Suite Description](../tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md) and [Server Test Suite Description](../tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md) for more granular details on test groups.
