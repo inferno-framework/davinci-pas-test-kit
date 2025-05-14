@@ -4,11 +4,10 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 
 ## Using this Test Kit
 
-*   **[Getting Started](../tree/main/README.md#how-to-run)**: Instructions on how to set up and run the test kit. (Link to root README section)
+*   **[Getting Started](../tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
 *   **[Test Kit Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 *   **[Client Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough)**: Step-by-step guide for testing client systems.
 *   **[Server Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough)**: Step-by-step guide for testing server systems.
-*   **[Frequently Asked Questions (FAQ)](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/FAQ)**: Answers to common questions. (To be created)
 
 ## Contributing to this Test Kit
 
@@ -23,7 +22,4 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 
 ## Support
 
-If you encounter any issues or have questions, please:
-*   Check the [FAQ](./FAQ.md) (once available).
-*   Open an issue on our [GitHub Issues page](https://github.com/HL7/davinci-pas-test-kit/issues).
-*   (Consider adding a link to a relevant Zulip stream if one exists for Da Vinci PAS implementers).
+If you have any problems, please open an issue on our [GitHub Issues page](https://github.com/HL7/davinci-pas-test-kit/issues).

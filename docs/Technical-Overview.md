@@ -20,11 +20,11 @@ The primary codebase for the PAS Test Kit resides within the `lib/davinci_pas_te
 *   **`client_suite.rb`**: Defines the main test suite for PAS clients.
 *   **`metadata.rb`**: Contains metadata for the test kit, including its title, description (which appears in the Inferno UI), and suite IDs. This is a crucial file for how the test kit presents itself in the Inferno Framework.
 *   **`version.rb`**: Specifies the version of the test kit.
-*   **`docs/`**: Contains all Markdown documentation files, including suite descriptions, this technical overview, walkthroughs, and potentially FAQs. It also houses related files like the requirements interpretation spreadsheet and demo Postman collections.
-*   **`custom_groups/`**: This directory likely holds custom-defined test groups that are not automatically generated. These groups often contain complex workflow logic or specific scenarios that require manual test definition. It's often structured by IG version (e.g., `v2.0.1/`).
-    *   Files like `pas_client_approval_group.rb`, `pas_server_subscription_setup.rb` define specific sequences of tests.
+*   **`docs/`**: Contains Markdown documentation files that are mirrored to the [GitHub wiki](/inferno-framework/davinci-pas-test-kit/wiki) for this repository.
 *   **`generated/`**: Contains tests and supporting files that are programmatically generated from the PAS Implementation Guide artifacts (like CapabilityStatements and StructureDefinitions). This is a key part of the test kit's strategy to stay aligned with the IG. It's typically structured by IG version.
 *   **`generator/`**: Holds the Ruby scripts and templates responsible for the test generation process. Files like `suite_generator.rb`, `group_generator.rb`, and `must_support_test_generator.rb` are central to this.
+*   **`custom_groups/`**: This directory contains custom-defined test groups that are not automatically generated. These groups often contain complex workflow logic or specific scenarios that require manual test definition. It's often structured by IG version (e.g., `v2.0.1/`).
+    *   Files like `pas_client_approval_group.rb`, `pas_server_subscription_setup.rb` define specific sequences of tests.
 *   **`igs/`**: Stores the IG package files (e.g., `davinci_pas_2.0.1.tgz`) that the generator uses as input.
 *   **`endpoints/`**: Contains code for managing the FHIR endpoints that Inferno exposes when acting as a server (e.g., for client testing). This might include endpoints for `$submit`, `$inquire`, and `Subscription` interactions.
 *   **`jobs/`**: For background jobs, if any. For PAS, this could include tasks like sending delayed subscription notifications (e.g., `send_pas_subscription_notification.rb`).
@@ -57,7 +57,7 @@ When making changes to the test kit itself, it's important to ensure the changes
     *   From the root directory of the test kit, you can typically run these tests using a command like `bundle exec rspec`.
     *   Ensure all RSpec tests pass before considering your changes complete.
 4.  **Manual Testing (Using Inferno UI)**:
-    *   Run your local Inferno instance (`run.sh` after `setup.sh`).
+    *   Run your local Inferno instance (`run.sh` after `setup.sh`), or use the [developer-oriented method](https://inferno-framework.github.io/docs/getting-started/#development-with-ruby).
     *   Manually execute the test suites/groups affected by your changes against:
         *   The public reference implementations (if applicable).
         *   Any local test servers or client simulators you have.
@@ -69,7 +69,8 @@ When making changes to the test kit itself, it's important to ensure the changes
         *   Run `bundle exec rake pas:generate`.
         *   Review the generated files for correctness.
         *   Run the re-generated tests in the Inferno UI.
-6.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details, update the relevant documentation files in `/docs/`.
+6.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details, update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's [GitHub Wiki](https://github.com/inferno-framework/davinci-pas-test-kit/wiki).
+
 
 ## Contribution Guidelines
 

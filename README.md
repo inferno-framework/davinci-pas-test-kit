@@ -46,7 +46,7 @@ found in the suite descriptions when the tests are run, or within this repositor
 for the [server](./tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
 and [client](./tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations).
 
-## How to Run
+## Getting Started
 
 Use either of the following methods to run the suites within this test kit.
 If you would like to try out the tests but don’t have a PAS implementation, 
