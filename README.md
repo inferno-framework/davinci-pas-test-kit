@@ -21,6 +21,8 @@ Framework](https://inferno-framework.github.io/). The Inferno Framework is
 designed for reuse and aims to make it easier to build test kits for any
 FHIR-based data exchange.
 
+**For comprehensive documentation, including detailed guides, overviews, and technical references, please see our [Main Documentation Hub](./lib/davinci_pas_test_kit/docs/README.md).**
+
 ## Status
 
 These tests are a **DRAFT** intended to allow PAS implementers to perform 
