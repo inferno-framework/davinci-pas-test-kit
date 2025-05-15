@@ -1,6 +1,6 @@
-# Da Vinci Prior Authorization Support (PAS) v2.0.1 Test Kit
+# Da Vinci Prior Authorization Support (PAS) Test Kit
 
-The Da Vinci Prior Authorization Support (PAS) STU 2.0.1 Test Kit validates the 
+The **Da Vinci Prior Authorization Support (PAS) STU 2.0.1 Test Kit** validates the 
 conformance of systems to the PAS STU 2.0.1 FHIR IG. The test kit includes
 suites targeting each of the actors from the specification:
 
@@ -15,76 +15,90 @@ for conformance and in aggregate to determine that the full set of features is
 supported.
 
 This test kit is [open source](#license) and freely available for use or
-adoption by the health IT community including EHR vendors, health app
+adoption by the health IT community including EHR vendors, payer systems, health app
 developers, and testing labs. It is built using the [Inferno
 Framework](https://inferno-framework.github.io/). The Inferno Framework is
 designed for reuse and aims to make it easier to build test kits for any
 FHIR-based data exchange.
 
-**For comprehensive documentation, including detailed guides, overviews, and technical references, please see our [Da Vinci PAS Test Kit Main Documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).**
+For comprehensive documentation, including detailed walkthroughs, overviews, and
+technical references, please see the [Da Vinci PAS Test Kit
+Documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).
+
+## Getting Started
+
+ASTP hosts a [public
+instance](https://inferno.healthit.gov/suites/g10_certification) of this test
+kit that developers and testers are welcome to use. However, users are
+encouraged to download and run this tool locally to allow testing within private
+networks and to avoid being affected by downtime of this shared resource.
+Please see the [Local Installation
+Instructions](#local-installation-instructions) section below for more
+information.
 
 ## Status
 
-These tests are a **DRAFT** intended to allow PAS implementers to perform 
+These tests are a **DRAFT** and are intended to allow PAS implementers to perform 
 preliminary checks of their implementations against PAS IG requirements and provide 
 feedback on the tests. Future versions of these tests may validate other 
 requirements and may change how these are tested.
 
-Additional details on the IG requirements that underlie this test kit, including those 
-that are not currently tested, can be found in [this spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/PAS-Requirements-Interpretation.xlsx). The spreadsheet includes
+Additional details on the IG requirements that underlie this test kit, including
+those that are not currently tested, can be found in [this
+spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/raw/refs/heads/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx).
+The spreadsheet includes:
 
 - a list of requirements extracted from the IG.
 - the requirements tested by this DRAFT test kit.
 - an analysis of which requirements are testable, including areas where testable requirements are weak or unclear.
 
-## Test Scope and Limitations
-
-Neither the server nor client test suite included test the full scope of the PAS IG.
-A detailed discussion of the test scope, in-scope requirements, out-of-scope requirements, and known limitations (including those related to X12) can be found in the [Test Kit Overview](/inferno-framework/davinci-pas-test-kit/wiki/Overview) document.
-Briefly, documentation of what is currently tested and what is out of scope can also be
-found in the suite descriptions when the tests are run, or within this repository
-for the [server](./tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)
-and [client](./tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations).
-
 ## Getting Started
 
-Use either of the following methods to run the suites within this test kit.
-If you would like to try out the tests but don’t have a PAS implementation, 
-the test home pages include instructions for trying out the tests, including
-
-- For server testing: a [public reference implementation](https://prior-auth.davinci.hl7.org/fhir)
-  ([code on github](https://github.com/HL7-DaVinci/prior-auth))
-- For client testing: a [sample postman collection](./tree/main/docs/demo/PAS%20Client%20Suite%20Demonstration.postman_collection.json)
+ASTP hosts a [public
+instance](https://inferno.healthit.gov/test-kits/davinci-pas/) of this test
+kit that developers and testers are welcome to use. However, users are
+encouraged to download and run this tool locally to allow testing within private
+networks and to avoid being affected by downtime of this shared resource.
+Please see the [Local Installation
+Instructions](#local-installation-instructions) section below for more
+information.
 
 Detailed step-by-step instructions for running the tests can be found in our walkthrough guides:
 - [Client Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough)
 - [Server Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough)
 
-Summary instructions are also available in the suite descriptions when the tests
-are run, or within this repository for the 
-[server](./tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#running-the-tests) and
-[client](./tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#running-the-tests).
+Additional information is provided in the [Da Vinci PAS Test Kit documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).
 
-### ASTP Hosted Instance
+## Local Installation Instructions
 
-You can run the PAS test kit via the ASTP hosted public [Inferno on HealthIT.gov](https://inferno.healthit.gov/test-kits/davinci-pas/) site.
-
-### Local Inferno Instance
-
-- Download the source code from this repository.
+- [Download an official release](https://github.com/inferno-framework/davinci-pas-test-kit/releases) of this test kit.
 - Open a terminal in the directory containing the downloaded code.
 - In the terminal, run `setup.sh`.
 - In the terminal, run `run.sh`.
 - Use a web browser to navigate to `http://localhost`.
 
+More information on using Inferno Test Kits is available on the [Inferno
+Framework documentation site](https://inferno-framework.github.io/docs).
+
+### Multi-user Installations
+
+The default configuration of this test kit uses SQLite for data persistence and
+is optimized for running on a local machine with a single user. For
+installations on shared servers that may have multiple tests running
+simultaneously, please [configure the installation to use
+PostgreSQL](https://inferno-framework.github.io/inferno-core/deployment/database.html#postgresql)
+to ensure stability in this type of environment.
+
 ## Providing Feedback and Reporting Issues
 
 We welcome feedback on the tests, including but not limited to the following areas:
 - Validation logic, such as potential bugs, lax checks, and unexpected failures.
-- Requirements coverage, such as requirements that have been missed, tests that necessitate features that the IG does not require, or other issues with the [interpretation](./tree/main/lib/da_vincipas_test_kit/docs/PAS-Requirements-Interpretation.xlsx) of the IG's requirements.
+- Requirements coverage, such as requirements that have been missed, tests that necessitate features that the IG does not require, or other issues with the interpretation of the IG's requirements.
 - User experience, such as confusing or missing information in the test UI.
 
-Please report any issues with this set of tests in the issues section of this repository.
+Please report any issues with this set of tests in the [issues
+section](https://github.com/inferno-framework/da-vinci-pas-test-kit/issues)
+section of this repository.
 
 ## License
 

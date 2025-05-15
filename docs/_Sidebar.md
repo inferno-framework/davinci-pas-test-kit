@@ -1,9 +1,15 @@
 **[Documentation Home](Home)**
 
 **Using this Test Kit**
-*   [Getting Started](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/README.md#getting-started)
+*   [Installation](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/README.md#getting-started)
 *   [Test Kit Overview](Overview)
+
+**Client Suite**
+*   [Client Testing Details](Client-Details)
 *   [Client Testing Walkthrough](Client-Walkthrough)
+
+**Server Suite**
+*   [Server Testing Details](Server-Details)
 *   [Server Testing Walkthrough](Server-Walkthrough)
 
 **Contributing to this Test Kit**
@@ -12,7 +18,6 @@
 
 **Reference Documents & External Links**
 *   [PAS Requirements Interpretation (Spreadsheet)](../tree/main/lib/davinci_pas_test_kit/docs/PAS-Requirements-Interpretation.xlsx)
-*   [Client Test Suite Description (v2.0.1)](../tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)
 *   [Server Test Suite Description (v2.0.1)](../tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)
 *   [Da Vinci PAS IG (STU2)](https://hl7.org/fhir/us/davinci-pas/STU2/)
 *   [Inferno Framework](https://inferno-framework.github.io/)

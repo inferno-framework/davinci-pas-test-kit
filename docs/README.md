@@ -1,6 +1,9 @@
 # Da Vinci PAS Test Kit Documentation
 
-Welcome to the comprehensive documentation for the Da Vinci Prior Authorization Support (PAS) Test Kit. This test kit is designed to help implementers validate their systems against the HL7 FHIR Da Vinci PAS Implementation Guide.
+The **Da Vinci Prior Authorization Support (PAS) Test Kit** is a testing tool
+that is designed to help implementers validate their systems against the HL7
+FHIR Da Vinci PAS Implementation Guide. The following documentation provides information
+on how to use and contribute to this test kit.
 
 ## Using this Test Kit
 
@@ -17,9 +20,8 @@ Welcome to the comprehensive documentation for the Da Vinci Prior Authorization 
 ## Reference Documents
 
 *   **[PAS Requirements Interpretation](../tree/main/lib/davinci_pas_test_kit/docs/PAS-Requirements-Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
-*   **[Client Test Suite Description (v2.0.1)](../tree/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md)**: Detailed description of the tests included in the client testing suite.
 *   **[Server Test Suite Description (v2.0.1)](../tree/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md)**: Detailed description of the tests included in the server testing suite.
 
 ## Support
 
-If you have any problems, please open an issue on our [GitHub Issues page](https://github.com/HL7/davinci-pas-test-kit/issues).
+If you have any problems, please open an issue on our [GitHub Issues page](https://github.com/inferno-framework/davinci-pas-test-kit/issues).
