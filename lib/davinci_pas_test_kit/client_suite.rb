@@ -50,10 +50,10 @@ module DaVinciPASTestKit
             - The denial of the request
             - The pending of the request and a subsequent notification that a final decision was made
         - The ability of the client to provide data covering the full scope of required by PAS, including
-            - The ability to send prior auth requests and inquiries with all PAS profiles and all must support elements on
-            those profiles
+            - The ability to send prior auth requests and inquiries with all PAS
+              profiles and all must support elements on those profiles
             - The ability to handle responses that contain all PAS profiles and all must support elements on those
-            profiles (not included in the current version of these tests)
+              profiles (not included in the current version of these tests)
 
         All requests and responses will be checked for conformance to the PAS
         IG requirements individually and used in aggregate to determine whether
