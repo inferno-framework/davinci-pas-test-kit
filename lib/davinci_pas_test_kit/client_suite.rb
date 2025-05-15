@@ -22,7 +22,44 @@ module DaVinciPASTestKit
     class ClientSuite < Inferno::TestSuite
       id :davinci_pas_client_suite_v201
       title 'Da Vinci PAS Client Suite v2.0.1'
-      description File.read(File.join(__dir__, 'docs', 'client_suite_description_v201.md'))
+      description %(
+        The Da Vinci PAS Test Kit Client Suite validates the conformance of client
+        systems to the STU 2 version of the HL7® FHIR®
+        [Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/STU2/).
+
+        These tests are a **DRAFT** intended to allow PAS client implementers to perform
+        preliminary checks of their clients against PAS IG requirements and [provide
+        feedback](https://github.com/inferno-framework/davinci-pas-test-kit/issues)
+        on the tests. Future versions of these tests may validate other
+        requirements and may change the test validation logic.
+
+        The best place to get started is the [Client Testing
+        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough)],
+        which provides a step-by-step guide for running the tests against a client and provides
+        an example client implemented in Postman.  Visit the [Client Testing
+        Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details)
+        documentation for information about technical implementation and known limitations of these tests.
+
+        In this test suite, Inferno simulates a PAS server for the client under test to
+        interact with. The client will be expected to initiate requests to the server
+        and demonstrate its ability to react to the returned responses. Over the course
+        of these interactions, Inferno will seek to observe conformant handling of PAS
+        requirements, including:
+        - The ability of the client to initiate a prior authorization submission and react to
+            - The approval of the request
+            - The denial of the request
+            - The pending of the request and a subsequent notification that a final decision was made
+        - The ability of the client to provide data covering the full scope of required by PAS, including
+            - The ability to send prior auth requests and inquiries with all PAS
+              profiles and all must support elements on those profiles
+            - The ability to handle responses that contain all PAS profiles and all must support elements on those
+              profiles (not included in the current version of these tests)
+
+        All requests and responses will be checked for conformance to the PAS
+        IG requirements individually and used in aggregate to determine whether
+        required features and functionality are present. HL7® FHIR® resources are
+        validated with the Java validator using `tx.fhir.org` as the terminology server.
+      )
 
       links [
         {
