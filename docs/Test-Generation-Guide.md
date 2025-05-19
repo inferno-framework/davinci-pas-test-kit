@@ -1,12 +1,24 @@
 # Da Vinci PAS Test Kit: Test Generation Guide
 
-This document provides a comprehensive guide on how tests are generated for the Da Vinci Prior Authorization Support (PAS) Test Kit, how to use the generator, and some insights into its mechanics for maintainers.
+This document provides a comprehensive guide on how tests are generated for the
+Da Vinci Prior Authorization Support (PAS) Test Kit, how to use the generator,
+and some insights into its mechanics for maintainers.
 
 ## Overview
 
-A significant portion of the tests within the Da Vinci PAS Test Kit, particularly those related to profile validation and must-support element checks, are programmatically generated. This approach ensures that the test kit remains aligned with the specific version of the PAS Implementation Guide (IG) it targets and reduces the manual effort required to update tests when new IG versions are released or when profiles change.
+A portion of the server tests within the Da Vinci PAS Test Kit, particularly
+those related to profile validation and must-support element checks, are
+programmatically generated. This approach ensures that the test kit remains
+aligned with the specific version of the PAS Implementation Guide (IG) it
+targets and reduces the manual effort required to update tests when new IG
+versions are released or when profiles change.
 
 The test generator processes the formal artifacts of the PAS IG (such as StructureDefinitions and CapabilityStatements) to create executable test code.
+
+Note that any time you make changes to content in the
+`lib/davinci_pas/generator` directory, you will need to regenerate the tests. 
+Do not make changes to the `generated` directory directly, because these will be
+overwritten during the next generation.
 
 ## Prerequisites for Test Generation
 
@@ -47,7 +59,7 @@ Follow these steps to generate a new test suite or update an existing one for a 
     *   In the Inferno UI, you should now see the newly generated (or updated) test suite available for selection.
     *   Execute some of the generated tests to ensure they load correctly and behave as expected. Test against a reference implementation or sample data if possible.
 
-## Generator Mechanics (For Maintainers)
+## Generator Mechanics
 
 The test generation logic resides primarily in the `lib/davinci_pas_test_kit/generator/` directory. Key components include:
 
@@ -71,4 +83,6 @@ The general process is:
 5.  These tests are organized into groups, and the groups form a test suite.
 6.  The generated Ruby files are written to the `lib/davinci_pas_test_kit/generated/<ig_version>/` directory.
 
-Maintaining or extending the generator requires a good understanding of Ruby, the Inferno Framework's testing DSL (Domain Specific Language), and the structure of FHIR Implementation Guide packages.
+Maintaining or extending the generator requires a good understanding of Ruby,
+the Inferno Framework's testing DSL (Domain Specific Language), and the
+structure of FHIR Implementation Guide packages.
