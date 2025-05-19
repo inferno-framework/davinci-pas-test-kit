@@ -12,6 +12,10 @@ module DaVinciPASTestKit
 
       <!-- break -->
 
+      Please visit the [Da Vinci PAS Test Kit documentation
+      site](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/) for
+      detailed information on how to use and maintain this test kit.
+
       To validate the behavior of a system Inferno will act as the partner to the
       system under test:
       - **When testing a client**: Inferno will act as a server, awaiting requests
@@ -58,16 +62,12 @@ module DaVinciPASTestKit
         e.g., the requirement that clinicians can update details of the prior authorization
         request before submitting them
 
-      For additional details on these and other areas where the tests may not align with
-      the IGs requirements, see documentation in the test kit source code ([client](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/client_suite_description_v201.md#testing-limitations), [server](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/server_suite_description_v201.md#testing-limitations)), and [this requirements analysis
-      spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx).
-
       ### Known IG Issues
 
       Through testing with this test kit, issues have been identified in the version of the PAS
       specification that this test kit tests against which cause false failures. The full list
       of known issues can be found on the [repository's issues page with the 'source ig issue'
-      lable](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).
+      label](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).
 
       ## Reporting Issues
 
