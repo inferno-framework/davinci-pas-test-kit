@@ -23,7 +23,7 @@ module DaVinciPASTestKit
         requirements and may change the test validation logic.
 
         The best place to get started is the [Server Testing
-        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough)],
+        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough),
         which provides a step-by-step guide for running the tests against a client and provides
         an example client implemented in Postman.  Visit the [Server Testing
         Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)
