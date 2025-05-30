@@ -8,7 +8,46 @@ module DaVinciPASTestKit
     class <%= class_name %> < Inferno::TestSuite
       id :<%= suite_id %>
       title '<%= title %>'
-      description File.read(File.join(__dir__, '..', '..', 'docs', 'server_suite_description_<%= ig_metadata.reformatted_version %>.md'))
+      description %(
+        The Da Vinci PAS Server Suite validates the conformance of server systems 
+        to the STU 2 version of the HL7® FHIR® 
+        [Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/STU2/).
+
+        These tests are a **DRAFT** intended to allow PAS server implementers to perform 
+        preliminary checks of their servers against PAS IG requirements and [provide 
+        feedback](https://github.com/inferno-framework/davinci-pas-test-kit/issues) 
+        on the tests. Future versions of these tests may validate other 
+        requirements and may change the test validation logic.
+
+        The best place to get started is the [Server Testing
+        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough),
+        which provides a step-by-step guide for running the tests against a client and provides
+        an example client implemented in Postman.  Visit the [Server Testing
+        Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)
+        documentation for information about technical implementation and known limitations of these tests.
+
+        Inferno will simulate a client and make a series of prior authorization requests to the 
+        server under test. Over the course of these requests, Inferno will seek to observe
+        conformant handling of PAS requirements, including
+        - The ability of the server to use PAS API interactions to communicate 
+            - Approval of a prior authorization request
+            - Denial of a prior authorization request
+            - Pending of a prior authorization request and a subsequent final decision
+            - Inability to process a prior authorization request
+        - The ability of the server to handle the full scope of data required by PAS, including
+            - Ability to process prior auth requests and inquiries with all PAS profiles and all must support elements on those profiles
+            - Ability to return responses that demonstrate the use of all PAS profiles and all must support elements on those profiles
+
+        Because the business logic that determines decisions and the elements populated in responses
+        Is outside of the PAS specification and will vary between implementers, testers
+        are required to provide the requests that Inferno will make to the server.
+
+        All requests and responses will be checked for conformance to the PAS
+        IG requirements individually and used in aggregate to determine whether
+        required features and functionality are present. HL7® FHIR® resources are 
+        validated with the Java validator using `tx.fhir.org` as the terminology server.
+      
+      %)
 
       links [
         {
