@@ -1,3 +1,7 @@
+# 0.13.2
+* Add publish workflow by @arscan in https://github.com/inferno-framework/davinci-pas-test-kit/pull/42
+* Generated documentation following us core and g10 documentation as best practice examples by @arscan in https://github.com/inferno-framework/davinci-pas-test-kit/pull/41
+
 # 0.13.1
 * Fix expired token responses by @karlnaden in
   https://github.com/inferno-framework/davinci-pas-test-kit/pull/38
