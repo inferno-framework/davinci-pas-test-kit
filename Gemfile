@@ -9,6 +9,10 @@ gem 'rubocop-rspec', require: false
 
 gem "rubocop-rake", "~> 0.6.0"
 
+gem 'inferno_core',
+    git: 'git@github.com:inferno-framework/inferno-core.git',
+    branch: 'fi-3943-requirements-coverage-command'
+
 group :development, :test do
   gem 'debug'
   gem 'rack-test'

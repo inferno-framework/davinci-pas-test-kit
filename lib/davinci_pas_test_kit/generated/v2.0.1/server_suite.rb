@@ -32,6 +32,14 @@ module DaVinciPASTestKit
         }
       ]
 
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.us.davinci-pas_2.0.1',
+          title: 'Da Vinci PAS v2.0.1',
+          actor: 'Server'
+        }
+      )
+
       fhir_resource_validator do
         igs 'hl7.fhir.us.davinci-pas#2.0.1'
 
