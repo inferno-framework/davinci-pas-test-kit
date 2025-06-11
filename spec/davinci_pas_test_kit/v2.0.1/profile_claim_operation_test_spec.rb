@@ -1,30 +1,16 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::ClaimOperationTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('davinci_pas_server_suite_v201') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
+  let(:suite_id) { 'davinci_pas_server_suite_v201' }
   let(:server_endpoint) { 'http://example.com/fhir' }
+
   let(:test) do
     Class.new(DaVinciPASTestKit::DaVinciPASV201::ClaimOperationTest) do
       fhir_client { url :server_endpoint }
       input :server_endpoint
     end
   end
+
   let(:pa_submit_request_payload) do
     File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   it 'passes if the PA response has a 200 status for Claim/$submit operation' do

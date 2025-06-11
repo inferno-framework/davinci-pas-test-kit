@@ -1,24 +1,8 @@
-RSpec.describe DaVinciPASTestKit::PasBundleValidation do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('davinci_pas_server_suite_v201') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
+RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
+  let(:suite_id) { 'davinci_pas_server_suite_v201' }
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:pa_request_valid_bundle) do
     File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe '#validate_pa_request_payload_structure' do

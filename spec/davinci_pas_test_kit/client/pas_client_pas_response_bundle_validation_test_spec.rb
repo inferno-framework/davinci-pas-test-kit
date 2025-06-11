@@ -1,11 +1,7 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:access_token) { '1234' }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
-  let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
   let(:fhirpath_url) { 'https://example.com/fhirpath/evaluate' }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
   let(:operation_outcome_success) do
@@ -58,20 +54,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
       status: 201,
       headers:
     )
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'when verifying submit responses' do

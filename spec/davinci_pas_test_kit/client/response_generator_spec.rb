@@ -1,9 +1,6 @@
-RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('davinci_pas_client_suite_v201') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
+RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disable RSpec/SpecFilePathFormat
+  let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:validator_url) { ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL') }
   let(:operation_outcome_success) do
     {
       outcomes: [{
@@ -89,20 +86,6 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator do # rubocop:disable RSpec/S
 
   before do
     Inferno::Repositories::Tests.new.insert(notification_verification_test)
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   describe 'When mocking responses' do
