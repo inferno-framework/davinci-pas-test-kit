@@ -83,7 +83,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidati
     end
 
     it 'passes with a valid response' do
-      stub_request(:post, "#{validator_url}/validate")
+      stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       stub_request(:post, /#{fhirpath_url}\?path=Claim.*/)
         .to_return(status: 200, body: [].to_json)

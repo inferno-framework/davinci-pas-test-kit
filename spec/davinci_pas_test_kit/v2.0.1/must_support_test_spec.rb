@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::MustSupportTest do
+RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
   let(:json_pas_request_bundle) do
     File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
   end
@@ -36,16 +36,16 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest do
           }
         }
       )
-    run(runnable)
+    run(runnable, {}, { scratch_key => { all: [bundle_resource] } })
+  end
+
+  # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+  def run_expect_pass(runnable, bundle_resource, scratch_key)
+    result = execute_mock_test(runnable, bundle_resource, scratch_key)
+    expect(result.result).to eq('pass')
   end
 
   describe 'must support test' do
-    # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
-    def run_expect_pass(runnable, bundle_resource, scratch_key)
-      result = execute_mock_test(runnable, bundle_resource, scratch_key)
-      expect(result.result).to eq('pass')
-    end
-
     context 'when PAS request bundle' do
       scratch_key = 'submit_request_resources'
       it 'passes if the request bundle contains all the must support specified in the PAS Request Bundle profile' do

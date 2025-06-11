@@ -473,7 +473,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
   describe 'When mocking notifications' do
     describe 'for id-only Subscriptions' do
       it 'returns a structurally-correct notification' do
-        stub_request(:post, "#{validator_url}/validate") # profile validation not performed
+        stub_request(:post, validation_url) # profile validation not performed
           .to_return(status: 200, body: operation_outcome_success.to_json)
         inputs = {
           submit_response_string:,
@@ -489,7 +489,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
 
     describe 'for full-resource Subscriptions' do
       it 'returns a structurally-correct notification' do
-        stub_request(:post, "#{validator_url}/validate") # profile validation not performed
+        stub_request(:post, validation_url) # profile validation not performed
           .to_return(status: 200, body: operation_outcome_success.to_json)
         inputs = {
           submit_response_string:,
