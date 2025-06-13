@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::MustSupportTest do
+RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
   let(:json_pas_request_bundle) do
     File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
   end
@@ -25,28 +25,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest do
       .find('pas_server_inquire_response_v201_pas_inquiry_response_bundle_must_support_test')
   end
 
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('davinci_pas_server_suite_v201') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite.id) }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
-  # def generate_request_bundle_resource(json_addition)
-  #   complete_json_string = json_pas_request_bundle + json_addition
-  #   return FHIR.from_contents(complete_json_string)
-  # end
+  let(:suite_id) { 'davinci_pas_server_suite_v201' }
 
   def execute_mock_test(runnable, bundle_resource, scratch_key)
     allow_any_instance_of(runnable)
@@ -57,16 +36,16 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest do
           }
         }
       )
-    run(runnable)
+    run(runnable, {}, { scratch_key => { all: [bundle_resource] } })
+  end
+
+  # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+  def run_expect_pass(runnable, bundle_resource, scratch_key)
+    result = execute_mock_test(runnable, bundle_resource, scratch_key)
+    expect(result.result).to eq('pass')
   end
 
   describe 'must support test' do
-    # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
-    def run_expect_pass(runnable, bundle_resource, scratch_key)
-      result = execute_mock_test(runnable, bundle_resource, scratch_key)
-      expect(result.result).to eq('pass')
-    end
-
     context 'when PAS request bundle' do
       scratch_key = 'submit_request_resources'
       it 'passes if the request bundle contains all the must support specified in the PAS Request Bundle profile' do
