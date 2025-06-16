@@ -80,6 +80,19 @@ module DaVinciPASTestKit
         }
       ]
 
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.us.davinci-pas_2.0.1',
+          title: 'Da Vinci Prior Authorization Support (PAS) v2.0.1',
+          actor: 'Client'
+        },
+        {
+          identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
+          title: 'Subscriptions R5 Backport IG',
+          actor: 'Client'
+        }
+      )
+
       fhir_resource_validator do
         igs 'hl7.fhir.us.davinci-pas#2.0.1'
 
