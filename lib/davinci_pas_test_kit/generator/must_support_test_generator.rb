@@ -138,9 +138,7 @@ module DaVinciPASTestKit
       end
 
       def verifies_requirements
-        case test_id # rubocop:disable Style/HashLikeCase
-        when 'pas_client_inquire_request_v201_claim_inquiry_must_support_test'
-          ['hl7.fhir.us.davinci-pas_2.0.1@36']
+        case test_id
         when 'pas_server_submit_response_v201_claimresponse_must_support_test'
           ['hl7.fhir.us.davinci-pas_2.0.1@37', 'hl7.fhir.us.davinci-pas_2.0.1@110']
         when 'pas_server_inquire_response_v201_claiminquiryresponse_must_support_test'
