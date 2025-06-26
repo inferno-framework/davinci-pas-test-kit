@@ -90,16 +90,6 @@ module DaVinciPASTestKit
           identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
           title: 'Subscriptions R5 Backport IG',
           actor: 'Client'
-        },
-        {
-          identifier: 'hl7.fhir.uv.smart-app-launch_2.2.0',
-          title: 'SMART App Launch',
-          actor: 'Client'
-        },
-        {
-          identifier: 'hl7.fhir.us.udap-security_1.0.0',
-          title: 'Security for Scalable Registration, Authentication, and Authorization (UDAP)',
-          actor: 'Client'
         }
       )
 
