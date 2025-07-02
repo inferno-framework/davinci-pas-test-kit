@@ -1,3 +1,7 @@
+# 0.13.3
+* FI-3815: Update Test Kit with new RSpec features by @Shaumik-Ashraf in https://github.com/inferno-framework/davinci-pas-test-kit/pull/44
+* FI-4144: Requirements Conversion by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/45
+
 # 0.13.2
 * Add publish workflow by @arscan in https://github.com/inferno-framework/davinci-pas-test-kit/pull/42
 * Generated documentation following us core and g10 documentation as best practice examples by @arscan in https://github.com/inferno-framework/davinci-pas-test-kit/pull/41
