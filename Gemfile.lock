@@ -2,9 +2,9 @@ PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.13.2)
-      inferno_core (~> 0.6.15)
+      inferno_core (~> 0.6.16)
       smart_app_launch_test_kit (~> 0.6.4)
-      subscriptions_test_kit (~> 0.11.2)
+      subscriptions_test_kit (~> 0.11.3)
       udap_security_test_kit (~> 0.11.6)
 
 GEM
