@@ -4,7 +4,6 @@ Gem::Specification.new do |spec|
   spec.name          = 'davinci_pas_test_kit'
   spec.version       = DaVinciPASTestKit::VERSION
   spec.authors       = ['Inferno Team']
-  spec.email         = ['inferno@groups.mitre.org']
   spec.date          = Time.now.utc.strftime('%Y-%m-%d')
   spec.summary       = 'Da Vinci PAS Test Kit'
   spec.description   = 'Inferno Test Kit for the Da Vinci Prior Authorization Support IG'
