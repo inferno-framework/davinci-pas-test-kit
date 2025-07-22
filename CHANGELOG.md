@@ -1,3 +1,6 @@
+# 0.14.0
+* FI-4182: Remove inferno@groups.mitre.org email from gemspec by @arscan in https://github.com/inferno-framework/davinci-pas-test-kit/pull/47
+
 # 0.13.3
 * FI-3815: Update Test Kit with new RSpec features by @Shaumik-Ashraf in https://github.com/inferno-framework/davinci-pas-test-kit/pull/44
 * FI-4144: Requirements Conversion by @tstrass in https://github.com/inferno-framework/davinci-pas-test-kit/pull/45
