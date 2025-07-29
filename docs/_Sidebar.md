@@ -17,7 +17,7 @@
 *   [Test Generation Guide](Test-Generation-Guide)
 
 **Reference Documents & External Links**
-*   [PAS Requirements Interpretation (Spreadsheet)](../tree/main/lib/davinci_pas_test_kit/docs/PAS-Requirements-Interpretation.xlsx)
+*   [PAS Requirements Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx)
 *   [Da Vinci PAS IG (STU2)](https://hl7.org/fhir/us/davinci-pas/STU2/)
 *   [Inferno Framework](https://inferno-framework.github.io/)
 *   [Report an Issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues)

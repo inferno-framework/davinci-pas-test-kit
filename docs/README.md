@@ -20,7 +20,7 @@ provides information on how to use and contribute to this test kit.
 
 ## Reference Documents
 
-*   **[PAS Requirements Interpretation](../tree/main/lib/davinci_pas_test_kit/docs/PAS-Requirements-Interpretation.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
+*   **[PAS Requirements Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx)**: Spreadsheet detailing the interpretation of IG requirements for this test kit.
 
 ## Support
 
