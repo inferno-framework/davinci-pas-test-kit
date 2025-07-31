@@ -59,8 +59,7 @@ issues, please consult the following resources: the [Client Testing
 Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#testing-limitations),
 the [Server Testing
 Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details#testing-limitations),
-the [PAS Requirements Interpretation
-Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx),
+the [PAS Requirements Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx),
 and the project's [GitHub Issues
 page](https://github.com/inferno-framework/davinci-pas-test-kit/issues).
 

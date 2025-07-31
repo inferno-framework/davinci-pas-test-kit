@@ -43,9 +43,8 @@ preliminary checks of their implementations against PAS IG requirements and prov
 feedback on the tests. Future versions of these tests may validate other 
 requirements and may change how these are tested.
 
-Additional details on the IG requirements that underlie this test kit, including
-those that are not currently tested, can be found in [this
-spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/raw/refs/heads/main/lib/davinci_pas_test_kit/docs/PAS%20Requirements%20Interpretation.xlsx).
+Additional details on the IG requirements that underlie this test kit can be found in the [Inferno Requirements Tools](https://inferno-framework.github.io/docs/advanced-test-features/requirements.html),
+including in [this spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx).
 The spreadsheet includes:
 
 - a list of requirements extracted from the IG.
