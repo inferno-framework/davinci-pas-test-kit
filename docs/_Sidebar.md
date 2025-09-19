@@ -15,6 +15,7 @@
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)
 *   [Test Generation Guide](Test-Generation-Guide)
+*   [Running the Suites Against Each Other](Running-Suites-Against-Each-Other)
 
 **Reference Documents & External Links**
 *   [PAS Requirements Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx)
