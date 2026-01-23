@@ -1,9 +1,6 @@
-require_relative 'fhir_resource_navigation'
-
 module DaVinciPASTestKit
   module MustSupportTest
     extend Forwardable
-    include FHIRResourceNavigation
 
     def_delegators 'self.class', :metadata
 
