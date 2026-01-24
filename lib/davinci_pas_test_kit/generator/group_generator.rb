@@ -1,5 +1,3 @@
-require_relative 'naming'
-
 module DaVinciPASTestKit
   class Generator
     class GroupGenerator
@@ -90,7 +88,7 @@ module DaVinciPASTestKit
       end
 
       def profile_identifier(group_metadata)
-        Naming.snake_case_for_profile(group_metadata)
+        ig_metadata.snake_case_for_profile(group_metadata)
       end
 
       def group_id

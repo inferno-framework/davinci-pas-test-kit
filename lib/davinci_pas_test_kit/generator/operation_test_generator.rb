@@ -1,6 +1,3 @@
-require 'pry'
-require_relative 'naming'
-
 module DaVinciPASTestKit
   class Generator
     class OperationTestGenerator
@@ -9,14 +6,15 @@ module DaVinciPASTestKit
           ig_metadata.claim_groups
             .reject { |group| group.name.include?('update') }
             .each do |group|
-              new(group, base_output_dir:).generate
+              new(ig_metadata, group, base_output_dir:).generate
             end
         end
       end
 
-      attr_accessor :group_metadata, :medication_request_metadata, :base_output_dir
+      attr_accessor :ig_metadata, :group_metadata, :medication_request_metadata, :base_output_dir
 
-      def initialize(group_metadata, medication_request_metadata = nil, base_output_dir:)
+      def initialize(ig_metadata, group_metadata, medication_request_metadata = nil, base_output_dir:)
+        self.ig_metadata = ig_metadata
         self.group_metadata = group_metadata
         self.medication_request_metadata = medication_request_metadata
         self.base_output_dir = base_output_dir
@@ -43,11 +41,11 @@ module DaVinciPASTestKit
       end
 
       def directory_name
-        Naming.snake_case_for_profile(medication_request_metadata || group_metadata)
+        ig_metadata.snake_case_for_profile(medication_request_metadata || group_metadata)
       end
 
       def profile_identifier
-        Naming.snake_case_for_profile(group_metadata)
+        ig_metadata.snake_case_for_profile(group_metadata)
       end
 
       def profile_url
@@ -67,7 +65,7 @@ module DaVinciPASTestKit
       end
 
       def class_name
-        "#{Naming.upper_camel_case_for_profile(group_metadata)}OperationTest"
+        "#{ig_metadata.upper_camel_case_for_profile(group_metadata)}OperationTest"
       end
 
       def module_name
@@ -89,7 +87,7 @@ module DaVinciPASTestKit
       end
 
       def request_type
-        Naming.request_type_for_bundle_or_claim[profile_name]
+        ig_metadata.request_type_for_bundle_or_claim[profile_name]
       end
 
       def operation

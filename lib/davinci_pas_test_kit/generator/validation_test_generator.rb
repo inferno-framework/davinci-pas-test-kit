@@ -1,20 +1,18 @@
-require 'pry'
-require_relative 'naming'
-
 module DaVinciPASTestKit
   class Generator
     class ValidationTestGenerator
       class << self
         def generate(ig_metadata, base_output_dir)
           ig_metadata.bundle_groups.each do |group|
-            new(group, base_output_dir:).generate
+            new(ig_metadata, group, base_output_dir:).generate
           end
         end
       end
 
-      attr_accessor :group_metadata, :medication_request_metadata, :base_output_dir, :workflow
+      attr_accessor :ig_metadata, :group_metadata, :medication_request_metadata, :base_output_dir, :workflow
 
-      def initialize(group_metadata, workflow = nil, medication_request_metadata = nil, base_output_dir:)
+      def initialize(ig_metadata, group_metadata, workflow = nil, medication_request_metadata = nil, base_output_dir:)
+        self.ig_metadata = ig_metadata
         self.group_metadata = group_metadata
         self.workflow = workflow
         self.medication_request_metadata = medication_request_metadata
@@ -42,11 +40,11 @@ module DaVinciPASTestKit
       end
 
       def directory_name
-        Naming.snake_case_for_profile(medication_request_metadata || group_metadata)
+        ig_metadata.snake_case_for_profile(medication_request_metadata || group_metadata)
       end
 
       def profile_identifier
-        Naming.snake_case_for_profile(group_metadata)
+        ig_metadata.snake_case_for_profile(group_metadata)
       end
 
       def profile_url
@@ -72,7 +70,7 @@ module DaVinciPASTestKit
 
       def class_name
         pref = "Server#{formatted_workflow.camelize}"
-        "#{pref}#{Naming.upper_camel_case_for_profile(group_metadata)}ValidationTest"
+        "#{pref}#{ig_metadata.upper_camel_case_for_profile(group_metadata)}ValidationTest"
       end
 
       def module_name
@@ -94,7 +92,7 @@ module DaVinciPASTestKit
       end
 
       def request_type
-        Naming.request_type_for_bundle_or_claim[profile_name]
+        ig_metadata.request_type_for_bundle_or_claim[profile_name]
       end
 
       def generate

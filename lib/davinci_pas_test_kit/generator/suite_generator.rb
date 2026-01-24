@@ -1,5 +1,3 @@
-require_relative 'naming'
-
 module DaVinciPASTestKit
   class Generator
     class SuiteGenerator

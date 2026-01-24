@@ -1,5 +1,3 @@
-require 'pry'
-require_relative 'naming'
 require_relative 'must_support_check_profiles'
 
 module DaVinciPASTestKit
@@ -21,22 +19,27 @@ module DaVinciPASTestKit
           end
 
           submit_request_groups.each do |group|
-            new(group, base_server_output_dir, 'request', 'submit').generate
-            new(group, base_client_output_dir, 'request', 'submit', 'client').generate
+            new(ig_metadata, group, base_server_output_dir, 'request', 'submit').generate
+            new(ig_metadata, group, base_client_output_dir, 'request', 'submit', 'client').generate
           end
-          submit_response_groups.each { |group| new(group, base_server_output_dir, 'response', 'submit').generate }
+          submit_response_groups.each do |group|
+            new(ig_metadata, group, base_server_output_dir, 'response', 'submit').generate
+          end
 
           inquiry_request_groups.each do |group|
-            new(group, base_server_output_dir, 'request', 'inquire').generate
-            new(group, base_client_output_dir, 'request', 'inquire', 'client').generate
+            new(ig_metadata, group, base_server_output_dir, 'request', 'inquire').generate
+            new(ig_metadata, group, base_client_output_dir, 'request', 'inquire', 'client').generate
           end
-          inquiry_response_groups.each { |group| new(group, base_server_output_dir, 'response', 'inquire').generate }
+          inquiry_response_groups.each do |group|
+            new(ig_metadata, group, base_server_output_dir, 'response', 'inquire').generate
+          end
         end
       end
 
-      attr_accessor :group_metadata, :base_output_dir, :type, :operation, :system
+      attr_accessor :ig_metadata, :group_metadata, :base_output_dir, :type, :operation, :system
 
-      def initialize(group_metadata, base_output_dir, type, operation, system = 'server')
+      def initialize(ig_metadata, group_metadata, base_output_dir, type, operation, system = 'server')
+        self.ig_metadata = ig_metadata
         self.group_metadata = group_metadata
         self.base_output_dir = base_output_dir
         self.type = type
@@ -69,7 +72,7 @@ module DaVinciPASTestKit
       end
 
       def profile_identifier
-        Naming.snake_case_for_profile(group_metadata)
+        ig_metadata.snake_case_for_profile(group_metadata)
       end
 
       def request_type
@@ -82,7 +85,7 @@ module DaVinciPASTestKit
 
       def class_name
         # rubocop:disable Layout/LineLength
-        "#{system.capitalize}#{request_type.camelize}#{Naming.upper_camel_case_for_profile(group_metadata)}MustSupportTest"
+        "#{system.capitalize}#{request_type.camelize}#{ig_metadata.upper_camel_case_for_profile(group_metadata)}MustSupportTest"
         # rubocop:enable Layout/LineLength
       end
 
