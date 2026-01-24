@@ -82,7 +82,7 @@ module DaVinciPASTestKit
       end
 
       def error_group_file_name
-        "../../custom_groups/#{ig_metadata.ig_version}/pas_error_group"
+        "../../#{ig_metadata.ig_version}/pas_error_group"
       end
 
       def error_group_id

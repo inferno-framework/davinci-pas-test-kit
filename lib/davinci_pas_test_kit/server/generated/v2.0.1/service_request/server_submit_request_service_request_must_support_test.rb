@@ -1,0 +1,60 @@
+require_relative '../../../../cross_suite/must_support/must_support_test'
+require_relative '../../../../generator/group_metadata'
+require_relative '../../../../cross_suite/tags'
+
+module DaVinciPASTestKit
+  module DaVinciPASV201
+    class ServerSubmitRequestServiceRequestMustSupportTest < Inferno::Test
+      include DaVinciPASTestKit::MustSupportTest
+
+      title 'All must support elements for Profile PAS Service Request are observed across all instances submitted'
+      description %(
+        
+        **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
+
+        PAS server systems are required to be able to receive all
+        must support elements on instances of all profiles included in 
+        requests, including instances of the PAS Service Request Profile.
+        This test checks all identified instances of the PAS Service Request
+        Profile on requests sent to the server to ensure that the following
+        must support elements are observed:
+
+        * ServiceRequest.code
+        * ServiceRequest.extension:coverage
+        * ServiceRequest.extension:serviceCodeEnd
+        * ServiceRequest.occurrence[x]
+        * ServiceRequest.quantity[x]
+        * ServiceRequest.subject
+      )
+
+      id :pas_server_submit_request_v201_service_request_must_support_test
+
+      def resource_type
+        'ServiceRequest'
+      end
+
+      def user_input_validation
+        true
+      end
+
+      def self.metadata
+        @metadata ||= Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, '..', '..', '..', '..', 'cross_suite', 'generated', 'v2.0.1', 'service_request', 'metadata.yml'), aliases: true))
+      end
+
+      def scratch_resources
+        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
+        scratch[:submit_request_resources] ||= {}
+      end
+
+      def resources_of_interest
+        collection = tagged_resources(SUBMIT_TAG).presence || all_scratch_resources
+        collection.select { |res| res.resourceType == resource_type }
+      end
+
+      run do
+        perform_must_support_test(resources_of_interest)
+        validate_must_support(user_input_validation)
+      end
+    end
+  end
+end

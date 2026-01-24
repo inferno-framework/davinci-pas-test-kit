@@ -4,29 +4,34 @@ module DaVinciPASTestKit
   class Generator
     class GroupGenerator
       class << self
-        def generate(ig_metadata, base_output_dir)
+        def generate(ig_metadata, base_metadata_output_dir, base_server_output_dir, base_client_output_dir)
           groups = ig_metadata.groups.select { |group| group.tests.present? }.reject do |group|
             group.profile_name.include?('Base')
           end
           # Server Test Groups
           ['approval', 'denial', 'pended', 'must_support'].each_with_index do |use_case, index|
-            new(ig_metadata, use_case, groups, base_output_dir, 'server', index.zero?).generate
+            new(ig_metadata, use_case, groups, base_server_output_dir, base_metadata_output_dir, 'server',
+                first_generate: index.zero?).generate
           end
 
           # Client Test Groups
           ['submit_must_support', 'inquiry_must_support'].each do |use_case|
-            new(ig_metadata, use_case, groups, base_output_dir, 'client', false).generate
+            new(ig_metadata, use_case, groups, base_client_output_dir, base_metadata_output_dir, 'client',
+                first_generate: false).generate
           end
         end
       end
 
-      attr_accessor :ig_metadata, :use_case, :groups, :base_output_dir, :first_generate, :system
+      attr_accessor :ig_metadata, :use_case, :groups, :base_output_dir, :base_metadata_output_dir,
+                    :first_generate, :system
 
-      def initialize(ig_metadata, use_case, groups, base_output_dir, system = 'server', first_generate = false)
+      def initialize(ig_metadata, use_case, groups, base_output_dir, base_metadata_output_dir,
+                     system = 'server', first_generate: false)
         self.ig_metadata = ig_metadata
         self.use_case = use_case
         self.groups = groups
         self.base_output_dir = base_output_dir
+        self.base_metadata_output_dir = base_metadata_output_dir
         self.system = system
         self.first_generate = first_generate
       end
@@ -76,8 +81,12 @@ module DaVinciPASTestKit
         File.join(base_output_dir, base_output_file_name)
       end
 
+      def metadata_file_dir(group)
+        File.join(base_metadata_output_dir, profile_identifier(group))
+      end
+
       def metadata_file_name(group)
-        File.join(base_output_dir, profile_identifier(group), base_metadata_file_name)
+        File.join(base_metadata_output_dir, profile_identifier(group), base_metadata_file_name)
       end
 
       def profile_identifier(group_metadata)
@@ -89,11 +98,13 @@ module DaVinciPASTestKit
       end
 
       def generate
+        FileUtils.mkdir_p(base_output_dir)
         File.write(output_file_name, output)
         ig_metadata.add_use_case_groups(group_id, base_output_file_name)
         return unless first_generate
 
         groups.each do |group_metadata|
+          FileUtils.mkdir_p(metadata_file_dir(group_metadata))
           File.write(metadata_file_name(group_metadata), YAML.dump(group_metadata.to_hash))
         end
       end
@@ -319,11 +330,11 @@ module DaVinciPASTestKit
       end
 
       def claim_response_decision_file_name
-        "../../custom_groups/#{ig_metadata.ig_version}/claim_response_decision/pas_claim_response_decision_test"
+        "../../#{ig_metadata.ig_version}/claim_response_decision/pas_claim_response_decision_test"
       end
 
       def subscription_notification_file_name
-        "../../custom_groups/#{ig_metadata.ig_version}/notification/pas_subscription_notification_test"
+        "../../#{ig_metadata.ig_version}/notification/pas_subscription_notification_test"
       end
 
       def rename_input?(test_id)
@@ -357,7 +368,7 @@ module DaVinciPASTestKit
       end
 
       def pas_submit_must_support_requirement_test_file
-        "../../custom_groups/#{ig_metadata.ig_version}/must_support/pas_#{system}_must_support_requirement_test"
+        "../../#{ig_metadata.ig_version}/must_support/pas_#{system}_must_support_requirement_test"
       end
 
       # Client tests initiation for must support: tests to allow the client to send $submit/$inquire requests in
@@ -369,7 +380,7 @@ module DaVinciPASTestKit
 
       def pas_client_must_support_test_file
         request_type = use_case.include?('submit') ? 'submit' : 'inquire'
-        "../../custom_groups/#{ig_metadata.ig_version}/client_tests/pas_client_#{request_type}_must_support_test"
+        "../../#{ig_metadata.ig_version}/workflows/pas_client_#{request_type}_must_support_test"
       end
 
       def verifies_requirements

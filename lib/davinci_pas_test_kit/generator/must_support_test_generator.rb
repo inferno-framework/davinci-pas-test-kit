@@ -6,7 +6,7 @@ module DaVinciPASTestKit
   class Generator
     class MustSupportTestGenerator
       class << self
-        def generate(ig_metadata, base_output_dir)
+        def generate(ig_metadata, base_server_output_dir, base_client_output_dir)
           submit_request_groups = ig_metadata.groups.select do |group|
             MustSupportCheckProfiles.submit_request_group?(group)
           end
@@ -21,16 +21,16 @@ module DaVinciPASTestKit
           end
 
           submit_request_groups.each do |group|
-            new(group, base_output_dir, 'submit_request').generate
-            new(group, base_output_dir, 'submit_request', 'client').generate
+            new(group, base_server_output_dir, 'submit_request').generate
+            new(group, base_client_output_dir, 'submit_request', 'client').generate
           end
-          submit_response_groups.each { |group| new(group, base_output_dir, 'submit_response').generate }
+          submit_response_groups.each { |group| new(group, base_server_output_dir, 'submit_response').generate }
 
           inquiry_request_groups.each do |group|
-            new(group, base_output_dir, 'inquire_request').generate
-            new(group, base_output_dir, 'inquire_request', 'client').generate
+            new(group, base_server_output_dir, 'inquire_request').generate
+            new(group, base_client_output_dir, 'inquire_request', 'client').generate
           end
-          inquiry_response_groups.each { |group| new(group, base_output_dir, 'inquire_response').generate }
+          inquiry_response_groups.each { |group| new(group, base_server_output_dir, 'inquire_response').generate }
         end
       end
 

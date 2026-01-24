@@ -1,6 +1,6 @@
-require_relative '../../../must_support_test'
-require_relative '../../../generator/group_metadata'
-require_relative '../../../tags'
+require_relative '../../../../cross_suite/must_support/must_support_test'
+require_relative '../../../../generator/group_metadata'
+require_relative '../../../../cross_suite/tags'
 
 module DaVinciPASTestKit
   module <%= module_name %>
@@ -54,7 +54,7 @@ module DaVinciPASTestKit
       end
 
       def self.metadata
-        @metadata ||= Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, 'metadata.yml'), aliases: true))
+        @metadata ||= Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, '..', '..', '..', '..', 'cross_suite', 'generated', '<%= group_metadata.version %>', '<%= profile_identifier %>', 'metadata.yml'), aliases: true))
       end
 
       def scratch_resources

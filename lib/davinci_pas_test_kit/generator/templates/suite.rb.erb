@@ -1,6 +1,6 @@
-require_relative '../../validator_suppressions'
+require_relative '../../../cross_suite/validator_suppressions'
 require_relative '<%= error_group_file_name %>'
-require_relative '../../custom_groups/v2.0.1/pas_server_subscription_setup'
+require_relative '../../v2.0.1/pas_server_subscription_setup'
 <% group_file_list.each do |file_name| %>require_relative '<%= file_name %>'
 <% end %>
 module DaVinciPASTestKit

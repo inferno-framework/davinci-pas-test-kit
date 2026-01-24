@@ -1,14 +1,18 @@
-require 'pry'
-require_relative '../generated/v2.0.1/resource_list'
-
 module DaVinciPASTestKit
   class Generator
     module Naming
       class << self
-        include DaVinciPASTestKit::PASV201::ResourceList
         def resources_with_multiple_profiles
+          # TODO: load once without relying on previoiusly generated files
+          metadata = YAML.load_file(File.join(__dir__, '..', 'cross_suite', 'generated', 'v2.0.1', 'metadata.yml'),
+                                    aliases: true)
+          resource_supported_profiles = metadata[:groups].each_with_object({}) do |group, dict|
+            dict[group[:resource]] ||= []
+            dict[group[:resource]] << group[:profile_url]
+          end
+
           resources = []
-          RESOURCE_SUPPORTED_PROFILES.each do |resource, profile_list|
+          resource_supported_profiles.each do |resource, profile_list|
             resources << resource.to_s if profile_list.length > 1
           end
           resources
