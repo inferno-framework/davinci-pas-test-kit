@@ -2,7 +2,6 @@ require 'inferno/ext/fhir_models'
 
 require_relative 'generator/ig_loader'
 require_relative 'generator/ig_metadata_extractor'
-require_relative 'generator/resource_list_generator'
 require_relative 'generator/validation_test_generator'
 require_relative 'generator/operation_test_generator'
 require_relative 'generator/group_generator'
@@ -31,7 +30,6 @@ module DaVinciPASTestKit
       extract_metadata
       FileUtils.mkdir_p(base_server_output_dir)
       FileUtils.mkdir_p(base_client_output_dir)
-      generate_resource_list
       generate_validation_tests
       generate_operation_tests
       generate_must_support_tests
@@ -61,10 +59,6 @@ module DaVinciPASTestKit
 
     def base_client_output_dir
       File.join(__dir__, 'client', 'generated', ig_metadata.ig_version)
-    end
-
-    def generate_resource_list
-      ResourceListGenerator.generate(ig_metadata, base_shared_output_dir)
     end
 
     def generate_validation_tests
