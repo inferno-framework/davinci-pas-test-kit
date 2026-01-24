@@ -1,13 +1,8 @@
-require_relative '../../../cross_suite/must_support/must_support_test'
-require_relative '../../../generator/group_metadata'
+require_relative '../../../cross_suite/must_support/must_support_request_type_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class PasServerMustSupportRequirementTest < Inferno::Test
-      include DaVinciPASTestKit::MustSupportTest
-
-      attr_accessor :resource_type
-
+    class PasServerMustSupportRequirementTest < DaVinciPASTestKit::MustSupportRequestTypeTest
       id :pas_server_submit_v201_must_support_requirement
       title %(
         At least one instance of a request profile (PAS Medication Request, PAS Service Request,
@@ -77,43 +72,15 @@ module DaVinciPASTestKit
         * NutritionOrder.patient
       )
 
-      def resource_types
-        ['DeviceRequest', 'MedicationRequest', 'NutritionOrder', 'ServiceRequest']
-      end
-
-      def self.metadata
-        metadata_file_name = "#{@@resource_type.underscore}_metadata.yml"
-        Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, metadata_file_name),
-                                                    aliases: true))
-      end
-
-      def scratch_resources
-        scratch[:submit_request_resources] ||= {}
-      end
-
-      def all_scratch_resources
-        scratch_resources[:all] ||= []
-      end
-
-      def resources_of_interest
-        all_scratch_resources.select { |resource| resource_types.include?(resource.resourceType) }
-      end
-
-      def grouped_resources
-        resources_of_interest.group_by(&:resourceType)
-      end
-
-      run do
-        msg = 'Request Bundle must include at least one instance of either DeviceRequest, MedicationRequest,
-                NutritionOrder, or ServiceRequest resource'
-        assert resources_of_interest.present?, msg
-
-        grouped_resources.each do |type, resources|
-          @@resource_type = @resource_type = type # rubocop:disable Style/ClassVars
-          perform_must_support_test(resources)
-        end
-        validate_must_support(true)
-      end
+      config(
+        options: {
+          profile_keys: ['device_request', 'medication_request', 'nutrition_order', 'service_request'],
+          user_input_validation: true,
+          version: 'v2.0.1',
+          type: 'request',
+          operation: 'submit'
+        }
+      )
     end
   end
 end

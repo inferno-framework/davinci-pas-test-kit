@@ -21,25 +21,26 @@ module DaVinciPASTestKit
           end
 
           submit_request_groups.each do |group|
-            new(group, base_server_output_dir, 'submit_request').generate
-            new(group, base_client_output_dir, 'submit_request', 'client').generate
+            new(group, base_server_output_dir, 'request', 'submit').generate
+            new(group, base_client_output_dir, 'request', 'submit', 'client').generate
           end
-          submit_response_groups.each { |group| new(group, base_server_output_dir, 'submit_response').generate }
+          submit_response_groups.each { |group| new(group, base_server_output_dir, 'response', 'submit').generate }
 
           inquiry_request_groups.each do |group|
-            new(group, base_server_output_dir, 'inquire_request').generate
-            new(group, base_client_output_dir, 'inquire_request', 'client').generate
+            new(group, base_server_output_dir, 'request', 'inquire').generate
+            new(group, base_client_output_dir, 'request', 'inquire', 'client').generate
           end
-          inquiry_response_groups.each { |group| new(group, base_server_output_dir, 'inquire_response').generate }
+          inquiry_response_groups.each { |group| new(group, base_server_output_dir, 'response', 'inquire').generate }
         end
       end
 
-      attr_accessor :group_metadata, :base_output_dir, :request_type, :system
+      attr_accessor :group_metadata, :base_output_dir, :type, :operation, :system
 
-      def initialize(group_metadata, base_output_dir, request_type, system = 'server')
+      def initialize(group_metadata, base_output_dir, type, operation, system = 'server')
         self.group_metadata = group_metadata
         self.base_output_dir = base_output_dir
-        self.request_type = request_type
+        self.type = type
+        self.operation = operation
         self.system = system
       end
 
@@ -69,6 +70,10 @@ module DaVinciPASTestKit
 
       def profile_identifier
         Naming.snake_case_for_profile(group_metadata)
+      end
+
+      def request_type
+        "#{operation}_#{type}"
       end
 
       def test_id

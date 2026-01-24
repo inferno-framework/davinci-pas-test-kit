@@ -1,11 +1,8 @@
 require_relative '../../../../cross_suite/must_support/must_support_test'
-require_relative '../../../../generator/group_metadata'
-require_relative '../../../../cross_suite/tags'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class ServerSubmitRequestPasRequestBundleMustSupportTest < Inferno::Test
-      include DaVinciPASTestKit::MustSupportTest
+    class ServerSubmitRequestPasRequestBundleMustSupportTest < DaVinciPASTestKit::MustSupportTest
 
       title 'All must support elements for Profile PAS Request Bundle are observed across all instances submitted'
       description %(
@@ -29,32 +26,16 @@ module DaVinciPASTestKit
 
       id :pas_server_submit_request_v201_pas_request_bundle_must_support_test
 
-      def resource_type
-        'Bundle'
-      end
-
-      def user_input_validation
-        true
-      end
-
-      def self.metadata
-        @metadata ||= Generator::GroupMetadata.new(YAML.load_file(File.join(__dir__, '..', '..', '..', '..', 'cross_suite', 'generated', 'v2.0.1', 'pas_request_bundle', 'metadata.yml'), aliases: true))
-      end
-
-      def scratch_resources
-        # The scratch key in MS test should be the same as the scratch key in the validation test for a given profile.
-        scratch[:submit_request_resources] ||= {}
-      end
-
-      def resources_of_interest
-        collection = tagged_resources(SUBMIT_TAG).presence || all_scratch_resources
-        collection.select { |res| res.resourceType == resource_type }
-      end
-
-      run do
-        perform_must_support_test(resources_of_interest)
-        validate_must_support(user_input_validation)
-      end
+      config(
+        options: {
+          resource_type: 'Bundle',
+          profile_key: 'pas_request_bundle',
+          user_input_validation: true,
+          version: 'v2.0.1',
+          type: 'request',
+          operation: 'submit'
+        }
+      )
     end
   end
 end
