@@ -1,15 +1,15 @@
-module DaVinciPASTestKit
-  module MustSupportTest
-    extend Forwardable
+require_relative '../../generator/group_metadata'
 
-    def_delegators 'self.class', :metadata
+module DaVinciPASTestKit
+  module MustSupportValidation
+    def load_metadata_for_profile_version(profile_key, version)
+      Generator::GroupMetadata.new(
+        YAML.load_file(File.join(__dir__, '..', 'generated', version, profile_key, 'metadata.yml'), aliases: true)
+      )
+    end
 
     def all_scratch_resources
       scratch_resources[:all] ||= []
-    end
-
-    def reset_variables
-      @missing_elements = @missing_slices = @missing_extensions = nil
     end
 
     def tagged_resources(tag)
@@ -38,7 +38,7 @@ module DaVinciPASTestKit
       @all_must_support_errors ||= []
     end
 
-    def validate_must_support(user_input_validation)
+    def validate_must_support(user_input_validation: true)
       if user_input_validation
         skip_if !all_must_support_errors.empty?, all_must_support_errors.join("\n")
       else
@@ -57,12 +57,6 @@ module DaVinciPASTestKit
                                  "in the #{resources.length} provided #{resource_type} resource(s)."
 
       all_must_support_errors.reject! { |err| err.downcase.include?('x12') }
-      reset_variables
-
-      # pass if (missing_elements + missing_slices + missing_extensions).empty?
-
-      # assert false, "Could not find #{missing_must_support_strings.join(', ')} in the #{resources.length} " \
-      #               "provided #{resource_type} resource(s)"
     end
   end
 end
