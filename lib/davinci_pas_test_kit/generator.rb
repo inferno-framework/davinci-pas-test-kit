@@ -11,7 +11,7 @@ require_relative 'generator/must_support_test_generator'
 module DaVinciPASTestKit
   class Generator
     def self.generate
-      ig_packages = Dir.glob(File.join(Dir.pwd, 'lib', 'davinci_pas_test_kit', 'cross_suite', 'igs', '*.tgz'))
+      ig_packages = Dir.glob(File.join(Dir.pwd, 'lib', 'davinci_pas_test_kit', 'igs', '*.tgz'))
 
       ig_packages.each do |ig_package|
         new(ig_package).generate
