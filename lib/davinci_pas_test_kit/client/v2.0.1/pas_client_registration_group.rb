@@ -1,6 +1,5 @@
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
-require_relative 'client_suite'
 require_relative 'pas_client_options'
 require_relative 'registration/configuration_smart_display_test'
 require_relative 'registration/configuration_udap_display_test'

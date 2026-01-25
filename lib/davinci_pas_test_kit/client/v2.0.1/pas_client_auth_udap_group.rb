@@ -1,5 +1,4 @@
 require 'udap_security_test_kit'
-require_relative 'client_suite'
 require_relative '../../cross_suite/tags'
 
 module DaVinciPASTestKit
