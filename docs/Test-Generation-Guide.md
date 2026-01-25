@@ -6,7 +6,7 @@ and some insights into its mechanics for maintainers.
 
 ## Overview
 
-A portion of the server tests within the Da Vinci PAS Test Kit, particularly
+A portion of the server and client tests within the Da Vinci PAS Test Kit, particularly
 those related to profile validation and must-support element checks, are
 programmatically generated. This approach ensures that the test kit remains
 aligned with the specific version of the PAS Implementation Guide (IG) it
@@ -47,10 +47,13 @@ Follow these steps to generate a new test suite or update an existing one for a 
         ```bash
         bundle exec rake pas:generate
         ```
-    *   This command will invoke the scripts located in `lib/davinci_pas_test_kit/generator/`.
+    *   This command will invoke the scripts located in `lib/davinci_pas_test_kit/generator.rb` and related files under `lib/davinci_pas_test_kit/generator/`.
 
 4.  **Verify Generated Files**:
-    *   After the generator runs, check the `lib/davinci_pas_test_kit/generated/` directory. You should see a new subdirectory corresponding to the IG version you targeted (e.g., `v2.0.1/`).
+    *   After the generator runs, check the `generated/` directory under the
+    `lib/davinci_pas_test_kit/client`, `lib/davinci_pas_test_kit/server`, and
+    `lib/davinci_pas_test_kit/cross_suite` directories. Under each, you should see a new
+    subdirectory corresponding to the IG version you targeted (e.g., `v2.0.1/`).
     *   Inside this version-specific directory, you'll find generated Ruby files containing test groups, profile validation tests, must-support tests, and other necessary components.
     *   Also, check `lib/davinci_pas_test_kit/metadata.rb` to ensure the new suite ID (if a new version was added) is registered.
 
@@ -69,7 +72,6 @@ The test generation logic resides primarily in the `lib/davinci_pas_test_kit/gen
 *   **`group_generator.rb` / `group_metadata.rb`**: Handles the creation of test groups within the suite.
 *   **`must_support_test_generator.rb`**: Specifically generates tests for "must support" elements defined in profiles. It inspects StructureDefinitions to identify these elements and creates tests to verify their presence or handling.
 *   **`validation_test_generator.rb`**: Generates tests that perform FHIR profile validation on resources.
-*   **`naming.rb`**: Provides conventions for naming generated files, classes, and test IDs.
 *   **Templates**: The generator likely uses ERB (Embedded Ruby) templates (often found within the `generator/templates/` subdirectory, though not explicitly listed in the initial file view) to structure the generated Ruby code for tests and groups.
 
 The general process is:
@@ -81,7 +83,9 @@ The general process is:
     *   Validation of "must support" elements.
     *   Potentially tests for specific operations or interactions defined in CapabilityStatements.
 5.  These tests are organized into groups, and the groups form a test suite.
-6.  The generated Ruby files are written to the `lib/davinci_pas_test_kit/generated/<ig_version>/` directory.
+6.  The generated Ruby files are written to the `generated/<ig_version>/` directory under the
+     `lib/davinci_pas_test_kit/client`, `lib/davinci_pas_test_kit/server`, and
+    `lib/davinci_pas_test_kit/cross_suite` directories.
 
 Maintaining or extending the generator requires a good understanding of Ruby,
 the Inferno Framework's testing DSL (Domain Specific Language), and the

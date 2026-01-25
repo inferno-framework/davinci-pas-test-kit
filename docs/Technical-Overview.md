@@ -17,24 +17,73 @@ The PAS Test Kit is built upon the Inferno Framework and adheres to its core des
 
 The primary codebase for the PAS Test Kit resides within the `lib/davinci_pas_test_kit/` directory. Key subdirectories and files include:
 
-*   **`client_suite.rb`**: Defines the main test suite for PAS clients.
-*   **`metadata.rb`**: Contains metadata for the test kit, including its title, description (which appears in the Inferno UI), and suite IDs. This is a crucial file for how the test kit presents itself in the Inferno Framework.
+*   **`client/`**: directory containing tests and logic specific to the client suites.
+*   **`cross_suite/`**: directory containing logic shared by all suites.
+*   **`server/`**: directory containing tests and logic specific to the server suites.
+*   **`generator.rb` and `generator/`**: Holds the Ruby scripts and templates that create
+    some of the test structure and content based on published IG content. Generated files are
+    placed in the `generated/` folder under the `client/`, `cross_suite/`, and `server/` directories.
+    See the [Test Generation Guide](Test-Generation-Guide) for more details on the generation scope
+    and process.
+*   **`igs/`**: directory containing the ig versions used to generate test content for suites within
+    this test kit.
+*   **`requirements/`**: directory containing the extractd requirements for this test kit.
 *   **`version.rb`**: Specifies the version of the test kit.
+*   **`metadata.rb`**: Contains metadata for the test kit, including its title, description
+    (which appears in the Inferno UI), and suite IDs. This is a crucial file for how the test kit
+    presents itself in the Inferno Framework.
+
+### Shared Cross-Suite Code Organization
+
+Key subdirectories and files within the `cross_suite/` folder include:
+
+*   **`generated/`**: Contains metadata files generated from the PAS IG and used for must support tests.
+*   **`must_support/`**: Contains base must support test logic used by all suites.
+*   **`pas_bundle_validation.rb`**: Specific validation logic for PAS Bundles.
+*   **`pas_subscription_validation.rb`**: Specific validation logic for PAS Subscriptions.
+*   **`tags.rb`**: Tags used when storing and retrieving requests for validation.
+*   **`urls.rb`**: Specific paths and addresses used and displayed by the tests.
+*   **`validation_test.rb`**: Core logic for FHIR validation tests.
+*   **`validator_suppressions.rb`**: Configuration for suppressing known, non-critical validation errors.
+
+### Client Code Organization
+
+Key subdirectories and files within the `client/` folder include:
+
+*   **`certs/`**: Certificates and private keys used in the UDAP server simulation.
+*   **`endpoints/`**: Contains code for managing the FHIR endpoints that Inferno exposes when simulating
+    a PAS server during client testing.
+*   **`generated/`**: Contains generated must support tests used by the client suites. The
+    tests are organized by version and profile.
+*   **`jobs/`**: Background jobs run in response to received messages, including 
+    Subscription handshakes following creation and notifications following a pended Claim.
+*   **`[version]`**: Contains the suite with all manually generated tests and logic for the
+    version corresponding to the directory name. There will be one folder for each IG version
+    supported.
+*   **`client_input_descriptions.rb`**: Common descriptions for inputs within the client tests.
+*   **`response_generator.rb`**: Logic used by the endpoints to generate responses when acting as
+    a PAS server.
+*   **`session_identification.rb`**: Logic used by client tests that receive requests to Inferno's
+    simulated PAS server to make sure that those requests will be associated with the correct
+    test session.
+*   **`user_input_response.rb`**: Logic used by client tests that receive requests to Inferno's
+    simulated PAS server to enable inputs provided by the tester to be returned by Inferno.
+
+### Server Code Organization
+
+Key subdirectories and files within the `server/` folder include:
+*   **`generated/`**: Contains generated tests and groups used by the server suites, including
+    the server suites themselves. The tests are organized by version and then profile when
+    applicable.
+*   **`[version]`**: Contains the manually generated tests and logic for the server suite
+    version corresponding to the directory name. There will be one folder for each IG version
+    supported.
+
+### Additional Top-level Organization
+
+*   **`config/presets/`**: Contains preset definitions used by the suites in this test kit.
 *   **`docs/`**: Contains Markdown documentation files that are mirrored to the [GitHub wiki](/inferno-framework/davinci-pas-test-kit/wiki) for this repository.
-*   **`generated/`**: Contains tests and supporting files that are programmatically generated from the PAS Implementation Guide artifacts (like CapabilityStatements and StructureDefinitions). This is a key part of the test kit's strategy to stay aligned with the IG. It's typically structured by IG version.
-*   **`generator/`**: Holds the Ruby scripts and templates responsible for the test generation process. Files like `suite_generator.rb`, `group_generator.rb`, and `must_support_test_generator.rb` are central to this.
-*   **`custom_groups/`**: This directory contains custom-defined test groups that are not automatically generated. These groups often contain complex workflow logic or specific scenarios that require manual test definition. It's often structured by IG version (e.g., `v2.0.1/`).
-    *   Files like `pas_client_approval_group.rb`, `pas_server_subscription_setup.rb` define specific sequences of tests.
-*   **`igs/`**: Stores the IG package files (e.g., `davinci_pas_2.0.1.tgz`) that the generator uses as input.
-*   **`endpoints/`**: Contains code for managing the FHIR endpoints that Inferno exposes when acting as a server (e.g., for client testing). This might include endpoints for `$submit`, `$inquire`, and `Subscription` interactions.
-*   **`jobs/`**: For background jobs, if any. For PAS, this could include tasks like sending delayed subscription notifications (e.g., `send_pas_subscription_notification.rb`).
-*   **Supporting Logic Files**:
-    *   `fhir_resource_navigation.rb`: Utilities for navigating FHIR resources.
-    *   `must_support_test.rb`: Core logic for generating and running Must Support tests.
-    *   `pas_bundle_validation.rb`: Specific validation logic for PAS bundles.
-    *   `response_generator.rb`: Logic for Inferno to generate responses when acting as a server.
-    *   `validation_test.rb`: Core logic for FHIR validation tests.
-    *   `validator_suppressions.rb`: Configuration for suppressing known, non-critical validation errors.
+*   **`spec/`**: Contains rspec-based unit tests for this test kit.
 
 ## Related Systems and Dependencies
 
