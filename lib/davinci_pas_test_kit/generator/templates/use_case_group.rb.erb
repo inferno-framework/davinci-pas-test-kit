@@ -1,0 +1,39 @@
+<% test_file_list.each do |file_name| %>require_relative '<%= file_name %>'
+<% end %>
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::TestGroup
+      title '<%= title %>'
+      description %(
+        <%=description.gsub("\n", "\n" + " "*8) %>
+      )
+
+      id :<%= group_id %>
+      run_as_group
+      def use_case
+        '<%= use_case %>'
+      end
+  <% test_id_list.each do |category, id_list| %>
+      group do
+        title '<%= category %>'
+        <% id_list.each do |id| %>
+        test from: :<%= id %><% if rename_input?(id) %> do
+          id :<%= alt_test_id(id, use_case) %>
+          config(
+            inputs: {
+              pa_submit_request_payload: {
+                name: :<%= alt_request_input_name(use_case, 'submit')%> ,
+                title: '<%= alt_request_input_title(use_case, 'submit')%>'
+              }
+            }
+          )
+        end<% elsif id == 'subscriptions_r4_server_notification_conformance' %> do
+          config options: { subscription_type: 'id-only' }
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@145'
+          input :pended_pa_submit_request_payload
+        end<% elsif ['prior_auth_claim_response_update_notification_validation', 'subscriptions_r4_server_id_only_conformance'].include?(id) %>,
+             input: :pended_pa_submit_request_payload<% end %><% end %>
+      end<% end %>
+    end
+  end
+end

@@ -15,7 +15,6 @@ module DaVinciPASTestKit
 
       id :pas_server_v201_denial_use_case
       run_as_group
-  
       def use_case
         'denial'
       end
@@ -48,7 +47,6 @@ module DaVinciPASTestKit
         test from: :pas_server_v201_pas_response_bundle_validation_test
         test from: :prior_auth_claim_response_decision_validation
       end
-  
     end
   end
 end

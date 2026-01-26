@@ -25,7 +25,6 @@ module DaVinciPASTestKit
 
       id :pas_server_v201_pended_use_case
       run_as_group
-  
       def use_case
         'pended'
       end
@@ -84,7 +83,6 @@ module DaVinciPASTestKit
         end
         test from: :pas_server_v201_pas_inquiry_response_bundle_validation_test
       end
-  
     end
   end
 end

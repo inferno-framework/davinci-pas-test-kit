@@ -4,7 +4,8 @@ require_relative 'generator/ig_loader'
 require_relative 'generator/ig_metadata_extractor'
 require_relative 'generator/validation_test_generator'
 require_relative 'generator/operation_test_generator'
-require_relative 'generator/group_generator'
+require_relative 'generator/use_case_group_generator'
+require_relative 'generator/must_support_group_generator'
 require_relative 'generator/suite_generator'
 require_relative 'generator/must_support_test_generator'
 
@@ -33,7 +34,8 @@ module DaVinciPASTestKit
       generate_validation_tests
       generate_operation_tests
       generate_must_support_tests
-      generate_groups
+      generate_use_case_groups
+      generate_must_support_groups
       generate_suites
     end
 
@@ -69,8 +71,12 @@ module DaVinciPASTestKit
       OperationTestGenerator.generate(ig_metadata, base_server_output_dir)
     end
 
-    def generate_groups
-      GroupGenerator.generate(ig_metadata, base_shared_output_dir, base_server_output_dir, base_client_output_dir)
+    def generate_use_case_groups
+      UseCaseGroupGenerator.generate(ig_metadata, base_shared_output_dir, base_server_output_dir)
+    end
+
+    def generate_must_support_groups
+      MustSupportGroupGenerator.generate(ig_metadata, base_server_output_dir, base_client_output_dir)
     end
 
     def generate_suites

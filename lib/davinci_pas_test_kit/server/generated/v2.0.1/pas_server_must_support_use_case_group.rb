@@ -70,7 +70,6 @@ module DaVinciPASTestKit
       def use_case
         'must_support'
       end
-  
     
       group do
         title '$submit Element Support'
