@@ -92,3 +92,7 @@ RSpec/SubjectStub:
 
 Gemspec/RequireMFA:
   Enabled: false
+
+# The test kit folder organization (and corresponding spec organization) does not align with modules, so RSpec complains
+RSpec/SpecFilePathFormat:
+  Enabled: false
