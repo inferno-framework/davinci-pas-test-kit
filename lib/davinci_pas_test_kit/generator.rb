@@ -3,7 +3,6 @@ require 'inferno/ext/fhir_models'
 require_relative 'generator/ig_loader'
 require_relative 'generator/ig_metadata_extractor'
 require_relative 'generator/validation_test_generator'
-require_relative 'generator/operation_test_generator'
 require_relative 'generator/use_case_group_generator'
 require_relative 'generator/must_support_group_generator'
 require_relative 'generator/suite_generator'
@@ -32,7 +31,6 @@ module DaVinciPASTestKit
       FileUtils.mkdir_p(base_server_output_dir)
       FileUtils.mkdir_p(base_client_output_dir)
       generate_validation_tests
-      generate_operation_tests
       generate_must_support_tests
       generate_use_case_groups
       generate_must_support_groups
@@ -65,10 +63,6 @@ module DaVinciPASTestKit
 
     def generate_validation_tests
       ValidationTestGenerator.generate(ig_metadata, base_server_output_dir)
-    end
-
-    def generate_operation_tests
-      OperationTestGenerator.generate(ig_metadata, base_server_output_dir)
     end
 
     def generate_use_case_groups
