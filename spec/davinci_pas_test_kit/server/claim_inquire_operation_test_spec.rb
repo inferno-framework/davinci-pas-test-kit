@@ -29,7 +29,8 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
     it 'fails if provided bundle is invalid json' do
       result = run(test, pa_inquire_request_payload: 'not json', server_endpoint:)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Invalid JSON./)
+      expect(result.result_message)
+        .to match(/Invalid JSON. Provide valid json to use for the \$inquire during the Pended workflow./)
     end
   end
 
@@ -87,7 +88,7 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
 
       result = run(test, pa_inquire_request_payload:, server_endpoint:)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Invalid JSON./)
+      expect(result.result_message).to match(/Invalid JSON. Server response to \$inquire was not json./)
       requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::INQUIRE_TAG,
                                                                         DaVinciPASTestKit::PENDED_WORKFLOW_TAG])
       expect(requests.size).to eq(1)

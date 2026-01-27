@@ -38,13 +38,14 @@ module DaVinciPASTestKit
 
     def check_response_status_and_payload(request)
       assert_response_status([200, 201])
-      assert_valid_json(request.response_body)
+      assert_valid_json(request.response_body, "Server response to $#{operation} was not json.")
       assert_resource_type(:bundle, resource: FHIR.from_contents(request.response_body))
     end
 
     def run_operation_test(request_payload)
       skip_if request_payload.blank?, "No bundle request provided to perform the #{operation} operation"
-      assert_valid_json(request_payload)
+      assert_valid_json(request_payload,
+                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} workflow.")
 
       requests_performed = request_bundles(request_payload).map do |bundle|
         perform_operation(bundle)
