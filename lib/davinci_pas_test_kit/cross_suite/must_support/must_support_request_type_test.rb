@@ -18,8 +18,8 @@ module DaVinciPASTestKit
       config.options[:user_input_validation]
     end
 
-    def version
-      config.options[:version]
+    def ig_version
+      config.options[:ig_version]
     end
 
     def type

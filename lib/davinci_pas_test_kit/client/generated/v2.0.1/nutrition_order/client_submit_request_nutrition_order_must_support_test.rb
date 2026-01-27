@@ -29,7 +29,7 @@ module DaVinciPASTestKit
           resource_type: 'NutritionOrder',
           profile_key: 'nutrition_order',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'submit'
         }

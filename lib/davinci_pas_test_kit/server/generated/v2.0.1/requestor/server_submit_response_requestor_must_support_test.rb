@@ -39,7 +39,7 @@ module DaVinciPASTestKit
           resource_type: 'Organization',
           profile_key: 'requestor',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'response',
           operation: 'submit'
         }

@@ -31,7 +31,7 @@ module DaVinciPASTestKit
           resource_type: 'ServiceRequest',
           profile_key: 'service_request',
           user_input_validation: true,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'submit'
         }

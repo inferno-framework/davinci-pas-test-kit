@@ -37,7 +37,7 @@ module DaVinciPASTestKit
           resource_type: 'Task',
           profile_key: 'task',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'response',
           operation: 'submit'
         }

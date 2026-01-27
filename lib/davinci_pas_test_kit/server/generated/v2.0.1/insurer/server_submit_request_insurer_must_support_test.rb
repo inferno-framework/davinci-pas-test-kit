@@ -38,7 +38,7 @@ module DaVinciPASTestKit
           resource_type: 'Organization',
           profile_key: 'insurer',
           user_input_validation: true,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'submit'
         }

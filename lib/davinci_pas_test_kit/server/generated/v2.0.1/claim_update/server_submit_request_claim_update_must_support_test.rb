@@ -86,7 +86,7 @@ module DaVinciPASTestKit
           resource_type: 'Claim',
           profile_key: 'claim_update',
           user_input_validation: true,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'submit'
         }

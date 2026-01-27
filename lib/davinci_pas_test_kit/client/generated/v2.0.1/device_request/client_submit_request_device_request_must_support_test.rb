@@ -27,7 +27,7 @@ module DaVinciPASTestKit
           resource_type: 'DeviceRequest',
           profile_key: 'device_request',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'submit'
         }

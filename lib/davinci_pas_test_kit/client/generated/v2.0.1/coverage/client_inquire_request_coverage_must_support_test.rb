@@ -31,7 +31,7 @@ module DaVinciPASTestKit
           resource_type: 'Coverage',
           profile_key: 'coverage',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'inquire'
         }

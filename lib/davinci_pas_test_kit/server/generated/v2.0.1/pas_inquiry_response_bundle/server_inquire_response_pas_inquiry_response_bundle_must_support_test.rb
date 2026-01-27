@@ -28,7 +28,7 @@ module DaVinciPASTestKit
           resource_type: 'Bundle',
           profile_key: 'pas_inquiry_response_bundle',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'response',
           operation: 'inquire'
         }

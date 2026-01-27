@@ -50,7 +50,7 @@ module DaVinciPASTestKit
           resource_type: 'ClaimResponse',
           profile_key: 'claiminquiryresponse',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'response',
           operation: 'inquire'
         }

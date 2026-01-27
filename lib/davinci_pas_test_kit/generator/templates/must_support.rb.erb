@@ -47,7 +47,7 @@ module DaVinciPASTestKit
           resource_type: '<%= resource_type %>',
           profile_key: '<%= profile_identifier %>',
           user_input_validation: <% if system == 'server' && request_type.include?('request') %>true<% else %>false<% end %>,
-          version: '<%= group_metadata.version %>',
+          ig_version: '<%= group_metadata.version %>',
           type: '<%= type %>',
           operation: '<%= operation %>'
         }

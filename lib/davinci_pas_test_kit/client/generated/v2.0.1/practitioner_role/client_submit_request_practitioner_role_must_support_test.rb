@@ -25,7 +25,7 @@ module DaVinciPASTestKit
           resource_type: 'PractitionerRole',
           profile_key: 'practitioner_role',
           user_input_validation: false,
-          version: 'v2.0.1',
+          ig_version: 'v2.0.1',
           type: 'request',
           operation: 'submit'
         }
