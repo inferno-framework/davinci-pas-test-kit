@@ -68,7 +68,6 @@
     :system: http://hl7.org/fhir/ValueSet/http-verb
     :path: entry.request.method
   :references: []
-  :delayed_references: []
 - :name: profile_pas_inquiry_response_bundle
   :class_name: ProfilePasInquiryResponseBundleSequence
   :version: v2.0.1
@@ -130,7 +129,6 @@
     :system: http://hl7.org/fhir/ValueSet/http-verb
     :path: entry.request.method
   :references: []
-  :delayed_references: []
 - :name: profile_pas_request_bundle
   :class_name: ProfilePasRequestBundleSequence
   :version: v2.0.1
@@ -198,7 +196,6 @@
     :system: http://hl7.org/fhir/ValueSet/http-verb
     :path: entry.request.method
   :references: []
-  :delayed_references: []
 - :name: profile_pas_response_bundle
   :class_name: ProfilePasResponseBundleSequence
   :version: v2.0.1
@@ -260,7 +257,6 @@
     :system: http://hl7.org/fhir/ValueSet/http-verb
     :path: entry.request.method
   :references: []
-  :delayed_references: []
 - :name: profile_claim_base
   :class_name: ProfileClaimBaseSequence
   :version: v2.0.1
@@ -732,21 +728,6 @@
   - :path: Claim.item.detail.subDetail.udi
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Device
-  :delayed_references:
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: careTeam.provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: insurance.coverage
-    :resources:
-    - Coverage
 - :name: profile_claim_inquiry
   :class_name: ProfileClaimInquirySequence
   :version: v2.0.1
@@ -1246,21 +1227,6 @@
   - :path: Claim.item.detail.subDetail.udi
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Device
-  :delayed_references:
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: careTeam.provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: insurance.coverage
-    :resources:
-    - Coverage
 - :name: profile_claim_update
   :class_name: ProfileClaimUpdateSequence
   :version: v2.0.1
@@ -1839,24 +1805,6 @@
   - :path: Claim.item.detail.subDetail.udi
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Device
-  :delayed_references:
-  - :path: extension.value[x]
-    :resources:
-    - Encounter
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: careTeam.provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: insurance.coverage
-    :resources:
-    - Coverage
 - :name: profile_claim
   :class_name: ProfileClaimSequence
   :version: v2.0.1
@@ -2423,24 +2371,6 @@
   - :path: Claim.item.detail.subDetail.udi
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Device
-  :delayed_references:
-  - :path: extension.value[x]
-    :resources:
-    - Encounter
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: careTeam.provider
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: insurance.coverage
-    :resources:
-    - Coverage
 - :name: profile_claiminquiryresponse
   :class_name: ProfileClaiminquiryresponseSequence
   :version: v2.0.1
@@ -2746,14 +2676,6 @@
   - :path: ClaimResponse.insurance.claimResponse
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/ClaimResponse
-  :delayed_references:
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: requestor
-    :resources:
-    - Organization
-    - PractitionerRole
 - :name: profile_claimresponse_base
   :class_name: ProfileClaimresponseBaseSequence
   :version: v2.0.1
@@ -3050,14 +2972,6 @@
   - :path: ClaimResponse.insurance.claimResponse
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/ClaimResponse
-  :delayed_references:
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: requestor
-    :resources:
-    - Organization
-    - PractitionerRole
 - :name: profile_claimresponse
   :class_name: ProfileClaimresponseSequence
   :version: v2.0.1
@@ -3369,17 +3283,6 @@
   - :path: ClaimResponse.insurance.claimResponse
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/ClaimResponse
-  :delayed_references:
-  - :path: insurer
-    :resources:
-    - Organization
-  - :path: requestor
-    :resources:
-    - Organization
-    - PractitionerRole
-  - :path: communicationRequest
-    :resources:
-    - CommunicationRequest
 - :name: profile_communicationrequest
   :class_name: ProfileCommunicationrequestSequence
   :version: v2.0.1
@@ -3499,17 +3402,6 @@
     - http://hl7.org/fhir/StructureDefinition/Observation
     - http://hl7.org/fhir/StructureDefinition/DiagnosticReport
     - http://hl7.org/fhir/StructureDefinition/DocumentReference
-  :delayed_references:
-  - :path: requester
-    :resources:
-    - Organization
-  - :path: recipient
-    :resources:
-    - Practitioner
-    - Organization
-  - :path: sender
-    :resources:
-    - Organization
 - :name: profile_coverage
   :class_name: ProfileCoverageSequence
   :version: v2.0.1
@@ -3613,10 +3505,6 @@
   - :path: Coverage.contract
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Contract
-  :delayed_references:
-  - :path: payor
-    :resources:
-    - Organization
 - :name: profile_devicerequest
   :class_name: ProfileDevicerequestSequence
   :version: v2.0.1
@@ -3724,7 +3612,6 @@
   - :path: DeviceRequest.relevantHistory
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Provenance
-  :delayed_references: []
 - :name: profile_encounter
   :class_name: ProfileEncounterSequence
   :version: v2.0.1
@@ -3937,7 +3824,6 @@
   - :path: Encounter.partOf
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Encounter
-  :delayed_references: []
 - :name: profile_location
   :class_name: ProfileLocationSequence
   :version: v2.0.1
@@ -4025,7 +3911,6 @@
   - :path: Location.endpoint
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Endpoint
-  :delayed_references: []
 - :name: profile_medicationrequest
   :class_name: ProfileMedicationrequestSequence
   :version: v2.0.1
@@ -4204,7 +4089,6 @@
   - :path: MedicationRequest.eventHistory
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Provenance
-  :delayed_references: []
 - :name: profile_nutritionorder
   :class_name: ProfileNutritionorderSequence
   :version: v2.0.1
@@ -4309,7 +4193,6 @@
   - :path: NutritionOrder.allergyIntolerance
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/AllergyIntolerance
-  :delayed_references: []
 - :name: profile_insurer
   :class_name: ProfileInsurerSequence
   :version: v2.0.1
@@ -4401,7 +4284,6 @@
   - :path: Organization.endpoint
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Endpoint
-  :delayed_references: []
 - :name: profile_organization
   :class_name: ProfileOrganizationSequence
   :version: v2.0.1
@@ -4491,7 +4373,6 @@
   - :path: Organization.endpoint
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Endpoint
-  :delayed_references: []
 - :name: profile_requestor
   :class_name: ProfileRequestorSequence
   :version: v2.0.1
@@ -4586,7 +4467,6 @@
   - :path: Organization.endpoint
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Endpoint
-  :delayed_references: []
 - :name: profile_beneficiary
   :class_name: ProfileBeneficiarySequence
   :version: v2.0.1
@@ -4735,7 +4615,6 @@
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Patient
     - http://hl7.org/fhir/StructureDefinition/RelatedPerson
-  :delayed_references: []
 - :name: profile_subscriber
   :class_name: ProfileSubscriberSequence
   :version: v2.0.1
@@ -4884,7 +4763,6 @@
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Patient
     - http://hl7.org/fhir/StructureDefinition/RelatedPerson
-  :delayed_references: []
 - :name: profile_practitioner
   :class_name: ProfilePractitionerSequence
   :version: v2.0.1
@@ -4945,7 +4823,6 @@
   - :path: Practitioner.qualification.issuer
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Organization
-  :delayed_references: []
 - :name: profile_practitionerrole
   :class_name: ProfilePractitionerroleSequence
   :version: v2.0.1
@@ -5010,13 +4887,6 @@
   - :path: PractitionerRole.endpoint
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Endpoint
-  :delayed_references:
-  - :path: practitioner
-    :resources:
-    - Practitioner
-  - :path: organization
-    :resources:
-    - Organization
 - :name: profile_servicerequest
   :class_name: ProfileServicerequestSequence
   :version: v2.0.1
@@ -5160,7 +5030,6 @@
   - :path: ServiceRequest.relevantHistory
     :profiles:
     - http://hl7.org/fhir/StructureDefinition/Provenance
-  :delayed_references: []
 - :name: profile_task
   :class_name: ProfileTaskSequence
   :version: v2.0.1
@@ -5350,4 +5219,3 @@
     - http://hl7.org/fhir/StructureDefinition/RelatedPerson
     - http://hl7.org/fhir/StructureDefinition/Group
     - http://hl7.org/fhir/StructureDefinition/Organization
-  :delayed_references: []

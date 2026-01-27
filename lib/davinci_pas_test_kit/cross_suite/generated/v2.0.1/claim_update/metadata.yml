@@ -582,21 +582,3 @@
   :file_name: server_submit_request_claim_update_must_support_test.rb
 - :id: pas_client_submit_request_v201_claim_update_must_support_test
   :file_name: client_submit_request_claim_update_must_support_test.rb
-:delayed_references:
-- :path: extension.value[x]
-  :resources:
-  - Encounter
-- :path: insurer
-  :resources:
-  - Organization
-- :path: provider
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: careTeam.provider
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: insurance.coverage
-  :resources:
-  - Coverage

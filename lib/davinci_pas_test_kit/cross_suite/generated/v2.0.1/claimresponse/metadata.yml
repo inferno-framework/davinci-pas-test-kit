@@ -313,14 +313,3 @@
 :tests:
 - :id: pas_server_submit_response_v201_claimresponse_must_support_test
   :file_name: server_submit_response_claimresponse_must_support_test.rb
-:delayed_references:
-- :path: insurer
-  :resources:
-  - Organization
-- :path: requestor
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: communicationRequest
-  :resources:
-  - CommunicationRequest

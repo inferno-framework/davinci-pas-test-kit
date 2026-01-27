@@ -76,10 +76,3 @@
   :file_name: client_inquire_request_practitioner_role_must_support_test.rb
 - :id: pas_server_inquire_response_v201_practitioner_role_must_support_test
   :file_name: server_inquire_response_practitioner_role_must_support_test.rb
-:delayed_references:
-- :path: practitioner
-  :resources:
-  - Practitioner
-- :path: organization
-  :resources:
-  - Organization

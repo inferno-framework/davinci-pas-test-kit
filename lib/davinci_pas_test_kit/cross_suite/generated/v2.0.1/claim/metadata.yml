@@ -568,21 +568,3 @@
 :tests:
 - :id: pas_v201_claim_operation_test
   :file_name: claim_operation_test.rb
-:delayed_references:
-- :path: extension.value[x]
-  :resources:
-  - Encounter
-- :path: insurer
-  :resources:
-  - Organization
-- :path: provider
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: careTeam.provider
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: insurance.coverage
-  :resources:
-  - Coverage

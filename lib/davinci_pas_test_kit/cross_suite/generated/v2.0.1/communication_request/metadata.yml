@@ -121,14 +121,3 @@
 :tests:
 - :id: pas_server_submit_response_v201_communication_request_must_support_test
   :file_name: server_submit_response_communication_request_must_support_test.rb
-:delayed_references:
-- :path: requester
-  :resources:
-  - Organization
-- :path: recipient
-  :resources:
-  - Practitioner
-  - Organization
-- :path: sender
-  :resources:
-  - Organization

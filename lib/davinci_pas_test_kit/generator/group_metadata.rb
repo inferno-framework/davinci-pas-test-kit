@@ -54,20 +54,6 @@ module DaVinciPASTestKit
       def to_hash
         ATTRIBUTES.each_with_object({}) { |key, hash| hash[key] = send(key) unless send(key).nil? }
       end
-
-      def add_delayed_references(delayed_profiles, ig_resources)
-        self.delayed_references =
-          references
-            .select { |reference| (reference[:profiles] & delayed_profiles).present? }
-            .map do |reference|
-            profile_urls = (reference[:profiles] & delayed_profiles)
-            delayed_resources = profile_urls.map { |url| ig_resources.resource_type_for_profile(url) }
-            {
-              path: reference[:path].gsub("#{resource}.", ''),
-              resources: delayed_resources
-            }
-          end
-      end
     end
   end
 end

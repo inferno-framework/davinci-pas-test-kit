@@ -7,31 +7,6 @@ module DaVinciPASTestKit
         @reformatted_version ||= ig_version.delete('.-')
       end
 
-      def ordered_groups
-        @ordered_groups ||=
-          [patient_group] + non_delayed_groups + delayed_groups
-      end
-
-      def patient_group
-        @patient_group ||=
-          groups.find { |group| group.resource == 'Patient' }
-      end
-
-      def delayed_groups
-        @delayed_groups ||=
-          groups.select(&:delayed?)
-      end
-
-      def non_delayed_groups
-        @non_delayed_groups ||=
-          groups.reject(&:delayed?) - [patient_group]
-      end
-
-      def delayed_profiles
-        @delayed_profiles ||=
-          delayed_groups.map(&:profile_url)
-      end
-
       def add_use_case_groups(id, file_name)
         @use_case_groups ||= []
         @use_case_groups << { id:, file_name: }
@@ -47,12 +22,6 @@ module DaVinciPASTestKit
         @claim_groups ||=
           groups.select { |group| group.resource == 'Claim' }
             .reject { |group| group.profile_name.include?('Base') }
-      end
-
-      def postprocess_groups(ig_resources)
-        groups.each do |group|
-          group.add_delayed_references(delayed_profiles, ig_resources)
-        end
       end
 
       def to_hash

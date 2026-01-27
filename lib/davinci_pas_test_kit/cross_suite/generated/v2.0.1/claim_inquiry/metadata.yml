@@ -505,18 +505,3 @@
   :file_name: server_inquire_request_claim_inquiry_must_support_test.rb
 - :id: pas_client_inquire_request_v201_claim_inquiry_must_support_test
   :file_name: client_inquire_request_claim_inquiry_must_support_test.rb
-:delayed_references:
-- :path: insurer
-  :resources:
-  - Organization
-- :path: provider
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: careTeam.provider
-  :resources:
-  - Organization
-  - PractitionerRole
-- :path: insurance.coverage
-  :resources:
-  - Coverage
