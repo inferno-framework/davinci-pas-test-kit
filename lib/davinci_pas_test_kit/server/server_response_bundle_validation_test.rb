@@ -1,0 +1,58 @@
+require_relative '../cross_suite/pas_bundle_validation'
+require_relative '../cross_suite/tags'
+
+module DaVinciPASTestKit
+  class ServerResponseBundleValidationTest < Inferno::Test
+    include DaVinciPASTestKit::PasBundleValidation
+
+    id :pas_server_response_bundle_validation_test
+    title 'PAS Bundle is valid'
+
+    input_order :server_endpoint, :smart_credentials
+
+    def operation
+      config.options[:operation]
+    end
+
+    def ig_version
+      config.options[:ig_version]
+    end
+
+    def use_case
+      config.options[:use_case]
+    end
+
+    def response_bundles
+      requests = load_tagged_requests(DaVinciPASTestKit.operation_tag(operation),
+                                      DaVinciPASTestKit.use_case_tag(use_case))
+      fhir_resources =
+        requests.map(&:response_body).compact.uniq.map do |request_body|
+          FHIR.from_contents(request_body)
+        rescue StandardError
+          nil
+        end.compact
+      fhir_resources.select { |res| res.resourceType == 'Bundle' }
+    end
+
+    run do
+      bundles_to_verify = response_bundles
+      assert bundles_to_verify.present?,
+             "No successful $#{operation} requests made during the #{use_case.titleize} workflow tests."
+
+      bundles_to_verify.each do |bundle|
+        perform_bundle_validation(
+          bundle,
+          operation,
+          'response',
+          ig_version
+        )
+      end
+
+      validation_error_messages.each do |msg|
+        messages << { type: 'error', message: msg }
+      end
+      assert validation_error_messages.blank?,
+             'Bundle response(s) returned are not conformant. Check messages for issues found.'
+    end
+  end
+end

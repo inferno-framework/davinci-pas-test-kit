@@ -499,8 +499,6 @@
   :profiles:
   - http://hl7.org/fhir/StructureDefinition/Device
 :tests:
-- :id: pas_v201_claim_inquiry_operation_test
-  :file_name: claim_inquiry_operation_test.rb
 - :id: pas_server_inquire_request_v201_claim_inquiry_must_support_test
   :file_name: server_inquire_request_claim_inquiry_must_support_test.rb
 - :id: pas_client_inquire_request_v201_claim_inquiry_must_support_test

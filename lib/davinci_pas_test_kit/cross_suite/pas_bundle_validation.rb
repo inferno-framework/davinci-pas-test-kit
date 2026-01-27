@@ -1,30 +1,24 @@
 # frozen_string_literal: true
 
 require_relative 'validation_test'
+require_relative 'pas_constants'
 
 module DaVinciPASTestKit
   module PasBundleValidation
     include DaVinciPASTestKit::ValidationTest
 
-    CLAIM_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim-update'
-    CLAIM_RESPONSE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse'
-    CLAIM_INQUIRY_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim-inquiry'
-    CLAIM_INQUIRY_RESPONSE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'
-
-    def all_scratch_resources
-      scratch_resources[:all] ||= []
-    end
-
-    def save_bundles_and_entries_to_scratch(bundles)
-      bundles.each do |bundle|
-        all_scratch_resources << bundle
-        all_scratch_resources.concat(bundle.entry.map(&:resource))
-        all_scratch_resources.uniq!
-      end
-    end
-
     def validation_error_messages
       @validation_error_messages ||= []
+    end
+
+    def perform_bundle_validation(bundle, operation, type, ig_version)
+      target_profile = PASConstants.profile_url_for_operation_and_type(operation, type)
+      request_type = "#{operation}_#{type}"
+      if type == 'request'
+        perform_request_validation(bundle, target_profile, ig_version, request_type)
+      else
+        perform_response_validation(bundle, target_profile, ig_version, request_type)
+      end
     end
 
     def perform_request_validation(bundle, profile_url, version, request_type)
@@ -243,7 +237,7 @@ module DaVinciPASTestKit
       reference_elements = metadata.references
 
       # Special handling for Claim submit profile
-      if current_entry_profile_url == CLAIM_PROFILE
+      if current_entry_profile_url == PASConstants::CLAIM_PROFILE
         handle_claim_profile(reference_elements,
                              current_entry_profile_url)
       end
@@ -259,7 +253,7 @@ module DaVinciPASTestKit
     # @param reference_elements [Array] The array of reference elements to be updated.
     # @param current_entry_profile_url [String] The profile URL of the current entry being processed.
     def handle_claim_profile(reference_elements, current_entry_profile_url)
-      return unless current_entry_profile_url == CLAIM_PROFILE
+      return unless current_entry_profile_url == PASConstants::CLAIM_PROFILE
 
       claim_ref_element = {
         path: 'Claim.item.extension.value',
@@ -407,8 +401,12 @@ module DaVinciPASTestKit
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
       {
-        'Claim' => request_type == 'submit' ? CLAIM_PROFILE : CLAIM_INQUIRY_PROFILE,
-        'ClaimResponse' => request_type == 'submit' ? CLAIM_RESPONSE_PROFILE : CLAIM_INQUIRY_RESPONSE_PROFILE
+        'Claim' => request_type == 'submit' ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
+        'ClaimResponse' => if request_type == 'submit'
+                             PASConstants::CLAIM_RESPONSE_PROFILE
+                           else
+                             PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE
+                           end
       }
     end
 
