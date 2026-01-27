@@ -1,5 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:suite_id) { 'davinci_pas_client_suite_v201' }
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest, :request do
   let(:access_token) { '1234' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }

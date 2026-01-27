@@ -1,6 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:suite_id) { 'davinci_pas_client_suite_v201' }
-
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTest, :request do
   describe 'when responding to requests from the client under tests' do
     let(:session_url_path) { '1234' }
     let(:notification_access_token) { '1234' }
