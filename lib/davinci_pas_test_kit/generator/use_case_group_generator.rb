@@ -1,3 +1,5 @@
+require_relative '../cross_suite/pas_constants'
+
 module DaVinciPASTestKit
   class Generator
     class UseCaseGroupGenerator
@@ -6,26 +8,29 @@ module DaVinciPASTestKit
           groups = ig_metadata.groups.select { |group| group.tests.present? }.reject do |group|
             group.profile_name.include?('Base')
           end
+
+          # metadata files
+          groups.each do |group_metadata|
+            metadata_file_dir = File.join(base_metadata_output_dir, ig_metadata.snake_case_for_profile(group_metadata))
+            FileUtils.mkdir_p(metadata_file_dir)
+            File.write(File.join(metadata_file_dir, 'metadata.yml'), YAML.dump(group_metadata.to_hash))
+          end
+
           # Server Test Groups
-          ['approval', 'denial', 'pended'].each_with_index do |use_case, index|
-            new(ig_metadata, use_case, groups, base_server_output_dir, base_metadata_output_dir, 'server',
-                first_generate: index.zero?).generate
+          ['approval', 'denial', 'pended'].each do |use_case|
+            new(ig_metadata, use_case, groups, base_server_output_dir, 'server').generate
           end
         end
       end
 
-      attr_accessor :ig_metadata, :use_case, :groups, :base_output_dir, :base_metadata_output_dir,
-                    :first_generate, :system
+      attr_accessor :ig_metadata, :use_case, :groups, :base_output_dir, :system
 
-      def initialize(ig_metadata, use_case, groups, base_output_dir, base_metadata_output_dir,
-                     system = 'server', first_generate: false)
+      def initialize(ig_metadata, use_case, groups, base_output_dir, system = 'server')
         self.ig_metadata = ig_metadata
         self.use_case = use_case
         self.groups = groups
         self.base_output_dir = base_output_dir
-        self.base_metadata_output_dir = base_metadata_output_dir
         self.system = system
-        self.first_generate = first_generate
       end
 
       def template
@@ -60,14 +65,6 @@ module DaVinciPASTestKit
         File.join(base_output_dir, base_output_file_name)
       end
 
-      def metadata_file_dir(group)
-        File.join(base_metadata_output_dir, profile_identifier(group))
-      end
-
-      def metadata_file_name(group)
-        File.join(base_metadata_output_dir, profile_identifier(group), base_metadata_file_name)
-      end
-
       def profile_identifier(group_metadata)
         ig_metadata.snake_case_for_profile(group_metadata)
       end
@@ -76,170 +73,52 @@ module DaVinciPASTestKit
         "pas_#{system}_#{groups.first.reformatted_version}_#{use_case}_use_case"
       end
 
+      def ig_version
+        ig_metadata.ig_version
+      end
+
+      def ig_version_for_id
+        ig_metadata.reformatted_version
+      end
+
       def generate
         FileUtils.mkdir_p(base_output_dir)
         File.write(output_file_name, output)
         ig_metadata.add_use_case_groups(group_id, base_output_file_name)
-        return unless first_generate
+      end
 
-        groups.each do |group_metadata|
-          FileUtils.mkdir_p(metadata_file_dir(group_metadata))
-          File.write(metadata_file_name(group_metadata), YAML.dump(group_metadata.to_hash))
+      def operation_requirements_verified(operation)
+        case "#{operation}_#{ig_version}"
+        when 'submit_v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@66', 'hl7.fhir.us.davinci-pas_2.0.1@111',
+           'hl7.fhir.us.davinci-pas_2.0.1@136', 'hl7.fhir.us.davinci-pas_2.0.1@207']
+        when 'inquire_v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@5', 'hl7.fhir.us.davinci-pas_2.0.1@111', 'hl7.fhir.us.davinci-pas_2.0.1@208']
         end
       end
 
-      def all_tests
-        @all_tests ||= groups.flat_map(&:tests).compact
-      end
-
-      def all_test_ids
-        @all_test_ids = all_tests.map { |test| test[:id] }
-      end
-
-      def select_test_ids(include_patterns, exclude_patterns = [])
-        all_test_ids.select do |id|
-          include_conditions = include_patterns.all? { |pattern| id.include?(pattern) }
-          exclude_conditions = exclude_patterns.none? { |pattern| id.include?(pattern) }
-          include_conditions && exclude_conditions
+      def notification_delivery_requirements_verified
+        case ig_version
+        when 'v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@141']
         end
       end
 
-      def submit_request_validation_test_ids
-        @submit_request_validation_test_ids ||= select_test_ids(['request', 'validation_test'], ['inquiry', 'client'])
+      def notification_conformance_requirements_verified
+        case ig_version
+        when 'v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@145']
+        end
       end
 
-      def inquiry_request_validation_test_ids
-        @inquiry_request_validation_test_ids ||= select_test_ids(['request', 'validation_test', 'inquiry'], ['client'])
-      end
-
-      def submit_response_validation_test_ids
-        @submit_response_validation_test_ids ||= select_test_ids(['response', 'validation_test'], ['inquiry', 'client'])
-      end
-
-      def inquiry_response_validation_test_ids
-        @inquiry_response_validation_test_ids ||= select_test_ids(['response', 'validation_test', 'inquiry'],
-                                                                  ['client'])
-      end
-
-      def submit_operation_test_ids
-        @submit_operation_test_ids ||= select_test_ids(['operation_test'], ['inquiry'])
-      end
-
-      def inquiry_operation_test_ids
-        @inquiry_operation_test_ids ||= select_test_ids(['operation_test', 'inquiry'])
-      end
-
-      def approval_denial_test_ids
-        submit_request_validation_test_ids + submit_operation_test_ids +
-          submit_response_validation_test_ids + [claim_response_decision_test_id]
-      end
-
-      def grouped_approval_denial_test_ids
-        {
-          'Server can respond to claims submitted for prior authorization' =>
-            approval_denial_test_ids
-        }
-      end
-
-      def pended_test_ids
-        approval_denial_test_ids + inquiry_request_validation_test_ids +
-          inquiry_operation_test_ids + inquiry_response_validation_test_ids
-      end
-
-      def subscription_notification_conformance_test_ids
-        ['subscriptions_r4_server_notification_conformance', 'subscriptions_r4_server_id_only_conformance']
-      end
-
-      def grouped_pended_test_ids
-        inquiry_operation = [inquiry_notification_test_id] +
-                            subscription_notification_conformance_test_ids +
-                            inquiry_request_validation_test_ids +
-                            inquiry_operation_test_ids +
-                            inquiry_response_validation_test_ids
-        inquiry_tests = {
-          'Server can notify client of updates and respond to claims submitted for inquiry' => inquiry_operation
-        }
-
-        grouped_approval_denial_test_ids.merge(inquiry_tests)
-      end
-
-      def common_test_file_list(test_ids)
-        test_ids.map do |id|
-          test = all_tests.find { |t| t[:id] == id }
-          next unless test
-
-          group = groups.find { |grp| grp.tests.include?(test) }
-          name_without_suffix = test[:file_name].delete_suffix('.rb')
-          test_file = if name_without_suffix.start_with?('..')
-                        name_without_suffix
-                      else
-                        "#{profile_identifier(group)}/#{name_without_suffix}"
-                      end
-          test_file
-        end.compact
-      end
-
-      def approval_denial_test_file_list
-        common_test_file_list(approval_denial_test_ids) << claim_response_decision_file_name
-      end
-
-      def pended_test_file_list
-        common_test_file_list(pended_test_ids).push(
-          claim_response_decision_file_name,
-          subscription_notification_file_name
-        )
-      end
-
-      def test_id_list
-        @test_id_list ||= if ['approval', 'denial'].include?(use_case)
-                            grouped_approval_denial_test_ids
-                          elsif use_case == 'pended'
-                            grouped_pended_test_ids
-                          end
-      end
-
-      def test_file_list
-        @test_file_list ||= if ['approval', 'denial'].include?(use_case)
-                              approval_denial_test_file_list
-                            elsif use_case == 'pended'
-                              pended_test_file_list
-                            end
-      end
-
-      def claim_response_decision_test_id
-        'prior_auth_claim_response_decision_validation'
-      end
-
-      def inquiry_notification_test_id
-        'prior_auth_claim_response_update_notification_validation'
-      end
-
-      def claim_response_decision_file_name
-        "../../#{ig_metadata.ig_version}/claim_response_decision/pas_claim_response_decision_test"
-      end
-
-      def subscription_notification_file_name
-        "../../#{ig_metadata.ig_version}/notification/pas_subscription_notification_test"
-      end
-
-      def rename_input?(test_id)
-        (test_id.include?('request') && test_id.include?('validation') && !test_id.include?('inquiry')) ||
-          test_id.include?('operation_test')
-      end
-
-      def alt_test_id(id, use_case)
-        "#{id}_#{use_case}"
-      end
-
-      def alt_request_input_name(use_case, request_type)
-        "#{use_case}_pa_#{request_type}_request_payload"
-      end
-
-      def alt_request_input_title(use_case, request_type)
-        if use_case == 'must_support'
-          "Additional PAS #{request_type.capitalize} Request Payloads"
-        else
-          "PAS #{request_type.capitalize} Request Payload for #{use_case.capitalize} Response"
+      def bundle_response_conformance_requirements_verified(operation)
+        case "#{operation}_#{ig_version}"
+        when 'submit_v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@64', 'hl7.fhir.us.davinci-pas_2.0.1@100',
+           'hl7.fhir.us.davinci-pas_2.0.1@101', 'hl7.fhir.us.davinci-pas_2.0.1@102',
+           'hl7.fhir.us.davinci-pas_2.0.1@103', 'hl7.fhir.us.davinci-pas_2.0.1@107']
+        when 'inquire_v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@131']
         end
       end
 
@@ -270,6 +149,57 @@ module DaVinciPASTestKit
             DESCRIPTION
           end
         end
+      end
+
+      def bundle_validation_test_title(operation, type)
+        if type == 'request'
+          "[USER INPUT VALIDATION] Provided $#{operation} Request Bundle is conformant"
+        else
+          "Server $#{operation} Response Bundle is conformant"
+        end
+      end
+
+      def profile_link(operation, type)
+        "[#{PASConstants.profile_name_for_operation_and_type(operation, type)}]" \
+          "(#{PASConstants.profile_url_for_operation_and_type(operation, type)}|#{ig_version})"
+      end
+
+      def bundle_validation_test_description(operation, type)
+        <<~DESCRIPTION
+          #{"#{description_user_input_validation}\n" if type == 'request'}This test validates the conformity of the
+          #{type == 'request' ? 'user input' : "server's response"} to the
+          #{profile_link(operation, type)}
+          profile#{type == 'request' ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
+
+          It also checks that other conformance requirements defined in the [PAS Formal
+          Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+          such as the presence of all referenced instances within the bundle and the
+          conformance of those instances to the appropriate profiles, are met.
+
+          It verifies the presence of mandatory elements and that elements with
+          required bindings contain appropriate values. CodeableConcept element
+          bindings will fail if none of their codings have a code/system belonging
+          to the bound ValueSet. Quantity, Coding, and code element bindings will
+          fail if their code/system are not found in the valueset.
+
+          Note that because X12 value sets are not public, elements bound to value
+          sets containing X12 codes are not validated.
+
+          **Limitations**
+
+          Due to recognized errors in the PAS IG around extension context definitions,
+          this test may not pass due to spurious errors of the form "The extension
+          [extension url] is not allowed at this point". See [this
+          issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
+          for additional details.
+        DESCRIPTION
+      end
+
+      def description_user_input_validation
+        <<~USER_INPUT_INTRO
+          **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
+          Errors encountered will be treated as a skip instead of a failure.
+        USER_INPUT_INTRO
       end
     end
   end
