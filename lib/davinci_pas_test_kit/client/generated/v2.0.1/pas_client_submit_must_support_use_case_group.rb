@@ -41,7 +41,6 @@ module DaVinciPASTestKit
 
       id :pas_client_v201_submit_must_support_use_case
       run_as_group
-  
     
       test from: :pas_client_submit_v201_must_support_test
       test from: :pas_client_submit_v201_must_support_requirement
@@ -55,7 +54,6 @@ module DaVinciPASTestKit
       test from: :pas_client_submit_request_v201_subscriber_must_support_test
       test from: :pas_client_submit_request_v201_practitioner_must_support_test
       test from: :pas_client_submit_request_v201_practitioner_role_must_support_test
-  
     end
   end
 end

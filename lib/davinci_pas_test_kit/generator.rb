@@ -3,7 +3,8 @@ require 'inferno/ext/fhir_models'
 require_relative 'generator/ig_loader'
 require_relative 'generator/ig_metadata_extractor'
 require_relative 'generator/use_case_group_generator'
-require_relative 'generator/must_support_group_generator'
+require_relative 'generator/client_must_support_group_generator'
+require_relative 'generator/server_must_support_group_generator'
 require_relative 'generator/suite_generator'
 require_relative 'generator/must_support_test_generator'
 
@@ -31,7 +32,8 @@ module DaVinciPASTestKit
       FileUtils.mkdir_p(base_client_output_dir)
       generate_must_support_tests
       generate_use_case_groups
-      generate_must_support_groups
+      generate_server_must_support_groups
+      generate_client_must_support_groups
       generate_suites
     end
 
@@ -67,8 +69,12 @@ module DaVinciPASTestKit
       UseCaseGroupGenerator.generate(ig_metadata, base_shared_output_dir, base_server_output_dir)
     end
 
-    def generate_must_support_groups
-      MustSupportGroupGenerator.generate(ig_metadata, base_server_output_dir, base_client_output_dir)
+    def generate_server_must_support_groups
+      ServerMustSupportGroupGenerator.generate(ig_metadata, base_server_output_dir)
+    end
+
+    def generate_client_must_support_groups
+      ClientMustSupportGroupGenerator.generate(ig_metadata, base_client_output_dir)
     end
 
     def generate_suites

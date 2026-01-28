@@ -1,0 +1,20 @@
+<% test_file_list.each do |file_name| %>require_relative '<%= file_name %>'
+<% end %>
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::TestGroup
+      title '<%= title %>'
+      description %(
+        <%=description.gsub("\n", "\n" + " "*8) %>
+      )
+
+      id :<%= group_id %>
+      <%- if verifies_requirements -%>
+      verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
+      <%- end -%>
+      <% if run_as_group %>run_as_group<% end %>
+    <% test_id_list.each do |id| %>
+      test from: :<%= id %><% end %>
+    end
+  end
+end

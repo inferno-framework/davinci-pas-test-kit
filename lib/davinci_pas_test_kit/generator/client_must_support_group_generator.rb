@@ -1,14 +1,10 @@
 module DaVinciPASTestKit
   class Generator
-    class MustSupportGroupGenerator
+    class ClientMustSupportGroupGenerator
       class << self
-        def generate(ig_metadata, base_server_output_dir, base_client_output_dir)
+        def generate(ig_metadata, base_client_output_dir)
           groups = ig_metadata.groups.select { |group| group.tests.present? }.reject do |group|
             group.profile_name.include?('Base')
-          end
-          # Server Test Groups
-          ['must_support'].each do |use_case|
-            new(ig_metadata, use_case, groups, base_server_output_dir, 'server').generate
           end
 
           # Client Test Groups
@@ -30,7 +26,7 @@ module DaVinciPASTestKit
       end
 
       def template
-        @template ||= File.read(File.join(__dir__, 'templates', 'must_support_group.rb.erb'))
+        @template ||= File.read(File.join(__dir__, 'templates', 'client_must_support_group.rb.erb'))
       end
 
       def output

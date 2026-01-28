@@ -33,7 +33,6 @@ module DaVinciPASTestKit
 
       id :pas_client_v201_inquiry_must_support_use_case
       run_as_group
-  
     
       test from: :pas_client_inquire_v201_must_support_test
       test from: :pas_client_inquire_request_v201_pas_inquiry_request_bundle_must_support_test
@@ -45,7 +44,6 @@ module DaVinciPASTestKit
       test from: :pas_client_inquire_request_v201_subscriber_must_support_test
       test from: :pas_client_inquire_request_v201_practitioner_must_support_test
       test from: :pas_client_inquire_request_v201_practitioner_role_must_support_test
-  
     end
   end
 end
