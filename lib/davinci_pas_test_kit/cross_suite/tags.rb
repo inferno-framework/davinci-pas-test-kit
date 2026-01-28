@@ -7,6 +7,7 @@ module DaVinciPASTestKit
   APPROVAL_WORKFLOW_TAG = 'pas_approved_workflow'
   DENIAL_WORKFLOW_TAG = 'pas_denied_workflow'
   PENDED_WORKFLOW_TAG = 'pas_pended_workflow'
+  MUST_SUPPORT_WORKFLOW_TAG = 'pas_must_support_workflow'
   NOTIFICATION_TAG = 'subscription_notification'
   SUBSCRIPTION_CREATE_TAG = 'subscription_create'
   SUBSCRIPTION_READ_TAG = 'subscription_read'

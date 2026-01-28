@@ -1,5 +1,5 @@
-require_relative '../generated/v2.0.1/pas_client_submit_must_support_use_case_group'
-require_relative '../generated/v2.0.1/pas_client_inquiry_must_support_use_case_group'
+require_relative '../generated/v2.0.1/pas_client_submit_must_support_group'
+require_relative '../generated/v2.0.1/pas_client_inquire_must_support_group'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -22,8 +22,8 @@ module DaVinciPASTestKit
         those tests need to be submitted as a part of these.
       )
 
-      group from: :pas_client_v201_submit_must_support_use_case
-      group from: :pas_client_v201_inquiry_must_support_use_case
+      group from: :pas_client_v201_submit_must_support
+      group from: :pas_client_v201_inquire_must_support
     end
   end
 end

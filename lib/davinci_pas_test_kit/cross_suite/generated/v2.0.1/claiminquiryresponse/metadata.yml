@@ -305,5 +305,5 @@
   :profiles:
   - http://hl7.org/fhir/StructureDefinition/ClaimResponse
 :tests:
-- :id: pas_server_inquire_response_v201_claiminquiryresponse_must_support_test
-  :file_name: server_inquire_response_claiminquiryresponse_must_support_test.rb
+- :id: pas_server_v201_inquire_response_must_support_claiminquiryresponse
+  :file_name: server_inquire_response_must_support_claiminquiryresponse_test.rb

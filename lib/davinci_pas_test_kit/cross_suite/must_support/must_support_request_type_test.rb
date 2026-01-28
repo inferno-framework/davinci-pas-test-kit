@@ -34,7 +34,8 @@ module DaVinciPASTestKit
       @metadata_array ||= profile_keys.each_with_object({}) do |profile_key, metadata_array|
         metadata_array[profile_key.camelize] =
           Generator::GroupMetadata.new(
-            YAML.load_file(File.join(__dir__, '..', 'generated', version, profile_key, 'metadata.yml'), aliases: true)
+            YAML.load_file(File.join(__dir__, '..', 'generated', ig_version, profile_key, 'metadata.yml'),
+                           aliases: true)
           )
       end
     end

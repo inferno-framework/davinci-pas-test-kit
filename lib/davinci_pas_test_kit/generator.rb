@@ -35,6 +35,7 @@ module DaVinciPASTestKit
       generate_server_must_support_groups
       generate_client_must_support_groups
       generate_suites
+      write_group_metadata
     end
 
     def load_ig_package
@@ -66,7 +67,7 @@ module DaVinciPASTestKit
     end
 
     def generate_use_case_groups
-      UseCaseGroupGenerator.generate(ig_metadata, base_shared_output_dir, base_server_output_dir)
+      UseCaseGroupGenerator.generate(ig_metadata, base_server_output_dir)
     end
 
     def generate_server_must_support_groups
@@ -79,6 +80,21 @@ module DaVinciPASTestKit
 
     def generate_suites
       SuiteGenerator.generate(ig_metadata, base_server_output_dir)
+    end
+
+    def write_group_metadata
+      # metadata files
+      metadata_groups = ig_metadata.groups.select do |group|
+        MustSupportCheckProfiles.submit_request_group?(group) ||
+          MustSupportCheckProfiles.submit_response_group?(group) ||
+          MustSupportCheckProfiles.inquire_request_group?(group) ||
+          MustSupportCheckProfiles.inquire_response_group?(group)
+      end
+      metadata_groups.each do |group_metadata|
+        metadata_file_dir = File.join(base_shared_output_dir, ig_metadata.snake_case_for_profile(group_metadata))
+        FileUtils.mkdir_p(metadata_file_dir)
+        File.write(File.join(metadata_file_dir, 'metadata.yml'), YAML.dump(group_metadata.to_hash))
+      end
     end
   end
 end

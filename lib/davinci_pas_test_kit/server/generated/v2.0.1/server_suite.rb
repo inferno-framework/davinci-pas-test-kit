@@ -4,7 +4,7 @@ require_relative '../../v2.0.1/pas_server_subscription_setup'
 require_relative 'pas_server_approval_use_case_group'
 require_relative 'pas_server_denial_use_case_group'
 require_relative 'pas_server_pended_use_case_group'
-require_relative 'pas_server_must_support_use_case_group'
+require_relative 'pas_server_must_support_group'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -145,7 +145,7 @@ module DaVinciPASTestKit
         group from: :pas_server_v201_denial_use_case
         group from: :pas_server_v201_pended_use_case
       end
-      group from: :pas_server_v201_must_support_use_case
+      group from: :pas_server_v201_must_support
       group from: :pas_v201_error_group
     end
   end

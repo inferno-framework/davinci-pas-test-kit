@@ -8,14 +8,6 @@ module DaVinciPASTestKit
       )
     end
 
-    def all_scratch_resources
-      scratch_resources[:all] ||= []
-    end
-
-    def scratch_resources
-      scratch[scratch_key] ||= {}
-    end
-
     def tag
       case operation
       when 'submit'
@@ -36,7 +28,7 @@ module DaVinciPASTestKit
 
       requests.each do |req|
         begin
-          bundle = FHIR.from_contents(req.request_body)
+          bundle = FHIR.from_contents(type == 'request' ? req.request_body : req.response_body)
         rescue StandardError
           next
         end
@@ -53,8 +45,7 @@ module DaVinciPASTestKit
 
     def resources_of_interest
       @resources_of_interest ||=
-        (tagged_resources.presence || all_scratch_resources)
-          .select { |res| type_of_interest?(res.resourceType) }
+        tagged_resources.presence.select { |res| type_of_interest?(res.resourceType) }
     end
 
     def error_message(missing, resources, resource_type)

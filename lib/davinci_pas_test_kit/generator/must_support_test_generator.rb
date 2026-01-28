@@ -5,17 +5,17 @@ module DaVinciPASTestKit
     class MustSupportTestGenerator
       class << self
         def generate(ig_metadata, base_server_output_dir, base_client_output_dir)
-          submit_request_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.submit_request_group?(group)
-          end
+          submit_request_groups =
+            ig_metadata.groups.select { |group| MustSupportCheckProfiles.submit_request_group?(group) }
+              .reject { |group| MustSupportCheckProfiles.request_group?(group) }
           submit_response_groups = ig_metadata.groups.select do |group|
             MustSupportCheckProfiles.submit_response_group?(group)
           end
           inquiry_request_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.inquiry_request_group?(group)
+            MustSupportCheckProfiles.inquire_request_group?(group)
           end
           inquiry_response_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.inquiry_response_group?(group)
+            MustSupportCheckProfiles.inquire_response_group?(group)
           end
 
           submit_request_groups.each do |group|
@@ -80,13 +80,12 @@ module DaVinciPASTestKit
       end
 
       def test_id
-        "pas_#{system}_#{request_type}_#{group_metadata.reformatted_version}_#{profile_identifier}_must_support_test"
+        "pas_#{system}_#{group_metadata.reformatted_version}_#{request_type}_must_support_#{profile_identifier}"
       end
 
       def class_name
-        # rubocop:disable Layout/LineLength
-        "#{system.capitalize}#{request_type.camelize}#{ig_metadata.upper_camel_case_for_profile(group_metadata)}MustSupportTest"
-        # rubocop:enable Layout/LineLength
+        "#{system.capitalize}#{request_type.camelize}MustSupport" \
+          "#{ig_metadata.upper_camel_case_for_profile(group_metadata)}Test"
       end
 
       def module_name
@@ -101,33 +100,22 @@ module DaVinciPASTestKit
         group_metadata.profile_name
       end
 
-      def resource_collection_string
-        'all_scratch_resources'
-      end
-
       def must_support_list_string
-        build_must_support_list_string(false)
+        build_must_support_list_string
       end
 
-      def uscdi_list_string
-        build_must_support_list_string(true)
-      end
-
-      def build_must_support_list_string(uscdi_only)
+      def build_must_support_list_string
         slice_names = group_metadata.must_supports[:slices]
-          .select { |slice| slice[:uscdi_only].presence == uscdi_only.presence }
           .map { |slice| slice[:slice_id] }
 
         element_names = group_metadata.must_supports[:elements]
-          .select { |element| element[:uscdi_only].presence == uscdi_only.presence }
           .map { |element| "#{resource_type}.#{element[:path]}" }
 
         extension_names = group_metadata.must_supports[:extensions]
-          .select { |extension| extension[:uscdi_only].presence == uscdi_only.presence }
           .map { |extension| extension[:id] }
 
         group_metadata.must_supports[:choices]&.each do |choice|
-          next unless choice[:uscdi_only].presence == uscdi_only.presence && choice.key?(:paths)
+          next unless choice.key?(:paths)
 
           choice[:paths].each { |path| element_names.delete("#{resource_type}.#{path}") }
           choice[:extension_ids].each { |id| extension_names.delete(id.to_s) } if choice[:extension_ids].present?
@@ -146,10 +134,10 @@ module DaVinciPASTestKit
       end
 
       def verifies_requirements
-        case test_id
-        when 'pas_server_submit_response_v201_claimresponse_must_support_test'
+        case "#{system}_#{operation}_#{type}_#{ig_metadata.ig_version}"
+        when 'server_submit_response_v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@37', 'hl7.fhir.us.davinci-pas_2.0.1@110']
-        when 'pas_server_inquire_response_v201_claiminquiryresponse_must_support_test'
+        when 'server_inquire_response_v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@38']
         end
       end

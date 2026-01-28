@@ -148,11 +148,11 @@
   - http://hl7.org/fhir/StructureDefinition/Patient
   - http://hl7.org/fhir/StructureDefinition/RelatedPerson
 :tests:
-- :id: pas_server_submit_request_v201_subscriber_must_support_test
-  :file_name: server_submit_request_subscriber_must_support_test.rb
-- :id: pas_client_submit_request_v201_subscriber_must_support_test
-  :file_name: client_submit_request_subscriber_must_support_test.rb
-- :id: pas_server_inquire_request_v201_subscriber_must_support_test
-  :file_name: server_inquire_request_subscriber_must_support_test.rb
-- :id: pas_client_inquire_request_v201_subscriber_must_support_test
-  :file_name: client_inquire_request_subscriber_must_support_test.rb
+- :id: pas_server_v201_submit_request_must_support_subscriber
+  :file_name: server_submit_request_must_support_subscriber_test.rb
+- :id: pas_client_v201_submit_request_must_support_subscriber
+  :file_name: client_submit_request_must_support_subscriber_test.rb
+- :id: pas_server_v201_inquire_request_must_support_subscriber
+  :file_name: server_inquire_request_must_support_subscriber_test.rb
+- :id: pas_client_v201_inquire_request_must_support_subscriber
+  :file_name: client_inquire_request_must_support_subscriber_test.rb

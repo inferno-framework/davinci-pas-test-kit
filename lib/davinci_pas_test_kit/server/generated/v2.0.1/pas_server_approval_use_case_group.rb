@@ -73,7 +73,7 @@ module DaVinciPASTestKit
           config(
             inputs: {
               pa_submit_request_payload: {
-                name: :approval_pa_submit_request_payload ,
+                name: :approval_pa_submit_request_payload,
                 title: 'PAS Submit Request Payload for Approval Response'
               }
             },

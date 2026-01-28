@@ -12,12 +12,12 @@ module DaVinciPASTestKit
       inquire_response: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle'
     }.freeze
 
-    def self.profile_url_for_operation_and_type(operation, type)
+    def self.bundle_profile_url_for_operation_and_type(operation, type)
       BUNDLE_PROFILES_FOR_OPERATION_TYPE[:"#{operation}_#{type}"]
     end
 
-    def self.profile_name_for_operation_and_type(operation, type)
-      url = profile_url_for_operation_and_type(operation, type)
+    def self.bundle_profile_name_for_operation_and_type(operation, type)
+      url = bundle_profile_url_for_operation_and_type(operation, type)
       url.split('/profile-').last.titleize.gsub('Pas', 'PAS')
     end
 

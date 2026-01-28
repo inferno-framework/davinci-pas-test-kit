@@ -189,7 +189,7 @@
   - http://hl7.org/fhir/StructureDefinition/Group
   - http://hl7.org/fhir/StructureDefinition/Organization
 :tests:
-- :id: pas_server_submit_response_v201_task_must_support_test
-  :file_name: server_submit_response_task_must_support_test.rb
-- :id: pas_server_inquire_response_v201_task_must_support_test
-  :file_name: server_inquire_response_task_must_support_test.rb
+- :id: pas_server_v201_submit_response_must_support_task
+  :file_name: server_submit_response_must_support_task_test.rb
+- :id: pas_server_v201_inquire_response_must_support_task
+  :file_name: server_inquire_response_must_support_task_test.rb

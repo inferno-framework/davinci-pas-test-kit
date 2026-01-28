@@ -4,31 +4,19 @@ module DaVinciPASTestKit
   class Generator
     class UseCaseGroupGenerator
       class << self
-        def generate(ig_metadata, base_metadata_output_dir, base_server_output_dir)
-          groups = ig_metadata.groups.select { |group| group.tests.present? }.reject do |group|
-            group.profile_name.include?('Base')
-          end
-
-          # metadata files
-          groups.each do |group_metadata|
-            metadata_file_dir = File.join(base_metadata_output_dir, ig_metadata.snake_case_for_profile(group_metadata))
-            FileUtils.mkdir_p(metadata_file_dir)
-            File.write(File.join(metadata_file_dir, 'metadata.yml'), YAML.dump(group_metadata.to_hash))
-          end
-
+        def generate(ig_metadata, base_server_output_dir)
           # Server Test Groups
           ['approval', 'denial', 'pended'].each do |use_case|
-            new(ig_metadata, use_case, groups, base_server_output_dir, 'server').generate
+            new(ig_metadata, use_case, base_server_output_dir, 'server').generate
           end
         end
       end
 
-      attr_accessor :ig_metadata, :use_case, :groups, :base_output_dir, :system
+      attr_accessor :ig_metadata, :use_case, :base_output_dir, :system
 
-      def initialize(ig_metadata, use_case, groups, base_output_dir, system = 'server')
+      def initialize(ig_metadata, use_case, base_output_dir, system = 'server')
         self.ig_metadata = ig_metadata
         self.use_case = use_case
-        self.groups = groups
         self.base_output_dir = base_output_dir
         self.system = system
       end
@@ -54,7 +42,7 @@ module DaVinciPASTestKit
       end
 
       def module_name
-        "DaVinciPAS#{groups.first.reformatted_version.upcase}"
+        "DaVinciPAS#{ig_metadata.reformatted_version.upcase}"
       end
 
       def title
@@ -70,7 +58,7 @@ module DaVinciPASTestKit
       end
 
       def group_id
-        "pas_#{system}_#{groups.first.reformatted_version}_#{use_case}_use_case"
+        "pas_#{system}_#{ig_metadata.reformatted_version}_#{use_case}_use_case"
       end
 
       def ig_version
@@ -160,8 +148,8 @@ module DaVinciPASTestKit
       end
 
       def profile_link(operation, type)
-        "[#{PASConstants.profile_name_for_operation_and_type(operation, type)}]" \
-          "(#{PASConstants.profile_url_for_operation_and_type(operation, type)}|#{ig_version})"
+        "[#{PASConstants.bundle_profile_name_for_operation_and_type(operation, type)}]" \
+          "(#{PASConstants.bundle_profile_url_for_operation_and_type(operation, type)}|#{ig_version})"
       end
 
       def bundle_validation_test_description(operation, type)

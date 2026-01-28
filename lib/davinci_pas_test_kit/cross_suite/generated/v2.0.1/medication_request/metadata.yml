@@ -177,8 +177,3 @@
 - :path: MedicationRequest.eventHistory
   :profiles:
   - http://hl7.org/fhir/StructureDefinition/Provenance
-:tests:
-- :id: pas_server_submit_request_v201_medication_request_must_support_test
-  :file_name: server_submit_request_medication_request_must_support_test.rb
-- :id: pas_client_submit_request_v201_medication_request_must_support_test
-  :file_name: client_submit_request_medication_request_must_support_test.rb

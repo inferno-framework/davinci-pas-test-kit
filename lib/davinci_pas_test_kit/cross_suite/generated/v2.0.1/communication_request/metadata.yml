@@ -119,5 +119,5 @@
   - http://hl7.org/fhir/StructureDefinition/DiagnosticReport
   - http://hl7.org/fhir/StructureDefinition/DocumentReference
 :tests:
-- :id: pas_server_submit_response_v201_communication_request_must_support_test
-  :file_name: server_submit_response_communication_request_must_support_test.rb
+- :id: pas_server_v201_submit_response_must_support_communication_request
+  :file_name: server_submit_response_must_support_communication_request_test.rb

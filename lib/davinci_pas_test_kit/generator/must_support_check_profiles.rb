@@ -53,7 +53,7 @@ module DaVinciPASTestKit
         'PAS Task'
       ].freeze
 
-      OPTIONAL_PROFILES = [
+      REQUEST_PROFILES = [
         'PAS Medication Request',
         'PAS Service Request',
         'PAS Device Request',
@@ -69,16 +69,16 @@ module DaVinciPASTestKit
           SUBMIT_RESPONSE_REQUIRED_PROFILES.include?(group.profile_name)
         end
 
-        def inquiry_request_group?(group)
+        def inquire_request_group?(group)
           INQUIRY_REQUEST_REQUIRED_PROFILES.include?(group.profile_name)
         end
 
-        def inquiry_response_group?(group)
+        def inquire_response_group?(group)
           INQUIRY_RESPONSE_REQUIRED_PROFILES.include?(group.profile_name)
         end
 
-        def optional_group?(group)
-          OPTIONAL_PROFILES.include?(group.profile_name)
+        def request_group?(group)
+          REQUEST_PROFILES.include?(group.profile_name)
         end
       end
     end

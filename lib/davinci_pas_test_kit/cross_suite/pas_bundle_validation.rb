@@ -12,7 +12,7 @@ module DaVinciPASTestKit
     end
 
     def perform_bundle_validation(bundle, operation, type, ig_version)
-      target_profile = PASConstants.profile_url_for_operation_and_type(operation, type)
+      target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
       request_type = "#{operation}_#{type}"
       if type == 'request'
         perform_request_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type)

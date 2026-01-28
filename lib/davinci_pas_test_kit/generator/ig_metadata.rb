@@ -12,18 +12,6 @@ module DaVinciPASTestKit
         @use_case_groups << { id:, file_name: }
       end
 
-      def bundle_groups
-        @bundle_groups ||=
-          groups.select { |group| group.resource == 'Bundle' }
-            .reject { |group| group.profile_name.include?('Base') }
-      end
-
-      def claim_groups
-        @claim_groups ||=
-          groups.select { |group| group.resource == 'Claim' }
-            .reject { |group| group.profile_name.include?('Base') }
-      end
-
       def to_hash
         {
           ig_version:,

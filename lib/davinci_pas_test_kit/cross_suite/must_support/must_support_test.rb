@@ -35,16 +35,12 @@ module DaVinciPASTestKit
       config.options[:operation]
     end
 
-    def scratch_key
-      :"#{operation}_#{type}_resources"
-    end
-
     def type_of_interest?(type)
       type == resource_type
     end
 
     def metadata
-      @metadata ||= load_metadata_for_profile_version(profile_key, version)
+      @metadata ||= load_metadata_for_profile_version(profile_key, ig_version)
     end
 
     run do
