@@ -1,6 +1,6 @@
 module DaVinciPASTestKit
   class Generator
-    class SuiteGenerator
+    class ServerSuiteGenerator
       class << self
         def generate(ig_metadata, base_output_dir)
           new(ig_metadata, base_output_dir).generate
@@ -15,7 +15,7 @@ module DaVinciPASTestKit
       end
 
       def template
-        @template ||= File.read(File.join(__dir__, 'templates', 'suite.rb.erb'))
+        @template ||= File.read(File.join(__dir__, 'templates', 'server_suite.rb.erb'))
       end
 
       def output

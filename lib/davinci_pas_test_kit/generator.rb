@@ -5,7 +5,7 @@ require_relative 'generator/ig_metadata_extractor'
 require_relative 'generator/use_case_group_generator'
 require_relative 'generator/client_must_support_group_generator'
 require_relative 'generator/server_must_support_group_generator'
-require_relative 'generator/suite_generator'
+require_relative 'generator/server_suite_generator'
 require_relative 'generator/must_support_test_generator'
 
 module DaVinciPASTestKit
@@ -34,7 +34,7 @@ module DaVinciPASTestKit
       generate_use_case_groups
       generate_server_must_support_groups
       generate_client_must_support_groups
-      generate_suites
+      generate_server_suite
       write_group_metadata
     end
 
@@ -78,8 +78,8 @@ module DaVinciPASTestKit
       ClientMustSupportGroupGenerator.generate(ig_metadata, base_client_output_dir)
     end
 
-    def generate_suites
-      SuiteGenerator.generate(ig_metadata, base_server_output_dir)
+    def generate_server_suite
+      ServerSuiteGenerator.generate(ig_metadata, base_server_output_dir)
     end
 
     def write_group_metadata
