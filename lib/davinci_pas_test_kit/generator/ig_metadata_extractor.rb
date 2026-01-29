@@ -1,5 +1,5 @@
 require_relative 'ig_metadata'
-require_relative 'group_metadata_extractor'
+require_relative 'profile_metadata_extractor'
 require 'pry'
 module DaVinciPASTestKit
   class Generator
@@ -40,10 +40,10 @@ module DaVinciPASTestKit
       end
 
       def add_metadata_from_resources
-        metadata.groups =
+        metadata.profiles =
           resources_in_capability_statement.flat_map do |resource|
             resource.supportedProfile&.map do |supported_profile|
-              GroupMetadataExtractor.new(resource, supported_profile, metadata, ig_resources).group_metadata
+              ProfileMetadataExtractor.new(resource, supported_profile, metadata, ig_resources).profile_metadata
             end
           end
       end

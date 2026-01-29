@@ -61,24 +61,24 @@ module DaVinciPASTestKit
       ].freeze
 
       class << self
-        def submit_request_group?(group)
-          SUBMIT_REQUEST_REQUIRED_PROFILES.include?(group.profile_name)
+        def submit_request_profile?(profile_metadata)
+          SUBMIT_REQUEST_REQUIRED_PROFILES.include?(profile_metadata.profile_name)
         end
 
-        def submit_response_group?(group)
-          SUBMIT_RESPONSE_REQUIRED_PROFILES.include?(group.profile_name)
+        def submit_response_profile?(profile_metadata)
+          SUBMIT_RESPONSE_REQUIRED_PROFILES.include?(profile_metadata.profile_name)
         end
 
-        def inquire_request_group?(group)
-          INQUIRY_REQUEST_REQUIRED_PROFILES.include?(group.profile_name)
+        def inquire_request_profile?(profile_metadata)
+          INQUIRY_REQUEST_REQUIRED_PROFILES.include?(profile_metadata.profile_name)
         end
 
-        def inquire_response_group?(group)
-          INQUIRY_RESPONSE_REQUIRED_PROFILES.include?(group.profile_name)
+        def inquire_response_profile?(profile_metadata)
+          INQUIRY_RESPONSE_REQUIRED_PROFILES.include?(profile_metadata.profile_name)
         end
 
-        def request_group?(group)
-          REQUEST_PROFILES.include?(group.profile_name)
+        def request_profile?(profile_metadata)
+          REQUEST_PROFILES.include?(profile_metadata.profile_name)
         end
       end
     end

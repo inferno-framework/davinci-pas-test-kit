@@ -53,8 +53,8 @@ module DaVinciPASTestKit
         File.join(base_output_dir, base_output_file_name)
       end
 
-      def profile_identifier(group_metadata)
-        ig_metadata.snake_case_for_profile(group_metadata)
+      def profile_identifier(profile_metadata)
+        ig_metadata.snake_case_for_profile(profile_metadata)
       end
 
       def group_id

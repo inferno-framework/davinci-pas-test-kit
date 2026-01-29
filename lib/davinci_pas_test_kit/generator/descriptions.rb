@@ -4,23 +4,23 @@ module DaVinciPASTestKit
   class Generator
     module Descriptions
       class << self
-        def profile_links_list(required_groups, request_groups: nil)
+        def profile_links_list(required_profiles, request_profiles: nil)
           <<~DESCRIPTION
-            #{profile_links(required_groups).join("\n")}
-            #{request_profile_links_list(request_groups) if request_groups.present?}
+            #{profile_links(required_profiles).join("\n")}
+            #{request_profile_links_list(request_profiles) if request_profiles.present?}
           DESCRIPTION
         end
 
-        def request_profile_links_list(request_groups)
+        def request_profile_links_list(request_profiles)
           <<~DESCRIPTION
             - At least one of the following request profiles
-            #{profile_links(request_groups, prefix: '  ').join("\n")}
+            #{profile_links(request_profiles, prefix: '  ').join("\n")}
           DESCRIPTION
         end
 
-        def profile_links(groups, prefix: '')
-          groups.map do |group_metadata|
-            "#{prefix}- [#{group_metadata.profile_name}](#{profile_url_to_link(group_metadata.profile_url)})"
+        def profile_links(profiles, prefix: '')
+          profiles.map do |profile_metadata|
+            "#{prefix}- [#{profile_metadata.profile_name}](#{profile_url_to_link(profile_metadata.profile_url)})"
           end
         end
 

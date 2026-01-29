@@ -1,6 +1,6 @@
 module DaVinciPASTestKit
   class Generator
-    class GroupMetadata
+    class ProfileMetadata
       ATTRIBUTES = %i[
         name
         class_name

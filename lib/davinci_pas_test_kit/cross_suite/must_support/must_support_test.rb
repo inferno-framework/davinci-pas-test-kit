@@ -1,5 +1,5 @@
 require_relative 'must_support_data_gathering'
-require_relative '../../generator/group_metadata'
+require_relative '../../generator/profile_metadata'
 require_relative '../tags'
 
 module DaVinciPASTestKit

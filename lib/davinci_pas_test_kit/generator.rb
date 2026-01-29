@@ -35,7 +35,7 @@ module DaVinciPASTestKit
       generate_server_must_support_groups
       generate_client_must_support_groups
       generate_server_suite
-      write_group_metadata
+      write_profile_metadata
     end
 
     def load_ig_package
@@ -82,18 +82,18 @@ module DaVinciPASTestKit
       ServerSuiteGenerator.generate(ig_metadata, base_server_output_dir)
     end
 
-    def write_group_metadata
+    def write_profile_metadata
       # metadata files
-      metadata_groups = ig_metadata.groups.select do |group|
-        MustSupportCheckProfiles.submit_request_group?(group) ||
-          MustSupportCheckProfiles.submit_response_group?(group) ||
-          MustSupportCheckProfiles.inquire_request_group?(group) ||
-          MustSupportCheckProfiles.inquire_response_group?(group)
+      profile_metadata_list = ig_metadata.profiles.select do |profile_metadata|
+        MustSupportCheckProfiles.submit_request_profile?(profile_metadata) ||
+          MustSupportCheckProfiles.submit_response_profile?(profile_metadata) ||
+          MustSupportCheckProfiles.inquire_request_profile?(profile_metadata) ||
+          MustSupportCheckProfiles.inquire_response_profile?(profile_metadata)
       end
-      metadata_groups.each do |group_metadata|
-        metadata_file_dir = File.join(base_shared_output_dir, ig_metadata.snake_case_for_profile(group_metadata))
+      profile_metadata_list.each do |profile_metadata|
+        metadata_file_dir = File.join(base_shared_output_dir, ig_metadata.snake_case_for_profile(profile_metadata))
         FileUtils.mkdir_p(metadata_file_dir)
-        File.write(File.join(metadata_file_dir, 'metadata.yml'), YAML.dump(group_metadata.to_hash))
+        File.write(File.join(metadata_file_dir, 'metadata.yml'), YAML.dump(profile_metadata.to_hash))
       end
     end
   end

@@ -1,9 +1,9 @@
-require_relative '../../generator/group_metadata'
+require_relative '../../generator/profile_metadata'
 
 module DaVinciPASTestKit
   module MustSupportDataGathering
     def load_metadata_for_profile_version(profile_key, version)
-      Generator::GroupMetadata.new(
+      Generator::ProfileMetadata.new(
         YAML.load_file(File.join(__dir__, '..', 'generated', version, profile_key, 'metadata.yml'), aliases: true)
       )
     end

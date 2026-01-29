@@ -352,8 +352,8 @@ module DaVinciPASTestKit
     def metadata_map(version)
       @metadata ||= YAML.load_file(File.join(__dir__, "generated/#{version}/metadata.yml"),
                                    aliases: true)
-      @metadata_map ||= @metadata[:groups].each_with_object({}) do |group, obj|
-        obj[group[:profile_url]] = Generator::GroupMetadata.new(group)
+      @metadata_map ||= @metadata[:profiles].each_with_object({}) do |profile_metadata, obj|
+        obj[profile_metadata[:profile_url]] = Generator::ProfileMetadata.new(profile_metadata)
       end
     end
 

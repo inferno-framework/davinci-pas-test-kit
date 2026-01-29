@@ -6,24 +6,24 @@ module DaVinciPASTestKit
     class ClientMustSupportGroupGenerator
       class << self
         def generate(ig_metadata, base_client_output_dir)
-          submit_request_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.submit_request_group?(group)
+          submit_request_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportCheckProfiles.submit_request_profile?(profile)
           end
-          new(ig_metadata, 'submit', submit_request_groups, base_client_output_dir).generate
+          new(ig_metadata, 'submit', submit_request_profiles, base_client_output_dir).generate
 
-          inquire_request_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.inquire_request_group?(group)
+          inquire_request_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportCheckProfiles.inquire_request_profile?(profile)
           end
-          new(ig_metadata, 'inquire', inquire_request_groups, base_client_output_dir).generate
+          new(ig_metadata, 'inquire', inquire_request_profiles, base_client_output_dir).generate
         end
       end
 
-      attr_accessor :ig_metadata, :operation, :groups, :base_output_dir, :type
+      attr_accessor :ig_metadata, :operation, :profiles, :base_output_dir, :type
 
-      def initialize(ig_metadata, operation, groups, base_output_dir)
+      def initialize(ig_metadata, operation, profiles, base_output_dir)
         self.ig_metadata = ig_metadata
         self.operation = operation
-        self.groups = groups
+        self.profiles = profiles
         self.base_output_dir = base_output_dir
         self.type = 'request' # TODO: currently only request must supports checked for client. Add responses?
       end
@@ -62,8 +62,8 @@ module DaVinciPASTestKit
         File.join(base_output_dir, base_output_file_name)
       end
 
-      def profile_identifier(group_metadata)
-        ig_metadata.snake_case_for_profile(group_metadata)
+      def profile_identifier(profile_metadata)
+        ig_metadata.snake_case_for_profile(profile_metadata)
       end
 
       def group_id
@@ -83,34 +83,38 @@ module DaVinciPASTestKit
         File.write(output_file_name, output)
       end
 
-      def required_groups
-        @required_groups = groups.reject { |group_metadata| MustSupportCheckProfiles.request_group?(group_metadata) }
+      def required_profiles
+        @required_profiles = profiles.reject do |profile_metadata|
+          MustSupportCheckProfiles.request_profile?(profile_metadata)
+        end
       end
 
-      def request_groups
-        @request_groups = groups.select { |group_metadata| MustSupportCheckProfiles.request_group?(group_metadata) }
+      def request_profiles
+        @request_profiles = profiles.select do |profile_metadata|
+          MustSupportCheckProfiles.request_profile?(profile_metadata)
+        end
       end
 
-      def test_id_for_group(group_metadata)
+      def test_id_for_profile(profile_metadata)
         "pas_client_#{ig_metadata.reformatted_version}_#{request_type}_" \
-          "must_support_#{profile_identifier_for_group(group_metadata)}"
+          "must_support_#{profile_identifier_for_profile(profile_metadata)}"
       end
 
-      def test_file_for_group(group_metadata)
-        profile_id = profile_identifier_for_group(group_metadata)
+      def test_file_for_profile(profile_metadata)
+        profile_id = profile_identifier_for_profile(profile_metadata)
         File.join(profile_id, "client_#{request_type}_must_support_#{profile_id}_test")
       end
 
-      def profile_identifier_for_group(group_metadata)
-        ig_metadata.snake_case_for_profile(group_metadata)
+      def profile_identifier_for_profile(profile_metadata)
+        ig_metadata.snake_case_for_profile(profile_metadata)
       end
 
       def profile_test_ids
-        required_groups.map { |group_metadata| test_id_for_group(group_metadata) }
+        required_profiles.map { |profile_metadata| test_id_for_profile(profile_metadata) }
       end
 
       def profile_test_files
-        required_groups.map { |group_metadata| test_file_for_group(group_metadata) }
+        required_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
       end
 
       def description
@@ -120,7 +124,7 @@ module DaVinciPASTestKit
 
           For `$#{operation}` requests, this includes the following profiles:
 
-          #{Descriptions.profile_links_list(required_groups, request_groups:)}
+          #{Descriptions.profile_links_list(required_profiles, request_profiles:)}
         DESCRIPTION
       end
     end

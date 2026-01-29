@@ -1,6 +1,6 @@
 ---
 :ig_version: v2.0.1
-:groups:
+:profiles:
 - :name: profile_pas_inquiry_request_bundle
   :class_name: ProfilePasInquiryRequestBundleSequence
   :version: v2.0.1

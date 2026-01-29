@@ -1,7 +1,7 @@
 module DaVinciPASTestKit
   class Generator
     class IGMetadata
-      attr_accessor :ig_version, :groups, :use_case_groups
+      attr_accessor :ig_version, :profiles, :use_case_groups
 
       def reformatted_version
         @reformatted_version ||= ig_version.delete('.-')
@@ -15,7 +15,7 @@ module DaVinciPASTestKit
       def to_hash
         {
           ig_version:,
-          groups: groups.map(&:to_hash)
+          profiles: profiles.map(&:to_hash)
         }
       end
 
@@ -26,9 +26,9 @@ module DaVinciPASTestKit
       def fetch_resources_with_multiple_profiles
         metadata = YAML.load_file(File.join(__dir__, '..', 'cross_suite', 'generated', 'v2.0.1', 'metadata.yml'),
                                   aliases: true)
-        resource_supported_profiles = metadata[:groups].each_with_object({}) do |group, dict|
-          dict[group[:resource]] ||= []
-          dict[group[:resource]] << group[:profile_url]
+        resource_supported_profiles = metadata[:profiles].each_with_object({}) do |profile, dict|
+          dict[profile[:resource]] ||= []
+          dict[profile[:resource]] << profile[:profile_url]
         end
 
         resources = []
@@ -56,17 +56,17 @@ module DaVinciPASTestKit
         }
       end
 
-      def snake_case_for_profile(group_metadata)
-        resource = group_metadata.resource
+      def snake_case_for_profile(profile_metadata)
+        resource = profile_metadata.resource
         return resource.underscore unless resource_has_multiple_profiles?(resource)
 
-        group_metadata.name
+        profile_metadata.name
           .delete_prefix('profile_')
           .underscore
       end
 
-      def upper_camel_case_for_profile(group_metadata)
-        snake_case_for_profile(group_metadata).camelize
+      def upper_camel_case_for_profile(profile_metadata)
+        snake_case_for_profile(profile_metadata).camelize
       end
     end
   end
