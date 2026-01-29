@@ -40,6 +40,7 @@ Key subdirectories and files within the `cross_suite/` folder include:
 *   **`generated/`**: Contains metadata files generated from the PAS IG and used for must support tests.
 *   **`must_support/`**: Contains base must support test logic used by all suites.
 *   **`pas_bundle_validation.rb`**: Specific validation logic for PAS Bundles.
+*   **`pas_constants.rb`**: Import PAS IG details extracted into constants for use during test execution.
 *   **`pas_subscription_validation.rb`**: Specific validation logic for PAS Subscriptions.
 *   **`tags.rb`**: Tags used when storing and retrieving requests for validation.
 *   **`urls.rb`**: Specific paths and addresses used and displayed by the tests.
@@ -78,6 +79,21 @@ Key subdirectories and files within the `server/` folder include:
 *   **`[version]`**: Contains the manually generated tests and logic for the server suite
     version corresponding to the directory name. There will be one folder for each IG version
     supported.
+*   **`claim_submit_operation_test.rb`, `claim_inquire_operation_test.rb`, and `claim_operation_logic.rb`**:
+    Common server tests and underlying logic to simulate making `$submit` and `$inquire`
+    operations requests against the target server and performing basic checks on the response.
+    Requests made are tagged for retrieval and evaluation during other tests.
+*   **`pas_claim_response_decision_test.rb`**: Common test for verifying that the expected decision
+    was returned from the server in the ClaimResponse.
+*   **`pas_subscription_notification_wait_test.rb`**: Common test for waiting for the server to send
+    a Subscription notification indicating that a pended claim has been updated.
+*   **`server_request_bundle_validation_test.rb` and `pserver_response_bundle_validation_test.rb`**:
+    Common tests for server Bundle validation. The primary difference is that the requests tests
+    evaluate input provided by testers to drive Inferno's simulated client and so will skip when
+    problems are detected, while the response tests evaluate server responses and will fail. Both
+    result in a suite-level failure, but the skip on the request input errors indicates that Inferno
+    was not able to verify conformant behavior, while the failure on server response errors indicates
+    that Inferno observed non-conformant behavior.
 
 ### Additional Top-level Organization
 
