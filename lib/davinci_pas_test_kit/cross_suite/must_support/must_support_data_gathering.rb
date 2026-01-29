@@ -45,7 +45,7 @@ module DaVinciPASTestKit
 
     def resources_of_interest
       @resources_of_interest ||=
-        tagged_resources.presence.select { |res| type_of_interest?(res.resourceType) }
+        tagged_resources.presence&.select { |res| type_of_interest?(res.resourceType) }
     end
 
     def error_message(missing, resources, resource_type)
