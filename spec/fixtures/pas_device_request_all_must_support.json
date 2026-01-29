@@ -1,0 +1,61 @@
+{
+    "resourceType": "DeviceRequest",
+    "id": "DeviceRequestExample",
+    "extension": [
+        {
+            "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+            "extension": [
+                {
+                    "url": "coverage",
+                    "valueReference": {
+                        "reference": "Coverage/InsuranceExample"
+                    }
+                },
+                {
+                    "url": "covered",
+                    "valueCode": "covered"
+                },
+                {
+                    "url": "pa-needed",
+                    "valueCode": "auth-needed"
+                },
+                {
+                    "url": "date",
+                    "valueDate": "2021-09-10"
+                },
+                {
+                    "url": "coverage-assertion-id",
+                    "valueString": "1122445"
+                }
+            ]
+        }
+    ],
+    "status": "active",
+    "intent": "order",
+    "codeCodeableConcept": {
+        "coding": [
+            {
+                "system": "http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets",
+                "code": "E1223"
+            }
+        ]
+    },
+    "subject": {
+        "reference": "Patient/BeneficiaryExample"
+    },
+    "authoredOn": "2005-06-02",
+    "requester": {
+        "reference": "Practitioner/ReferralPractitionerExample"
+    },
+    "occurrenceTiming": {
+        "repeat": {
+            "duration": 15,
+            "durationMax": 25,
+            "durationUnit": "min",
+            "frequency": 1,
+            "frequencyMax": 4,
+            "period": 1,
+            "periodUnit": "d"
+        }
+    }
+}
