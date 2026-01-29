@@ -1,4 +1,4 @@
-require_relative 'must_support_check_profiles'
+require_relative 'must_support_target_profiles'
 
 module DaVinciPASTestKit
   class Generator
@@ -6,16 +6,16 @@ module DaVinciPASTestKit
       class << self
         def generate(ig_metadata, base_server_output_dir, base_client_output_dir)
           submit_request_profiles =
-            ig_metadata.profiles.select { |profile| MustSupportCheckProfiles.submit_request_profile?(profile) }
-              .reject { |profile| MustSupportCheckProfiles.request_profile?(profile) }
+            ig_metadata.profiles.select { |profile| MustSupportTargetProfiles.submit_request_profile?(profile) }
+              .reject { |profile| MustSupportTargetProfiles.request_profile?(profile) }
           submit_response_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportCheckProfiles.submit_response_profile?(profile)
+            MustSupportTargetProfiles.submit_response_profile?(profile)
           end
           inquiry_request_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportCheckProfiles.inquire_request_profile?(profile)
+            MustSupportTargetProfiles.inquire_request_profile?(profile)
           end
           inquiry_response_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportCheckProfiles.inquire_response_profile?(profile)
+            MustSupportTargetProfiles.inquire_response_profile?(profile)
           end
 
           submit_request_profiles.each do |profile|

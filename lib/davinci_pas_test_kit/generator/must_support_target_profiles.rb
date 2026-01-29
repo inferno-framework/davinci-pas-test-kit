@@ -1,6 +1,6 @@
 module DaVinciPASTestKit
   class Generator
-    module MustSupportCheckProfiles
+    module MustSupportTargetProfiles
       SUBMIT_REQUEST_REQUIRED_PROFILES = [
         'PAS Request Bundle',
         'PAS Beneficiary Patient',

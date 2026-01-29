@@ -85,10 +85,10 @@ module DaVinciPASTestKit
     def write_profile_metadata
       # metadata files
       profile_metadata_list = ig_metadata.profiles.select do |profile_metadata|
-        MustSupportCheckProfiles.submit_request_profile?(profile_metadata) ||
-          MustSupportCheckProfiles.submit_response_profile?(profile_metadata) ||
-          MustSupportCheckProfiles.inquire_request_profile?(profile_metadata) ||
-          MustSupportCheckProfiles.inquire_response_profile?(profile_metadata)
+        MustSupportTargetProfiles.submit_request_profile?(profile_metadata) ||
+          MustSupportTargetProfiles.submit_response_profile?(profile_metadata) ||
+          MustSupportTargetProfiles.inquire_request_profile?(profile_metadata) ||
+          MustSupportTargetProfiles.inquire_response_profile?(profile_metadata)
       end
       profile_metadata_list.each do |profile_metadata|
         metadata_file_dir = File.join(base_shared_output_dir, ig_metadata.snake_case_for_profile(profile_metadata))

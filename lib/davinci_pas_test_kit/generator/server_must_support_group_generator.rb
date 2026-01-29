@@ -94,19 +94,19 @@ module DaVinciPASTestKit
         ig_metadata.profiles.select do |profile|
           case "#{operation}_#{type}"
           when 'submit_request'
-            MustSupportCheckProfiles.submit_request_profile?(profile) && !MustSupportCheckProfiles.request_profile?(profile)
+            MustSupportTargetProfiles.submit_request_profile?(profile) && !MustSupportTargetProfiles.request_profile?(profile)
           when 'submit_response'
-            MustSupportCheckProfiles.submit_response_profile?(profile)
+            MustSupportTargetProfiles.submit_response_profile?(profile)
           when 'inquire_request'
-            MustSupportCheckProfiles.inquire_request_profile?(profile)
+            MustSupportTargetProfiles.inquire_request_profile?(profile)
           when 'inquire_response'
-            MustSupportCheckProfiles.inquire_response_profile?(profile)
+            MustSupportTargetProfiles.inquire_response_profile?(profile)
           end
         end
       end
 
       def request_profiles
-        ig_metadata.profiles.select { |profile_metadata| MustSupportCheckProfiles.request_profile?(profile_metadata) }
+        ig_metadata.profiles.select { |profile_metadata| MustSupportTargetProfiles.request_profile?(profile_metadata) }
       end
 
       def verifies_requirements
