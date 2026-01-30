@@ -525,10 +525,7 @@ module DaVinciPASTestKit
     # This method generates an error message when a referenced resource appears more than once
     # in a FHIR bundle, which is not allowed.
     def resource_shall_appear_once_message(absolute_ref, total_matches)
-      "
-        The referenced #{absolute_ref} resource
-        SHALL appear exactly once in the Bundle, but found #{total_matches}.
-      "
+      " The referenced #{absolute_ref} resource SHALL appear exactly once in the Bundle, but found #{total_matches}."
     end
 
     # Generates a message for a resource present in both the PA request and response bundles.
@@ -538,10 +535,8 @@ module DaVinciPASTestKit
     # This method generates an error message when a resource appears in both the PA request
     # and response bundles but does not have the same fullUrl or identifiers.
     def resource_present_in_pa_request_and_response_msg(resource)
-      "
-        Resource #{resource.resourceType}/#{resource.id} is an entry in both the PA Request Bundle
-        and the Response Bundle, but they do not have the same fullUrl or identifiers
-      "
+      "Resource #{resource.resourceType}/#{resource.id} is an entry in both the PA Request Bundle and the Response " /
+        'Bundle, but they do not have the same fullUrl or identifiers'
     end
   end
 end
