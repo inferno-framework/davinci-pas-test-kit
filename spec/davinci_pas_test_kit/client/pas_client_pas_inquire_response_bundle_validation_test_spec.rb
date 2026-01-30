@@ -1,4 +1,5 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundleValidationTest, :request do
+  let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:access_token) { '1234' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:fhirpath_url) { 'https://example.com/fhirpath/evaluate' }

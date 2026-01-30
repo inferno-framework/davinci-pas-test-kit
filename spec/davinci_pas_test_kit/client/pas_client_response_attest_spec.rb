@@ -1,4 +1,5 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientResponseAttest, :request, :runnable do
+  let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:random_id) { '1234' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{random_id}" }
