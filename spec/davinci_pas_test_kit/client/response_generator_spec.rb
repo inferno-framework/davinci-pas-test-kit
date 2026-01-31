@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:operation_outcome_success) do

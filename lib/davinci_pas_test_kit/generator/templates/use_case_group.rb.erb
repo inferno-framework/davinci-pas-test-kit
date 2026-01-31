@@ -1,0 +1,156 @@
+require_relative '../../server_request_bundle_validation_test'
+require_relative '../../claim_submit_operation_test'
+require_relative '../../server_response_bundle_validation_test'
+require_relative '../../pas_claim_response_decision_test'
+<% if use_case == 'pended' -%>
+require_relative '../../pas_subscription_notification_wait_test'
+require 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/common/interaction_verification/notification_conformance_test'
+require 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/event_notification/id_only_content/id_only_conformance_test'
+require_relative '../../claim_inquire_operation_test'<% end %>
+
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::TestGroup
+      id :<%= group_id %>
+      title '<%= title %>'
+      description %(
+        <%= description.gsub("\n", "\n" + " "*8) %>
+      )
+      run_as_group
+  
+      group do
+        title "Server can respond with '<%= use_case.titleize %>' to claims submitted for prior authorization"
+        
+        test from: :pas_server_request_bundle_validation_test do
+          id :pas_server_<%= ig_version_for_id %>_pas_request_bundle_validation_test_<%= use_case %>
+          title '<%= bundle_validation_test_title('submit', 'request') %>'
+          description %(
+            <%= bundle_validation_test_description('submit', 'request').gsub("\n", "\n" + " "*12) %>
+          )
+          config(
+            inputs: {
+              bundle_payload: {
+                name: :approval_pa_submit_request_payload ,
+                title: 'PAS Submit Request Payload for Approval Response'
+              }
+            },
+            options: {
+              operation: 'submit',
+              use_case: '<%= use_case %>',
+              ig_version: '<%= ig_version %>'
+            }
+          )
+        end
+        test from: :pas_claim_submit_operation_test do
+          id :pas_<%= ig_version_for_id %>_claim_submit_operation_test_<%= use_case %>
+          config(
+            inputs: {
+              pa_submit_request_payload: {
+                name: :approval_pa_submit_request_payload,
+                title: 'PAS Submit Request Payload for Approval Response'
+              }
+            },
+            options: {
+              use_case: '<%= use_case %>',
+              ig_version: '<%= ig_version %>'
+            }
+          )<% if operation_requirements_verified('submit').present? %>
+          verifies_requirements '<%= operation_requirements_verified('submit').join("', '") %>'<% end %>
+        end
+        test from: :pas_server_response_bundle_validation_test do
+          id :pas_server_<%= ig_version_for_id %>_pas_response_bundle_validation_test_<%= use_case %>
+          title '<%= bundle_validation_test_title('submit', 'response') %>'
+          description %(
+            <%= bundle_validation_test_description('submit', 'response').gsub("\n", "\n" + " "*12) %>
+          )
+          config(
+            options: {
+              use_case: '<%= use_case %>',
+              operation: 'submit',
+              ig_version: '<%= ig_version %>'
+            }
+          )<% if bundle_response_conformance_requirements_verified('submit').present? %>
+          verifies_requirements '<%= bundle_response_conformance_requirements_verified('submit').join("', '") %>'<% end %>
+        end
+        test from: :prior_auth_claim_response_decision_validation do
+          id :pas_server_<%= ig_version_for_id %>_decision_validation_test_<%= use_case %>
+          title "Server response includes the '<%= use_case.titleize %>' decision code in the ClaimResponse instance"
+          config(
+            options: {
+              use_case: '<%= use_case %>',
+              operation: 'submit'
+            }
+          )
+        end
+      end
+      <% if use_case == 'pended' %>group do
+        title 'Server can notify client of updates and respond to claims submitted for inquiry'
+        
+        test from: :pas_subscription_notification_wait do
+          id :pas_server_<%= ig_version_for_id %>_subscription_notification_wait_<%= use_case %><% if notification_delivery_requirements_verified.present? %>
+          verifies_requirements '<%= notification_delivery_requirements_verified.join("', '") %>'<% end %>
+        end
+        test from: :subscriptions_r4_server_notification_conformance do
+          id :pas_server_<%= ig_version_for_id %>_subscription_notification_conformance_<%= use_case %>
+          config options: { subscription_type: 'id-only' }<% if notification_conformance_requirements_verified.present? %>
+          verifies_requirements(*(verifies_requirements + ['<%= notification_conformance_requirements_verified.join("', '") %>']))<% end %>
+        end
+        test from: :subscriptions_r4_server_id_only_conformance do
+          id :pas_server_<%= ig_version_for_id %>_subscription_notification_id_only_conformance_<%= use_case %>
+        end
+
+        test from: :pas_server_request_bundle_validation_test do
+          id :pas_server_<%= ig_version_for_id %>_pas_inquire_request_bundle_validation_test_<%= use_case %>
+          title '<%= bundle_validation_test_title('inquire', 'request') %>'
+          description %(
+            <%= bundle_validation_test_description('inquire', 'request').gsub("\n", "\n" + " "*12) %>
+          )
+          config(
+            inputs: {
+              bundle_payload: {
+                name: :pended_pa_inquire_request_payload,
+                title: 'PAS Inquire Request Payload for Pended Claim'
+              }
+            },
+            options: {
+              operation: 'inquire',
+              use_case: '<%= use_case %>',
+              ig_version: '<%= ig_version %>'
+            }
+          )
+        end
+        test from: :pas_claim_inquire_operation_test do
+          id :pas_<%= ig_version_for_id %>_claim_inquire_operation_test_<%= use_case %>
+          config(
+            inputs: {
+              pa_inquire_request_payload: {
+                name: :pended_pa_inquire_request_payload,
+                title: 'PAS Inquire Request Payload for Pended Claim'
+              }
+            },
+            options: {
+              use_case: '<%= use_case %>',
+              ig_version: '<%= ig_version %>'
+            }
+          )<% if operation_requirements_verified('inquire').present? %>
+          verifies_requirements '<%= operation_requirements_verified('inquire').join("', '") %>'<% end %>
+        end
+        test from: :pas_server_response_bundle_validation_test do
+          id :pas_server_<%= ig_version_for_id %>_pas_inquire_response_bundle_validation_test_<%= use_case %>
+          title '<%= bundle_validation_test_title('inquire', 'response') %>'
+          description %(
+            <%= bundle_validation_test_description('inquire', 'response').gsub("\n", "\n" + " "*12) %>
+          )
+          config(
+            options: {
+              use_case: '<%= use_case %>',
+              operation: 'inquire',
+              ig_version: '<%= ig_version %>'
+            }
+          )<% if bundle_response_conformance_requirements_verified('inquire').present? %>
+          verifies_requirements '<%= bundle_response_conformance_requirements_verified('inquire').join("', '") %>'<% end %>
+        end
+      end<% end %>
+    end
+  end
+end

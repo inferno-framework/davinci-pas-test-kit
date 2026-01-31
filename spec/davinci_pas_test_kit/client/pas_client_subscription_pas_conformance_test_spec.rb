@@ -1,7 +1,6 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::SubscriptionPASConformanceTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:suite_id) { 'davinci_pas_client_suite_v201' }
-
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::SubscriptionPASConformanceTest, :request do
   describe 'responding to requests from the client under tests' do
+    let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:access_token) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
     let(:test) { described_class }

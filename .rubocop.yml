@@ -11,7 +11,7 @@ AllCops:
   TargetRubyVersion: 3.3.6
   Exclude:
     - 'Gemfile'
-    - 'lib/davinci_pas_test_kit/generated/**/*'
+    - 'lib/davinci_pas_test_kit/*/generated/**/*'
     - 'vendor/**/*'
 
 Layout/LineLength:
@@ -91,4 +91,8 @@ RSpec/SubjectStub:
   Enabled: false
 
 Gemspec/RequireMFA:
+  Enabled: false
+
+# The test kit folder organization (and corresponding spec organization) does not align with modules, so RSpec complains
+RSpec/SpecFilePathFormat:
   Enabled: false

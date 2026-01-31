@@ -1,45 +1,49 @@
-require 'pry'
-require_relative 'naming'
-require_relative 'must_support_check_profiles'
+require_relative 'must_support_target_profiles'
 
 module DaVinciPASTestKit
   class Generator
     class MustSupportTestGenerator
       class << self
-        def generate(ig_metadata, base_output_dir)
-          submit_request_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.submit_request_group?(group)
+        def generate(ig_metadata, base_server_output_dir, base_client_output_dir)
+          submit_request_profiles =
+            ig_metadata.profiles.select { |profile| MustSupportTargetProfiles.submit_request_profile?(profile) }
+              .reject { |profile| MustSupportTargetProfiles.request_profile?(profile) }
+          submit_response_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportTargetProfiles.submit_response_profile?(profile)
           end
-          submit_response_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.submit_response_group?(group)
+          inquiry_request_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportTargetProfiles.inquire_request_profile?(profile)
           end
-          inquiry_request_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.inquiry_request_group?(group)
-          end
-          inquiry_response_groups = ig_metadata.groups.select do |group|
-            MustSupportCheckProfiles.inquiry_response_group?(group)
+          inquiry_response_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportTargetProfiles.inquire_response_profile?(profile)
           end
 
-          submit_request_groups.each do |group|
-            new(group, base_output_dir, 'submit_request').generate
-            new(group, base_output_dir, 'submit_request', 'client').generate
+          submit_request_profiles.each do |profile|
+            new(ig_metadata, profile, base_server_output_dir, 'request', 'submit').generate
+            new(ig_metadata, profile, base_client_output_dir, 'request', 'submit', 'client').generate
           end
-          submit_response_groups.each { |group| new(group, base_output_dir, 'submit_response').generate }
+          submit_response_profiles.each do |profile|
+            new(ig_metadata, profile, base_server_output_dir, 'response', 'submit').generate
+          end
 
-          inquiry_request_groups.each do |group|
-            new(group, base_output_dir, 'inquire_request').generate
-            new(group, base_output_dir, 'inquire_request', 'client').generate
+          inquiry_request_profiles.each do |profile|
+            new(ig_metadata, profile, base_server_output_dir, 'request', 'inquire').generate
+            new(ig_metadata, profile, base_client_output_dir, 'request', 'inquire', 'client').generate
           end
-          inquiry_response_groups.each { |group| new(group, base_output_dir, 'inquire_response').generate }
+          inquiry_response_profiles.each do |profile|
+            new(ig_metadata, profile, base_server_output_dir, 'response', 'inquire').generate
+          end
         end
       end
 
-      attr_accessor :group_metadata, :base_output_dir, :request_type, :system
+      attr_accessor :ig_metadata, :profile_metadata, :base_output_dir, :type, :operation, :system
 
-      def initialize(group_metadata, base_output_dir, request_type, system = 'server')
-        self.group_metadata = group_metadata
+      def initialize(ig_metadata, profile_metadata, base_output_dir, type, operation, system = 'server')
+        self.ig_metadata = ig_metadata
+        self.profile_metadata = profile_metadata
         self.base_output_dir = base_output_dir
-        self.request_type = request_type
+        self.type = type
+        self.operation = operation
         self.system = system
       end
 
@@ -64,62 +68,54 @@ module DaVinciPASTestKit
       end
 
       def read_interaction
-        self.class.read_interaction(group_metadata)
+        self.class.read_interaction(profile_metadata)
       end
 
       def profile_identifier
-        Naming.snake_case_for_profile(group_metadata)
+        ig_metadata.snake_case_for_profile(profile_metadata)
+      end
+
+      def request_type
+        "#{operation}_#{type}"
       end
 
       def test_id
-        "pas_#{system}_#{request_type}_#{group_metadata.reformatted_version}_#{profile_identifier}_must_support_test"
+        "pas_#{system}_#{profile_metadata.reformatted_version}_#{request_type}_must_support_#{profile_identifier}"
       end
 
       def class_name
-        # rubocop:disable Layout/LineLength
-        "#{system.capitalize}#{request_type.camelize}#{Naming.upper_camel_case_for_profile(group_metadata)}MustSupportTest"
-        # rubocop:enable Layout/LineLength
+        "#{system.capitalize}#{request_type.camelize}MustSupport" \
+          "#{ig_metadata.upper_camel_case_for_profile(profile_metadata)}Test"
       end
 
       def module_name
-        "DaVinciPAS#{group_metadata.reformatted_version.upcase}"
+        "DaVinciPAS#{profile_metadata.reformatted_version.upcase}"
       end
 
       def resource_type
-        group_metadata.resource
+        profile_metadata.resource
       end
 
       def profile_name
-        group_metadata.profile_name
-      end
-
-      def resource_collection_string
-        'all_scratch_resources'
+        profile_metadata.profile_name
       end
 
       def must_support_list_string
-        build_must_support_list_string(false)
+        build_must_support_list_string
       end
 
-      def uscdi_list_string
-        build_must_support_list_string(true)
-      end
-
-      def build_must_support_list_string(uscdi_only)
-        slice_names = group_metadata.must_supports[:slices]
-          .select { |slice| slice[:uscdi_only].presence == uscdi_only.presence }
+      def build_must_support_list_string
+        slice_names = profile_metadata.must_supports[:slices]
           .map { |slice| slice[:slice_id] }
 
-        element_names = group_metadata.must_supports[:elements]
-          .select { |element| element[:uscdi_only].presence == uscdi_only.presence }
+        element_names = profile_metadata.must_supports[:elements]
           .map { |element| "#{resource_type}.#{element[:path]}" }
 
-        extension_names = group_metadata.must_supports[:extensions]
-          .select { |extension| extension[:uscdi_only].presence == uscdi_only.presence }
+        extension_names = profile_metadata.must_supports[:extensions]
           .map { |extension| extension[:id] }
 
-        group_metadata.must_supports[:choices]&.each do |choice|
-          next unless choice[:uscdi_only].presence == uscdi_only.presence && choice.key?(:paths)
+        profile_metadata.must_supports[:choices]&.each do |choice|
+          next unless choice.key?(:paths)
 
           choice[:paths].each { |path| element_names.delete("#{resource_type}.#{path}") }
           choice[:extension_ids].each { |id| extension_names.delete(id.to_s) } if choice[:extension_ids].present?
@@ -138,23 +134,19 @@ module DaVinciPASTestKit
       end
 
       def verifies_requirements
-        case test_id
-        when 'pas_server_submit_response_v201_claimresponse_must_support_test'
+        case "#{system}_#{operation}_#{type}_#{ig_metadata.ig_version}"
+        when 'server_submit_response_v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@37', 'hl7.fhir.us.davinci-pas_2.0.1@110']
-        when 'pas_server_inquire_response_v201_claiminquiryresponse_must_support_test'
+        when 'server_inquire_response_v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@38']
         end
-      end
-
-      def optional?
-        MustSupportCheckProfiles.optional_group?(group_metadata)
       end
 
       def generate
         FileUtils.mkdir_p(output_file_directory)
         File.write(output_file_name, output)
 
-        group_metadata.add_test(
+        profile_metadata.add_test(
           id: test_id,
           file_name: base_output_file_name
         )
