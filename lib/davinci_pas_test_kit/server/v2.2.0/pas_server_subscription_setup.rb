@@ -13,7 +13,6 @@ module DaVinciPASTestKit
         )
       config inputs: { url: { name: :server_endpoint } }
       input_order :server_endpoint, :smart_credentials, :access_token, :subscription_resource
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@141'
       run_as_group
 
       test from: :subscriptions_r4_server_subscription_conformance do

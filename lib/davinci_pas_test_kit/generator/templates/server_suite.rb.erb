@@ -1,6 +1,6 @@
 require_relative '../../../cross_suite/validator_suppressions'
 require_relative '<%= error_group_file_name %>'
-require_relative '../../<%= ig_metadata.version %>/pas_server_subscription_setup'
+require_relative '../../<%= ig_metadata.ig_version %>/pas_server_subscription_setup'
 <% group_file_list.each do |file_name| %>require_relative '<%= file_name %>'
 <% end %>
 module DaVinciPASTestKit
@@ -70,8 +70,8 @@ module DaVinciPASTestKit
 
       requirement_sets(
         {
-          identifier: 'hl7.fhir.us.davinci-pas_<%= ig_metadata.version.delete_prefix('v') %>',
-          title: 'Da Vinci Prior Authorization Support (PAS) <%= ig_metadata.version %>',
+          identifier: 'hl7.fhir.us.davinci-pas_<%= ig_metadata.ig_version.delete_prefix('v') %>',
+          title: 'Da Vinci Prior Authorization Support (PAS) <%= ig_metadata.ig_version %>',
           actor: 'Server'
         },
         {
@@ -82,8 +82,9 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs '<%= ig_identifier %>'
-
+      <% if ig_metadata.ig_version == 'v2.0.1' %>igs '<%= ig_identifier %>'<% end %>
+      <% if ig_metadata.ig_version == 'v2.2.0' %>igs 'igs/davinci_pas_2.2.0-preview.tgz' # TODO: update to published ig instead of local file when released<% end %>
+        
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
           # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching

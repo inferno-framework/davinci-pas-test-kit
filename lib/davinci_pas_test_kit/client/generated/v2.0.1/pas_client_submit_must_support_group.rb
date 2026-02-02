@@ -44,8 +44,7 @@ module DaVinciPASTestKit
       run_as_group
       
       test from: :pas_client_submit_gather_must_support do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
-                          'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62', 'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
       end
       test from: :pas_client_v201_must_support_request_profiles
       test from: :pas_client_v201_submit_request_must_support_pas_request_bundle

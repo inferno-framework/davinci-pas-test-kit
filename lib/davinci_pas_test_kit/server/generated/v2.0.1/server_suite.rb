@@ -85,8 +85,9 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs 'hl7.fhir.us.davinci-pas#2.0.1'
-
+      igs 'hl7.fhir.us.davinci-pas#2.0.1'
+      
+        
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
           # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching
@@ -121,15 +122,6 @@ module DaVinciPASTestKit
       resume_test_route :get, RESUME_SKIP_PATH, result: 'skip' do |request|
         request.query_parameters['token']
       end
-
-      # Used for attestation experiment - see pas_claim_response_decision_test.rb
-      # resume_test_route :get, RESUME_PASS_PATH do |request|
-      #   request.query_parameters['token']
-      # end
-      #
-      # resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
-      #   request.query_parameters['token']
-      # end
 
       group from: :pas_server_v201_subscription_setup
 

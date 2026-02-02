@@ -71,22 +71,23 @@ module DaVinciPASTestKit
         }
       ]
 
-      # requirement_sets(
-      #   {
-      #     identifier: 'hl7.fhir.us.davinci-pas_2.0.1',
-      #     title: 'Da Vinci Prior Authorization Support (PAS) v2.0.1',
-      #     actor: 'Server'
-      #   },
-      #   {
-      #     identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
-      #     title: 'Subscriptions R5 Backport IG',
-      #     actor: 'Server'
-      #   }
-      # )
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.us.davinci-pas_2.2.0',
+          title: 'Da Vinci Prior Authorization Support (PAS) v2.2.0',
+          actor: 'Server'
+        },
+        {
+          identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
+          title: 'Subscriptions R5 Backport IG',
+          actor: 'Server'
+        }
+      )
 
       fhir_resource_validator do
-        igs 'hl7.fhir.us.davinci-pas#current'
-
+      
+      igs 'igs/davinci_pas_2.2.0-preview.tgz' # TODO: update to published ig instead of local file when released
+        
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
           # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching

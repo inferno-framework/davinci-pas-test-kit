@@ -16,7 +16,7 @@ module DaVinciPASTestKit
       )
       run_as_group
       
-      test from: :pas_client_<%= operation %>_gather_must_support <% if verifies_requirements.present? %>do
+      test from: :pas_client_<%= operation %>_gather_must_support<% if verifies_requirements.present? %> do
         verifies_requirements '<%= verifies_requirements.join("', '") %>'
       end<% end %>
       <%- if operation == 'submit' -%>
