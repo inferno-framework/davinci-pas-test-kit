@@ -1,5 +1,5 @@
 require_relative 'workflows/pas_client_pended_submit_test'
-require_relative 'workflows/pas_client_response_attest'
+require_relative '../pas_client_response_attest'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative 'workflows/pas_client_inquire_response_bundle_validation_test'
 require_relative 'workflows/pas_client_request_bundle_validation_test'
@@ -51,7 +51,7 @@ module DaVinciPASTestKit
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v201_response_attest,
+        test from: :pas_client_response_attest,
              title: 'Check that the client registers the request as pended (Attestation)',
              description: %(
               This test provides the tester an opportunity to observe their client following
@@ -112,7 +112,7 @@ module DaVinciPASTestKit
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v201_response_attest,
+        test from: :pas_client_response_attest,
              title: 'Check that the client registers the request as approved (Attestation)',
              description: %(
               This test provides the tester an opportunity to observe their client following

@@ -1,7 +1,7 @@
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PasInquiryErrorTest < Inferno::Test
-      id :prior_auth_inquiry_error
+      id :pas_server_v201_prior_auth_inquiry_error
       title %(
         Server returns OperationOutcome instance when invoking the $inquire operation on the Claim endpoint
         (/Claim/$inquire) with nonconformant PAS Request Bundle

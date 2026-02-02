@@ -71,10 +71,6 @@ RSpec/DescribeClass:
 RSpec/ExampleLength:
   Enabled: false
 
-RSpec/SpecFilePathFormat:
-  CustomTransform:
-    DaVinciPASTestKit: davinci_pas_test_kit
-
 RSpec/MultipleExpectations:
   Enabled: false
 

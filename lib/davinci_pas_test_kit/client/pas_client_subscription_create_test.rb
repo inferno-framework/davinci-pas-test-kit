@@ -1,0 +1,58 @@
+require_relative '../cross_suite/urls'
+require_relative 'client_input_descriptions'
+require_relative 'session_identification'
+
+module DaVinciPASTestKit
+  class PASClientSubscriptionCreateTest < Inferno::Test
+    include URLs
+    include SessionIdentification
+
+    id :pas_client_subscription_create_test
+    title 'Client submits a Subscription Creation Request'
+    description %(
+      Inferno will wait for a Subscription Creation request
+      and then perform a handshake to activate the Subscription.
+    )
+
+    input :client_id,
+          title: 'Client Id',
+          type: 'text',
+          optional: true,
+          locked: true,
+          description: INPUT_CLIENT_ID_LOCKED
+    input :session_url_path,
+          title: 'Session-specific URL path extension',
+          type: 'text',
+          optional: true,
+          locked: true,
+          description: INPUT_SESSION_URL_PATH_LOCKED
+    input :client_endpoint_access_token,
+          optional: true,
+          title: 'Client Notification Access Token',
+          description: %(
+            The bearer token that Inferno will send on requests to the client under test's rest-hook notification
+            endpoint, including handshake notifications sent after Subscription creation. Not needed if the client
+            under test will create a Subscription with an appropriate header value in the `channel.header` element.
+            If a value for the `authorization` header is provided in `channel.header`, this value will override it.
+          )
+
+    run do
+      wait_identifier = session_wait_identifier(client_id, session_url_path)
+      subscription_endpoint = session_endpont_url(:subscription, client_id, session_url_path)
+
+      wait(
+        identifier: wait_identifier,
+        message: %(
+          **Subscription Creation Test**:
+
+          Submit a POST with a Subscription to:
+
+          `#{subscription_endpoint}`
+
+          Upon receipt, Inferno will send a handshake request to verify that notifications can be
+          delivered and continue the test with a pass or fail based on the result.
+        )
+      )
+    end
+  end
+end

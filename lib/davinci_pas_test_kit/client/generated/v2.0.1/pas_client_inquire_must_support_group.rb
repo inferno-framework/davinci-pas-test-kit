@@ -1,4 +1,4 @@
-require_relative '../../v2.0.1/workflows/pas_client_inquire_gather_must_support_test'
+require_relative '../../pas_client_inquire_gather_must_support_test'
 require_relative 'pas_inquiry_request_bundle/client_inquire_request_must_support_pas_inquiry_request_bundle_test'
 require_relative 'claim_inquiry/client_inquire_request_must_support_claim_inquiry_test'
 require_relative 'coverage/client_inquire_request_must_support_coverage_test'
@@ -35,7 +35,7 @@ module DaVinciPASTestKit
       )
       run_as_group
       
-      test from: :pas_client_v201_inquire_gather_must_support
+      test from: :pas_client_inquire_gather_must_support
       test from: :pas_client_v201_inquire_request_must_support_pas_inquiry_request_bundle
       test from: :pas_client_v201_inquire_request_must_support_claim_inquiry
       test from: :pas_client_v201_inquire_request_must_support_coverage

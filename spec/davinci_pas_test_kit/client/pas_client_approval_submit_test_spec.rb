@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest, :request do
+RSpec.describe DaVinciPASTestKit::PASClientApprovalSubmitTest, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do

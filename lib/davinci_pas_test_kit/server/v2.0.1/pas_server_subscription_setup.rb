@@ -4,7 +4,7 @@ require_relative 'pas_server_subscription_input_conformance'
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASServerSubscriptionSetup < Inferno::TestGroup
-      id :pas_server_subscription_setup
+      id :pas_server_v201_subscription_setup
       title 'Subscription Setup'
       description %(
           The Subscription Setup tests verify that the server supports creation of a rest-hook Subscription. The
@@ -26,7 +26,7 @@ module DaVinciPASTestKit
                      modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
                    )
       end
-      test from: :pas_server_subscription_input_conformance
+      test from: :pas_server_v201_subscription_input_conformance
       test from: :subscriptions_r4_server_notification_delivery,
            title: 'Send Subscription and Receive Handshake Notification from Server',
            description: %(

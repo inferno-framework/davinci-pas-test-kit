@@ -18,12 +18,15 @@
   - :id: Patient.extension:race
     :path: extension
     :url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
+    :modifier_extension: false
   - :id: Patient.extension:ethnicity
     :path: extension
     :url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity
+    :modifier_extension: false
   - :id: Patient.extension:birthsex
     :path: extension
     :url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex
+    :modifier_extension: false
   :slices:
   - :slice_id: Patient.multipleBirth[x]:multipleBirthInteger
     :slice_name: multipleBirthInteger

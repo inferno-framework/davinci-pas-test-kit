@@ -1,6 +1,6 @@
 require_relative '../../../cross_suite/validator_suppressions'
 require_relative '<%= error_group_file_name %>'
-require_relative '../../v2.0.1/pas_server_subscription_setup'
+require_relative '../../<%= ig_metadata.version %>/pas_server_subscription_setup'
 <% group_file_list.each do |file_name| %>require_relative '<%= file_name %>'
 <% end %>
 module DaVinciPASTestKit
@@ -70,8 +70,8 @@ module DaVinciPASTestKit
 
       requirement_sets(
         {
-          identifier: 'hl7.fhir.us.davinci-pas_2.0.1',
-          title: 'Da Vinci Prior Authorization Support (PAS) v2.0.1',
+          identifier: 'hl7.fhir.us.davinci-pas_<%= ig_metadata.version.delete_prefix('v') %>',
+          title: 'Da Vinci Prior Authorization Support (PAS) <%= ig_metadata.version %>',
           actor: 'Server'
         },
         {
@@ -119,17 +119,7 @@ module DaVinciPASTestKit
         request.query_parameters['token']
       end
 
-      # Used for attestation experiment - see pas_claim_response_decision_test.rb
-      # resume_test_route :get, RESUME_PASS_PATH do |request|
-      #   request.query_parameters['token']
-      # end
-      #
-      # resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
-      #   request.query_parameters['token']
-      # end
-
-      group from: :pas_server_subscription_setup,
-            id: :pas_server_<%= ig_metadata.reformatted_version %>_subscription_setup
+      group from: :pas_server_<%= ig_metadata.reformatted_version %>_subscription_setup
 
       group 'Demonstrate Workflow Support' do
         description %(

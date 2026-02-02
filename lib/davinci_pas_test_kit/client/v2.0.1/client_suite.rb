@@ -8,7 +8,7 @@ require_relative '../endpoints/claim_endpoint'
 require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
-require_relative 'pas_client_options'
+require_relative '../pas_client_options'
 require_relative 'pas_client_workflows_group'
 require_relative 'pas_client_must_support_group'
 require_relative 'pas_client_subscription_setup_group'
@@ -153,6 +153,12 @@ module DaVinciPASTestKit
       resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
         request.query_parameters['token']
       end
+
+      config(
+        options: {
+          ig_version: 'v2.0.1'
+        }
+      )
 
       group from: :pas_client_v201_registration
 

@@ -1,5 +1,5 @@
-require_relative 'workflows/pas_client_approval_submit_test'
-require_relative 'workflows/pas_client_response_attest'
+require_relative '../pas_client_approval_submit_test'
+require_relative '../pas_client_response_attest'
 require_relative 'workflows/pas_client_request_bundle_validation_test'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative '../../cross_suite/tags'
@@ -17,13 +17,16 @@ module DaVinciPASTestKit
 
       input :approval_json_response, optional: true
 
-      test from: :pas_client_v201_approval_submit_test
+      test from: :pas_client_approval_submit_test do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
+                              'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202'
+      end
       test from: :pas_client_v201_request_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
 
       test from: :pas_client_v201_response_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
-      test from: :pas_client_v201_response_attest,
+      test from: :pas_client_response_attest,
            title: 'Check that the client registers the request as approved (Attestation)',
            description: %(
              This test provides the tester an opportunity to observe their client following

@@ -1,9 +1,17 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::SubscriptionPASConformanceTest, :request do
+RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
   describe 'responding to requests from the client under tests' do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:access_token) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
-    let(:test) { described_class }
+    let(:test) do
+      Class.new(described_class) do
+        config(
+          options: {
+            ig_version: 'v2.0.1'
+          }
+        )
+      end
+    end
     let(:results_repo) { Inferno::Repositories::Results.new }
     let(:result) { repo_create(:result, test_session_id: test_session.id) }
     let(:requests_repo) { Inferno::Repositories::Requests.new }

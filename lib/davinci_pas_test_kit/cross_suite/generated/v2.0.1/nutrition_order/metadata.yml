@@ -20,6 +20,7 @@
   - :id: NutritionOrder.extension:coverage
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+    :modifier_extension: false
   :slices: []
   :elements:
   - :path: patient

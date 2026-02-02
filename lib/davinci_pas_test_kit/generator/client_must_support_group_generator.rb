@@ -117,6 +117,14 @@ module DaVinciPASTestKit
         required_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
       end
 
+      def verifies_requirements
+        case "#{operation}_#{ig_version}"
+        when 'submit_v2.0.1'
+          ['hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62', 'hl7.fhir.us.davinci-pas_2.0.1@70',
+           'hl7.fhir.us.davinci-pas_2.0.1@202']
+        end
+      end
+
       def description
         <<~DESCRIPTION
           Check that the client can demonstrate `$#{operation}` requests that contain

@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientSubscriptionCreateTest, :request do
+RSpec.describe DaVinciPASTestKit::PASClientSubscriptionCreateTest, :request do
   describe 'when responding to requests from the client under tests' do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:session_url_path) { '1234' }

@@ -1,7 +1,7 @@
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PasSubmissionErrorTest < Inferno::Test
-      id :prior_auth_submission_error
+      id :pas_server_v201_prior_auth_submission_error
       title %(
         Server returns OperationOutcome instance when invoking the $submit operation on the Claim endpoint
         (/Claim/$submit) with nonconformant PAS Request Bundle

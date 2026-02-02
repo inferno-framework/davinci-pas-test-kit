@@ -131,8 +131,7 @@ module DaVinciPASTestKit
       #   request.query_parameters['token']
       # end
 
-      group from: :pas_server_subscription_setup,
-            id: :pas_server_v201_subscription_setup
+      group from: :pas_server_v201_subscription_setup
 
       group 'Demonstrate Workflow Support' do
         description %(

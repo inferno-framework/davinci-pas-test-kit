@@ -1,6 +1,8 @@
 module DaVinciPASTestKit
   module PASSubscriptionVerification
-    def verify_pas_subscription(subscription_json_str)
+    def verify_pas_subscription(subscription_json_str, ig_version: 'v2.0.1')
+      assert ig_version == 'v2.0.1', 'IMPLEMENT ME - non v2.0.1'
+
       assert_valid_json(subscription_json_str)
       subscription = JSON.parse(subscription_json_str)
 

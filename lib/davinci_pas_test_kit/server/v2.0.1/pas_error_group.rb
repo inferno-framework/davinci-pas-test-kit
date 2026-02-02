@@ -13,8 +13,8 @@ module DaVinciPASTestKit
       id :pas_v201_error_group
       run_as_group
 
-      test from: :prior_auth_submission_error
-      test from: :prior_auth_inquiry_error
+      test from: :pas_server_v201_prior_auth_submission_error
+      test from: :pas_server_v201_prior_auth_inquiry_error
     end
   end
 end
