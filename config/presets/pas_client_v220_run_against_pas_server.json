@@ -1,7 +1,7 @@
 {
   "title": "Run Against the PAS Server Suite",
-  "id": "pas-client-run-against-pas-server-tests",
-  "test_suite_id": "davinci_pas_client_suite_v201",
+  "id": "pas-client-v220-run-against-pas-server-tests",
+  "test_suite_id": "davinci_pas_client_suite_v220",
   "inputs": [
     {
       "name": "session_url_path",
