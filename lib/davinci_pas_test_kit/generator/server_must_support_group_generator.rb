@@ -94,7 +94,8 @@ module DaVinciPASTestKit
         ig_metadata.profiles.select do |profile|
           case "#{operation}_#{type}"
           when 'submit_request'
-            MustSupportTargetProfiles.submit_request_profile?(profile) && !MustSupportTargetProfiles.request_profile?(profile)
+            MustSupportTargetProfiles.submit_request_profile?(profile) &&
+              !MustSupportTargetProfiles.request_profile?(profile)
           when 'submit_response'
             MustSupportTargetProfiles.submit_response_profile?(profile)
           when 'inquire_request'
