@@ -1,6 +1,6 @@
 require_relative '../user_input_response'
 require_relative '../response_generator'
-require_relative '../../cross_suite/urls'
+require_relative '../client_urls'
 require_relative '../jobs/send_pas_subscription_notification'
 require 'subscriptions_test_kit'
 require 'udap_security_test_kit'
@@ -9,9 +9,9 @@ module DaVinciPASTestKit
   class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
     include ResponseGenerator
-    include URLs
+    include ClientURLs
 
-    # override the one from URLs
+    # override the one from URLs to make it version specific
     def suite_id
       request.path.split('/custom/')[1].split('/')[0] # request.path = {base inferno path}/custom/{suite_id}/...
     end

@@ -1,5 +1,4 @@
 require 'udap_security_test_kit'
-require_relative '../cross_suite/urls'
 
 module DaVinciPASTestKit
   module SessionIdentification

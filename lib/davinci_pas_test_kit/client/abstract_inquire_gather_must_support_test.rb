@@ -1,19 +1,17 @@
-require_relative '../cross_suite/urls'
 require_relative 'client_input_descriptions'
 require_relative 'session_identification'
 
 module DaVinciPASTestKit
-  class PASClientSubmitGatherMustSupportTest < Inferno::Test
-    include URLs
+  # abstract test, needs to be extended to include a version-specific URLs module
+  class AbstractInquireGatherMustSupportTest < Inferno::Test
     include SessionIdentification
 
-    id :pas_client_submit_gather_must_support
-    title 'Client submits claims using the $submit operation to demonstrate coverage of must support elements'
+    id :pas_client_inquire_gather_must_support
+    title 'Client inquires about claims using the $inquire operation to demonstrate coverage of must support elements'
     description %(
-      This test allows the client to send $submit requests in addition to any already sent in previous test groups
+      This test allows the client to send $inquire requests in addition to any already sent in previous test groups
       for Inferno to evaluate coverage of must support elements.
     )
-
     input :client_id,
           title: 'Client Id',
           type: 'text',
@@ -30,18 +28,18 @@ module DaVinciPASTestKit
 
     run do
       wait_identifier = session_wait_identifier(client_id, session_url_path)
-      submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
+      inquire_endpoint = session_endpont_url(:inquire, client_id, session_url_path)
 
       wait(
         identifier: wait_identifier,
         message: %(
-          The client system may now make multiple $submit requests before continuing. These requests should
+          The client system may now make multiple $inquire requests before continuing. These requests should
           cumulatively demonstrate coverage of all required profiles and all must support elements within those
           profiles, as specified by the DaVince Prior Authorization Support implementation guide.
 
-          For the $submit operation the required profiles include:
-          - PAS Request Bundle
-          - PAS Claim Update
+          For the $inquire operation the required profiles include:
+          - PAS Inquiry Request Bundle
+          - PAS Claim Inquiry
           - PAS Coverage
           - PAS Beneficiary Patient
           - PAS Subscriber Patient
@@ -49,16 +47,10 @@ module DaVinciPASTestKit
           - PAS Requestor Organization
           - PAS Practitioner
           - PAS PractitionerRole
-          - PAS Encounter
-          - At least one of the following request profiles
-            - PAS Device Request
-            - PAS Medication Request
-            - PAS Nutrition Order
-            - PAS Service Request
 
           Submit PAS requests to
 
-          `#{submit_endpoint}`
+          `#{inquire_endpoint}`
 
           and [click here](#{resume_pass_url}?token=#{wait_identifier}) when done.
         )

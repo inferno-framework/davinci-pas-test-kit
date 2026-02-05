@@ -1,9 +1,6 @@
-require_relative '../cross_suite/urls'
-
 module DaVinciPASTestKit
-  class PASSubscriptionNotificationWaitTest < Inferno::Test
-    include URLs
-    id :pas_subscription_notification_wait
+  class AbstractPASSubscriptionNotificationWaitTest < Inferno::Test
+    id :pas_server_subscription_notification_wait
     title 'Server notifies the client that the pended claim was updated.'
     description %(
         This test validates that the server can notify the client that a final

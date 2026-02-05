@@ -1,10 +1,9 @@
-require_relative '../cross_suite/urls'
 require_relative 'client_input_descriptions'
 require_relative 'session_identification'
 
 module DaVinciPASTestKit
-  class PASClientSubscriptionCreateTest < Inferno::Test
-    include URLs
+  # abstract test, needs to be extended to include a version-specific URLs module
+  class AbstractSubscriptionCreateTest < Inferno::Test
     include SessionIdentification
 
     id :pas_client_subscription_create_test

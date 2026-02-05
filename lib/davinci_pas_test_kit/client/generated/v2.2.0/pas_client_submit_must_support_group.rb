@@ -1,4 +1,4 @@
-require_relative '../../pas_client_submit_gather_must_support_test'
+require_relative '../../v2.2.0/must_support/pas_client_submit_gather_must_support_test'
 require_relative '../../v2.2.0/must_support/pas_client_must_support_request_profiles_test'
 require_relative 'pas_request_bundle/client_submit_request_must_support_pas_request_bundle_test'
 require_relative 'claim_update/client_submit_request_must_support_claim_update_test'
@@ -43,7 +43,7 @@ module DaVinciPASTestKit
       )
       run_as_group
       
-      test from: :pas_client_submit_gather_must_support
+      test from: :pas_client_v220_submit_gather_must_support
       test from: :pas_client_v220_must_support_request_profiles
       test from: :pas_client_v220_submit_request_must_support_pas_request_bundle
       test from: :pas_client_v220_submit_request_must_support_claim_update

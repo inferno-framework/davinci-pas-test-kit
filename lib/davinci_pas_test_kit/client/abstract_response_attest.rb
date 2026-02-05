@@ -1,9 +1,6 @@
-require_relative '../cross_suite/urls'
-
 module DaVinciPASTestKit
-  class PASClientResponseAttest < Inferno::Test
-    include URLs
-
+  # abstract test, needs to be extended to include a version-specific URLs module
+  class AbstractResponseAttest < Inferno::Test
     id :pas_client_response_attest
     title 'Check that the client reacts appropriately to the response (Attestation)'
     description %(

@@ -3,7 +3,6 @@ require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
 require_relative '../../cross_suite/validator_suppressions'
 require_relative '../../cross_suite/tags'
-require_relative '../../cross_suite/urls'
 require_relative '../endpoints/claim_endpoint'
 require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
@@ -154,7 +153,7 @@ module DaVinciPASTestKit
         request.query_parameters['token']
       end
 
-      group from: :pas_client_v201_registration
+      group from: :pas_client_v220_registration
 
       # SMART test groups (with :session_url_path input removed)
       group from: :pas_client_v220_subscription_setup, id: :pas_client_v220_subscription_setup_smart do

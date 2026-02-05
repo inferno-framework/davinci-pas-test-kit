@@ -2,7 +2,6 @@
 
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
-require_relative '../../cross_suite/urls'
 require_relative '../../cross_suite/tags'
 
 module DaVinciPASTestKit

@@ -2,6 +2,7 @@
 
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
+require_relative '../cross_suite/base_urls'
 
 module DaVinciPASTestKit
   SESSION_PATH_PLACEHOLDER = '/:session_path'
@@ -19,14 +20,11 @@ module DaVinciPASTestKit
   SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH = SESSION_PATH_PLACEHOLDER + FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH
   FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH = "#{FHIR_SUBSCRIPTION_PATH}/$status".freeze
   SESSION_FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH = SESSION_PATH_PLACEHOLDER + FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH
-  RESUME_PASS_PATH = '/resume_pass'
-  RESUME_FAIL_PATH = '/resume_fail'
-  RESUME_SKIP_PATH = '/resume_skip'
 
-  module URLs
-    def base_url
-      @base_url ||= "#{Inferno::Application['base_url']}/custom/#{suite_id}"
-    end
+  # URLs used by client tests
+  # suite_id still not provided since not specific to a suite, yet
+  module ClientURLs
+    include BaseURLs
 
     def fhir_base_url
       @fhir_base_url ||= base_url + FHIR_PATH
@@ -68,18 +66,6 @@ module DaVinciPASTestKit
       base_url + SESSION_FHIR_SUBSCRIPTION_PATH.gsub(SESSION_PATH_PLACEHOLDER, "/#{session_path}")
     end
 
-    def resume_pass_url
-      @resume_pass_url ||= base_url + RESUME_PASS_PATH
-    end
-
-    def resume_fail_url
-      @resume_fail_url ||= base_url + RESUME_FAIL_PATH
-    end
-
-    def resume_skip_url
-      @resume_skip_url ||= base_url + RESUME_SKIP_PATH
-    end
-
     def udap_discovery_url
       @udap_discovery_url ||= base_url + UDAPSecurityTestKit::UDAP_DISCOVERY_PATH
     end
@@ -90,10 +76,6 @@ module DaVinciPASTestKit
 
     def registration_url
       @registration_url ||= base_url + UDAPSecurityTestKit::REGISTRATION_PATH
-    end
-
-    def suite_id
-      self.class.suite.id
     end
   end
 end

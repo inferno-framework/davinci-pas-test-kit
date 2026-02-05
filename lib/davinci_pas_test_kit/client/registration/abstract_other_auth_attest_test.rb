@@ -1,9 +1,5 @@
-require_relative '../../cross_suite/urls'
-
 module DaVinciPASTestKit
-  class PASClientRegistrationOtherAuthAttest < Inferno::Test
-    include URLs
-
+  class AbstractRegistrationOtherAuthAttest < Inferno::Test
     id :pas_client_reg_other_auth_attest
     title 'Verify that the client supports an approach for authenticating itself to the server (Attestation)'
     description %(

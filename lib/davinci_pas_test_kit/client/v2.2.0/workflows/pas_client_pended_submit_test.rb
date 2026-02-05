@@ -1,4 +1,4 @@
-require_relative '../../../cross_suite/urls'
+require_relative '../urls'
 require_relative '../../client_input_descriptions'
 require_relative '../../user_input_response'
 require_relative '../../../cross_suite/pas_bundle_validation'

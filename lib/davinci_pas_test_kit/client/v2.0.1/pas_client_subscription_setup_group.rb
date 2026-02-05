@@ -1,5 +1,5 @@
 require 'subscriptions_test_kit'
-require_relative '../pas_client_subscription_create_test'
+require_relative 'subscription/pas_client_subscription_create_test'
 require_relative '../pas_client_subscription_pas_conformance_test'
 
 module DaVinciPASTestKit
@@ -14,10 +14,7 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      test from: :pas_client_subscription_create_test do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@137', 'hl7.fhir.us.davinci-pas_2.0.1@140',
-                              'hl7.fhir.us.davinci-pas_2.0.1@142'
-      end
+      test from: :pas_client_v201_subscription_create_test
       test from: :subscriptions_r4_client_subscription_verification
       test from: :pas_client_subscription_pas_conformance_test do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@143'

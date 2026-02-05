@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../cross_suite/tags'
-require_relative '../../cross_suite/urls'
+require_relative '../client_urls'
 require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
@@ -9,9 +9,9 @@ module DaVinciPASTestKit
     class SendPASSubscriptionNotification
       include Sidekiq::Job
       include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
-      include URLs
+      include ClientURLs
 
-      # override the one from URLs
+      # provide a suite_id definition to use with the ClientURLs module
       def suite_id
         @notification_suite_id
       end

@@ -1,9 +1,5 @@
-require_relative '../../cross_suite/urls'
-
 module DaVinciPASTestKit
-  class PASClientRegistrationConfigurationOtherDisplay < Inferno::Test
-    include URLs
-
+  class AbstractRegistrationConfigurationOtherDisplay < Inferno::Test
     id :pas_client_reg_config_other_display
     title 'Confirm client configuration'
     description %(

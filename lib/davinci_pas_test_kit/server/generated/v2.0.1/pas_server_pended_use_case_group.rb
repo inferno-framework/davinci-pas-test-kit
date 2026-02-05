@@ -2,7 +2,7 @@ require_relative '../../server_request_bundle_validation_test'
 require_relative '../../claim_submit_operation_test'
 require_relative '../../server_response_bundle_validation_test'
 require_relative '../../pas_claim_response_decision_test'
-require_relative '../../pas_subscription_notification_wait_test'
+require_relative '../../v2.0.1/pas_server_subscription_notification_wait_test'
 require 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/common/interaction_verification/notification_conformance_test'
 require 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/event_notification/id_only_content/id_only_conformance_test'
 require_relative '../../claim_inquire_operation_test'
@@ -148,7 +148,7 @@ module DaVinciPASTestKit
       group do
         title 'Server can notify client of updates and respond to claims submitted for inquiry'
         
-        test from: :pas_subscription_notification_wait do
+        test from: :pas_server_v201_subscription_notification_wait do
           id :pas_server_v201_subscription_notification_wait_pended
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@141'
         end

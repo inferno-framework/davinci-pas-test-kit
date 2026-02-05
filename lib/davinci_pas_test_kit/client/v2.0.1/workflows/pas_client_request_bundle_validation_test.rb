@@ -1,11 +1,9 @@
 require_relative '../../../cross_suite/pas_bundle_validation'
-require_relative '../../../cross_suite/urls'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PasClientRequestBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
-      include URLs
 
       id :pas_client_v201_request_bundle_validation_test
       title 'Submit Request Bundle is valid'
