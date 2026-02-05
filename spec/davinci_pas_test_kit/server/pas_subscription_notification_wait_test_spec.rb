@@ -1,8 +1,17 @@
-RSpec.describe DaVinciPASTestKit::PASSubscriptionNotificationWaitTest, :request do
+require_relative '../../../lib/davinci_pas_test_kit/server/v2.0.1/server_urls'
+
+RSpec.describe DaVinciPASTestKit::AbstractPASSubscriptionNotificationWaitTest, :request do
   let(:suite_id) { 'davinci_pas_server_suite_v201' }
 
   let(:access_token) { '1234' }
-  let(:test) { described_class }
+  let(:test) do
+    Class.new(described_class) do
+      include DaVinciPASTestKit::DaVinciPASV201::ServerURLs
+      def suite_id
+        'davinci_pas_client_suite_v201'
+      end
+    end
+  end
   let(:resume_skip_url) { "/custom/#{suite_id}/resume_skip" }
   let(:notification_url) { '/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener' }
   let(:results_repo) { Inferno::Repositories::Results.new }

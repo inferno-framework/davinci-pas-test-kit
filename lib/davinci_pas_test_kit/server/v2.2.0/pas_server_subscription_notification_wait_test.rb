@@ -1,5 +1,5 @@
 require_relative '../abstract_pas_subscription_notification_wait_test'
-require_relative 'urls'
+require_relative 'server_urls'
 
 module DaVinciPASTestKit
   module DaVinciPASV220
