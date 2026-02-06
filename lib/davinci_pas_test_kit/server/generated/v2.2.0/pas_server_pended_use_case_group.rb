@@ -66,8 +66,8 @@ module DaVinciPASTestKit
           config(
             inputs: {
               bundle_payload: {
-                name: :approval_pa_submit_request_payload ,
-                title: 'PAS Submit Request Payload for Approval Response'
+                name: :pended_pa_submit_request_payload ,
+                title: 'PAS Submit Request Payload for Pended Response'
               }
             },
             options: {
@@ -82,8 +82,8 @@ module DaVinciPASTestKit
           config(
             inputs: {
               pa_submit_request_payload: {
-                name: :approval_pa_submit_request_payload,
-                title: 'PAS Submit Request Payload for Approval Response'
+                name: :pended_pa_submit_request_payload,
+                title: 'PAS Submit Request Payload for Pended Response'
               }
             },
             options: {
