@@ -10,9 +10,8 @@ module DaVinciPASTestKit
     )
 
     run do
-      identifier = SecureRandom.hex(32)
       wait(
-        identifier:,
+        identifier: test_session_id,
         message: %(
           **Other Authentication Attestation**:
 
@@ -20,9 +19,9 @@ module DaVinciPASTestKit
           a mechanism other than the SMART Backend Services or UDAP B2B client credentials
           flows.
 
-          [Click here](#{resume_pass_url}?token=#{identifier}) if the above statement is true.
+          [Click here](#{resume_pass_url}?token=#{test_session_id}) if the above statement is true.
 
-          [Click here](#{resume_fail_url}?token=#{identifier}) if the above statement is false.
+          [Click here](#{resume_fail_url}?token=#{test_session_id}) if the above statement is false.
         )
       )
     end

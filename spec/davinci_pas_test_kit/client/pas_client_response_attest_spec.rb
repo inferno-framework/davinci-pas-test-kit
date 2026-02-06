@@ -23,7 +23,7 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
 
   describe 'When asking for an attestation' do
     it 'passes when responding true' do
-      allow(SecureRandom).to receive(:hex).with(32).and_return(random_id)
+      allow_any_instance_of(approval_attest_test).to receive(:test_session_id).and_return(random_id)
       result = run(approval_attest_test)
       expect(result.result).to eq('wait')
 
@@ -33,7 +33,7 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
     end
 
     it 'passes when responding false' do
-      allow(SecureRandom).to receive(:hex).with(32).and_return(random_id)
+      allow_any_instance_of(approval_attest_test).to receive(:test_session_id).and_return(random_id)
       result = run(approval_attest_test)
       expect(result.result).to eq('wait')
 

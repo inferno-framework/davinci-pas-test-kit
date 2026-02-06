@@ -29,17 +29,16 @@ module DaVinciPASTestKit
     end
 
     run do
-      identifier = SecureRandom.hex(32)
       wait(
-        identifier:,
+        identifier: test_session_id,
         message: %(
           **#{workflow_name} Workflow Test**:
 
           #{attest_message}
 
-          [Click here](#{resume_pass_url}?token=#{identifier}) if the above statement is **true**.
+          [Click here](#{resume_pass_url}?token=#{test_session_id}) if the above statement is **true**.
 
-          [Click here](#{resume_fail_url}?token=#{identifier}) if the above statement is **false**.
+          [Click here](#{resume_fail_url}?token=#{test_session_id}) if the above statement is **false**.
         )
       )
     end
