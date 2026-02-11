@@ -40,24 +40,22 @@ module DaVinciPASTestKit
 
       # For v2.2.0 inquire responses, expect Parameters resource
       if version == '2.2.0' && request_type == 'inquire' && bundle_type == 'response_bundle'
-        unless resource.resourceType == 'Parameters'
-          error_msg = "Expected Parameters resource for v2.2.0 inquire response, but received #{resource.resourceType}"
-          assert false, error_msg
-        end
+        if resource.resourceType == 'Parameters'
+          # Extract and validate each Bundle in the Parameters
+          bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
 
-        # Extract and validate each Bundle in the Parameters
-        bundles = extract_bundles_from_parameters(resource)
-        if bundles.empty?
-          error_msg = 'Parameters resource must contain at least one return parameter with a Bundle'
-          assert false, error_msg
-        end
-
-        bundles.each_with_index do |bundle, _index|
-          if bundle_type == 'request_bundle'
-            perform_request_validation(bundle, profile_url, version, request_type)
-          else
+          bundles.each do |bundle|
             perform_response_validation(bundle, profile_url, version, request_type)
           end
+        elsif resource.is_a?(FHIR::Bundle)
+          # Bundle received instead of Parameters - validate it but log an error
+          validation_error_messages << 'Expected Parameters resource for v2.2.0 inquire response, but received ' \
+                                       "#{resource.resourceType}. The response Bundle should be wrapped in a " \
+                                       'Parameters resource with a return parameter.'
+          perform_response_validation(resource, profile_url, version, request_type)
+        else
+          assert false,
+                 "Expected Parameters resource for v2.2.0 inquire response, but received #{resource.resourceType}"
         end
       else
         # For v2.0.1 or non-inquire operations, expect Bundle resource

@@ -33,7 +33,7 @@ module DaVinciPASTestKit
         # Handle Parameters resource (v2.2.0 inquire responses)
         if resource.resourceType == 'Parameters'
           # Extract all Bundles from Parameters.parameter entries
-          parameter_bundles = extract_bundles_from_parameters(resource)
+          parameter_bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
           bundles.concat(parameter_bundles)
         elsif resource.is_a?(FHIR::Bundle)
           # Handle Bundle resource (v2.0.1 or v2.2.0 non-inquire)

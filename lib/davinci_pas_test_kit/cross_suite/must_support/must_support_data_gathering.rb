@@ -40,7 +40,7 @@ module DaVinciPASTestKit
 
         # Handle Parameters resource (v2.2.0 inquire responses)
         if response_resource.resourceType == 'Parameters'
-          bundles = extract_bundles_from_parameters(response_resource)
+          bundles = extract_bundles_from_pas_inquiry_response_parameters(response_resource)
           bundles.each do |bundle|
             next unless bundle.is_a?(FHIR::Bundle)
 

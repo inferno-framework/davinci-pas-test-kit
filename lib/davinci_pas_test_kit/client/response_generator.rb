@@ -35,16 +35,21 @@ module DaVinciPASTestKit
     # - reference to the submitted Claim (may not have control of created id). NOTE: this is likely
     #   incomplete - when the Claim is included, there are other things that
     #   need to be in the Bundle that may also not be controlled
-    def update_tester_provided_response(user_inputted_response, claim_full_url, _ig_version = 'v2.0.1')
+    def update_tester_provided_response(user_inputted_response, claim_full_url, ig_version = 'v2.0.1')
       response_resource = FHIR.from_contents(user_inputted_response)
       return user_inputted_response unless response_resource.present?
 
-      # For v2.2.0 inquire responses, extract Bundle(s) from Parameters
+      # For v2.2.0 inquire responses, wrap user's Bundle in Parameters if needed
+      if ig_version == 'v2.2.0' && response_resource.is_a?(FHIR::Bundle)
+        response_resource = wrap_bundle_in_parameters(response_resource)
+      end
+
+      # Extract Bundle(s) for updating
       bundles_to_update = []
       is_parameters = response_resource.resourceType == 'Parameters'
 
       if is_parameters
-        bundles_to_update = extract_bundles_from_parameters(response_resource)
+        bundles_to_update = extract_bundles_from_pas_inquiry_response_parameters(response_resource)
       elsif response_resource.is_a?(FHIR::Bundle)
         bundles_to_update = [response_resource]
       else
@@ -432,9 +437,5 @@ module DaVinciPASTestKit
       )
       parameters
     end
-
-    # Extracts Bundles from a Parameters resource
-    # @param parameters [FHIR::Parameters] The Parameters resource
-    # @return [Array<FHIR::Bundle>] Array of Bundles from return parameters
   end
 end

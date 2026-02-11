@@ -226,22 +226,20 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
 
     context 'when invalid response is provided for v2.2.0' do
-      it 'fails if Bundle provided instead of Parameters' do
+      it 'fails with error if Bundle provided instead of Parameters' do
         bundle_json = File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
 
         result = run(test, server_endpoint:, response_json: bundle_json)
         expect(result.result).to eq('fail')
-        expect(result.result_message).to match(/Expected Parameters resource for v2.2.0 inquire response/)
+        expect(result.result_message).to match(/not conformant/)
       end
 
-      it 'fails if Parameters is empty (no return parameters)' do
+      it 'passes if Parameters is empty (no return parameters)' do
         parameters = FHIR::Parameters.new
-        # No parameters added - should fail
+        # No parameters added - valid per v2.2.0 (no matching results)
 
         result = run(test, server_endpoint:, response_json: parameters.to_json)
-        expect(result.result).to eq('fail')
-        expect(result.result_message)
-          .to match(/Parameters resource must contain at least one return parameter with a Bundle/)
+        expect(result.result).to eq('pass')
       end
     end
   end
