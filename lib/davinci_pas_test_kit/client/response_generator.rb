@@ -1,5 +1,9 @@
+require_relative '../parameters_helper'
+
 module DaVinciPASTestKit
   module ResponseGenerator
+    include ParametersHelper
+
     def mock_id_only_notification_bundle(submit_response, subscription_reference, subscription_topic)
       notification_timestamp = Time.now.utc
       mock_notification_bundle = build_mock_notification_bundle(notification_timestamp, subscription_reference,
@@ -15,9 +19,15 @@ module DaVinciPASTestKit
       mock_notification_bundle.to_json
     end
 
-    def mock_response_bundle(request_bundle, operation, decision, claim_response_uuid = nil)
+    def mock_response_bundle(request_bundle, operation, decision, claim_response_uuid = nil, ig_version = 'v2.0.1')
       mocked_timestamp = Time.now.utc
-      build_mock_response_bundle(request_bundle, operation, decision, mocked_timestamp, claim_response_uuid)&.to_json
+      response = build_mock_response_bundle(request_bundle, operation, decision, mocked_timestamp, claim_response_uuid)
+      return nil unless response.present?
+
+      # For v2.2.0 inquire operations, wrap the Bundle in a Parameters resource
+      response = wrap_bundle_in_parameters(response) if ig_version == 'v2.2.0' && operation == 'inquire'
+
+      response.to_json
     end
 
     # update things that tester cannot get right themselves
@@ -25,20 +35,35 @@ module DaVinciPASTestKit
     # - reference to the submitted Claim (may not have control of created id). NOTE: this is likely
     #   incomplete - when the Claim is included, there are other things that
     #   need to be in the Bundle that may also not be controlled
-    def update_tester_provided_response(user_inputted_response, claim_full_url)
-      response_bundle = FHIR.from_contents(user_inputted_response)
-      return user_inputted_response unless response_bundle.present?
+    def update_tester_provided_response(user_inputted_response, claim_full_url, _ig_version = 'v2.0.1')
+      response_resource = FHIR.from_contents(user_inputted_response)
+      return user_inputted_response unless response_resource.present?
+
+      # For v2.2.0 inquire responses, extract Bundle(s) from Parameters
+      bundles_to_update = []
+      is_parameters = response_resource.resourceType == 'Parameters'
+
+      if is_parameters
+        bundles_to_update = extract_bundles_from_parameters(response_resource)
+      elsif response_resource.is_a?(FHIR::Bundle)
+        bundles_to_update = [response_resource]
+      else
+        return user_inputted_response
+      end
 
       now = Time.now.utc
-      response_bundle.timestamp = now.iso8601 if response_bundle&.timestamp.present?
-      claim_response_entry = response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
-      if claim_response_entry.present?
+      bundles_to_update.each do |response_bundle|
+        response_bundle.timestamp = now.iso8601 if response_bundle&.timestamp.present?
+        claim_response_entry = response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
+        next unless claim_response_entry.present?
+
         claim_response_entry.resource.created = now.iso8601 if claim_response_entry.resource.created
         if claim_response_entry.resource.request.present? && claim_full_url.present?
           claim_response_entry.resource.request.reference = claim_full_url
         end
       end
-      response_bundle.to_json
+
+      response_resource.to_json
     end
 
     # update things that tester cannot get right themselves
@@ -393,5 +418,23 @@ module DaVinciPASTestKit
       end
       "urn:uuid:#{SecureRandom.uuid}"
     end
+
+    # Wraps a Bundle in a Parameters resource for v2.2.0 inquire responses
+    # @param bundle [FHIR::Bundle] The Bundle to wrap
+    # @return [FHIR::Parameters] Parameters resource with the bundle as a return parameter
+    def wrap_bundle_in_parameters(bundle)
+      return nil unless bundle.is_a?(FHIR::Bundle)
+
+      parameters = FHIR::Parameters.new
+      parameters.parameter << FHIR::Parameters::Parameter.new(
+        name: 'return',
+        resource: bundle
+      )
+      parameters
+    end
+
+    # Extracts Bundles from a Parameters resource
+    # @param parameters [FHIR::Parameters] The Parameters resource
+    # @return [Array<FHIR::Bundle>] Array of Bundles from return parameters
   end
 end

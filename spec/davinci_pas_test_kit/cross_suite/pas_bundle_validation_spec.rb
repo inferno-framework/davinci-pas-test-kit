@@ -161,4 +161,88 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
     end
   end
+
+  describe '#validate_pas_bundle_json for v2.2.0' do
+    let(:test) do
+      Class.new(Inferno::Test) do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        fhir_client { url :server_endpoint }
+        input :server_endpoint, :response_json
+
+        run do
+          profile_url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle'
+          validate_pas_bundle_json(
+            response_json,
+            profile_url,
+            '2.2.0',
+            'inquire',
+            'response_bundle'
+          )
+        end
+      end
+    end
+
+    before do
+      Inferno::Repositories::Tests.new.insert(test)
+      allow_any_instance_of(test).to receive(:validate_resources_conformance_against_profile).and_return(nil)
+    end
+
+    context 'when a valid Parameters response is provided' do
+      it 'validates the Parameters with Bundle inside' do
+        bundle_json = File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+        bundle = FHIR.from_contents(bundle_json)
+
+        # Wrap Bundle in Parameters
+        parameters = FHIR::Parameters.new
+        parameters.parameter << FHIR::Parameters::Parameter.new(
+          name: 'return',
+          resource: bundle
+        )
+
+        result = run(test, server_endpoint:, response_json: parameters.to_json)
+        expect(result.result).to eq('pass')
+      end
+
+      it 'validates Parameters with multiple Bundles (multiple return parameter entries)' do
+        bundle_json = File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+        bundle1 = FHIR.from_contents(bundle_json)
+        bundle2 = FHIR.from_contents(bundle_json)
+
+        # Create Parameters with multiple return parameter entries
+        parameters = FHIR::Parameters.new
+        parameters.parameter << FHIR::Parameters::Parameter.new(
+          name: 'return',
+          resource: bundle1
+        )
+        parameters.parameter << FHIR::Parameters::Parameter.new(
+          name: 'return',
+          resource: bundle2
+        )
+
+        result = run(test, server_endpoint:, response_json: parameters.to_json)
+        expect(result.result).to eq('pass')
+      end
+    end
+
+    context 'when invalid response is provided for v2.2.0' do
+      it 'fails if Bundle provided instead of Parameters' do
+        bundle_json = File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+
+        result = run(test, server_endpoint:, response_json: bundle_json)
+        expect(result.result).to eq('fail')
+        expect(result.result_message).to match(/Expected Parameters resource for v2.2.0 inquire response/)
+      end
+
+      it 'fails if Parameters is empty (no return parameters)' do
+        parameters = FHIR::Parameters.new
+        # No parameters added - should fail
+
+        result = run(test, server_endpoint:, response_json: parameters.to_json)
+        expect(result.result).to eq('fail')
+        expect(result.result_message)
+          .to match(/Parameters resource must contain at least one return parameter with a Bundle/)
+      end
+    end
+  end
 end

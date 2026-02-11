@@ -25,13 +25,25 @@ module DaVinciPASTestKit
     def response_bundles
       requests = load_tagged_requests(DaVinciPASTestKit.operation_tag(operation),
                                       DaVinciPASTestKit.use_case_tag(use_case))
-      fhir_resources =
-        requests.map(&:response_body).compact.uniq.map do |request_body|
-          FHIR.from_contents(request_body)
-        rescue StandardError
-          nil
-        end.compact
-      fhir_resources.select { |res| res.resourceType == 'Bundle' }
+      bundles = []
+      requests.map(&:response_body).compact.uniq.each do |response_body|
+        resource = FHIR.from_contents(response_body)
+        next unless resource.present?
+
+        # Handle Parameters resource (v2.2.0 inquire responses)
+        if resource.resourceType == 'Parameters'
+          # Extract all Bundles from Parameters.parameter entries
+          parameter_bundles = extract_bundles_from_parameters(resource)
+          bundles.concat(parameter_bundles)
+        elsif resource.is_a?(FHIR::Bundle)
+          # Handle Bundle resource (v2.0.1 or v2.2.0 non-inquire)
+          bundles << resource
+        end
+      rescue StandardError
+        next
+      end
+
+      bundles
     end
 
     run do
