@@ -39,7 +39,13 @@ module DaVinciPASTestKit
     def check_response_status_and_payload(request)
       assert_response_status([200, 201])
       assert_valid_json(request.response_body, "Server response to $#{operation} was not json.")
-      assert_resource_type(:bundle, resource: FHIR.from_contents(request.response_body))
+      resource = FHIR.from_contents(request.response_body)
+      if config.options[:ig_version] == 'v2.2.0' && operation == 'inquire'
+        assert resource.resourceType == 'Parameters',
+               "Expected Parameters resource for v2.2.0 inquire response, but received #{resource.resourceType}"
+      else
+        assert_resource_type(:bundle, resource:)
+      end
     end
 
     def run_operation_test(request_payload)

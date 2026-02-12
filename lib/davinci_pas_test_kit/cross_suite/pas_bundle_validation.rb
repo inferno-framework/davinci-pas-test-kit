@@ -50,7 +50,7 @@ module DaVinciPASTestKit
         elsif resource.is_a?(FHIR::Bundle)
           # Bundle received instead of Parameters - validate it but log an error
           validation_error_messages << 'Expected Parameters resource for v2.2.0 inquire response, but received ' \
-                                       "#{resource.resourceType}. The response Bundle should be wrapped in a " \
+                                       'Bundle. The response Bundle should be wrapped in a ' \
                                        'Parameters resource with a return parameter.'
           perform_response_validation(resource, profile_url, version, request_type)
         else
