@@ -67,7 +67,7 @@ module DaVinciPASTestKit
       user_inputted_response = UserInputResponse.user_inputted_response(test, operation, result)
       if user_inputted_response.present?
         generated_claim_response_uuid = nil
-        response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url)
+        response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url, ig_version)
       else
         decision = # always use the workflow, except for pended when the inquire will get approved
           if operation == 'inquire' && workflow == :pended
@@ -76,7 +76,8 @@ module DaVinciPASTestKit
             workflow
           end
         generated_claim_response_uuid = SecureRandom.uuid
-        response_bundle_json = mock_response_bundle(req_bundle, operation, decision, generated_claim_response_uuid)
+        response_bundle_json = mock_response_bundle(req_bundle, operation, decision, generated_claim_response_uuid,
+                                                    ig_version)
       end
 
       response.body = response_bundle_json
@@ -93,6 +94,11 @@ module DaVinciPASTestKit
       end
 
       results_repo.update_result(result.id, 'pass') unless test.config.options[:accepts_multiple_requests]
+    end
+
+    # Determines the IG version from the suite_id
+    def ig_version
+      @ig_version ||= suite_id.include?('v220') ? 'v2.2.0' : 'v2.0.1'
     end
 
     private

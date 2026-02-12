@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
+require_relative '../parameters_helper'
 require_relative 'validation_test'
 require_relative 'pas_constants'
 
 module DaVinciPASTestKit
   module PasBundleValidation
     include DaVinciPASTestKit::ValidationTest
+    include ParametersHelper
 
     def validation_error_messages
       @validation_error_messages ||= []
@@ -33,14 +35,38 @@ module DaVinciPASTestKit
 
     def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false, message: '')
       assert_valid_json(json)
-      bundle = FHIR.from_contents(json)
-      assert bundle.present?, 'Not a FHIR resource'
-      assert_resource_type(:bundle, resource: bundle)
+      resource = FHIR.from_contents(json)
+      assert resource.present?, 'Not a FHIR resource'
 
-      if bundle_type == 'request_bundle'
-        perform_request_validation(bundle, profile_url, version, request_type)
+      # For v2.2.0 inquire responses, expect Parameters resource
+      if version == '2.2.0' && request_type == 'inquire' && bundle_type == 'response_bundle'
+        if resource.resourceType == 'Parameters'
+          # Extract and validate each Bundle in the Parameters
+          bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
+
+          bundles.each do |bundle|
+            perform_response_validation(bundle, profile_url, version, request_type)
+          end
+        elsif resource.is_a?(FHIR::Bundle)
+          # Bundle received instead of Parameters - validate it but log an error
+          validation_error_messages << 'Expected Parameters resource for v2.2.0 inquire response, but received ' \
+                                       'Bundle. The response Bundle should be wrapped in a ' \
+                                       'Parameters resource with a return parameter.'
+          perform_response_validation(resource, profile_url, version, request_type)
+        else
+          assert false,
+                 "Expected Parameters resource for v2.2.0 inquire response, but received #{resource.resourceType}"
+        end
       else
-        perform_response_validation(bundle, profile_url, version, request_type)
+        # For v2.0.1 or non-inquire operations, expect Bundle resource
+        assert_resource_type(:bundle, resource: resource)
+        bundle = resource
+
+        if bundle_type == 'request_bundle'
+          perform_request_validation(bundle, profile_url, version, request_type)
+        else
+          perform_response_validation(bundle, profile_url, version, request_type)
+        end
       end
 
       validation_error_messages.each do |msg|
