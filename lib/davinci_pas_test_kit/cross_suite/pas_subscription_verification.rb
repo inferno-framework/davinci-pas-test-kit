@@ -1,32 +1,113 @@
 module DaVinciPASTestKit
   module PASSubscriptionVerification
-    def verify_pas_subscription(subscription_json_str, ig_version: 'v2.0.1')
-      assert ig_version == 'v2.0.1', 'IMPLEMENT ME - non v2.0.1'
+    PAS_SUBSCRIPTION_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscription'.freeze
+    PAS_SUBSCRIPTION_TOPIC = 'http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic'.freeze
+    BACKPORT_FILTER_CRITERIA_URL =
+      'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria'.freeze
+    BACKPORT_PAYLOAD_CONTENT_URL =
+      'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'.freeze
 
+    def verify_pas_subscription(subscription_json_str, ig_version: 'v2.0.1')
       assert_valid_json(subscription_json_str)
       subscription = JSON.parse(subscription_json_str)
 
-      unless subscription['criteria'] == 'http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic'
+      if ig_version == 'v2.0.1'
+        verify_pas_subscription_v201(subscription)
+      else
+        verify_pas_subscription_v220(subscription)
+      end
+
+      assert messages.none? { |msg| msg[:type] == 'error' },
+             'The Subscription does not conform to PAS requirements - see messages for details.'
+    end
+
+    private
+
+    def verify_pas_subscription_v201(subscription)
+      unless subscription['criteria'] == PAS_SUBSCRIPTION_TOPIC
         add_message('error', %(
           The Subscription must use the PAS-defined Subscription topic
-          `http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic`
+          `#{PAS_SUBSCRIPTION_TOPIC}`
           in the `Subscription.criteria` element.
         ))
       end
 
       filter_criteria = subscription.dig('_criteria', 'extension')
-        &.select do |ext|
-          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria'
-        end
-      unless filter_criteria&.length == 1
-        add_message('error', %(
+        &.select { |ext| ext['url'] == BACKPORT_FILTER_CRITERIA_URL }
+      return if filter_criteria&.length == 1
+
+      add_message('error', %(
             The Subscription must include a single filter on the submitting organization
             in the `Subscription.criteria.extension` element.
           ))
+    end
+
+    def verify_pas_subscription_v220(subscription)
+      verify_v220_profile(subscription)
+      verify_v220_rest_hook_channel(subscription)
+      verify_v220_full_resource_payload(subscription)
+      verify_v220_criteria_format(subscription)
+    end
+
+    def verify_v220_profile(subscription)
+      profiles = subscription.dig('meta', 'profile') || []
+      return if profiles.include?(PAS_SUBSCRIPTION_PROFILE)
+
+      add_message('error', %(
+          The Subscription must declare conformance to the PAS Subscription profile
+          `#{PAS_SUBSCRIPTION_PROFILE}`
+          in the `Subscription.meta.profile` element.
+        ))
+    end
+
+    def verify_v220_rest_hook_channel(subscription)
+      channel_type = subscription.dig('channel', 'type')
+      return if channel_type == 'rest-hook'
+
+      add_message('error', %(
+          The Subscription channel type must be `rest-hook`,
+          but found `#{channel_type || 'none'}`.
+        ))
+    end
+
+    def verify_v220_full_resource_payload(subscription)
+      payload_content = extract_payload_content(subscription)
+      return if payload_content == 'full-resource'
+
+      add_message('error', %(
+          The Subscription payload content type must be `full-resource` for PAS v2.2.0,
+          but found `#{payload_content || 'none'}`.
+        ))
+    end
+
+    def verify_v220_criteria_format(subscription)
+      filter_criteria = subscription.dig('_criteria', 'extension')
+        &.select { |ext| ext['url'] == BACKPORT_FILTER_CRITERIA_URL }
+
+      if filter_criteria.blank?
+        add_message('error', %(
+          The Subscription must include filter criteria in the
+          `Subscription._criteria.extension` element with a value matching
+          the format `org-identifier=<identifier>`.
+        ))
+        return
       end
 
-      assert messages.none? { |msg| msg[:type] == 'error' },
-             'The Subscription does not conform to PAS requirements - see messages for details.'
+      filter_criteria.each do |fc|
+        value = fc['valueString']
+        next if value.present? && value.match?(/\Aorg-identifier=\S+\z/)
+
+        add_message('error', %(
+          The Subscription filter criteria value `#{value}` does not match
+          the expected format `org-identifier=<identifier>`.
+        ))
+      end
+    end
+
+    def extract_payload_content(subscription)
+      payload_ext = subscription.dig('channel', '_payload', 'extension')
+      content_ext = payload_ext&.find { |ext| ext['url'] == BACKPORT_PAYLOAD_CONTENT_URL }
+      content_ext&.dig('valueCode')
     end
   end
 end
