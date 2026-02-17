@@ -233,7 +233,7 @@ module DaVinciPASTestKit
         resource = item[:resource]
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
         success_profile = item[:profile_urls].find do |url|
-          profile_to_validate = url == base_profile ? url : "#{url}|#{version}"
+          profile_to_validate = url.starts_with?(base_profile) ? url : "#{url}|#{version}"
           resource_is_valid?(resource:, profile_url: profile_to_validate)
         end
 
