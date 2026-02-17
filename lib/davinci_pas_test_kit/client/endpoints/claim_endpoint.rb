@@ -67,7 +67,8 @@ module DaVinciPASTestKit
       user_inputted_response = UserInputResponse.user_inputted_response(test, operation, result)
       if user_inputted_response.present?
         generated_claim_response_uuid = nil
-        response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url, ig_version)
+        response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url, operation,
+                                                               ig_version)
       else
         decision = # always use the workflow, except for pended when the inquire will get approved
           if operation == 'inquire' && workflow == :pended

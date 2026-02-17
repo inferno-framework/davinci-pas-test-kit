@@ -444,7 +444,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       allow(Time).to receive(:now).and_return(time_now)
       returned_response_string = module_instance.update_tester_provided_response(
         submit_response_string,
-        nil
+        nil,
+        'submit'
       )
 
       bundle = FHIR.from_contents(returned_response_string)
@@ -467,7 +468,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
       returned_response_string = module_instance.update_tester_provided_response(
         bundle_with_claim.to_json,
-        updated_claim_reference
+        updated_claim_reference,
+        'submit'
       )
 
       bundle = FHIR.from_contents(returned_response_string)
@@ -479,7 +481,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
     it 'leaves Claim references alone if no updated reference provided' do
       returned_response_string = module_instance.update_tester_provided_response(
         submit_response_string,
-        nil
+        nil,
+        'submit'
       )
 
       bundle = FHIR.from_contents(returned_response_string)
@@ -492,7 +495,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
       returned_response_string = module_instance.update_tester_provided_response(
         submit_response_missing_elements,
-        updated_claim_reference
+        updated_claim_reference,
+        'submit'
       )
 
       expect(returned_response_string).to eq(submit_response_missing_elements)
@@ -503,7 +507,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
       returned_response_string = module_instance.update_tester_provided_response(
         non_fhir_json_string,
-        updated_claim_reference
+        updated_claim_reference,
+        'submit'
       )
 
       expect(returned_response_string).to eq(non_fhir_json_string)
@@ -528,7 +533,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         returned_response_string = module_instance.update_tester_provided_response(
           parameters_response_string,
           nil,
-          'v2.2.0'
+          'v2.2.0',
+          'inquire'
         )
 
         parameters = FHIR.from_contents(returned_response_string)
@@ -560,7 +566,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         returned_response_string = module_instance.update_tester_provided_response(
           parameters.to_json,
           updated_claim_reference,
-          'v2.2.0'
+          'v2.2.0',
+          'inquire'
         )
 
         returned_parameters = FHIR.from_contents(returned_response_string)
