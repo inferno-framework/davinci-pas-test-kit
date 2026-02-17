@@ -50,14 +50,8 @@ module DaVinciPASTestKit
     end
 
     def verify_v220_profile(subscription)
-      profiles = subscription.dig('meta', 'profile') || []
-      return if profiles.include?(PAS_SUBSCRIPTION_PROFILE)
-
-      add_message('error', %(
-          The Subscription must declare conformance to the PAS Subscription profile
-          `#{PAS_SUBSCRIPTION_PROFILE}`
-          in the `Subscription.meta.profile` element.
-        ))
+      resource = FHIR.from_contents(subscription.to_json)
+      resource_is_valid?(resource: resource, profile_url: PAS_SUBSCRIPTION_PROFILE)
     end
 
     def verify_v220_rest_hook_channel(subscription)

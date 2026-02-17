@@ -6,18 +6,104 @@ RSpec.describe DaVinciPASTestKit::NotificationPASConformanceTest, :request do
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:requests_repo) { Inferno::Repositories::Requests.new }
-  let(:notification_body_good) do
-    File.read(File.join(__dir__, '../fixtures', 'PAS_notification_example_full_resource.json'))
+  let(:fhirpath_url) { 'https://example.com/fhirpath/evaluate' }
+  let(:operation_outcome_success) do
+    {
+      outcomes: [{
+        issues: []
+      }],
+      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+    }
   end
-  let(:notification_body_bad) do
+  let(:pas_response_bundle) do
+    JSON.parse(File.read(File.join(__dir__, '../fixtures', 'valid_pa_response_bundle.json')))
+  end
+  let(:test) do
+    Class.new(described_class) do
+      fhir_resource_validator do
+        url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
+
+        cli_context do
+          txServer nil
+          displayWarnings true
+          disableDefaultResourceFetcher true
+        end
+
+        igs('hl7.fhir.us.davinci-pas#2.0.1')
+      end
+    end
+  end
+  let(:notification_body_good) do
     {
       resourceType: 'Bundle',
-      type: 'subscription-notification',
+      type: 'history',
+      timestamp: '2024-01-30T13:44:30Z',
+      meta: {
+        profile: [
+          'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription-notification-r4'
+        ]
+      },
       entry: [
         {
-          fullUrl: 'urn:uuid:status',
+          fullUrl: 'urn:uuid:status-entry',
           resource: {
             resourceType: 'Parameters',
+            id: 'status-entry',
+            parameter: [
+              { name: 'subscription', valueReference: { reference: 'Subscription/123' } },
+              { name: 'status', valueCode: 'active' },
+              { name: 'type', valueCode: 'event-notification' },
+              {
+                name: 'notification-event',
+                part: [
+                  { name: 'event-number', valueString: '1' },
+                  { name: 'focus', valueReference: { reference: 'urn:uuid:focus-bundle' } }
+                ]
+              }
+            ]
+          },
+          request: { method: 'GET', url: 'Subscription/123/$status' },
+          response: { status: '200' }
+        },
+        {
+          fullUrl: 'urn:uuid:focus-bundle',
+          resource: pas_response_bundle
+        }
+      ]
+    }.to_json
+  end
+  let(:notification_body_no_focus) do
+    {
+      resourceType: 'Bundle',
+      type: 'history',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:status-entry',
+          resource: {
+            resourceType: 'Parameters',
+            id: 'status-entry',
+            parameter: [
+              { name: 'subscription', valueReference: { reference: 'Subscription/123' } },
+              { name: 'notification-event',
+                part: [
+                  { name: 'event-number', valueString: '1' }
+                ] }
+            ]
+          }
+        }
+      ]
+    }.to_json
+  end
+  let(:notification_body_no_notification_event) do
+    {
+      resourceType: 'Bundle',
+      type: 'history',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:status-entry',
+          resource: {
+            resourceType: 'Parameters',
+            id: 'status-entry',
             parameter: [
               { name: 'subscription', valueReference: { reference: 'Subscription/123' } }
             ]
@@ -40,25 +126,33 @@ RSpec.describe DaVinciPASTestKit::NotificationPASConformanceTest, :request do
     )
   end
 
-  it 'passes when conformant with a PAS focus resource' do
+  it 'passes when focus resource is a valid PAS Response Bundle' do
+    stub_request(:post, validation_url)
+      .to_return(status: 200, body: operation_outcome_success.to_json)
+    stub_request(:post, /#{fhirpath_url}/)
+      .to_return(status: 200, body: [].to_json)
+
     create_notification_request(notification_body_good)
-    result = run(described_class)
+    result = run(test)
     expect(result.result).to eq('pass')
   end
 
   it 'skips when no notification requests are found' do
-    result = run(described_class)
+    result = run(test)
     expect(result.result).to eq('skip')
   end
 
-  it 'fails when no focus resource is present' do
-    create_notification_request(notification_body_bad)
-    result = run(described_class)
+  it 'fails when no notification-event focus reference is present' do
+    create_notification_request(notification_body_no_focus)
+    result = run(test)
     expect(result.result).to eq('fail')
+    expect(result.result_message).to include('focus reference')
+  end
 
-    result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
-    expect(result_messages.any? do |m|
-      m.message.include?('must include at least one focus resource entry')
-    end).to be(true)
+  it 'fails when no notification-event parameter is present' do
+    create_notification_request(notification_body_no_notification_event)
+    result = run(test)
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('notification-event')
   end
 end

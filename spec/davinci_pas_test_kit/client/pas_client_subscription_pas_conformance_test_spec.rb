@@ -1,4 +1,24 @@
 RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
+  let(:operation_outcome_success) do
+    {
+      outcomes: [{
+        issues: []
+      }],
+      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+    }
+  end
+  let(:operation_outcome_failure) do
+    {
+      outcomes: [{
+        issues: [{
+          level: 'ERROR',
+          message: 'Resource does not conform to profile'
+        }]
+      }],
+      sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
+    }
+  end
+
   describe 'v2.0.1 subscription verification' do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:access_token) { '1234' }
@@ -81,6 +101,18 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
     let(:test) do
       Class.new(described_class) do
+        fhir_resource_validator do
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
+
+          cli_context do
+            txServer nil
+            displayWarnings true
+            disableDefaultResourceFetcher true
+          end
+
+          igs('hl7.fhir.us.davinci-pas#2.2.0')
+        end
+
         config(
           options: {
             ig_version: 'v2.2.0'
@@ -121,6 +153,8 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
     end
 
     it 'passes with a valid v2.2.0 subscription' do
+      stub_request(:post, validation_url)
+        .to_return(status: 200, body: operation_outcome_success.to_json)
       create_subscription_request(good_v220_subscription)
       result = run(test)
       expect(result.result).to eq('pass')
@@ -131,18 +165,17 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
       expect(result.result).to eq('skip')
     end
 
-    it 'fails with missing PAS profile, wrong channel type, and id-only payload' do
+    it 'fails with wrong channel type and id-only payload' do
+      stub_request(:post, validation_url)
+        .to_return(status: 200, body: operation_outcome_failure.to_json)
       create_subscription_request(bad_v220_subscription)
       result = run(test)
       expect(result.result).to eq('fail')
 
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
       error_messages = result_messages.select { |m| m.type == 'error' }
-      expect(error_messages.length).to be >= 3
+      expect(error_messages.length).to be >= 2
 
-      expect(error_messages.find do |message|
-               /must declare conformance to the PAS Subscription profile/.match(message.message)
-             end).to_not be_nil
       expect(error_messages.find do |message|
                /channel type must be `rest-hook`/.match(message.message)
              end).to_not be_nil
