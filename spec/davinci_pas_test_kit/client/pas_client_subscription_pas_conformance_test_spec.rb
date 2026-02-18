@@ -165,7 +165,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
       expect(result.result).to eq('skip')
     end
 
-    it 'fails with wrong channel type and id-only payload' do
+    it 'fails with non-conformant subscription' do
       stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
       create_subscription_request(bad_v220_subscription)
@@ -177,10 +177,10 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
       expect(error_messages.length).to be >= 2
 
       expect(error_messages.find do |message|
-               /channel type must be `rest-hook`/.match(message.message)
+               /does not conform to profile/.match(message.message)
              end).to_not be_nil
       expect(error_messages.find do |message|
-               /payload content type must be `full-resource`/.match(message.message)
+               /does not match.*the expected format `org-identifier=/m.match(message.message)
              end).to_not be_nil
     end
   end
