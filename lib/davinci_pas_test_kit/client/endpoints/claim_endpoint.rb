@@ -147,17 +147,18 @@ module DaVinciPASTestKit
 
       if find_subscription_content_type(subscription) == 'full-resource'
         mock_full_resource_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
-                                               decision)
+                                               decision, ig_version)
       else # assume id-only since empty not allowed - if asked for empty, other failures will occur
-        mock_id_only_notification_bundle(response_bundle_json, subscription_reference, subscription_topic)
+        mock_id_only_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
+                                         ig_version)
       end
     end
 
     def find_subscription_content_type(subscription)
       content_ext = subscription['channel']['_payload']['extension']
-        .find do |ext|
-          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
-        end
+                      .find do |ext|
+        ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
+      end
       content_ext['valueCode'] if content_ext.present?
     end
   end

@@ -100,9 +100,23 @@ module DaVinciPASTestKit
       end
 
       def send_event_notification
-        event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic, 1).to_json
+        # For v2.2.0, the notification JSON is already a complete notification bundle
+        # with PAS-specific structure (focus points to an inner PAS Response Bundle).
+        # Using derive_event_notification would flatten this structure, making the focus
+        # point to the ClaimResponse directly instead of the wrapping Bundle.
+        # For v2.0.1, derive_event_notification correctly builds the notification.
+        event_json = if ig_version == 'v2.2.0'
+                       @notification_json
+                     else
+                       derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
+                                                 1).to_json
+                     end
         response = send_notification(event_json)
-        persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
+        persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG], event_json)
+      end
+
+      def ig_version
+        @notification_suite_id&.include?('v220') ? 'v2.2.0' : 'v2.0.1'
       end
 
       def send_notification(request_body)
@@ -114,7 +128,7 @@ module DaVinciPASTestKit
         Faraday::Response.new(response_body: e.message, url: rest_hook_connection.url_prefix.to_s)
       end
 
-      def persist_notification_request(response, tags)
+      def persist_notification_request(response, tags, sent_body = nil)
         inferno_request_headers = headers.map { |name, value| { name:, value: } }
         inferno_response_headers = response.headers&.map { |name, value| { name:, value: } }
         requests_repo.create(
@@ -122,7 +136,7 @@ module DaVinciPASTestKit
           url: response.env.url.to_s,
           direction: 'outgoing',
           status: response.status,
-          request_body: response.env.request_body,
+          request_body: sent_body || response.env.request_body,
           response_body: response.env.response_body,
           test_session_id: @test_session_id,
           result_id: @result_id,

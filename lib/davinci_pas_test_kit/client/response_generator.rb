@@ -4,24 +4,28 @@ module DaVinciPASTestKit
   module ResponseGenerator
     include ParametersHelper
 
-    def mock_id_only_notification_bundle(submit_response, subscription_reference, subscription_topic)
+    def mock_id_only_notification_bundle(submit_response, subscription_reference, subscription_topic,
+                                         ig_version = 'v2.0.1')
       notification_timestamp = Time.now.utc
       mock_notification_bundle = build_mock_notification_bundle(notification_timestamp, subscription_reference,
-                                                                subscription_topic, submit_response, 'id-only', nil)
+                                                                subscription_topic, submit_response, 'id-only', nil,
+                                                                ig_version)
       mock_notification_bundle.to_json
     end
 
-    def mock_full_resource_notification_bundle(submit_response, subscription_reference, subscription_topic, decision)
+    def mock_full_resource_notification_bundle(submit_response, subscription_reference, subscription_topic, decision,
+                                               ig_version = 'v2.0.1')
       notification_timestamp = Time.now.utc
       mock_notification_bundle = build_mock_notification_bundle(notification_timestamp, subscription_reference,
                                                                 subscription_topic, submit_response, 'full-resource',
-                                                                decision)
+                                                                decision, ig_version)
       mock_notification_bundle.to_json
     end
 
     def mock_response_bundle(request_bundle, operation, decision, claim_response_uuid = nil, ig_version = 'v2.0.1')
       mocked_timestamp = Time.now.utc
-      response = build_mock_response_bundle(request_bundle, operation, decision, mocked_timestamp, claim_response_uuid)
+      response = build_mock_response_bundle(request_bundle, operation, decision, mocked_timestamp,
+                                            claim_response_uuid, ig_version)
       return nil unless response.present?
 
       # For v2.2.0 inquire operations, wrap the Bundle in a Parameters resource
@@ -125,14 +129,9 @@ module DaVinciPASTestKit
     end
 
     def build_mock_notification_bundle(notification_timestamp, subscription_reference, subscription_topic,
-                                       submit_response, type, decision)
+                                       submit_response, type, decision, ig_version = 'v2.0.1')
       submit_bundle = FHIR.from_contents(submit_response)
       claim_response_full_url = claim_response_full_url_from_submit_response_bundle(submit_bundle)
-      mock_notification_bundle = FHIR::Bundle.new(
-        id: SecureRandom.uuid,
-        timestamp: notification_timestamp.iso8601,
-        type: 'history'
-      )
 
       additional_context_references =
         if type == 'full-resource' && submit_bundle.present? && submit_bundle.is_a?(FHIR::Bundle)
@@ -140,23 +139,76 @@ module DaVinciPASTestKit
         else
           []
         end
+
+      # For v2.2.0, the notification focus points to a Bundle containing the ClaimResponse and its resources
+      if ig_version == 'v2.2.0' && type == 'full-resource'
+        inner_bundle_full_url = "urn:uuid:#{SecureRandom.uuid}"
+        claim_response_reference = inner_bundle_full_url
+      else
+        claim_response_reference = claim_response_full_url
+      end
+
+      mock_notification_bundle = FHIR::Bundle.new(
+        id: SecureRandom.uuid,
+        timestamp: notification_timestamp.iso8601,
+        type: 'history'
+      )
+
       mock_notification_status = build_mock_notification_status(notification_timestamp, subscription_reference,
-                                                                subscription_topic, claim_response_full_url,
+                                                                subscription_topic, claim_response_reference,
                                                                 additional_context_references)
       mock_notification_bundle.entry << build_mock_notification_status_entry(mock_notification_status,
                                                                              subscription_reference)
       if type == 'full-resource' && submit_bundle.present? && submit_bundle.is_a?(FHIR::Bundle)
         fhir_base_url = extract_fhir_base_url(subscription_reference)
-        submit_bundle.entry.each do |entry|
-          update_claim_response_decisions(entry.resource, decision) if entry.resource.resourceType == 'ClaimResponse'
-          entry.request = FHIR::Bundle::Entry::Request.new(
-            method: 'POST',
-            url: "#{fhir_base_url}/#{entry.resource.resourceType}"
+
+        if ig_version == 'v2.2.0'
+          inner_bundle = FHIR::Bundle.new(
+            id: inner_bundle_full_url.delete_prefix('urn:uuid:'),
+            type: 'collection',
+            timestamp: notification_timestamp.iso8601,
+            identifier: FHIR::Identifier.new(
+              system: 'urn:ietf:rfc:3986',
+              value: "urn:uuid:#{SecureRandom.uuid}"
+            ),
+            meta: FHIR::Meta.new(profile: ['http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'])
           )
-          entry.response = FHIR::Bundle::Entry::Response.new(
-            status: '201'
+
+          # Track references for profile tagging
+          claim_response_entry = nil
+          submit_bundle.entry.each do |entry|
+            if entry.resource.resourceType == 'ClaimResponse'
+              update_claim_response_decisions(entry.resource, decision)
+              # Update outcome to 'complete' since the decision is now finalized
+              entry.resource.outcome = 'complete'
+              # Ensure request reference is present (required in v2.2.0)
+              if entry.resource.request.blank?
+                entry.resource.request = FHIR::Reference.new(reference: "urn:uuid:#{SecureRandom.uuid}")
+              end
+              claim_response_entry = entry
+            end
+            inner_bundle.entry << entry
+          end
+
+          # Add v2.2.0 profiles to referenced Organizations
+          add_v220_profiles(inner_bundle, claim_response_entry&.resource) if claim_response_entry&.resource.present?
+
+          mock_notification_bundle.entry << FHIR::Bundle::Entry.new(
+            fullUrl: inner_bundle_full_url,
+            resource: inner_bundle
           )
-          mock_notification_bundle.entry << entry
+        else
+          submit_bundle.entry.each do |entry|
+            update_claim_response_decisions(entry.resource, decision) if entry.resource.resourceType == 'ClaimResponse'
+            entry.request = FHIR::Bundle::Entry::Request.new(
+              method: 'POST',
+              url: "#{fhir_base_url}/#{entry.resource.resourceType}"
+            )
+            entry.response = FHIR::Bundle::Entry::Response.new(
+              status: '201'
+            )
+            mock_notification_bundle.entry << entry
+          end
         end
       end
 
@@ -183,15 +235,16 @@ module DaVinciPASTestKit
       end
     end
 
-    def build_mock_response_bundle(request_bundle, operation, decision, timestamp, claim_response_uuid = nil)
+    def build_mock_response_bundle(request_bundle, operation, decision, timestamp, claim_response_uuid = nil,
+                                   ig_version = 'v2.0.1')
       claim_entry = request_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
       claim_full_url = claim_entry&.fullUrl
       return nil if claim_entry.blank? || claim_full_url.blank?
 
       root_url = extract_fhir_base_url(claim_full_url)
       mocked_claim_response = build_mock_claim_response(claim_entry.resource, request_bundle, root_url, operation,
-                                                        decision, timestamp, claim_response_uuid)
-      build_mock_bundle(mocked_claim_response, request_bundle, root_url, operation, timestamp)
+                                                        decision, timestamp, claim_response_uuid, claim_full_url)
+      build_mock_bundle(mocked_claim_response, request_bundle, root_url, operation, timestamp, ig_version)
     end
 
     # Note that references from the claim to other resources in the bundle need to be changed to absolute URLs
@@ -199,7 +252,7 @@ module DaVinciPASTestKit
     #
     # @private
     def build_mock_claim_response(claim, request_bundle, root_url, operation, decision, timestamp,
-                                  claim_response_uuid = nil)
+                                  claim_response_uuid = nil, claim_full_url = nil)
       claim_response_uuid = SecureRandom.uuid if claim_response_uuid.blank?
       return FHIR::ClaimResponse.new(id: claim_response_uuid) if claim.blank?
 
@@ -218,7 +271,8 @@ module DaVinciPASTestKit
         created: timestamp.iso8601,
         insurer: absolute_reference(claim.insurer, request_bundle.entry, root_url),
         requestor: absolute_reference(claim.provider, request_bundle.entry, root_url),
-        outcome: 'complete',
+        request: claim_full_url.present? ? FHIR::Reference.new(reference: claim_full_url) : nil,
+        outcome: decision == :pended ? 'queued' : 'complete',
         item: claim.item.map do |item|
           FHIR::ClaimResponse::Item.new(
             extension: [
@@ -262,7 +316,7 @@ module DaVinciPASTestKit
       )
     end
 
-    def build_mock_bundle(claim_response, request_bundle, root_url, operation, timestamp)
+    def build_mock_bundle(claim_response, request_bundle, root_url, operation, timestamp, ig_version = 'v2.0.1')
       response_bundle = FHIR::Bundle.new(
         id: SecureRandom.uuid,
         meta: FHIR::Meta.new(profile: if operation == 'submit'
@@ -270,6 +324,10 @@ module DaVinciPASTestKit
                                       else
                                         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle'
                                       end),
+        identifier: ig_version == 'v2.2.0' ? FHIR::Identifier.new(
+          system: 'urn:ietf:rfc:3986',
+          value: "urn:uuid:#{SecureRandom.uuid}"
+        ) : nil,
         timestamp: timestamp.iso8601,
         type: 'collection',
         entry: [
@@ -278,6 +336,7 @@ module DaVinciPASTestKit
         ]
       )
       response_bundle.entry.concat(referenced_entities(claim_response, request_bundle.entry, root_url))
+      add_v220_profiles(response_bundle, claim_response) if ig_version == 'v2.2.0'
       response_bundle
     end
 
@@ -291,6 +350,33 @@ module DaVinciPASTestKit
                               response: FHIR::Bundle::Entry::Response.new(
                                 status: '200'
                               ))
+    end
+
+    # Add v2.2.0-specific profiles to referenced resources so they pass validation.
+    # The insurer and requestor Organizations are copied from the client's request
+    # and need profile declarations for the v2.2.0 validator to match them.
+    def add_v220_profiles(response_bundle, claim_response)
+      insurer_ref = claim_response.insurer&.reference
+      requestor_ref = claim_response.requestor&.reference
+
+      response_bundle.entry.each do |entry|
+        resource = entry.resource
+        next unless resource&.resourceType == 'Organization'
+
+        full_url = entry.fullUrl
+        resource.meta ||= FHIR::Meta.new
+        resource.meta.profile ||= []
+
+        if insurer_ref.present? && full_url == insurer_ref
+          insurer_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer'
+          resource.meta.profile << insurer_profile unless resource.meta.profile.include?(insurer_profile)
+        end
+
+        if requestor_ref.present? && full_url == requestor_ref
+          requestor_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor'
+          resource.meta.profile << requestor_profile unless resource.meta.profile.include?(requestor_profile)
+        end
+      end
     end
 
     def build_mock_notification_status(timestamp, subscription_reference, subscription_topic, claim_response_reference,
