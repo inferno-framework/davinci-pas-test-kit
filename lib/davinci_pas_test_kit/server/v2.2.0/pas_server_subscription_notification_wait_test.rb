@@ -7,6 +7,8 @@ module DaVinciPASTestKit
       include ServerURLs
 
       id :pas_server_v220_subscription_notification_wait
+
+      receives_request :notification
     end
   end
 end

@@ -23,10 +23,10 @@ module DaVinciPASTestKit
         
       )
       run_as_group
-  
+
       group do
         title "Server can respond with 'Pended' to claims submitted for prior authorization"
-        
+
         test from: :pas_server_request_bundle_validation_test do
           id :pas_server_v220_pas_request_bundle_validation_test_pended
           title '[USER INPUT VALIDATION] Provided $submit Request Bundle is conformant'
@@ -144,7 +144,7 @@ module DaVinciPASTestKit
       end
       group do
         title 'Server can notify client of updates via full-resource notification'
-        
+
         test from: :pas_server_v220_subscription_notification_wait do
           id :pas_server_v220_subscription_notification_wait_pended
         end
@@ -155,7 +155,16 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_server_full_resource_conformance do
           id :pas_server_v220_subscription_notification_full_resource_conformance_pended
         end
-        test from: :pas_notification_pas_conformance_test
+        test from: :pas_notification_pas_conformance_test do
+          uses_request :notification
+
+          run do
+            skip_if request.nil?, 'Inferno did not send or receive an event notification'
+
+            notification_body = request.request_body
+            verify_pas_notification(notification_body)
+          end
+        end
       end
     end
   end
