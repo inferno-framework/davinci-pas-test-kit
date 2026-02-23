@@ -156,7 +156,7 @@ module DaVinciPASTestKit
 
     def find_subscription_content_type(subscription)
       content_ext = subscription['channel']['_payload']['extension']
-                      .find do |ext|
+        .find do |ext|
         ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
       end
       content_ext['valueCode'] if content_ext.present?
