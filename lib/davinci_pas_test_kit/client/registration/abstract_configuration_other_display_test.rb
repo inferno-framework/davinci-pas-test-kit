@@ -16,6 +16,7 @@ module DaVinciPASTestKit
             to use during these tests. If not provided a value will be generated.
           )
     output :session_url_path
+    output :confirmation_url
 
     run do
       if session_url_path.blank?
@@ -23,6 +24,8 @@ module DaVinciPASTestKit
         output(session_url_path: new_session_url_path)
       end
       wait_identifier = session_url_path || new_session_url_path
+      confirmation_url = "#{resume_pass_url}?token=#{wait_identifier}"
+      output(confirmation_url:)
 
       wait(
         identifier: wait_identifier,
@@ -31,7 +34,7 @@ module DaVinciPASTestKit
 
           FHIR Base URL: `#{session_fhir_base_url(wait_identifier)}`
 
-          [Click here](#{resume_pass_url}?token=#{wait_identifier}) once you have configured
+          [Click here](#{confirmation_url}) once you have configured
           the client to connect to Inferno at the above endpoints.
         )
       )

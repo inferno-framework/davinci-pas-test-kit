@@ -9,10 +9,15 @@ module DaVinciPASTestKit
     )
 
     input :client_id
+    output :confirmation_url
 
     run do
+      identifier = client_id
+      confirmation_url = "#{resume_pass_url}?token=#{identifier}"
+      output(confirmation_url:)
+
       wait(
-        identifier: client_id,
+        identifier:,
         message: %(
           **Inferno Simulated Server Details**:
 
@@ -22,7 +27,7 @@ module DaVinciPASTestKit
           - UDAP Client Id: `#{client_id}`
           - Token endpoint: `#{token_url}`
 
-          [Click here](#{resume_pass_url}?token=#{client_id}) once you have configured
+          [Click here](#{confirmation_url}) once you have configured
           the client to connect to Inferno at the above endpoints.
         )
       )

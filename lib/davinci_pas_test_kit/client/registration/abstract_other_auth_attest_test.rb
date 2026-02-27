@@ -9,9 +9,18 @@ module DaVinciPASTestKit
       TLS.
     )
 
+    output :attest_true_url
+    output :attest_false_url
+
     run do
+      identifier = test_session_id
+      attest_true_url = "#{resume_pass_url}?token=#{identifier}"
+      output(attest_true_url:)
+      attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+      output(attest_false_url:)
+
       wait(
-        identifier: test_session_id,
+        identifier:,
         message: %(
           **Other Authentication Attestation**:
 
@@ -19,9 +28,9 @@ module DaVinciPASTestKit
           a mechanism other than the SMART Backend Services or UDAP B2B client credentials
           flows.
 
-          [Click here](#{resume_pass_url}?token=#{test_session_id}) if the above statement is true.
+          [Click here](#{attest_true_url}) if the above statement is true.
 
-          [Click here](#{resume_fail_url}?token=#{test_session_id}) if the above statement is false.
+          [Click here](#{attest_false_url}) if the above statement is false.
         )
       )
     end

@@ -28,17 +28,26 @@ module DaVinciPASTestKit
       end
     end
 
+    output :attest_true_url
+    output :attest_false_url
+
     run do
+      identifier = test_session_id
+      attest_true_url = "#{resume_pass_url}?token=#{identifier}"
+      output(attest_true_url:)
+      attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+      output(attest_false_url:)
+
       wait(
-        identifier: test_session_id,
+        identifier:,
         message: %(
           **#{workflow_name} Workflow Test**:
 
           #{attest_message}
 
-          [Click here](#{resume_pass_url}?token=#{test_session_id}) if the above statement is **true**.
+          [Click here](#{attest_true_url}) if the above statement is **true**.
 
-          [Click here](#{resume_fail_url}?token=#{test_session_id}) if the above statement is **false**.
+          [Click here](#{attest_false_url}) if the above statement is **false**.
         )
       )
     end
