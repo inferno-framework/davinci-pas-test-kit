@@ -113,7 +113,7 @@ module DaVinciPASTestKit
       def description
         case system
         when 'server'
-          case use_case # rubocop:disable Style/HashLikeCase
+          case use_case
           when 'approval'
             <<~DESCRIPTION
               Demonstrate the ability of the server to respond to a prior
@@ -125,16 +125,28 @@ module DaVinciPASTestKit
               authorization request with a `denied` decision.
             DESCRIPTION
           when 'pended'
-            <<~DESCRIPTION
-              Demonstrate a complete prior authorization workflow including a period
-              during which the final decision is pending. This includes demonstrating
-              the ability of the server to
+            if ig_version == 'v2.2.0'
+              <<~DESCRIPTION
+                Demonstrate a complete prior authorization workflow including a period
+                during which the final decision is pending. This includes demonstrating
+                the ability of the server to
 
-              - Respond to a prior authorization request with a `pended` status.
-              - Accept a Subscription creation request and send a notification when
-                the pended claim has been finalized.
-              - Respond to a subsequent inquiry request with a final decision for the request.
-            DESCRIPTION
+                - Respond to a prior authorization request with a `pended` status.
+                - Accept a Subscription creation request and send a full-resource notification when
+                  the pended claim has been finalized.
+              DESCRIPTION
+            else
+              <<~DESCRIPTION
+                Demonstrate a complete prior authorization workflow including a period
+                during which the final decision is pending. This includes demonstrating
+                the ability of the server to
+
+                - Respond to a prior authorization request with a `pended` status.
+                - Accept a Subscription creation request and send a notification when
+                  the pended claim has been finalized.
+                - Respond to a subsequent inquiry request with a final decision for the request.
+              DESCRIPTION
+            end
           end
         end
       end

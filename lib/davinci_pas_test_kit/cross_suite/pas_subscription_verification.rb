@@ -58,6 +58,8 @@ module DaVinciPASTestKit
 
       filter_criteria.each do |fc|
         value = fc['valueString']
+        # PAS v2.2.0 requires filter criteria in the format 'org-identifier=<identifier>'
+        # where <identifier> is a non-whitespace organization identifier string
         next if value.present? && value.match?(/\Aorg-identifier=\S+\z/)
 
         add_message('error', %(

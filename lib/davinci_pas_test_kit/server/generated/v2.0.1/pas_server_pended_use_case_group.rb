@@ -7,6 +7,7 @@ require 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/commo
 require 'subscriptions_test_kit/suites/subscriptions_r5_backport_r4_server/event_notification/id_only_content/id_only_conformance_test'
 require_relative '../../claim_inquire_operation_test'
 
+
 module DaVinciPASTestKit
   module DaVinciPASV201
     class PASServerPendedUseCaseGroup < Inferno::TestGroup

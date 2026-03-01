@@ -180,7 +180,7 @@ module DaVinciPASTestKit
         add_v220_notification_entries(mock_notification_bundle, submit_bundle, decision, inner_bundle_full_url)
       else
         fhir_base_url = extract_fhir_base_url(subscription_reference)
-        add_legacy_notification_entries(mock_notification_bundle, submit_bundle, decision, fhir_base_url)
+        add_v201_notification_entries(mock_notification_bundle, submit_bundle, decision, fhir_base_url)
       end
     end
 
@@ -189,20 +189,14 @@ module DaVinciPASTestKit
         id: inner_bundle_full_url.delete_prefix('urn:uuid:'),
         type: 'collection',
         timestamp: Time.now.utc.iso8601,
-        identifier: FHIR::Identifier.new(system: 'urn:ietf:rfc:3986', value: "urn:uuid:#{SecureRandom.uuid}"),
-        meta: FHIR::Meta.new(profile: ['http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'])
+        identifier: FHIR::Identifier.new(system: 'urn:ietf:rfc:3986', value: "urn:uuid:#{SecureRandom.uuid}")
       )
 
-      claim_response_resource = nil
       submit_bundle.entry.each do |entry|
-        if entry.resource.resourceType == 'ClaimResponse'
-          prepare_v220_claim_response(entry.resource, decision)
-          claim_response_resource = entry.resource
-        end
+        prepare_v220_claim_response(entry.resource, decision) if entry.resource.resourceType == 'ClaimResponse'
         inner_bundle.entry << entry
       end
 
-      add_v220_profiles(inner_bundle, claim_response_resource) if claim_response_resource.present?
       mock_notification_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: inner_bundle_full_url, resource: inner_bundle)
     end
 
@@ -214,7 +208,7 @@ module DaVinciPASTestKit
       claim_response.request = FHIR::Reference.new(reference: "urn:uuid:#{SecureRandom.uuid}")
     end
 
-    def add_legacy_notification_entries(mock_notification_bundle, submit_bundle, decision, fhir_base_url)
+    def add_v201_notification_entries(mock_notification_bundle, submit_bundle, decision, fhir_base_url)
       submit_bundle.entry.each do |entry|
         update_claim_response_decisions(entry.resource, decision) if entry.resource.resourceType == 'ClaimResponse'
         entry.request = FHIR::Bundle::Entry::Request.new(
@@ -349,7 +343,6 @@ module DaVinciPASTestKit
         ]
       )
       response_bundle.entry.concat(referenced_entities(claim_response, request_bundle.entry, root_url))
-      add_v220_profiles(response_bundle, claim_response) if ig_version == 'v2.2.0'
       response_bundle
     end
 
@@ -363,33 +356,6 @@ module DaVinciPASTestKit
                               response: FHIR::Bundle::Entry::Response.new(
                                 status: '200'
                               ))
-    end
-
-    # Add v2.2.0-specific profiles to referenced resources so they pass validation.
-    # The insurer and requestor Organizations are copied from the client's request
-    # and need profile declarations for the v2.2.0 validator to match them.
-    def add_v220_profiles(response_bundle, claim_response)
-      insurer_ref = claim_response.insurer&.reference
-      requestor_ref = claim_response.requestor&.reference
-
-      response_bundle.entry.each do |entry|
-        resource = entry.resource
-        next unless resource&.resourceType == 'Organization'
-
-        full_url = entry.fullUrl
-        resource.meta ||= FHIR::Meta.new
-        resource.meta.profile ||= []
-
-        if insurer_ref.present? && full_url == insurer_ref
-          insurer_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer'
-          resource.meta.profile << insurer_profile unless resource.meta.profile.include?(insurer_profile)
-        end
-
-        if requestor_ref.present? && full_url == requestor_ref
-          requestor_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor'
-          resource.meta.profile << requestor_profile unless resource.meta.profile.include?(requestor_profile)
-        end
-      end
     end
 
     def build_mock_notification_status(timestamp, subscription_reference, subscription_topic, claim_response_reference,

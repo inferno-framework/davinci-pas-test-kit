@@ -17,7 +17,20 @@ module DaVinciPASTestKit
     )
 
     run do
+      # Client tests tag the outgoing notification with REST_HOOK_EVENT_NOTIFICATION_TAG
       load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)
+
+      # Server tests tag incoming notifications with the Subscription ID
+      if requests.none?
+        subscription_requests = load_tagged_requests('subscription_creation').select { |req| req.status == 201 }
+        latest_subscription = subscription_requests.max_by(&:created_at)
+
+        if latest_subscription.present?
+          subscription = JSON.parse(latest_subscription.response_body)
+          load_tagged_requests(subscription['id'])
+        end
+      end
+
       skip_if(requests.none?, 'Inferno did not send or receive an event notification')
 
       notification_body = request.request_body

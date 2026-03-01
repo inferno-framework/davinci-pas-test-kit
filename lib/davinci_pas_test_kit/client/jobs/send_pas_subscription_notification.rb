@@ -16,10 +16,12 @@ module DaVinciPASTestKit
         @notification_suite_id
       end
 
+      attr_reader :ig_version
+
       sidekiq_options retry: false
 
       def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token,
-                  notification_suite_id)
+                  notification_suite_id, ig_version = 'v2.0.1')
         @test_run_id = test_run_id
         @test_session_id = test_session_id
         @result_id = result_id
@@ -27,6 +29,7 @@ module DaVinciPASTestKit
         @notification_json = notification_json
         @resume_token = resume_token
         @notification_suite_id = notification_suite_id
+        @ig_version = ig_version
 
         await_subscription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
         sleep 1
@@ -113,10 +116,6 @@ module DaVinciPASTestKit
                      end
         response = send_notification(event_json)
         persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG], event_json)
-      end
-
-      def ig_version
-        @notification_suite_id&.include?('v220') ? 'v2.2.0' : 'v2.0.1'
       end
 
       def send_notification(request_body)

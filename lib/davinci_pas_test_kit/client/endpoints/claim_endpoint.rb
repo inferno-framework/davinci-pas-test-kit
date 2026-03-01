@@ -126,7 +126,8 @@ module DaVinciPASTestKit
       notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
 
       Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, test_run.id, test_run.test_session_id, result.id,
-                            notification_bearer_token, notification_contents, test_run_identifier, suite_id)
+                            notification_bearer_token, notification_contents, test_run_identifier, suite_id,
+                            ig_version)
     end
 
     def notification_json(response_bundle_json, decision, generated_claim_response_uuid)
@@ -157,8 +158,8 @@ module DaVinciPASTestKit
     def find_subscription_content_type(subscription)
       content_ext = subscription['channel']['_payload']['extension']
         .find do |ext|
-        ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
-      end
+          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
+        end
       content_ext['valueCode'] if content_ext.present?
     end
   end

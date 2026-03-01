@@ -7,7 +7,7 @@ module DaVinciPASTestKit
 
     PAS_RESPONSE_BUNDLE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'.freeze
 
-    def verify_pas_notification(notification_json_str)
+    def verify_pas_notification(notification_json_str, ig_version: 'v2.2.0')
       assert_valid_json(notification_json_str)
       notification_bundle = FHIR.from_contents(notification_json_str)
 
@@ -52,7 +52,7 @@ module DaVinciPASTestKit
         end
 
         # Validate the focus resource as a PAS Response Bundle
-        validate_focus_as_response_bundle(focus_resource)
+        validate_focus_as_response_bundle(focus_resource, ig_version)
       end
 
       assert messages.none? { |msg| msg[:type] == 'error' },
@@ -89,7 +89,7 @@ module DaVinciPASTestKit
       end
     end
 
-    def validate_focus_as_response_bundle(focus_resource)
+    def validate_focus_as_response_bundle(focus_resource, ig_version)
       if focus_resource.resourceType != 'Bundle'
         add_message('error', %(
           Expected the focus resource to be a Bundle (PAS Response Bundle),
@@ -98,10 +98,12 @@ module DaVinciPASTestKit
         return
       end
 
+      # Convert ig_version format (e.g., 'v2.2.0') to validator format (e.g., '2.2.0')
+      validator_version = ig_version.delete_prefix('v')
       perform_response_validation(
         focus_resource,
         PAS_RESPONSE_BUNDLE_PROFILE,
-        '2.2.0',
+        validator_version,
         'submit_response'
       )
     end
