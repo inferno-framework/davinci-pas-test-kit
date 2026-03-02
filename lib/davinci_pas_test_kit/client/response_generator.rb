@@ -133,7 +133,7 @@ module DaVinciPASTestKit
       submit_bundle = FHIR.from_contents(submit_response)
       claim_response_full_url = claim_response_full_url_from_submit_response_bundle(submit_bundle)
 
-      additional_context_references = build_additional_context_references(submit_bundle, type)
+      additional_context_references = build_additional_context_references(submit_bundle, type, ig_version)
       claim_response_reference, inner_bundle_full_url = determine_notification_focus(ig_version, type,
                                                                                      claim_response_full_url)
 
@@ -155,7 +155,13 @@ module DaVinciPASTestKit
       mock_notification_bundle
     end
 
-    def build_additional_context_references(submit_bundle, type)
+    # For v2.2.0 full-resource notifications, all resources are inside an inner bundle
+    # referenced by the focus. The subscriptions test kit checks that additional-context
+    # references resolve to direct entries in the notification bundle, but in v2.2.0
+    # they are nested inside the inner bundle, so we don't populate additional-context.
+    def build_additional_context_references(submit_bundle, type, ig_version = 'v2.0.1')
+      return [] if ig_version == 'v2.2.0'
+
       if type == 'full-resource' && submit_bundle.present? && submit_bundle.is_a?(FHIR::Bundle)
         submit_bundle.entry.reject { |entry| entry.resource&.resourceType == 'ClaimResponse' }.map(&:fullUrl).compact
       else
@@ -197,7 +203,12 @@ module DaVinciPASTestKit
         inner_bundle.entry << entry
       end
 
-      mock_notification_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: inner_bundle_full_url, resource: inner_bundle)
+      mock_notification_bundle.entry << FHIR::Bundle::Entry.new(
+        fullUrl: inner_bundle_full_url,
+        resource: inner_bundle,
+        request: FHIR::Bundle::Entry::Request.new(method: 'POST', url: 'Bundle'),
+        response: FHIR::Bundle::Entry::Response.new(status: '201')
+      )
     end
 
     def prepare_v220_claim_response(claim_response, decision)

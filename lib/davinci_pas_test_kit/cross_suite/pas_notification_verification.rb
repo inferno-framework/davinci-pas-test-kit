@@ -1,13 +1,10 @@
 require_relative 'tags'
-require_relative 'pas_bundle_validation'
 
 module DaVinciPASTestKit
   module PASNotificationVerification
-    include PasBundleValidation
-
     PAS_RESPONSE_BUNDLE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'.freeze
 
-    def verify_pas_notification(notification_json_str, ig_version: 'v2.2.0')
+    def verify_pas_notification(notification_json_str, ig_version: 'v2.2.0') # rubocop:disable Lint/UnusedMethodArgument
       assert_valid_json(notification_json_str)
       notification_bundle = FHIR.from_contents(notification_json_str)
 
@@ -29,7 +26,7 @@ module DaVinciPASTestKit
              'The SubscriptionStatus must include at least one notification-event ' \
              'parameter with a focus reference'
 
-      # Resolve each focus reference to a Bundle entry and validate
+      # Resolve each focus reference to a Bundle entry and validate PAS structure
       bundle_entries = notification_bundle.entry.drop(1)
       focus_references.each do |focus_ref|
         focus_entry = resolve_focus_entry(focus_ref, bundle_entries)
@@ -51,8 +48,10 @@ module DaVinciPASTestKit
           next
         end
 
-        # Validate the focus resource as a PAS Response Bundle
-        validate_focus_as_response_bundle(focus_resource, ig_version)
+        # Check PAS-specific structural requirements only.
+        # Profile validation is handled by the Subscription conformance tests
+        # (9.3.3.01 and 9.3.3.02) to avoid duplicate error messages.
+        validate_focus_as_response_bundle(focus_resource)
       end
 
       assert messages.none? { |msg| msg[:type] == 'error' },
@@ -89,7 +88,11 @@ module DaVinciPASTestKit
       end
     end
 
-    def validate_focus_as_response_bundle(focus_resource, ig_version)
+    # Validates PAS-specific structural requirements only:
+    # - Focus resource must be a Bundle
+    # - Bundle must be of type 'collection' (PAS Response Bundle)
+    # - Bundle must contain at least one ClaimResponse entry
+    def validate_focus_as_response_bundle(focus_resource)
       if focus_resource.resourceType != 'Bundle'
         add_message('error', %(
           Expected the focus resource to be a Bundle (PAS Response Bundle),
@@ -98,14 +101,20 @@ module DaVinciPASTestKit
         return
       end
 
-      # Convert ig_version format (e.g., 'v2.2.0') to validator format (e.g., '2.2.0')
-      validator_version = ig_version.delete_prefix('v')
-      perform_response_validation(
-        focus_resource,
-        PAS_RESPONSE_BUNDLE_PROFILE,
-        validator_version,
-        'submit_response'
-      )
+      if focus_resource.type != 'collection'
+        add_message('error', %(
+          Expected the focus Bundle to be of type 'collection' (PAS Response Bundle),
+          but found type '#{focus_resource.type}'.
+        ))
+      end
+
+      claim_response = focus_resource.entry&.find { |e| e.resource&.resourceType == 'ClaimResponse' }
+      return if claim_response.present?
+
+      add_message('error', %(
+        The focus Bundle (PAS Response Bundle) must contain at least one
+        ClaimResponse entry, but none was found.
+      ))
     end
   end
 end
