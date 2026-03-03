@@ -116,3 +116,5 @@
 :tests:
 - :id: pas_server_v220_submit_response_must_support_communication_request
   :file_name: server_submit_response_must_support_communication_request_test.rb
+- :id: pas_client_v220_submit_response_must_support_communication_request
+  :file_name: client_submit_response_must_support_communication_request_test.rb

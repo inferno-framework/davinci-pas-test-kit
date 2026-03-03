@@ -44,7 +44,11 @@ module DaVinciPASTestKit
     end
 
     run do
-      assert resources_of_interest.present?, "No #{resource_type} resources were found"
+      if user_input_validation
+        skip_if resources_of_interest.blank?, "No #{resource_type} resources were found"
+      else
+        assert resources_of_interest.present?, "No #{resource_type} resources were found"
+      end
 
       missing_must_support_strings = missing_must_support_elements(resources_of_interest, nil, metadata:)
 

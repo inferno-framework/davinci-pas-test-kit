@@ -457,3 +457,5 @@
 :tests:
 - :id: pas_server_v220_submit_response_must_support_claimresponse
   :file_name: server_submit_response_must_support_claimresponse_test.rb
+- :id: pas_client_v220_submit_response_must_support_claimresponse
+  :file_name: client_submit_response_must_support_claimresponse_test.rb

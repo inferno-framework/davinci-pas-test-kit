@@ -28,9 +28,10 @@ module DaVinciPASTestKit
       operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
       workflow_tag = WORKFLOW_TAG_MAP[workflow]
 
-      return [operation_tag, workflow_tag] if workflow_tag.present?
-
-      [operation_tag]
+      tag_list = [operation_tag]
+      tag_list << workflow_tag if workflow_tag.present?
+      tag_list << MUST_SUPPORT_WORKFLOW_TAG if must_support_workflow?
+      tag_list
     end
 
     def workflow
@@ -42,6 +43,10 @@ module DaVinciPASTestKit
       when /.*approval.*/
         :approval
       end
+    end
+
+    def must_support_workflow?
+      test.id =~ /.*must_support.*/ || test.id =~ /.*gather_must_support.*/
     end
 
     WORKFLOW_TAG_MAP = {
@@ -64,7 +69,7 @@ module DaVinciPASTestKit
         return
       end
 
-      user_inputted_response = UserInputResponse.user_inputted_response(test, operation, result)
+      user_inputted_response = resolve_user_response
       if user_inputted_response.present?
         generated_claim_response_uuid = nil
         response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url, operation,
@@ -103,6 +108,29 @@ module DaVinciPASTestKit
     end
 
     private
+
+    # Resolves the user-provided response, using nth-response logic for must support workflows
+    # or the single-response approach for other workflows.
+    def resolve_user_response
+      if must_support_workflow?
+        request_number = count_previous_ms_requests
+        UserInputResponse.nth_user_inputted_response(result, operation, request_number)
+      else
+        UserInputResponse.user_inputted_response(test, operation, result)
+      end
+    end
+
+    # Count how many previous requests in this test session have the must support workflow tag
+    # and the same operation tag. This gives us the 0-based index for nth-response selection.
+    def count_previous_ms_requests
+      operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
+      requests_repo = Inferno::Repositories::Requests.new
+      previous_requests = requests_repo.find_named_request(test_session_id: test_run.test_session_id,
+                                                           tags: [MUST_SUPPORT_WORKFLOW_TAG, operation_tag])
+      previous_requests.is_a?(Array) ? previous_requests.length : 0
+    rescue StandardError
+      0
+    end
 
     def handle_missing_required_elements(claim_entry, response)
       response.status = 400
