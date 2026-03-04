@@ -8,11 +8,13 @@ sessions:
     name: server
     preset_id: pas-server-v220-run-against-pas-client-tests
 
-rules:
+steps:
   - state_description: client session created
     session: client
     status: created
-    command: "bundle exec inferno session start_run '{session_id.client}' -r davinci_pas_client_suite_v201-pas_client_v201_registration"
+    start_run:
+      session: client
+      runnable: 1
     action_description: Run Client Group 1 Client Registration
 
   - state_description: Wait at Client test 1.06 (attestation)
@@ -33,14 +35,18 @@ rules:
     session: client
     status: done
     last_test: davinci_pas_client_suite_v201-pas_client_v201_registration-pas_client_v201_reg_config_other_display
-    command: "bundle exec inferno session start_run '{session_id.client}' -r davinci_pas_client_suite_v201-pas_client_v201_subscription_setup_no_auth"
+    start_run:
+      session: client
+      runnable: 8
     action_description: Run Client Group 8 Subscription Setup
 
   - state_description: Wait at Client test 8.01 Client submits a Subscription Creation Request
     session: client
     status: waiting
     last_test: davinci_pas_client_suite_v201-pas_client_v201_subscription_setup_no_auth-pas_client_v201_subscription_create_test
-    command: "bundle exec inferno session start_run '{session_id.server}' -r davinci_pas_server_suite_v201-pas_server_v201_subscription_setup"
+    start_run:
+      session: server
+      runnable: 1
     next_poll_session: server
     action_description: Run Server Group 1 Subscription Setup
 
@@ -64,7 +70,9 @@ rules:
     session: server
     status: done
     last_test: davinci_pas_server_suite_v201-pas_server_v201_subscription_setup-subscriptions_r4_server_handshake_conformance
-    command: "bundle exec inferno session start_run '{session_id.client}' -r davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_approval_group"
+    start_run:
+      session: client
+      runnable: 9.1
     next_poll_session: client
     action_description: Run Client Group 9.1 Approval Workflow
 
@@ -72,7 +80,9 @@ rules:
     session: client
     status: waiting
     last_test: davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_approval_group-pas_client_v201_approval_submit_test
-    command: "bundle exec inferno session start_run '{session_id.server}' -r davinci_pas_server_suite_v201-Group02-pas_server_v201_approval_use_case"
+    start_run:
+      session: server
+      runnable: 2.1
     next_poll_session: server
     action_description: Run Server Group 2.1 Successful Approval Workflow
 
@@ -95,14 +105,18 @@ rules:
     session: client
     status: done
     last_test: davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_approval_group-pas_client_v201_response_attest
-    command: "bundle exec inferno session start_run '{session_id.client}' -r davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_denial_group"
+    start_run:
+      session: client
+      runnable: 9.2
     action_description: Run Client Group 9.2 Denial Workflow
 
   - state_description: Wait at Client test 9.2.01 Client submits a claim using the $submit operation
     session: client
     status: waiting
     last_test: davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_denial_group-pas_client_v201_denial_submit_test
-    command: "bundle exec inferno session start_run '{session_id.server}' -r davinci_pas_server_suite_v201-Group02-pas_server_v201_denial_use_case"
+    start_run:
+      session: server
+      runnable: 2.2
     next_poll_session: server
     action_description: Run Server Group 2.2 Successful Denial Workflow
 
@@ -125,14 +139,18 @@ rules:
     session: client
     status: done
     last_test: davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_denial_group-pas_client_v201_response_attest
-    command: "bundle exec inferno session start_run '{session_id.client}' -r davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_pended_group"
+    start_run:
+      session: client
+      runnable: 9.3
     action_description: Run Client Group 9.3 Pended Workflow
 
   - state_description: Wait at Client test 9.3.01 (submit requests)
     session: client
     status: waiting
     last_test: davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_pended_group-Group01-pas_client_v201_pended_submit_test
-    command: "bundle exec inferno session start_run '{session_id.server}' -r davinci_pas_server_suite_v201-Group02-pas_server_v201_pended_use_case"
+    start_run:
+      session: server
+      runnable: 2.3
     next_poll_session: server
     action_description: Run Server Group 2.3 Successful Pended Workflow
 
@@ -169,14 +187,18 @@ rules:
     session: client
     status: done
     last_test: davinci_pas_client_suite_v201-pas_client_v201_workflows_no_auth-pas_client_v201_pended_group-Group04-pas_client_v201_response_attest
-    command: "bundle exec inferno session start_run '{session_id.client}' -r davinci_pas_client_suite_v201-pas_client_v201_must_support_no_auth"
+    start_run:
+      session: client
+      runnable: 10
     action_description: Run Client Group 10 Must Support Elements
 
   - state_description: Wait at Client test 10.1.? (submit requests)
     session: client
     status: waiting
     last_test: davinci_pas_client_suite_v201-pas_client_v201_must_support_no_auth-pas_client_v201_submit_must_support-pas_client_v201_submit_gather_must_support
-    command: "bundle exec inferno session start_run '{session_id.server}' -r davinci_pas_server_suite_v201-pas_server_v201_must_support"
+    start_run:
+      session: server
+      runnable: 3
     next_poll_session: server
     action_description: Run Server Group 3 Demonstrate Element Support
 
@@ -184,7 +206,9 @@ rules:
     session: server
     status: done
     last_test: davinci_pas_server_suite_v201-pas_server_v201_must_support-Group02-Group03-pas_server_v201_inquire_response_must_support_task
-    command: "bundle exec inferno session start_run '{session_id.server}' -r davinci_pas_server_suite_v201-pas_v201_error_group"
+    start_run:
+      session: server
+      runnable: 4
     action_description: Run Server Group 4 Demonstrate Error Handling
 
   - state_description: Finished Server Group 4 Demonstrate Error Handling
