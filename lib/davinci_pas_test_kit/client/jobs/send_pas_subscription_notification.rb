@@ -103,19 +103,10 @@ module DaVinciPASTestKit
       end
 
       def send_event_notification
-        # For v2.2.0, the notification JSON is already a complete notification bundle
-        # with PAS-specific structure (focus points to an inner PAS Response Bundle).
-        # Using derive_event_notification would flatten this structure, making the focus
-        # point to the ClaimResponse directly instead of the wrapping Bundle.
-        # For v2.0.1, derive_event_notification correctly builds the notification.
-        event_json = if ig_version == 'v2.2.0'
-                       @notification_json
-                     else
-                       derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
-                                                 1).to_json
-                     end
+        event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
+                                               1).to_json
         response = send_notification(event_json)
-        persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG], event_json)
+        persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
       end
 
       def send_notification(request_body)
@@ -124,10 +115,11 @@ module DaVinciPASTestKit
         # Warning: This is a hack. If there is an error with the request such that we never get a response, we have
         #          no clean way to persist that information for the Inferno test to check later. The solution here
         #          is to persist the request anyway with a status of nil, using the error message as response body
-        Faraday::Response.new(response_body: e.message, url: rest_hook_connection.url_prefix.to_s)
+        Faraday::Response.new(response_body: e.message, url: rest_hook_connection.url_prefix.to_s,
+                              request_body:, request_headers: headers)
       end
 
-      def persist_notification_request(response, tags, sent_body = nil)
+      def persist_notification_request(response, tags)
         inferno_request_headers = headers.map { |name, value| { name:, value: } }
         inferno_response_headers = response.headers&.map { |name, value| { name:, value: } }
         requests_repo.create(
@@ -135,7 +127,7 @@ module DaVinciPASTestKit
           url: response.env.url.to_s,
           direction: 'outgoing',
           status: response.status,
-          request_body: sent_body || response.env.request_body,
+          request_body: response.env.request_body,
           response_body: response.env.response_body,
           test_session_id: @test_session_id,
           result_id: @result_id,

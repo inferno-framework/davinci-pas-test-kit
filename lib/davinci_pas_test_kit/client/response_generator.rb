@@ -62,14 +62,7 @@ module DaVinciPASTestKit
 
       now = Time.now.utc
       bundles_to_update.each do |response_bundle|
-        response_bundle.timestamp = now.iso8601 if response_bundle&.timestamp.present?
-        claim_response_entry = response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
-        next unless claim_response_entry.present?
-
-        claim_response_entry.resource.created = now.iso8601 if claim_response_entry.resource.created
-        if claim_response_entry.resource.request.present? && claim_full_url.present?
-          claim_response_entry.resource.request.reference = claim_full_url
-        end
+        update_response_bundle(response_bundle, claim_full_url, now, ig_version)
       end
 
       response_resource.to_json
@@ -128,14 +121,30 @@ module DaVinciPASTestKit
       claim_response_entry.resource.id = claim_response_id
     end
 
-    def build_mock_notification_bundle(notification_timestamp, subscription_reference, subscription_topic,
-                                       submit_response, type, decision, ig_version = 'v2.0.1')
-      submit_bundle = FHIR.from_contents(submit_response)
-      claim_response_full_url = claim_response_full_url_from_submit_response_bundle(submit_bundle)
+    def update_response_bundle(response_bundle, claim_full_url, now, ig_version)
+      response_bundle.timestamp = now.iso8601 if response_bundle&.timestamp.present?
+      if ig_version == 'v2.2.0' && response_bundle.identifier.blank?
+        response_bundle.identifier = FHIR::Identifier.new(system: 'urn:ietf:rfc:3986',
+                                                          value: "urn:uuid:#{SecureRandom.uuid}")
+      end
+      claim_response_entry = response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
+      return unless claim_response_entry.present?
 
-      additional_context_references = build_additional_context_references(submit_bundle, type, ig_version)
-      claim_response_reference, inner_bundle_full_url = determine_notification_focus(ig_version, type,
-                                                                                     claim_response_full_url)
+      claim_response_entry.resource.created = now.iso8601 if claim_response_entry.resource.created
+      return unless claim_full_url.present?
+
+      if claim_response_entry.resource.request.present?
+        claim_response_entry.resource.request.reference = claim_full_url
+      elsif ig_version == 'v2.2.0'
+        claim_response_entry.resource.request = FHIR::Reference.new(reference: claim_full_url)
+      end
+    end
+
+    def build_mock_notification_bundle(notification_timestamp, subscription_reference, subscription_topic,
+                                       submit_response, type, decision, _ig_version = 'v2.0.1')
+      submit_response_bundle = FHIR.from_contents(submit_response)
+
+      focus_reference, inner_bundle_full_url = determine_notification_focus(type, submit_response_bundle)
 
       mock_notification_bundle = FHIR::Bundle.new(
         id: SecureRandom.uuid,
@@ -144,91 +153,42 @@ module DaVinciPASTestKit
       )
 
       mock_notification_status = build_mock_notification_status(notification_timestamp, subscription_reference,
-                                                                subscription_topic, claim_response_reference,
-                                                                additional_context_references)
+                                                                subscription_topic, focus_reference, [])
       mock_notification_bundle.entry << build_mock_notification_status_entry(mock_notification_status,
                                                                              subscription_reference)
 
-      add_notification_entries(mock_notification_bundle, submit_bundle, type, decision, ig_version,
+      add_notification_entries(mock_notification_bundle, submit_response_bundle, type, decision,
                                subscription_reference, inner_bundle_full_url)
 
       mock_notification_bundle
     end
 
-    # For v2.2.0 full-resource notifications, all resources are inside an inner bundle
-    # referenced by the focus. The subscriptions test kit checks that additional-context
-    # references resolve to direct entries in the notification bundle, but in v2.2.0
-    # they are nested inside the inner bundle, so we don't populate additional-context.
-    def build_additional_context_references(submit_bundle, type, ig_version = 'v2.0.1')
-      return [] if ig_version == 'v2.2.0'
-
-      if type == 'full-resource' && submit_bundle.present? && submit_bundle.is_a?(FHIR::Bundle)
-        submit_bundle.entry.reject { |entry| entry.resource&.resourceType == 'ClaimResponse' }.map(&:fullUrl).compact
+    def determine_notification_focus(type, submit_response_bundle)
+      if type == 'full-resource' && submit_response_bundle.is_a?(FHIR::Bundle)
+        bundle_full_url = "urn:uuid:#{submit_response_bundle.id}"
+        [bundle_full_url, bundle_full_url]
       else
-        []
+        [claim_response_full_url_from_submit_response_bundle(submit_response_bundle), nil]
       end
     end
 
-    def determine_notification_focus(ig_version, type, claim_response_full_url)
-      if ig_version == 'v2.2.0' && type == 'full-resource'
-        inner_bundle_full_url = "urn:uuid:#{SecureRandom.uuid}"
-        [inner_bundle_full_url, inner_bundle_full_url]
-      else
-        [claim_response_full_url, nil]
-      end
-    end
-
-    def add_notification_entries(mock_notification_bundle, submit_bundle, type, decision, ig_version,
+    def add_notification_entries(mock_notification_bundle, submit_response_bundle, type, decision,
                                  subscription_reference, inner_bundle_full_url)
-      return unless type == 'full-resource' && submit_bundle.present? && submit_bundle.is_a?(FHIR::Bundle)
+      return unless type == 'full-resource' && submit_response_bundle.is_a?(FHIR::Bundle)
 
-      if ig_version == 'v2.2.0'
-        add_v220_notification_entries(mock_notification_bundle, submit_bundle, decision, inner_bundle_full_url)
-      else
-        fhir_base_url = extract_fhir_base_url(subscription_reference)
-        add_v201_notification_entries(mock_notification_bundle, submit_bundle, decision, fhir_base_url)
-      end
-    end
-
-    def add_v220_notification_entries(mock_notification_bundle, submit_bundle, decision, inner_bundle_full_url)
-      inner_bundle = FHIR::Bundle.new(
-        id: inner_bundle_full_url.delete_prefix('urn:uuid:'),
-        type: 'collection',
-        timestamp: Time.now.utc.iso8601,
-        identifier: FHIR::Identifier.new(system: 'urn:ietf:rfc:3986', value: "urn:uuid:#{SecureRandom.uuid}")
-      )
-
-      submit_bundle.entry.each do |entry|
-        prepare_v220_claim_response(entry.resource, decision) if entry.resource.resourceType == 'ClaimResponse'
-        inner_bundle.entry << entry
+      claim_response_entry = submit_response_bundle.entry.find { |e| e.resource&.resourceType == 'ClaimResponse' }
+      if claim_response_entry.present?
+        update_claim_response_decisions(claim_response_entry.resource, decision)
+        claim_response_entry.resource.outcome = 'complete'
       end
 
+      fhir_base_url = extract_fhir_base_url(subscription_reference)
       mock_notification_bundle.entry << FHIR::Bundle::Entry.new(
         fullUrl: inner_bundle_full_url,
-        resource: inner_bundle,
-        request: FHIR::Bundle::Entry::Request.new(method: 'POST', url: 'Bundle'),
+        resource: submit_response_bundle,
+        request: FHIR::Bundle::Entry::Request.new(method: 'POST', url: "#{fhir_base_url}/Bundle"),
         response: FHIR::Bundle::Entry::Response.new(status: '201')
       )
-    end
-
-    def prepare_v220_claim_response(claim_response, decision)
-      update_claim_response_decisions(claim_response, decision)
-      claim_response.outcome = 'complete'
-      return if claim_response.request.present?
-
-      claim_response.request = FHIR::Reference.new(reference: "urn:uuid:#{SecureRandom.uuid}")
-    end
-
-    def add_v201_notification_entries(mock_notification_bundle, submit_bundle, decision, fhir_base_url)
-      submit_bundle.entry.each do |entry|
-        update_claim_response_decisions(entry.resource, decision) if entry.resource.resourceType == 'ClaimResponse'
-        entry.request = FHIR::Bundle::Entry::Request.new(
-          method: 'POST',
-          url: "#{fhir_base_url}/#{entry.resource.resourceType}"
-        )
-        entry.response = FHIR::Bundle::Entry::Response.new(status: '201')
-        mock_notification_bundle.entry << entry
-      end
     end
 
     def update_claim_response_decisions(claim_response, decision)
@@ -259,7 +219,8 @@ module DaVinciPASTestKit
 
       root_url = extract_fhir_base_url(claim_full_url)
       mocked_claim_response = build_mock_claim_response(claim_entry.resource, request_bundle, root_url, operation,
-                                                        decision, timestamp, claim_response_uuid, claim_full_url)
+                                                        decision, timestamp, ig_version, claim_response_uuid,
+                                                        claim_full_url)
       build_mock_bundle(mocked_claim_response, request_bundle, root_url, operation, timestamp, ig_version)
     end
 
@@ -268,16 +229,16 @@ module DaVinciPASTestKit
     #
     # @private
     def build_mock_claim_response(claim, request_bundle, root_url, operation, decision, timestamp,
-                                  claim_response_uuid = nil, claim_full_url = nil)
+                                  ig_version = 'v2.0.1', claim_response_uuid = nil, claim_full_url = nil)
       claim_response_uuid = SecureRandom.uuid if claim_response_uuid.blank?
       return FHIR::ClaimResponse.new(id: claim_response_uuid) if claim.blank?
 
       FHIR::ClaimResponse.new(
         id: claim_response_uuid,
         meta: FHIR::Meta.new(profile: if operation == 'submit'
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse'
+                                        "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse|#{ig_version.delete('v')}"
                                       else
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'
+                                        "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|#{ig_version.delete('v')}"
                                       end),
         identifier: claim.identifier,
         type: claim.type,
@@ -336,9 +297,9 @@ module DaVinciPASTestKit
       response_bundle = FHIR::Bundle.new(
         id: SecureRandom.uuid,
         meta: FHIR::Meta.new(profile: if operation == 'submit'
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'
+                                        "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle|#{ig_version.delete('v')}"
                                       else
-                                        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle'
+                                        "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle|#{ig_version.delete('v')}"
                                       end),
         identifier: if ig_version == 'v2.2.0'
                       FHIR::Identifier.new(
@@ -492,10 +453,10 @@ module DaVinciPASTestKit
       url.sub(%r{/[^/]*/[^/]*(/)?\z}, '')
     end
 
-    def claim_response_full_url_from_submit_response_bundle(submit_bundle)
-      submit_bundle = submit_bundle.parameter[0] if submit_bundle.is_a?(FHIR::Parameters)
+    def claim_response_full_url_from_submit_response_bundle(submit_response_bundle)
+      submit_response_bundle = submit_response_bundle.parameter[0] if submit_response_bundle.is_a?(FHIR::Parameters)
 
-      claim_response_entry = submit_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
+      claim_response_entry = submit_response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
 
       if claim_response_entry.present?
         return claim_response_entry.fullUrl unless claim_response_entry.fullUrl.blank?
