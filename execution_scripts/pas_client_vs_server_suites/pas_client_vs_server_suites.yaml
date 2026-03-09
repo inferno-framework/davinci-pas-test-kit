@@ -1,12 +1,16 @@
 sessions:
   - suite_id: davinci_pas_client_suite_v201
     name: client
-    preset_id: pas-client-v220-run-against-pas-server-tests
+    preset_id: pas-client-v201-run-against-pas-server-tests
     suite_options:
       client_type: other_auth
   - suite_id: davinci_pas_server_suite_v201
     name: server
-    preset_id: pas-server-v220-run-against-pas-client-tests
+    preset_id: pas-server-v201-run-against-pas-client-tests
+
+normalized_strings:
+  - replacement: <UUID>
+    pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 
 steps:
   - state_description: client session created
@@ -158,7 +162,7 @@ steps:
     session: server
     status: waiting
     last_test: davinci_pas_server_suite_v201-Group02-pas_server_v201_pended_use_case-Group02-pas_server_v201_subscription_notification_wait_pended
-    command: NOOP
+    command: WAIT
     action_description: Continue waiting until it completes
 
   - state_description: Finished Server Group 2.3 Successful Pended Workflow
