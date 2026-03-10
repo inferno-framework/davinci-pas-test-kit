@@ -13,8 +13,9 @@ module DaVinciPASTestKit
       coverage of must support elements in both requests and responses. Any requests made during
       previous workflow tests will also be considered.
 
-      Testers may optionally provide lists of response bundles for Inferno to return when responding
-      to $submit and $inquire requests. For the nth request to a given operation during this test,
+      Because Inferno's mocked responses do not cover all must support elements, in order to pass
+      these tests testers will need to provide lists of response bundles for Inferno to return when
+      responding to $submit and $inquire requests. For the nth request to a given operation during this test,
       Inferno will respond with the nth provided response bundle. If no nth response is available,
       Inferno will generate a default response.
 

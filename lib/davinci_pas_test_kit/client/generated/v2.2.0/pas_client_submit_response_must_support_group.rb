@@ -7,6 +7,7 @@ require_relative 'insurer/client_submit_response_must_support_insurer_test'
 require_relative 'practitioner/client_submit_response_must_support_practitioner_test'
 require_relative 'practitioner_role/client_submit_response_must_support_practitioner_role_test'
 require_relative 'communication_request/client_submit_response_must_support_communication_request_test'
+require_relative '../../v2.2.0/workflows/pas_client_response_attest'
 
 module DaVinciPASTestKit
   module DaVinciPASV220
@@ -36,7 +37,7 @@ module DaVinciPASTestKit
         
       )
       run_as_group
-      
+
       test from: :pas_client_v220_submit_response_must_support_pas_response_bundle
       test from: :pas_client_v220_submit_response_must_support_claimresponse
       test from: :pas_client_v220_submit_response_must_support_task
@@ -46,6 +47,18 @@ module DaVinciPASTestKit
       test from: :pas_client_v220_submit_response_must_support_practitioner
       test from: :pas_client_v220_submit_response_must_support_practitioner_role
       test from: :pas_client_v220_submit_response_must_support_communication_request
+      test from: :pas_client_v220_response_attest,
+           title: 'Confirm that the client handled the $submit response must support elements (Attestation)',
+           description: %(
+             This test provides the tester an opportunity to verify that their client
+             correctly processed and used the must support elements present in the
+             $submit responses received from Inferno during these tests.
+           ),
+           config: { options: {
+             workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+             attest_message: "I attest that the client system correctly processed the must support elements " \
+                             "contained in the $submit responses received from Inferno."
+           } }
     end
   end
 end

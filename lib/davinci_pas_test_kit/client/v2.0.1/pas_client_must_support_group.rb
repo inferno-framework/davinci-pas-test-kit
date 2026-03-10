@@ -20,9 +20,10 @@ module DaVinciPASTestKit
           must support elements.
 
         Clients under test will be asked to make additional requests to Inferno demonstrating coverage
-        of all must support items in the requests. Testers may optionally provide response bundles
-        for Inferno to return, enabling verification that the client can handle responses containing
-        all must support elements.
+        of all must support items in the requests. Clients must also demonstrate that they can handle
+        all response must support elements. Because Inferno's mocked responses do not include all must
+        support elements, testers will need to provide responses that include examples of all must
+        support elements for Inferno to respond with.
 
         Note that Inferno will consider requests made during the workflow group of tests, so only
         profiles and must support elements not demonstrated during those tests need to be submitted

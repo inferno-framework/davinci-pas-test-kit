@@ -1,6 +1,7 @@
 <%- profile_test_files.each do |file_name| -%>
 require_relative '<%= file_name %>'
 <%- end -%>
+require_relative '../../<%= ig_version %>/workflows/pas_client_response_attest'
 
 module DaVinciPASTestKit
   module <%= module_name %>
@@ -11,10 +12,22 @@ module DaVinciPASTestKit
         <%= description.gsub("\n", "\n" + " "*8) %>
       )
       run_as_group
-      
+
       <%- profile_test_ids.each do |id| -%>
       test from: :<%= id %>
       <%- end -%>
+      test from: :pas_client_<%= ig_version_for_id %>_response_attest,
+           title: 'Confirm that the client handled the $<%= operation %> response must support elements (Attestation)',
+           description: %(
+             This test provides the tester an opportunity to verify that their client
+             correctly processed and used the must support elements present in the
+             $<%= operation %> responses received from Inferno during these tests.
+           ),
+           config: { options: {
+             workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+             attest_message: "I attest that the client system correctly processed the must support elements " \
+                             "contained in the $<%= operation %> responses received from Inferno."
+           } }
     end
   end
 end
