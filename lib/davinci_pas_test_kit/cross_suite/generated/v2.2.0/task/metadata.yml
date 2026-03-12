@@ -229,5 +229,9 @@
 :tests:
 - :id: pas_server_v220_submit_response_must_support_task
   :file_name: server_submit_response_must_support_task_test.rb
+- :id: pas_client_v220_submit_response_must_support_task
+  :file_name: client_submit_response_must_support_task_test.rb
 - :id: pas_server_v220_inquire_response_must_support_task
   :file_name: server_inquire_response_must_support_task_test.rb
+- :id: pas_client_v220_inquire_response_must_support_task
+  :file_name: client_inquire_response_must_support_task_test.rb

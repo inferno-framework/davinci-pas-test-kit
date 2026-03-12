@@ -1,83 +1,59 @@
-require_relative '../../../cross_suite/must_support/must_support_request_type_test'
+require_relative '../generated/v2.0.1/pas_client_submit_must_support_group'
+require_relative '../generated/v2.0.1/pas_client_inquire_must_support_group'
+require_relative '../generated/v2.0.1/pas_client_submit_response_must_support_group'
+require_relative '../generated/v2.0.1/pas_client_inquire_response_must_support_group'
+require_relative 'must_support/pas_client_gather_must_support_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class PasClientMustSupportRequestProfilesTest < DaVinciPASTestKit::MustSupportRequestTypeTest
-      id :pas_client_v201_must_support_request_profiles
-      title %(
-        At least one instance of a request profile (PAS Medication Request, PAS Service Request,
-        PAS Device Request, or PAS Nutrition Order) is observed with all of its must support elements
-      )
+    class PASClientMustSupportGroup < Inferno::TestGroup
+      id :pas_client_v201_must_support
+      title 'Must Support Elements'
+      run_as_group
       description %(
-        The PAS IG includes four profiles for providing the specifics of the service or product requested
-        in the prior authorization request. Any one of these profiles can be referenced in
-        the must support element `Claim.item.extension:requestedService`:
+        During these tests, the client will show that it supports all PAS-defined profiles and the must support
+        elements defined in them. This includes
 
-        * PAS Medication Request
-        * PAS Service Request
-        * PAS Device Request
-        * PAS Nutrition Order
+        - The ability to make prior authorization submission and inquiry requests that contain all
+          PAS-defined profiles and their must support elements.
+        - The ability to receive in responses to those requests all PAS-defined profiles and their
+          must support elements.
 
-        System are allowed to support only the request profiles that fit their use cases. However,
-        they must support at least one of them (because `Claim.item.extension:requestedService` is a
-        must support element) and for any request profiles they support, they must be able to
-        populate all of the defined must support elements.
+        Clients under test will be asked to make additional requests to Inferno demonstrating coverage
+        of all must support items in the requests. Testers may optionally provide response bundles
+        for Inferno to return, enabling verification that the client can handle responses containing
+        all must support elements.Expand commentComment on lines R23 to R25Resolved
 
-        This test ensures that the submitted request bundles include at least one instance of a
-        profile listed above. Then for each profile observed, it checks for the presence of
-        each must support element defined in that profile.
-
-        The test will look through the instances included in submissions made by the client
-        for the following must support elements:
-
-        ### PAS Medication Request
-        * MedicationRequest.authoredOn
-        * MedicationRequest.dispenseRequest
-        * MedicationRequest.dispenseRequest.quantity
-        * MedicationRequest.dosageInstruction
-        * MedicationRequest.dosageInstruction.text
-        * MedicationRequest.dosageInstruction.timing
-        * MedicationRequest.encounter
-        * MedicationRequest.extension:coverage
-        * MedicationRequest.intent
-        * MedicationRequest.medication[x]
-        * MedicationRequest.reported[x]
-        * MedicationRequest.requester
-        * MedicationRequest.status
-        * MedicationRequest.subject
-
-        ### PAS Service Request
-        * ServiceRequest.code
-        * ServiceRequest.extension:coverage
-        * ServiceRequest.extension:serviceCodeEnd
-        * ServiceRequest.occurrence[x]
-        * ServiceRequest.quantity[x]
-        * ServiceRequest.subject
-
-        ### PAS Device Request
-        * DeviceRequest.code[x]
-        * DeviceRequest.extension:coverage
-        * DeviceRequest.occurrence[x]
-        * DeviceRequest.subject
-
-        ### PAS Nutrition Order
-        * NutritionOrder.enteralFormula
-        * NutritionOrder.enteralFormula.baseFormulaType
-        * NutritionOrder.extension:coverage
-        * NutritionOrder.oralDiet
-        * NutritionOrder.oralDiet.type
-        * NutritionOrder.patient
+        Note that Inferno will consider requests made during the workflow group of tests, so only
+        profiles and must support elements not demonstrated during those tests need to be submitted
+        as a part of these.
       )
 
-      config(
-        options: {
-          profile_keys: ['device_request', 'medication_request', 'nutrition_order', 'service_request'],
-          user_input_validation: false,
-          ig_version: 'v2.0.1',
-          type: 'request',
-          operation: 'submit'
-        }
-      )
+      # Combined receive group - single wait test for both submit and inquire
+      group do
+        id :pas_client_v201_must_support_receive
+        title 'Demonstrate Must Support Coverage'
+        description %(
+          Submit $submit and $inquire requests demonstrating coverage of must support elements.
+          Optionally, provide response bundles for Inferno to use when responding. Inferno will
+          verify both the requests received and the responses provided.
+        )
+        run_as_group
+
+        test from: :pas_client_v201_gather_must_support
+      end
+
+      # $submit Request Must Support (fail when errors detected)
+      group from: :pas_client_v201_submit_must_support
+
+      # $submit Response Must Support (skip when errors detected)
+      group from: :pas_client_v201_submit_response_must_support
+
+      # $inquire Request Must Support (fail when errors detected)
+      group from: :pas_client_v201_inquire_must_support
+
+      # $inquire Response Must Support (skip when errors detected)
+      group from: :pas_client_v201_inquire_response_must_support
     end
   end
 end

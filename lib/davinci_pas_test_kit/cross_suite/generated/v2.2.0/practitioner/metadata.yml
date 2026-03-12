@@ -93,9 +93,13 @@
   :file_name: client_submit_request_must_support_practitioner_test.rb
 - :id: pas_server_v220_submit_response_must_support_practitioner
   :file_name: server_submit_response_must_support_practitioner_test.rb
-- :id: pas_server_v220_inquire_request_must_support_practitioner
-  :file_name: server_inquire_request_must_support_practitioner_test.rb
-- :id: pas_client_v220_inquire_request_must_support_practitioner
-  :file_name: client_inquire_request_must_support_practitioner_test.rb
-- :id: pas_server_v220_inquire_response_must_support_practitioner
-  :file_name: server_inquire_response_must_support_practitioner_test.rb
+- :id: pas_client_v220_submit_response_must_support_practitioner_role
+  :file_name: client_submit_response_must_support_practitioner_role_test.rb
+- :id: pas_server_v220_inquire_request_must_support_practitioner_role
+  :file_name: server_inquire_request_must_support_practitioner_role_test.rb
+- :id: pas_client_v220_inquire_request_must_support_practitioner_role
+  :file_name: client_inquire_request_must_support_practitioner_role_test.rb
+- :id: pas_server_v220_inquire_response_must_support_practitioner_role
+  :file_name: server_inquire_response_must_support_practitioner_role_test.rb
+- :id: pas_client_v220_inquire_response_must_support_practitioner_role
+  :file_name: client_inquire_response_must_support_practitioner_role_test.rb

@@ -63,3 +63,5 @@
 :tests:
 - :id: pas_server_v201_submit_response_must_support_pas_response_bundle
   :file_name: server_submit_response_must_support_pas_response_bundle_test.rb
+  :id: pas_client_v201_submit_response_must_support_pas_response_bundle
+  :file_name: client_submit_response_must_support_pas_response_bundle_test.rb

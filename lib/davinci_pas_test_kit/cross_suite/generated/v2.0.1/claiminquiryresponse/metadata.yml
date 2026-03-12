@@ -320,3 +320,5 @@
 :tests:
 - :id: pas_server_v201_inquire_response_must_support_claiminquiryresponse
   :file_name: server_inquire_response_must_support_claiminquiryresponse_test.rb
+  :id: pas_client_v201_inquire_response_must_support_claiminquiryresponse
+  :file_name: client_inquire_response_must_support_claiminquiryresponse_test.rb

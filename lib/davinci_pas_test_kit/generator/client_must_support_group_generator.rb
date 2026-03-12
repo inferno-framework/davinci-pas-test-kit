@@ -11,25 +11,39 @@ module DaVinciPASTestKit
           end
           new(ig_metadata, 'submit', submit_request_profiles, base_client_output_dir).generate
 
+           submit_response_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportTargetProfiles.submit_response_profile?(profile)
+          end
+          new(ig_metadata, 'submit', submit_response_profiles, base_client_output_dir, 'response').generate
+
           inquire_request_profiles = ig_metadata.profiles.select do |profile|
             MustSupportTargetProfiles.inquire_request_profile?(profile)
           end
           new(ig_metadata, 'inquire', inquire_request_profiles, base_client_output_dir).generate
+
+          inquire_response_profiles = ig_metadata.profiles.select do |profile|
+            MustSupportTargetProfiles.inquire_response_profile?(profile)
+          end
+          new(ig_metadata, 'inquire', inquire_response_profiles, base_client_output_dir, 'response').generate
         end
       end
 
       attr_accessor :ig_metadata, :operation, :profiles, :base_output_dir, :type
 
-      def initialize(ig_metadata, operation, profiles, base_output_dir)
+      def initialize(ig_metadata, operation, profiles, base_output_dir, type = 'request')
         self.ig_metadata = ig_metadata
         self.operation = operation
         self.profiles = profiles
         self.base_output_dir = base_output_dir
-        self.type = 'request' # TODO: currently only request must supports checked for client. Add responses?
+        self.type = type 
       end
 
       def template
-        @template ||= File.read(File.join(__dir__, 'templates', 'client_must_support_group.rb.erb'))
+        @@template ||= File.read(File.join(__dir__, 'templates', template_file_name))
+      end
+
+      def template_file_name
+        type == 'response' ? 'client_must_support_response_group.rb.erb' : 'client_must_support_group.rb.erb'
       end
 
       def output
@@ -41,7 +55,11 @@ module DaVinciPASTestKit
       end
 
       def class_name
-        "PASClient#{operation.camelize}MustSupportGroup"
+        if type == 'response'
+          "PASClient#{operation.camelize}ResponseMustSupportGroup"
+        else
+          "PASClient#{operation.camelize}MustSupportGroup"
+        end
       end
 
       def module_name
@@ -49,9 +67,15 @@ module DaVinciPASTestKit
       end
 
       def title
-        return 'Submit Request Must Support' if operation == 'submit'
+        if type == 'response'
+          return 'Submit Response Must Support' if operation == 'submit'
 
-        'Inquiry Request Must Support'
+          'Inquiry Response Must Support'
+        else
+          return 'Submit Request Must Support' if operation == 'submit'
+          
+          'Inquiry Request Must Support'
+        end
       end
 
       def request_type
@@ -67,7 +91,11 @@ module DaVinciPASTestKit
       end
 
       def group_id
-        "pas_client_#{ig_version_for_id}_#{operation}_must_support"
+        if type == 'response'
+          "pas_client_#{ig_version_for_id}_#{operation}_response_must_support"
+        else
+          "pas_client_#{ig_version_for_id}_#{operation}_must_support"
+        end
       end
 
       def ig_version
@@ -110,30 +138,48 @@ module DaVinciPASTestKit
       end
 
       def profile_test_ids
-        required_profiles.map { |profile_metadata| test_id_for_profile(profile_metadata) }
+        target_profiles = type == 'response' ? profiles : required_profiles
+        target_profiles.map { |profile_metadata| test_id_for_profile(profile_metadata) }
       end
 
       def profile_test_files
-        required_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
+        target_profiles = type == 'response' ? profiles : required_profiles
+        target_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
       end
 
       def verifies_requirements
         case "#{operation}_#{ig_version}"
         when 'submit_v2.0.1'
-          ['hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62', 'hl7.fhir.us.davinci-pas_2.0.1@70',
-           'hl7.fhir.us.davinci-pas_2.0.1@202']
+          return nil if type == 'response'
+
+          ['hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
+           'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202']
         end
       end
 
       def description
-        <<~DESCRIPTION
-          Check that the client can demonstrate `$#{operation}` requests that contain
-          all PAS-defined profiles and their must support elements.
+        if type == 'response'
+          <<~DESCRIPTION
+            Check that `$#{operation}` responses provided to the client contain
+            all PAS-defined profiles and their must support elements.
 
-          For `$#{operation}` requests, this includes the following profiles:
+            **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
+            not the system under test. Errors will be treated as skips instead of failures.
 
-          #{Descriptions.profile_links_list(required_profiles, request_profiles:)}
-        DESCRIPTION
+            For `$#{operation}` responses, this includes the following profiles:
+
+             #{Descriptions.profile_links_list(profiles)}
+          DESCRIPTION
+        else
+          <<~DESCRIPTION
+            Check that the client can demonstrate `$#{operation}` requests that contain
+            all PAS-defined profiles and their must support elements.
+
+            For `$#{operation}` requests, this includes the following profiles:
+
+            #{Descriptions.profile_links_list(required_profiles, request_profiles: operation == 'submit' ? request_profiles : nil)}
+          DESCRIPTION
+        end          
       end
     end
   end

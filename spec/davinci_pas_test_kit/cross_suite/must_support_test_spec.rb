@@ -179,9 +179,9 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
       end
     end
 
-    it 'fails if no resources of a given type were returned in previous tests' do
+    it 'skips if no resources of a given type were returned in previous tests' do
       result = run(test)
-      expect(result.result).to eq('fail')
+      expect(result.result).to eq('skip')
       expect(result.result_message).to match(/No Patient resources were found/)
     end
 

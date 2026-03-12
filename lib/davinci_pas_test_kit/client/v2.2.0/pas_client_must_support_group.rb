@@ -1,11 +1,15 @@
 require_relative '../generated/v2.2.0/pas_client_submit_must_support_group'
 require_relative '../generated/v2.2.0/pas_client_inquire_must_support_group'
+require_relative '../generated/v2.2.0/pas_client_submit_response_must_support_group'
+require_relative '../generated/v2.2.0/pas_client_inquire_response_must_support_group'
+require_relative 'must_support/pas_client_gather_must_support_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV220
     class PASClientMustSupportGroup < Inferno::TestGroup
       id :pas_client_v220_must_support
       title 'Must Support Elements'
+      run_as_group
       description %(
         During these tests, the client will show that it supports all PAS-defined profiles and the must support
         elements defined in them. This includes
@@ -13,17 +17,43 @@ module DaVinciPASTestKit
         - The ability to make prior authorization submission and inquiry requests that contain all
           PAS-defined profiles and their must support elements.
         - The ability to receive in responses to those requests all PAS-defined profiles and their
-          must support elements and continue the prior authorization workflow as appropriate (not currently
-          implemented in these tests).
+          must support elements.
 
         Clients under test will be asked to make additional requests to Inferno demonstrating coverage
-        of all must support items in the requests. Note that Inferno will consider requests made during
-        the workflow group of tests, so only profiles and must support elements not demonstrated during
-        those tests need to be submitted as a part of these.
+        of all must support items in the requests. Testers may optionally provide response bundles
+        for Inferno to return, enabling verification that the client can handle responses containing
+        all must support elements.Expand commentComment on lines R23 to R25Resolved
+
+        Note that Inferno will consider requests made during the workflow group of tests, so only
+        profiles and must support elements not demonstrated during those tests need to be submitted
+        as a part of these.
       )
 
+      # Combined receive group - single wait test for both submit and inquire
+      group do
+        id :pas_client_v220_must_support_receive
+        title 'Demonstrate Must Support Coverage'
+        description %(
+          Submit $submit and $inquire requests demonstrating coverage of must support elements.
+          Optionally, provide response bundles for Inferno to use when responding. Inferno will
+          verify both the requests received and the responses provided.
+        )
+        run_as_group
+
+        test from: :pas_client_v220_gather_must_support
+      end
+
+      # $submit Request Must Support (fail when errors detected)
       group from: :pas_client_v220_submit_must_support
+
+      # $submit Response Must Support (skip when errors detected)
+      group from: :pas_client_v220_submit_response_must_support
+
+      # $inquire Request Must Support (fail when errors detected)
       group from: :pas_client_v220_inquire_must_support
+
+      # $inquire Response Must Support (skip when errors detected)
+      group from: :pas_client_v220_inquire_response_must_support
     end
   end
 end

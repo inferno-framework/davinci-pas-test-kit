@@ -1,4 +1,3 @@
-require_relative '../../<%= ig_version %>/must_support/pas_client_<%= operation %>_gather_must_support_test'
 <%- if operation == 'submit' -%>
 require_relative '../../<%= ig_version %>/must_support/pas_client_must_support_request_profiles_test'
 <%- end -%>
@@ -16,9 +15,6 @@ module DaVinciPASTestKit
       )
       run_as_group
       
-      test from: :pas_client_<%= ig_version_for_id %>_<%= operation %>_gather_must_support<% if verifies_requirements.present? %> do
-        verifies_requirements '<%= verifies_requirements.join("', '") %>'
-      end<% end %>
       <%- if operation == 'submit' -%>
       test from: :pas_client_<%= ig_version_for_id %>_must_support_request_profiles
       <%- end -%>
