@@ -1,0 +1,37 @@
+sessions:
+  - suite: davinci_pas_client_suite_v201
+    preset: pas-client-v201-must-support-responses
+    suite_options:
+      client_type: other_auth
+
+steps:
+  - state_description: client session created
+    status: created
+    start_run:
+      runnable: 10
+    action_description: Run Must Support Elements
+
+  - state_description: wait at Must Support request and response gathering
+    status: waiting
+    last_completed: "10.1.01"
+    command: "./execution_scripts/pas_client_must_support/send_must_support_requests.sh davinci_pas_client_suite_v201 ./config/presets/pas_server_v201_run_against_pas_client.json.erb demo_execution"
+    timeout: 120
+    action_description: Send Must Support $submit and $inquire requests and continue the wait
+
+  - state_description: wait at $submit response handling attestation
+    status: waiting
+    last_completed: "10.3.10"
+    command: "curl --fail --silent -o /dev/null 'http://localhost:4567/custom/davinci_pas_client_suite_v201/resume_pass?token={session_id}'"
+    action_description: Attest that the client handled the $submit response Must Support elements
+
+  - state_description: wait at $inquire response handling attestation
+    status: waiting
+    last_completed: "10.5.09"
+    command: "curl --fail --silent -o /dev/null 'http://localhost:4567/custom/davinci_pas_client_suite_v201/resume_pass?token={session_id}'"
+    action_description: Attest that the client handled the $inquire response Must Support elements
+
+  - state_description: Must Support execution completed
+    status: done
+    last_completed: "10"
+    action: END_SCRIPT
+    action_description: Complete the script
