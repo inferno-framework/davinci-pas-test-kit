@@ -1,5 +1,4 @@
 require_relative 'davinci_pas_test_kit/metadata'
-require_relative 'davinci_pas_test_kit/inferno_bundle_entry_slice_patch'
 require_relative 'davinci_pas_test_kit/client/v2.0.1/client_suite'
 require_relative 'davinci_pas_test_kit/client/v2.2.0/client_suite'
 require_relative 'davinci_pas_test_kit/server/generated/v2.0.1/server_suite'
