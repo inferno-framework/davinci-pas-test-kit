@@ -56,11 +56,14 @@ module DaVinciPASTestKit
             this list. If not provided or if the list is exhausted, Inferno will generate a default response.
           )
     config options: { accepts_multiple_requests: true }
+    output :confirmation_url
 
     run do
       wait_identifier = session_wait_identifier(client_id, session_url_path)
       submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
       inquire_endpoint = session_endpont_url(:inquire, client_id, session_url_path)
+      confirmation_url = "#{resume_pass_url}?token=#{wait_identifier}"
+      output(confirmation_url:)
 
       wait(
         identifier: wait_identifier,
@@ -109,7 +112,7 @@ module DaVinciPASTestKit
 
           `#{inquire_endpoint}`
 
-          and [click here](#{resume_pass_url}?token=#{wait_identifier}) when done.
+          and [click here](#{confirmation_url}) when done.
         )
       )
     end
