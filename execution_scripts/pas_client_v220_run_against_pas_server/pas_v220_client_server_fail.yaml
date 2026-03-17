@@ -26,14 +26,14 @@ steps:
     session: client
     status: waiting
     last_completed: 1.06
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
     action_description: GET the attestation URL
 
   - state_description: Wait at Client test 1.07 (confirm configuration)
     session: client
     status: waiting
     last_completed: 1.07
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.confirmation_url}'"
     action_description: GET the confirmation URL
 
   - state_description: Finished Client Group 1 Client Registration
@@ -103,7 +103,7 @@ steps:
     session: client
     status: waiting
     last_completed: 9.1.04
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
     action_description: GET attestation URL
 
   - state_description: Finished Client Group 9.1 Approval Workflow
@@ -137,7 +137,7 @@ steps:
     session: client
     status: waiting
     last_completed: 9.2.04
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
     action_description: GET attestation URL
 
   - state_description: Finished Client Group 9.2 Denial Workflow
@@ -171,7 +171,7 @@ steps:
     session: server
     status: done
     last_completed: 2.3
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{client.wait_outputs.confirmation_url}'"
     next_poll_session: client
     action_description: confirm in Client session that all requests have been sent
 
@@ -179,14 +179,14 @@ steps:
     session: client
     status: waiting
     last_completed: 9.3.2.03
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
     action_description: GET attestation URL
 
   - state_description: Wait at Client test 9.3.4.01 (attestation)
     session: client
     status: waiting
     last_completed: 9.3.4.01
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
     action_description: GET attestation URL
 
   - state_description: Finished Client Group 9.3 Pended Workflow
@@ -223,7 +223,7 @@ steps:
     session: server
     status: done
     last_completed: 4
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{client.wait_outputs.confirmation_url}'"
     next_poll_session: client
     action_description: confirm in Client session that all requests have been sent
 
@@ -231,7 +231,7 @@ steps:
     session: client
     status: waiting
     last_completed: 10.2.01
-    command: "curl -o /dev/null -s '{inferno_base_url}/custom/davinci_pas_client_suite_v220/resume_pass?token={client.session_id}'"
+    command: "curl -o /dev/null -s '{wait_outputs.confirmation_url}'"
     action_description: confirm in Client session that all requests have been sent
 
   - state_description: Finished Client Group 10 Must Support Elements

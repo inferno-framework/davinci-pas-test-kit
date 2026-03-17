@@ -79,6 +79,7 @@ module DaVinciPASTestKit
             description: INPUT_SESSION_URL_PATH_LOCKED
 
       submit_respond_with :pended_json_response
+      output :confirmation_url
 
       run do
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
@@ -112,6 +113,8 @@ module DaVinciPASTestKit
 
         wait_identifier = session_wait_identifier(client_id, session_url_path)
         submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
+        confirmation_url = "#{resume_pass_url}?token=#{wait_identifier}"
+        output(confirmation_url:)
 
         wait(
           identifier: wait_identifier,
@@ -140,7 +143,7 @@ module DaVinciPASTestKit
             to be able to faithfully answer the attestations.
 
             Once the client has completed these steps,
-            [click here to complete the test](#{resume_pass_url}?token=#{wait_identifier})
+            [click here to complete the test](#{confirmation_url})
             and continue Inferno's evaluation of the interaction.
           )
         )
