@@ -18,7 +18,7 @@ module DaVinciPASTestKit
         all PAS-defined profiles and their must support elements.
         
         **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
-        not the system under test. Errors will be treated as skips instead of failures.
+        not the system under test. Errors will be treated as warnings instead of failures.
         
         For `$inquire` responses, this includes the following profiles:
         

@@ -45,6 +45,10 @@ module DaVinciPASTestKit
         config.options[:workflow_tag]
       end
 
+      def warnings_only_validation?
+        workflow_tag == MUST_SUPPORT_WORKFLOW_TAG
+      end
+
       run do
         if workflow_tag.present?
           load_tagged_requests(request_type_tag, workflow_tag)
@@ -59,6 +63,7 @@ module DaVinciPASTestKit
           '2.2.0',
           'inquire',
           'request_bundle',
+          warnings_only: warnings_only_validation?,
           message: 'The Bundle provided for the Claim/$inquire operation is invalid:'
         )
       end

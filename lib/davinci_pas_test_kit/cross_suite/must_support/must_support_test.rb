@@ -35,6 +35,12 @@ module DaVinciPASTestKit
       config.options[:operation]
     end
 
+    def response_user_input_validation?
+      return false unless user_input_validation
+
+      type.to_s == 'response' || id.to_s.include?('response_must_support')
+    end
+
     def type_of_interest?(type)
       type == resource_type
     end
@@ -45,7 +51,11 @@ module DaVinciPASTestKit
 
     run do
       if user_input_validation
-        skip_if resources_of_interest.blank?, "No #{resource_type} resources were found"
+        if response_user_input_validation?
+          warning "No #{resource_type} resources were found" if resources_of_interest.blank?
+        else
+          skip_if resources_of_interest.blank?, "No #{resource_type} resources were found"
+        end
       else
         assert resources_of_interest.present?, "No #{resource_type} resources were found"
       end
@@ -54,7 +64,9 @@ module DaVinciPASTestKit
 
       if missing_must_support_strings.present?
         message = error_message(missing_must_support_strings, resources_of_interest, resource_type)
-        if user_input_validation
+        if response_user_input_validation?
+          warning message
+        elsif user_input_validation
           skip_if true, message
         else
           assert false, message
