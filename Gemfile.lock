@@ -1,8 +1,16 @@
+GIT
+  remote: https://github.com/inferno-framework/subscriptions-test-kit
+  revision: b371215d4fdbf93a2852b4723b97107b0592b9e4
+  branch: wait-outputs-for-scripting
+  specs:
+    subscriptions_test_kit (0.12.0)
+      inferno_core (~> 1.0, >= 1.0.2)
+
 PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.14.0)
-      inferno_core (~> 1.0, >= 1.0.2)
+      inferno_core (~> 1.1)
       smart_app_launch_test_kit (~> 1.0)
       subscriptions_test_kit (~> 0.12.0)
       udap_security_test_kit (~> 0.12.0)
@@ -143,7 +151,7 @@ GEM
       mutex_m
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    inferno_core (1.0.3)
+    inferno_core (1.1.0)
       activesupport (~> 6.1.7.5)
       base62-rb (= 0.3.1)
       blueprinter (= 0.25.2)
@@ -174,7 +182,7 @@ GEM
       sequel (~> 5.42.0)
       sidekiq (~> 7.2.4)
       sqlite3 (~> 1.4)
-      thor (~> 1.2.1)
+      thor (~> 1.4)
       tty-markdown (~> 0.7.1)
     io-console (0.8.0)
     irb (1.15.2)
@@ -339,9 +347,7 @@ GEM
       unicode-display_width (>= 1.5, < 3.0)
       unicode_utils (~> 1.4)
     strings-ansi (0.2.0)
-    subscriptions_test_kit (0.12.0)
-      inferno_core (~> 1.0, >= 1.0.2)
-    thor (1.2.2)
+    thor (1.5.0)
     tilt (2.6.1)
     tls_test_kit (1.0.0)
       inferno_core (~> 1.0, >= 1.0.2)
@@ -391,6 +397,7 @@ DEPENDENCIES
   rubocop
   rubocop-rake (~> 0.6.0)
   rubocop-rspec
+  subscriptions_test_kit!
   webmock (~> 3.11)
 
 BUNDLED WITH
