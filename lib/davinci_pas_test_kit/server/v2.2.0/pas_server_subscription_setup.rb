@@ -18,6 +18,7 @@ module DaVinciPASTestKit
       test from: :pas_server_v220_subscription_input_conformance do
         input :subscription_resource,
               title: 'Pended Prior Authorization Subscription',
+              type: 'textarea',
               description: %(
                      A Subscription resource in JSON format that Inferno will send to the server under test so that it
                      can demonstrate its ability to notify Inferno when pended prior authorization requests have been
