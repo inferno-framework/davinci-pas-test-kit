@@ -9,7 +9,8 @@ sessions:
     name: server
     preset: pas-server-v220-run-against-pas-client-passing-tests
 
-normalized_strings:
+comparison_config:
+  normalized_strings:
   - replacement: <UUID>
     pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 

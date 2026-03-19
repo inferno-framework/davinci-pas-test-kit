@@ -67,7 +67,7 @@ module DaVinciPASTestKit
         title 'Verify notification interaction'
 
         test from: :subscriptions_r4_client_notification_input_verification,
-             title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle is conformant',
+             title: '[USER INPUT VERIFICATION] Inferno\'s event notification Bundle is conformant',
              description: %(
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
@@ -80,7 +80,7 @@ module DaVinciPASTestKit
                }
              }
         test from: :subscriptions_r4_client_notification_input_payload_verification,
-             title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle matches the Subscription',
+             title: '[USER INPUT VERIFICATION] Inferno\'s event notification Bundle matches the Subscription',
              description: %(
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
@@ -92,7 +92,8 @@ module DaVinciPASTestKit
                  notification_bundle: { optional: true } # doesn't use the input (bug in Subscriptions)
                }
              }
-        test from: :pas_notification_pas_conformance_test
+        test from: :pas_notification_pas_conformance_test,
+             title: '[USER INPUT VERIFICATION] Inferno\'s Notification conforms to PAS-specific requirements'
         test from: :subscriptions_r4_client_event_notification_verification,
              title: 'Client accepts the "claim updated" event notification',
              description: %(
