@@ -15,9 +15,10 @@ module DaVinciPASTestKit
       input_order :server_endpoint, :smart_credentials, :access_token, :subscription_resource
       run_as_group
 
-      test from: :subscriptions_r4_server_subscription_conformance do
+      test from: :pas_server_v220_subscription_input_conformance do
         input :subscription_resource,
               title: 'Pended Prior Authorization Subscription',
+              type: 'textarea',
               description: %(
                      A Subscription resource in JSON format that Inferno will send to the server under test so that it
                      can demonstrate its ability to notify Inferno when pended prior authorization requests have been
@@ -25,7 +26,6 @@ module DaVinciPASTestKit
                      modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
                    )
       end
-      test from: :pas_server_v220_subscription_input_conformance
       test from: :subscriptions_r4_server_notification_delivery,
            title: 'Send Subscription and Receive Handshake Notification from Server',
            description: %(

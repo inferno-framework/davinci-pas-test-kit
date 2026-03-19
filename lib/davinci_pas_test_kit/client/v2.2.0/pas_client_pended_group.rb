@@ -1,9 +1,8 @@
 require_relative 'workflows/pas_client_pended_submit_test'
 require_relative 'workflows/pas_client_response_attest'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
-require_relative 'workflows/pas_client_inquire_response_bundle_validation_test'
 require_relative 'workflows/pas_client_request_bundle_validation_test'
-require_relative 'workflows/pas_client_inquire_request_bundle_validation_test'
+require_relative '../../pas_notification_conformance_test'
 require_relative '../user_input_response'
 require_relative '../../cross_suite/tags'
 
@@ -16,16 +15,15 @@ module DaVinciPASTestKit
       description %(
         During these tests, the client will initiate a prior authorization
         request and show it can respond appropriately to a 'pended' decision, including
-        waiting for a notification that an update has been made
-        and making an inquiry request to retrieve the final result.
+        waiting for a full-resource notification that contains the final decision.
+        In v2.2.0, the notification includes all details so no follow-up `$inquire`
+        request is needed.
       )
       run_as_group
 
       input :pended_json_response, optional: true
-      input :inquire_json_response, optional: true
 
       input_order :pended_json_response,
-                  :inquire_json_response,
                   :client_id,
                   :session_url_path
 
@@ -36,9 +34,8 @@ module DaVinciPASTestKit
           between Inferno and the client under test will be performed during this test
           including
           - A `$submit` request from the client to Inferno where Inferno returns a pended response.
-          - A notification that the prior authorization decision has been finalized from Inferno
-            to the client under test.
-          - An `$inquire` request from the client to Inferno where Inferno returns an approved response.
+          - A full-resource notification that the prior authorization decision has been finalized
+            from Inferno to the client under test.
         )
 
         test from: :pas_client_v220_pended_submit_test
@@ -70,7 +67,7 @@ module DaVinciPASTestKit
         title 'Verify notification interaction'
 
         test from: :subscriptions_r4_client_notification_input_verification,
-             title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle is conformant',
+             title: '[USER INPUT VERIFICATION] Inferno\'s event notification Bundle is conformant',
              description: %(
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
@@ -83,7 +80,7 @@ module DaVinciPASTestKit
                }
              }
         test from: :subscriptions_r4_client_notification_input_payload_verification,
-             title: '[USER INPUT VERIFICATION] Tester-provided event notification Bundle matches the Subscription',
+             title: '[USER INPUT VERIFICATION] Inferno\'s event notification Bundle matches the Subscription',
              description: %(
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
@@ -95,9 +92,8 @@ module DaVinciPASTestKit
                  notification_bundle: { optional: true } # doesn't use the input (bug in Subscriptions)
                }
              }
-        # test for PAS-specific requirements? Current decision: no, there isn't anything hard in the spec
-        # and testers have to demonstrate and attest that their systems work, which will require some
-        # correspondence.
+        test from: :pas_notification_pas_conformance_test,
+             title: '[USER INPUT VERIFICATION] Inferno\'s Notification conforms to PAS-specific requirements'
         test from: :subscriptions_r4_client_event_notification_verification,
              title: 'Client accepts the "claim updated" event notification',
              description: %(
@@ -106,22 +102,21 @@ module DaVinciPASTestKit
       end
 
       group do
-        title 'Verify $inquire interaction'
+        title 'Verify final decision from notification'
 
-        test from: :pas_client_v220_inquire_request_bundle_validation_test,
-             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v220_inquire_response_bundle_validation_test,
-             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v220_response_attest,
-             title: 'Check that the client registers the request as approved (Attestation)',
+             title: 'Check that the client processes the full-resource notification ' \
+                    'with the final decision (Attestation)',
              description: %(
               This test provides the tester an opportunity to observe their client following
-              the receipt of the inquiry response with a final decision and attest that users
-              are able to determine that the response has been approved in full.
+              the receipt of the full-resource notification containing the final decision and attest
+              that users are able to determine that the request has been approved.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
+               attest_message: "I attest that the client system displays the submitted claim as 'approved' based " \
+                               'on the full-resource notification, meaning that the user can proceed with ' \
+                               'ordering or providing the requested service.'
              } }
       end
     end

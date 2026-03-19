@@ -75,7 +75,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         notification_verification(notification_bundle_string, 'event-notification',
                                   subscription_id: subscription_url.split('/').last, status:)
         if notification_type == 'full-resource'
-          full_resource_event_notification_verification(notification_bundle_string, 'ClaimResponse')
+          full_resource_event_notification_verification(notification_bundle_string, 'Bundle')
         else
           id_only_event_notification_verification(notification_bundle_string, 'ClaimResponse')
         end
@@ -108,7 +108,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
           nil
         )
 
-        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse'
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse|2.0.1'
         returned_bundle = FHIR.from_contents(returned_response_string)
         expect(returned_bundle).to be_a(FHIR::Bundle)
         claim_response = returned_bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
@@ -125,7 +125,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
           # No ig_version = defaults to v2.0.1
         )
 
-        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|2.0.1'
         returned_bundle = FHIR.from_contents(returned_response_string)
         expect(returned_bundle).to be_a(FHIR::Bundle)
         claim_response = returned_bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
@@ -155,7 +155,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         bundle = return_param.resource
         claim_response = bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
         expect(claim_response).to_not be_nil
-        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|2.2.0'
         expect(claim_response.meta&.profile&.find { |profile| profile == claim_response_profile }).to_not be_nil
       end
 

@@ -15,7 +15,6 @@ module DaVinciPASTestKit
       run_as_group
 
       test from: :pas_client_v220_subscription_create_test
-      test from: :subscriptions_r4_client_subscription_verification
       test from: :pas_client_subscription_pas_conformance_test,
            config: { options: { ig_version: 'v2.2.0' } }
       test from: :subscriptions_r4_client_handshake_notification_verification

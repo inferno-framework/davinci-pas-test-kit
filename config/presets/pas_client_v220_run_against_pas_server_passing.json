@@ -1,6 +1,6 @@
 {
-  "title": "Run Against the PAS Server Suite",
-  "id": "pas-client-v220-run-against-pas-server-tests",
+  "title": "Run Against the PAS Server Suite (Passing)",
+  "id": "pas-client-v220-run-against-pas-server-passing-tests",
   "test_suite_id": "davinci_pas_client_suite_v220",
   "inputs": [
     {
@@ -9,7 +9,7 @@
       "optional": true,
       "title": "Session-specific URL path extension",
       "type": "text",
-      "value": "demo_execution"
+      "value": "passing_execution"
     },
     {
       "name": "client_endpoint_access_token",
@@ -17,7 +17,7 @@
       "optional": true,
       "title": "Client Notification Access Token",
       "type": "text",
-      "value": "demo_execution"
+      "value": "passing_execution"
     },
     {
       "name": "denial_json_response",

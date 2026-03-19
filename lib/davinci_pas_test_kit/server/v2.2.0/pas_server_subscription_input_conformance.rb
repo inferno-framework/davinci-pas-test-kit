@@ -4,31 +4,41 @@ module DaVinciPASTestKit
   module DaVinciPASV220
     class PASServerSubscriptionInputConformance < Inferno::Test
       include PASSubscriptionVerification
+      include SubscriptionsTestKit::SubscriptionConformanceVerification
       id :pas_server_v220_subscription_input_conformance
       title '[USER INPUT VERIFICATION] Verify Subscription PAS conformance'
       description %(
         This test accepts a Subscription resource as an input and verifies that it is conformant to PAS requirements on
         the Subscriptions, including:
-        - The payload content type must be `id-only`
-        - The use of the [PAS-defined Subscription
-          Topic](https://hl7.org/fhir/us/davinci-pas/STU2/SubscriptionTopic-PASSubscriptionTopic.html), and
+        - The payload content type must be `full-resource`
+        - Conformance to the [PAS Subscription
+          profile](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscription)
+        - The channel type is `rest-hook`
         - Inclusion of filter criteria for the client's organization.
       )
       input :subscription_resource
+      input :access_token,
+            title: 'Notification Access Token',
+            description: %(
+              An access token that the server under test will send to Inferno on notifications
+              so that the request gets associated with this test session. The token must be
+              provided as a `Bearer` token in the `Authorization` header of HTTP requests
+              sent to Inferno.
+            )
+
+      output :updated_subscription
 
       run do
         omit_if subscription_resource.blank?, 'Did not input a Subscription resource of this type.'
-        verify_pas_subscription(subscription_resource)
 
+        assert_valid_json(subscription_resource)
         subscription = JSON.parse(subscription_resource)
-        payload_ext = subscription.dig('channel', '_payload', 'extension')
-        content_ext = payload_ext&.find do |ext|
-          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
-        end
+        server_check_channel(subscription, access_token)
 
-        payload_content = content_ext&.dig('valueCode')
-        assert payload_content == 'id-only',
-               "PAS Subscription payload content type is #{payload_content}, but must be id-only"
+        updated_subscription = subscription.to_json
+        output(updated_subscription:)
+
+        verify_pas_subscription(updated_subscription, ig_version: 'v2.2.0')
       end
     end
   end

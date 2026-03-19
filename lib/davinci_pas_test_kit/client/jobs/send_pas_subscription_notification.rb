@@ -16,10 +16,12 @@ module DaVinciPASTestKit
         @notification_suite_id
       end
 
+      attr_reader :ig_version
+
       sidekiq_options retry: false
 
       def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token,
-                  notification_suite_id)
+                  notification_suite_id, ig_version = 'v2.0.1')
         @test_run_id = test_run_id
         @test_session_id = test_session_id
         @result_id = result_id
@@ -27,6 +29,7 @@ module DaVinciPASTestKit
         @notification_json = notification_json
         @resume_token = resume_token
         @notification_suite_id = notification_suite_id
+        @ig_version = ig_version
 
         await_subscription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
         sleep 1
@@ -100,7 +103,8 @@ module DaVinciPASTestKit
       end
 
       def send_event_notification
-        event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic, 1).to_json
+        event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
+                                               1).to_json
         response = send_notification(event_json)
         persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
       end
@@ -111,7 +115,8 @@ module DaVinciPASTestKit
         # Warning: This is a hack. If there is an error with the request such that we never get a response, we have
         #          no clean way to persist that information for the Inferno test to check later. The solution here
         #          is to persist the request anyway with a status of nil, using the error message as response body
-        Faraday::Response.new(response_body: e.message, url: rest_hook_connection.url_prefix.to_s)
+        Faraday::Response.new(response_body: e.message, url: rest_hook_connection.url_prefix.to_s,
+                              request_body:, request_headers: headers)
       end
 
       def persist_notification_request(response, tags)
