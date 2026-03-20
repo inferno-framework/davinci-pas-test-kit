@@ -61,19 +61,13 @@ module DaVinciPASTestKit
           :denial_json_response
         when PENDED_WORKFLOW_TAG
           :pended_json_response
-        when MUST_SUPPORT_WORKFLOW_TAG
-          :ms_submit_responses
         end
-      end
-
-      def warnings_only_validation?
-        workflow_tag == MUST_SUPPORT_WORKFLOW_TAG
       end
 
       run do
         load_tagged_requests(workflow_tag, SUBMIT_TAG)
         skip_if requests.empty?, 'No responses to verify because no submit requests were made.'
-        message = if target_user_input && user_inputted_response?(target_user_input)
+        message = if user_inputted_response? target_user_input
                     "Invalid response generated from provided input '#{input_title(target_user_input)}':"
                   else
                     'Invalid response generated from the submitted claim:'
@@ -85,8 +79,7 @@ module DaVinciPASTestKit
           '2.2.0',
           request_type,
           'response_bundle',
-          skips: !warnings_only_validation?,
-          warnings_only: warnings_only_validation?,
+          skips: true,
           message:
         )
       end

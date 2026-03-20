@@ -99,30 +99,6 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     end
   end
 
-  describe 'when PAS response bundle with user input validation' do
-    let(:test) do
-      Class.new(described_class) do
-        config(
-          options: {
-            resource_type: 'Bundle',
-            profile_key: 'pas_response_bundle',
-            user_input_validation: true,
-            ig_version: 'v2.0.1',
-            type: 'response',
-            operation: 'submit'
-          }
-        )
-      end
-    end
-
-    it 'passes with warnings if the response bundle does not contain all the must support elements' do
-      create_submit_request('', FHIR::Bundle.new.to_json, [DaVinciPASTestKit::SUBMIT_TAG])
-
-      result = run(test)
-      expect(result.result).to eq('pass')
-    end
-  end
-
   describe 'when PAS inquiry request bundle' do
     let(:test) do
       Class.new(described_class) do
@@ -184,30 +160,6 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(/Could not find/)
-    end
-  end
-
-  describe 'when PAS inquiry response bundle with user input validation' do
-    let(:test) do
-      Class.new(described_class) do
-        config(
-          options: {
-            resource_type: 'Bundle',
-            profile_key: 'pas_inquiry_response_bundle',
-            user_input_validation: true,
-            ig_version: 'v2.0.1',
-            type: 'response',
-            operation: 'inquire'
-          }
-        )
-      end
-    end
-
-    it 'passes with warnings if the response bundle does not contain all the must support elements' do
-      create_inquire_request('', FHIR::Bundle.new.to_json, [DaVinciPASTestKit::INQUIRE_TAG])
-
-      result = run(test)
-      expect(result.result).to eq('pass')
     end
   end
 

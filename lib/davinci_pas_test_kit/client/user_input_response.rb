@@ -31,14 +31,11 @@ module DaVinciPASTestKit
     end
 
     def user_inputted_response?(input_key)
-      return false if input_key.blank?
-      return false unless respond_to?(input_key)
-
-      public_send(input_key).present?
+      send(input_key).present?
     end
 
     def input_title(input_key)
-      config.inputs[input_key]&.title || config.inputs[input_key]&.name || input_key.to_s
+      config.inputs[input_key]&.title || config.inputs[input_key]&.name
     end
 
     module ClassMethods

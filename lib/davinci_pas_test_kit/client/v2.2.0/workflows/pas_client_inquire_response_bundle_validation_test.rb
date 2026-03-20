@@ -53,19 +53,11 @@ module DaVinciPASTestKit
         config.options[:workflow_tag]
       end
 
-      def target_user_input
-        workflow_tag == MUST_SUPPORT_WORKFLOW_TAG ? :ms_inquire_responses : :inquire_json_response
-      end
-
-      def warnings_only_validation?
-        workflow_tag == MUST_SUPPORT_WORKFLOW_TAG
-      end
-
       run do
         load_tagged_requests(workflow_tag, INQUIRE_TAG)
         skip_if requests.empty?, 'No responses to verify because no inquire requests were made.'
-        message = if target_user_input && user_inputted_response?(target_user_input)
-                    "Invalid response generated from provided input '#{input_title(target_user_input)}':"
+        message = if user_inputted_response? :inquire_json_response
+                    "Invalid response generated from provided input '#{input_title(:inquire_json_response)}':"
                   else
                     'Invalid response generated from the submitted claim:'
                   end
@@ -76,8 +68,7 @@ module DaVinciPASTestKit
           '2.2.0',
           request_type,
           'response_bundle',
-          skips: !warnings_only_validation?,
-          warnings_only: warnings_only_validation?,
+          skips: true,
           message:
         )
       end

@@ -47,10 +47,6 @@ module DaVinciPASTestKit
         SUBMIT_TAG
       end
 
-      def warnings_only_validation?
-        workflow_tag == MUST_SUPPORT_WORKFLOW_TAG
-      end
-
       run do
         if workflow_tag.present?
           load_tagged_requests(request_type_tag, workflow_tag)
@@ -65,7 +61,6 @@ module DaVinciPASTestKit
           '2.0.1',
           'submit',
           'request_bundle',
-          warnings_only: warnings_only_validation?,
           message: 'The Bundle provided for the Claim/$submit operation is invalid:'
         )
       end

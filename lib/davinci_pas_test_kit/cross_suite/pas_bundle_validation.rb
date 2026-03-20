@@ -33,8 +33,7 @@ module DaVinciPASTestKit
       validate_resources_conformance_against_profile(response_bundle, profile_url, version, request_type)
     end
 
-    def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false,
-                                 warnings_only: false, message: '')
+    def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false, message: '')
       assert_valid_json(json)
       resource = FHIR.from_contents(json)
       assert resource.present?, 'Not a FHIR resource'
@@ -74,19 +73,12 @@ module DaVinciPASTestKit
         messages << { type: 'error', message: msg }
       end
       msg = 'Bundle response returned and/or entry resources are not conformant. Check messages for issues found.'
-      if validation_error_messages.present?
-        if warnings_only
-          warning "#{message} #{msg}".strip
-        else
-          assert false, msg
-        end
-      end
+      assert validation_error_messages.blank?, msg
     rescue Inferno::Exceptions::AssertionException => e
       msg = "#{message} #{e.message}".strip
-      return warning msg if warnings_only
-      return skip msg if skips
+      raise e.class, msg unless skips
 
-      raise e.class, msg
+      skip msg
     end
 
     # Validates the structure of a Prior Authorization (PA) request Bundle.
