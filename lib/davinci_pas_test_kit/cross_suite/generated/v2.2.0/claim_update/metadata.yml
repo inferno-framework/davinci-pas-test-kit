@@ -322,7 +322,6 @@
   - :path: item.unitPrice
 :mandatory_elements:
 - Claim.extension.url
-- Claim.extension.value[x]
 - Claim.identifier
 - Claim.identifier.system
 - Claim.identifier.value
@@ -688,7 +687,6 @@
 - :path: Claim.supportingInfo.value[x]
   :profiles:
   - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-documentreference
-  - http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/DTR-QRBundle
   - http://hl7.org/fhir/us/core/StructureDefinition/us-core-questionnaireresponse|7.0.0
   - http://hl7.org/fhir/us/core/StructureDefinition/us-core-allergyintolerance|7.0.0
   - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis|7.0.0
@@ -703,6 +701,7 @@
   - http://hl7.org/fhir/us/core/StructureDefinition/us-core-vital-signs|7.0.0
   - http://hl7.org/fhir/StructureDefinition/NutritionOrder
   - http://hl7.org/fhir/StructureDefinition/DeviceRequest
+  - http://hl7.org/fhir/StructureDefinition/Bundle
 - :path: Claim.procedure.udi
   :profiles:
   - http://hl7.org/fhir/StructureDefinition/Device|4.0.1

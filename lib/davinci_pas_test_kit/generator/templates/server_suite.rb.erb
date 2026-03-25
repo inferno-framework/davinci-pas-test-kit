@@ -82,8 +82,7 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-      <% if ig_metadata.ig_version == 'v2.0.1' %>igs '<%= ig_identifier %>'<% end %>
-      <% if ig_metadata.ig_version == 'v2.2.0' %>igs 'igs/davinci_pas_2.2.0-preview.tgz' # TODO: update to published ig instead of local file when released<% end %>
+      igs '<%= ig_identifier %>'
         
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`

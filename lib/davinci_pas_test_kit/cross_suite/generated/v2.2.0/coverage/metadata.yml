@@ -76,6 +76,7 @@
   - :path: class:plan.value
   - :path: class:plan.name
 :mandatory_elements:
+- Coverage.identifier
 - Coverage.identifier.type
 - Coverage.status
 - Coverage.beneficiary

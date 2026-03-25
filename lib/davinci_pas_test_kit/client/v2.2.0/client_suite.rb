@@ -93,7 +93,7 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs 'igs/davinci_pas_2.2.0-preview.tgz' # TODO: replace with official remote 2.2.0 version id when released
+        igs('hl7.fhir.us.davinci-pas#2.2.0')
 
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
