@@ -221,14 +221,14 @@ module DaVinciPASTestKit
                             inquiry_response_validation_test_ids
         submit_request_key = [
           'Submit Request Must Support',
-          (' ' * 10) + "verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'",
-          (' ' * 10) + 'simulation_verification'
+          "#{' ' * 10}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'",
+          "#{' ' * 10}simulation_verification"
         ].join("\n")
 
         inquiry_request_key = [
           'Inquiry Request Must Support',
-          (' ' * 10) + "verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'",
-          (' ' * 10) + 'simulation_verification'
+          "#{' ' * 10}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'",
+          "#{' ' * 10}simulation_verification"
         ].join("\n")
 
         {
