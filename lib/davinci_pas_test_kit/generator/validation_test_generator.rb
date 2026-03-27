@@ -109,12 +109,15 @@ module DaVinciPASTestKit
       end
 
       def title
-        pref = user_input? ? '[USER INPUT VALIDATION] ' : ''
-        "#{pref}#{group_metadata.title} is valid"
+        "#{group_metadata.title} is valid"
       end
 
       def user_input?
         request_type.include?('request')
+      end
+
+      def simulation_verification
+        user_input?
       end
 
       def verifies_requirements

@@ -6,7 +6,7 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::PasBundleValidation
 
       id :pas_server_v201_pas_request_bundle_validation_test
-      title '[USER INPUT VALIDATION] Request Bundle is valid'
+      title 'Request Bundle is valid'
       description %(
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
         Errors encountered will be treated as a skip instead of a failure.
@@ -39,6 +39,7 @@ module DaVinciPASTestKit
         issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
         for additional details.
       )
+      simulation_verification
       
       input :pa_submit_request_payload,
             title: 'PAS Submit Request Payload',

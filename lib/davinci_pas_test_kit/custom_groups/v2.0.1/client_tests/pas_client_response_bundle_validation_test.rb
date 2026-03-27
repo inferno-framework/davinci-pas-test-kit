@@ -10,10 +10,10 @@ module DaVinciPASTestKit
       include ResponseGenerator
 
       id :pas_client_v201_response_bundle_validation_test
-      title '[USER INPUT VERIFICATION] Submit Response Bundle is valid'
+      title 'Submit Response Bundle is valid'
       description %(
-        **USER INPUT VERIFICATION**: This test verifies input provided by the tester instead of the system under test.
-        Errors encountered will be treated as a skip instead of a failure.
+        **USER INPUT VERIFICATION**: This test verifies input provided by the tester instead
+        of the system under test. Errors encountered will be treated as a skip instead of a failure.
 
         This test verifies the conformity of the submit response sent by Inferno, which will have been
         either:
@@ -44,6 +44,7 @@ module DaVinciPASTestKit
         issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
         for additional details.
       )
+      simulation_verification
 
       def request_type
         'submit'

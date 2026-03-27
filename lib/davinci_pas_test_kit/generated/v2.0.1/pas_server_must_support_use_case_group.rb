@@ -112,7 +112,7 @@ module DaVinciPASTestKit
           - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
         )
         run_as_group
-        
+
         group do
           title 'Submission of claims to the $submit operation for must support validation'
           
@@ -143,8 +143,9 @@ module DaVinciPASTestKit
           test from: :pas_server_v201_pas_response_bundle_validation_test
         end
         group do
-          title '[USER INPUT VALIDATION] Submit Request Must Support'
+          title 'Submit Request Must Support'
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'
+          simulation_verification
           
           test from: :pas_server_submit_v201_must_support_requirement
           test from: :pas_server_submit_request_v201_pas_request_bundle_must_support_test
@@ -205,7 +206,7 @@ module DaVinciPASTestKit
           - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
         )
         run_as_group
-        
+
         group do
           title 'Submission of claims to the $inquire operation for must support validation'
           
@@ -236,8 +237,9 @@ module DaVinciPASTestKit
           test from: :pas_server_v201_pas_inquiry_response_bundle_validation_test
         end
         group do
-          title '[USER INPUT VALIDATION] Inquiry Request Must Support'
+          title 'Inquiry Request Must Support'
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'
+          simulation_verification
           
           test from: :pas_server_inquire_request_v201_pas_inquiry_request_bundle_must_support_test
           test from: :pas_server_inquire_request_v201_claim_inquiry_must_support_test

@@ -16,7 +16,9 @@ module DaVinciPASTestKit
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@141'
       run_as_group
 
-      test from: :subscriptions_r4_server_subscription_conformance do
+      test from: :subscriptions_r4_server_subscription_conformance,
+           title: 'Verify Subscription to Send to Server',
+           simulation_verification: true do
         input :subscription_resource,
               title: 'Pended Prior Authorization Subscription',
               description: %(

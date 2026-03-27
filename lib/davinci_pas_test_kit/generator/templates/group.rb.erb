@@ -112,9 +112,24 @@ module DaVinciPASTestKit
           - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
         )<% end %>
         run_as_group
-        <% subgroup.each do |category, id_list| %>
-        group do
-          title '<%= category%>'
+        <%- subgroup.each do |category, id_list| -%>
+<%-
+  title_lines = category.to_s.split("\n").map(&:strip)
+  s = "        group do\n"
+  s << "          title '#{title_lines.shift.gsub("'","\\\\'")}'\n"
+  title_lines.each do |extra|
+    if extra.start_with?("verifies_requirements")
+    s << "          #{extra}\n"
+    elsif extra == 'simulation_verification'
+      s << "          simulation_verification\n"
+    else
+      s << "          #{extra}\n"
+    end
+  end
+  s.rstrip!
+  s << "\n"
+-%>
+<%= "\n" + s -%>
           <% id_list.each do |id|%>
           test from: :<%= id%><% if must_support_rename_input?(id) %> do
             id :<%= alt_test_id(id, use_case) %>
