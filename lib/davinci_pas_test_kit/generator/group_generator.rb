@@ -219,15 +219,27 @@ module DaVinciPASTestKit
         inquiry_operation = inquiry_request_validation_test_ids +
                             inquiry_operation_test_ids +
                             inquiry_response_validation_test_ids
+        submit_request_key = [
+          'Submit Request Must Support',
+          (' ' * 10) + "verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'",
+          (' ' * 10) + 'simulation_verification'
+        ].join("\n")
+
+        inquiry_request_key = [
+          'Inquiry Request Must Support',
+          (' ' * 10) + "verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'",
+          (' ' * 10) + 'simulation_verification'
+        ].join("\n")
+
         {
           '$submit Element Support' => {
             'Submission of claims to the $submit operation for must support validation' => submit_tests,
-            "Submit Request Must Support\n#{' ' * 10}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'\n#{' ' * 10}simulation_verification" => submit_request_must_support_test_ids,
+            submit_request_key => submit_request_must_support_test_ids,
             'Submit Response Must Support' => submit_response_must_support_test_ids
           },
           '$inquire Element Support' => {
             'Submission of claims to the $inquire operation for must support validation' => inquiry_operation,
-            "Inquiry Request Must Support\n#{' ' * 10}verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'\n#{' ' * 10}simulation_verification" => inquiry_request_must_support_test_ids,
+            inquiry_request_key => inquiry_request_must_support_test_ids,
             'Inquiry Response Must Support' => inquiry_response_must_support_test_ids
           }
         }
