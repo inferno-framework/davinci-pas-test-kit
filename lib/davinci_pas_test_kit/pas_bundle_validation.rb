@@ -358,14 +358,14 @@ module DaVinciPASTestKit
     def metadata_map(version)
       @metadata ||= YAML.load_file(File.join(__dir__, "generated/#{version}/metadata.yml"),
                                    aliases: true)
-      @metadata_map ||= @metadata[:groups].each_with_object({}) do |group, obj|
-        obj[group[:profile_url]] = Generator::GroupMetadata.new(group)
+      @metadata_map ||= @metadata[:groups].to_h do |group|
+        [group[:profile_url], Generator::GroupMetadata.new(group)]
       end
     end
 
     def bundle_entry_map(bundle_entry)
-      @bundle_entry_map ||= bundle_entry.each_with_object({}) do |entry, obj|
-        obj[entry.fullUrl] = entry
+      @bundle_entry_map ||= bundle_entry.to_h do |entry|
+        [entry.fullUrl, entry]
       end
     end
 
@@ -479,7 +479,7 @@ module DaVinciPASTestKit
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
             check_presence_of_referenced_resources(value, base_url, resources_to_match)
-          elsif value.is_a?(Array) && value.all? { |elmt| elmt.is_a?(FHIR::Model) }
+          elsif value.is_a?(Array) && value.all?(FHIR::Model)
             value.each { |elmt| check_presence_of_referenced_resources(elmt, base_url, resources_to_match) }
           end
         end

@@ -47,14 +47,16 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
 
   describe 'must support test' do
     context 'when PAS request bundle' do
-      scratch_key = 'submit_request_resources'
+      let(:scratch_key) { 'submit_request_resources' }
+
       it 'passes if the request bundle contains all the must support specified in the PAS Request Bundle profile' do
         run_expect_pass(pas_request_bundle_must_support_test, FHIR.from_contents(json_pas_request_bundle), scratch_key)
       end
     end
 
     context 'when PAS response bundle' do
-      scratch_key = 'submit_response_resources'
+      let(:scratch_key) { 'submit_response_resources' }
+
       it 'passes if the response bundle contains all the must support specified in the PAS Response Bundle profile' do
         run_expect_pass(
           pas_response_bundle_must_support_test, FHIR.from_contents(json_pas_response_bundle), scratch_key
@@ -63,7 +65,8 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     end
 
     context 'when PAS inquiry request bundle' do
-      scratch_key = 'inquire_request_resources'
+      let(:scratch_key) { 'inquire_request_resources' }
+
       it 'passes if bundle contains all the must support specified in the PAS Inquiry Request Bundle profile' do
         run_expect_pass(
           pas_inquiry_request_bundle_must_support_test, FHIR.from_contents(json_pas_request_bundle), scratch_key
@@ -72,7 +75,8 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     end
 
     context 'when PAS inquiry response bundle' do
-      scratch_key = 'inquire_response_resources'
+      let(:scratch_key) { 'inquire_response_resources' }
+
       it 'passes if bundle contains all the must support specified in the PAS Inquiry Response Bundle profile' do
         run_expect_pass(
           pas_inquiry_response_bundle_must_support_test, FHIR.from_contents(json_pas_response_bundle), scratch_key

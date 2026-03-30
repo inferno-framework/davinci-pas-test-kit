@@ -66,11 +66,13 @@ module DaVinciPASTestKit
         end
       end
 
+      # rubocop:disable Naming/PredicateMethod
       def run_as_group
         return false if use_case.include?('must_support') && system == 'server'
 
         true
       end
+      # rubocop:enable Naming/PredicateMethod
 
       def output_file_name
         File.join(base_output_dir, base_output_file_name)

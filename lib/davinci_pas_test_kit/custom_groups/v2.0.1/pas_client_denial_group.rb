@@ -9,6 +9,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientDenialGroup < Inferno::TestGroup
       include UserInputResponse
+
       id :pas_client_v201_denial_group
       title 'Denial Workflow'
       description %(
