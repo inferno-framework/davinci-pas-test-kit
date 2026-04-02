@@ -10,7 +10,7 @@ module DaVinciPASTestKit
       description %(
         <%=description.strip.gsub("\n", "\n" + " "*8) %>
       )
-<% if simulation_verification -%>
+<% if simulation_verification? -%>
       simulation_verification
 <% end -%>
 <% if verifies_requirements -%>

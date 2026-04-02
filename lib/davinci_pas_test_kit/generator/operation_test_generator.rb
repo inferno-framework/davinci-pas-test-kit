@@ -82,13 +82,11 @@ module DaVinciPASTestKit
         read_interaction[:expectation]
       end
 
-      # rubocop:disable Naming/PredicateMethod
-      def skip_if_empty
+      def skip_if_empty?
         # Return true if a system must demonstrate at least one example of the resource type.
         # This drives omit vs. skip result statuses in this test.
         resource_type != 'Medication'
       end
-      # rubocop:enable Naming/PredicateMethod
 
       def request_type
         Naming.request_type_for_bundle_or_claim[profile_name]
