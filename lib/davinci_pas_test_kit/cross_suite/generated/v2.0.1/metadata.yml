@@ -24,6 +24,7 @@
       :discriminator:
         :type: type
         :code: Claim
+        :path: resource
     :elements:
     - :path: identifier
     - :path: timestamp
@@ -91,6 +92,7 @@
       :discriminator:
         :type: type
         :code: ClaimResponse
+        :path: resource
     :elements:
     - :path: timestamp
     - :path: entry
@@ -152,6 +154,7 @@
       :discriminator:
         :type: type
         :code: Claim
+        :path: resource
     :elements:
     - :path: identifier
     - :path: timestamp
@@ -219,6 +222,7 @@
       :discriminator:
         :type: type
         :code: ClaimResponse
+        :path: resource
     :elements:
     - :path: timestamp
     - :path: entry
