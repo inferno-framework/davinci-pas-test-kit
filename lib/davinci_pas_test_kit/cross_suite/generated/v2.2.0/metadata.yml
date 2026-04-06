@@ -456,14 +456,17 @@
       :discriminator:
         :type: value
         :values:
-        - :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
           :value: true
     - :slice_id: Claim.careTeam:ItemClaimMember
       :slice_name: ItemClaimMember
       :path: careTeam
       :discriminator:
-        :type: unsupported
-        :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        :type: value
+        :values:
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+          :value: false
+      :fixed_value: false
     - :slice_id: Claim.supportingInfo:PatientEvent
       :slice_name: PatientEvent
       :path: supportingInfo
@@ -1040,14 +1043,17 @@
       :discriminator:
         :type: value
         :values:
-        - :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
           :value: true
     - :slice_id: Claim.careTeam:ItemClaimMember
       :slice_name: ItemClaimMember
       :path: careTeam
       :discriminator:
-        :type: unsupported
-        :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        :type: value
+        :values:
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+          :value: false
+      :fixed_value: false
     - :slice_id: Claim.supportingInfo:PatientEvent
       :slice_name: PatientEvent
       :path: supportingInfo
@@ -1659,14 +1665,17 @@
       :discriminator:
         :type: value
         :values:
-        - :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
           :value: true
     - :slice_id: Claim.careTeam:ItemClaimMember
       :slice_name: ItemClaimMember
       :path: careTeam
       :discriminator:
-        :type: unsupported
-        :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        :type: value
+        :values:
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+          :value: false
+      :fixed_value: false
     - :slice_id: Claim.supportingInfo:PatientEvent
       :slice_name: PatientEvent
       :path: supportingInfo
@@ -2363,14 +2372,17 @@
       :discriminator:
         :type: value
         :values:
-        - :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
           :value: true
     - :slice_id: Claim.careTeam:ItemClaimMember
       :slice_name: ItemClaimMember
       :path: careTeam
       :discriminator:
-        :type: unsupported
-        :path: extension('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').value.ofType(boolean)
+        :type: value
+        :values:
+        - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+          :value: false
+      :fixed_value: false
     - :slice_id: Claim.supportingInfo:PatientEvent
       :slice_name: PatientEvent
       :path: supportingInfo

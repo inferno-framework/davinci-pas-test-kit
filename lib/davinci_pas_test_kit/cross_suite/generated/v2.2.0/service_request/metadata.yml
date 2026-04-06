@@ -18,7 +18,7 @@
   :extensions:
   - :id: ServiceRequest.extension:serviceCodeEnd
     :path: extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd|2.2.0
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd
     :modifier_extension: false
   - :id: ServiceRequest.extension:coverage
     :path: extension
