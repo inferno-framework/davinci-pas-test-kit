@@ -46,6 +46,9 @@ module DaVinciPASTestKit
               ig_version: '<%= ig_version %>'
             }
           )
+<% if simulation_verification?('request') -%>
+          simulation_verification
+<% end -%>
         end
         test from: :pas_claim_submit_operation_test do
           id :pas_<%= ig_version_for_id %>_claim_submit_operation_test_<%= use_case %>
@@ -136,6 +139,9 @@ module DaVinciPASTestKit
               ig_version: '<%= ig_version %>'
             }
           )
+<% if simulation_verification?('request') -%>
+          simulation_verification
+<% end -%>
         end
         test from: :pas_claim_inquire_operation_test do
           id :pas_<%= ig_version_for_id %>_claim_inquire_operation_test_<%= use_case %>

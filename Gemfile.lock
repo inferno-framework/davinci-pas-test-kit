@@ -10,7 +10,7 @@ PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.14.0)
-      inferno_core (~> 1.1)
+      inferno_core (~> 1.1.2)
       smart_app_launch_test_kit (~> 1.0)
       subscriptions_test_kit (~> 0.12.0)
       udap_security_test_kit (~> 0.12.0)
@@ -151,7 +151,7 @@ GEM
       mutex_m
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    inferno_core (1.1.0)
+    inferno_core (1.1.2)
       activesupport (~> 6.1.7.5)
       base62-rb (= 0.3.1)
       blueprinter (= 0.25.2)
