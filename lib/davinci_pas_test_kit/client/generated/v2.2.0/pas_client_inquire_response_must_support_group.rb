@@ -1,11 +1,11 @@
 require_relative 'pas_inquiry_response_bundle/client_inquire_response_must_support_pas_inquiry_response_bundle_test'
 require_relative 'claiminquiryresponse/client_inquire_response_must_support_claiminquiryresponse_test'
-require_relative 'task/client_inquire_response_must_support_task_test'
-require_relative 'beneficiary/client_inquire_response_must_support_beneficiary_test'
-require_relative 'requestor/client_inquire_response_must_support_requestor_test'
 require_relative 'insurer/client_inquire_response_must_support_insurer_test'
+require_relative 'requestor/client_inquire_response_must_support_requestor_test'
+require_relative 'beneficiary/client_inquire_response_must_support_beneficiary_test'
 require_relative 'practitioner/client_inquire_response_must_support_practitioner_test'
 require_relative 'practitioner_role/client_inquire_response_must_support_practitioner_role_test'
+require_relative 'task/client_inquire_response_must_support_task_test'
 require_relative '../../v2.2.0/workflows/pas_client_response_attest'
 
 module DaVinciPASTestKit
@@ -24,12 +24,12 @@ module DaVinciPASTestKit
         
         - [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-response-bundle.html)
         - [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claiminquiryresponse.html)
-        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
-        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
         - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
+        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
+        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
         - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
         - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
         
         
         
@@ -38,12 +38,12 @@ module DaVinciPASTestKit
 
       test from: :pas_client_v220_inquire_response_must_support_pas_inquiry_response_bundle
       test from: :pas_client_v220_inquire_response_must_support_claiminquiryresponse
-      test from: :pas_client_v220_inquire_response_must_support_task
-      test from: :pas_client_v220_inquire_response_must_support_beneficiary
-      test from: :pas_client_v220_inquire_response_must_support_requestor
       test from: :pas_client_v220_inquire_response_must_support_insurer
+      test from: :pas_client_v220_inquire_response_must_support_requestor
+      test from: :pas_client_v220_inquire_response_must_support_beneficiary
       test from: :pas_client_v220_inquire_response_must_support_practitioner
       test from: :pas_client_v220_inquire_response_must_support_practitioner_role
+      test from: :pas_client_v220_inquire_response_must_support_task
       test from: :pas_client_v220_response_attest,
            title: 'Confirm that the client handled the $inquire response must support elements (Attestation)',
            description: %(

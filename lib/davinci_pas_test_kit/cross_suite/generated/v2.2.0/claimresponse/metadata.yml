@@ -40,7 +40,7 @@
     :modifier_extension: false
   - :id: ClaimResponse.request.extension:DataAbsentReason
     :path: request.extension
-    :url: http://hl7.org/fhir/StructureDefinition/data-absent-reason|5.3.0-ballot-tc1
+    :url: http://hl7.org/fhir/StructureDefinition/data-absent-reason
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:itemTraceNumber
     :path: item.extension
