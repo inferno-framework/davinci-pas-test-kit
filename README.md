@@ -27,7 +27,7 @@ Documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).
 
 ## Getting Started
 
-ASTP hosts a [public
+ONC hosts a [public
 instance](https://inferno.healthit.gov/suites/g10_certification) of this test
 kit that developers and testers are welcome to use. However, users are
 encouraged to download and run this tool locally to allow testing within private
@@ -53,7 +53,7 @@ The spreadsheet includes:
 
 ## Getting Started
 
-ASTP hosts a [public
+ONC hosts a [public
 instance](https://inferno.healthit.gov/test-kits/davinci-pas/) of this test
 kit that developers and testers are welcome to use. However, users are
 encouraged to download and run this tool locally to allow testing within private
