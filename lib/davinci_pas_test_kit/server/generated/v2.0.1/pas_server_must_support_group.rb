@@ -116,7 +116,7 @@ module DaVinciPASTestKit
 
           test from: :pas_server_request_bundle_validation_test do
             id :pas_server_v201_submit_request_bundle_validation_test_must_support
-            title '[USER INPUT VALIDATION] Provided $submit Request Bundle is conformant'
+            title 'Provided $submit Request Bundle is conformant'
             description %(
               **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
             Errors encountered will be treated as a skip instead of a failure.
@@ -149,6 +149,7 @@ module DaVinciPASTestKit
             for additional details.
             
             )
+            simulation_verification
             config(
               inputs: {
                 bundle_payload: {
@@ -223,7 +224,8 @@ module DaVinciPASTestKit
         end
 
         group do
-          title '[USER INPUT VALIDATION] $submit Request Must Support'
+          title '$submit Request Must Support'
+          simulation_verification
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@35'
 
           test from: :pas_server_v201_must_support_request_profiles
@@ -296,7 +298,7 @@ module DaVinciPASTestKit
 
           test from: :pas_server_request_bundle_validation_test do
             id :pas_server_v201_inquire_request_bundle_validation_test_must_support
-            title '[USER INPUT VALIDATION] Provided $inquire Request Bundle is conformant'
+            title 'Provided $inquire Request Bundle is conformant'
             description %(
               **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
             Errors encountered will be treated as a skip instead of a failure.
@@ -329,6 +331,7 @@ module DaVinciPASTestKit
             for additional details.
             
             )
+            simulation_verification
             config(
               inputs: {
                 bundle_payload: {
@@ -403,7 +406,8 @@ module DaVinciPASTestKit
         end
 
         group do
-          title '[USER INPUT VALIDATION] $inquire Request Must Support'
+          title '$inquire Request Must Support'
+          simulation_verification
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@36'
 
           test from: :pas_server_v201_inquire_request_must_support_pas_inquiry_request_bundle

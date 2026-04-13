@@ -6,7 +6,7 @@ module DaVinciPASTestKit
       include PASSubscriptionVerification
       include SubscriptionsTestKit::SubscriptionConformanceVerification
       id :pas_server_v220_subscription_input_conformance
-      title '[USER INPUT VERIFICATION] Verify Subscription PAS conformance'
+      title 'Verify Subscription PAS conformance'
       description %(
         This test accepts a Subscription resource as an input and verifies that it is conformant to PAS requirements on
         the Subscriptions, including:
@@ -27,6 +27,8 @@ module DaVinciPASTestKit
             )
 
       output :updated_subscription
+
+      simulation_verification
 
       run do
         omit_if subscription_resource.blank?, 'Did not input a Subscription resource of this type.'

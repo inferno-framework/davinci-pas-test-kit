@@ -5,7 +5,7 @@ module DaVinciPASTestKit
     class PASServerSubscriptionInputConformance < Inferno::Test
       include PASSubscriptionVerification
       id :pas_server_v201_subscription_input_conformance
-      title '[USER INPUT VERIFICATION] Verify Subscription PAS conformance'
+      title 'Verify Subscription PAS conformance'
       description %(
         This test accepts a Subscription resource as an input and verifies that it is conformant to PAS requirements on
         the Subscriptions, including:
@@ -15,6 +15,7 @@ module DaVinciPASTestKit
         - Inclusion of filter criteria for the client's organization.
       )
       input :subscription_resource
+      simulation_verification
 
       run do
         omit_if subscription_resource.blank?, 'Did not input a Subscription resource of this type.'

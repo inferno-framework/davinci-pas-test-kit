@@ -21,7 +21,7 @@ module DaVinciPASTestKit
         
         test from: :pas_server_request_bundle_validation_test do
           id :pas_server_v201_pas_request_bundle_validation_test_approval
-          title '[USER INPUT VALIDATION] Provided $submit Request Bundle is conformant'
+          title 'Provided $submit Request Bundle is conformant'
           description %(
             **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test.
             Errors encountered will be treated as a skip instead of a failure.
@@ -67,6 +67,7 @@ module DaVinciPASTestKit
               ig_version: 'v2.0.1'
             }
           )
+          simulation_verification
         end
         test from: :pas_claim_submit_operation_test do
           id :pas_v201_claim_submit_operation_test_approval

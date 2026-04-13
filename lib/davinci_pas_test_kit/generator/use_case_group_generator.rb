@@ -151,9 +151,13 @@ module DaVinciPASTestKit
         end
       end
 
+      def simulation_verification?(type)
+        type == 'request'
+      end
+
       def bundle_validation_test_title(operation, type)
-        if type == 'request'
-          "[USER INPUT VALIDATION] Provided $#{operation} Request Bundle is conformant"
+        if simulation_verification?(type)
+          "Provided $#{operation} Request Bundle is conformant"
         else
           "Server $#{operation} Response Bundle is conformant"
         end
@@ -166,10 +170,12 @@ module DaVinciPASTestKit
 
       def bundle_validation_test_description(operation, type)
         <<~DESCRIPTION
-          #{"#{description_user_input_validation}\n" if type == 'request'}This test validates the conformity of the
-          #{type == 'request' ? 'user input' : "server's response"} to the
+          #{if simulation_verification?(type)
+              "#{description_user_input_validation}\n"
+            end}This test validates the conformity of the
+          #{simulation_verification?(type) ? 'user input' : "server's response"} to the
           #{profile_link(operation, type)}
-          profile#{type == 'request' ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
+          profile#{simulation_verification?(type) ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
 
           It also checks that other conformance requirements defined in the [PAS Formal
           Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),

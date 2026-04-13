@@ -42,10 +42,11 @@ module DaVinciPASTestKit
 
           test from: :pas_server_request_bundle_validation_test do
             id :pas_server_<%= ig_version_for_id %>_<%= operation %>_request_bundle_validation_test_must_support
-            title '[USER INPUT VALIDATION] Provided $<%= operation %> Request Bundle is conformant'
+            title 'Provided $<%= operation %> Request Bundle is conformant'
             description %(
               <%= Descriptions.bundle_validation_test_description(operation, 'request').gsub("\n", "\n" + " "*12) %>
             )
+            simulation_verification
             config(
               inputs: {
                 bundle_payload: {
@@ -94,7 +95,8 @@ module DaVinciPASTestKit
         end
 
         group do
-          title '[USER INPUT VALIDATION] $<%= operation %> Request Must Support'
+          title '$<%= operation %> Request Must Support'
+          simulation_verification
           <%- if verifies_must_support_requirements(operation, 'request').present? -%>
           verifies_requirements <%= verifies_must_support_requirements(operation, 'request').map { |r| "'#{r}'" }.join(', ') %>
           <%- end -%>
