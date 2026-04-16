@@ -1,0 +1,1 @@
+require_relative 'inferno_core_patches/required_binding_slice'
