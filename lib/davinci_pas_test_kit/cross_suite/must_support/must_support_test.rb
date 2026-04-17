@@ -6,6 +6,10 @@ module DaVinciPASTestKit
   class MustSupportTest < Inferno::Test
     include DaVinciPASTestKit::MustSupportDataGathering
 
+    X12_SYSTEM_FRAGMENT = 'x12.org'.freeze
+    X12_SLICE = 'Coverage.relationship.coding:X12Code'.freeze
+    X12_CHILD = 'relationship.coding:X12Code.code'.freeze
+
     title 'Generic Must Support Test'
     description 'Generic Must Support Test Description'
 
@@ -51,6 +55,24 @@ module DaVinciPASTestKit
       end
 
       missing_must_support_strings = missing_must_support_elements(resources_of_interest, nil, metadata:)
+
+      # Special case: Coverage.relationship.coding:X12Code slice has an empty required binding
+      # discriminator values list, so Inferno cannot reliably detect it automatically.
+      # Ideally this should be determined from ClaimResponse context, but since this test
+      # operates on Coverage resources, we approximate by checking for x12.org in
+      # Coverage.relationship.coding.system.
+      if resource_type == 'Coverage' && missing_must_support_strings.include?(X12_SLICE)
+        has_x12_coding = resources_of_interest.any? do |resource|
+          resource.relationship&.coding&.any? do |coding|
+            coding.system&.include?(X12_SYSTEM_FRAGMENT)
+          end
+        end
+
+        if has_x12_coding
+          missing_must_support_strings.delete(X12_SLICE)
+          missing_must_support_strings.delete(X12_CHILD)
+        end
+      end
 
       if missing_must_support_strings.present?
         message = error_message(missing_must_support_strings, resources_of_interest, resource_type)
