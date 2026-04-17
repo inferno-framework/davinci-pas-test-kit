@@ -243,4 +243,117 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
     end
   end
+
+  describe '#reject_entry_resource_issues' do
+    let(:validator_issue_class) { Inferno::DSL::FHIRResourceValidation::ValidatorIssue }
+    let(:test_instance) do
+      Class.new { include DaVinciPASTestKit::PasBundleValidation }.new
+    end
+
+    def make_issue(location:, level: 'WARNING', message: 'test message', filtered: false)
+      validator_issue_class.new(
+        raw_issue: { 'location' => location, 'level' => level, 'message' => message },
+        target: {},
+        filtered:
+      )
+    end
+
+    it 'keeps bundle-structural issues and rejects Bundle.entry[N].resource issues' do
+      # Structural slicing hints — location at Bundle.entry[N] with no .resource segment
+      first_entry_slicing_hint = make_issue(
+        location: 'Bundle.entry[0]',
+        level: 'INFORMATION',
+        message: 'This element does not match any known slice defined in the profile ' \
+                 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle|2.0.1'
+      )
+      third_entry_slicing_hint = make_issue(
+        location: 'Bundle.entry[2]',
+        level: 'INFORMATION',
+        message: 'This element does not match any known slice defined in the profile ' \
+                 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle|2.0.1'
+      )
+      fourth_entry_slicing_hint = make_issue(
+        location: 'Bundle.entry[3]',
+        level: 'INFORMATION',
+        message: 'This element does not match any known slice defined in the profile ' \
+                 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle|2.0.1'
+      )
+      # A bundle-level error (e.g. missing required field on the Bundle itself)
+      bundle_error = make_issue(
+        location: 'Bundle.timestamp',
+        level: 'ERROR',
+        message: 'Bundle.timestamp: minimum required = 1, but only found 0'
+      )
+
+      # Entry-resource issues — location at/below Bundle.entry[N].resource
+      org_x12_warning = make_issue(
+        location: 'Bundle.entry[0].resource/*Organization/UMOExample*/.type[0]',
+        level: 'WARNING',
+        message: "A definition for CodeSystem 'https://codesystem.x12.org/005010/98' could not be found"
+      )
+      claim_response_xhtml_error = make_issue(
+        location: 'Bundle.entry[1].resource/*ClaimResponse/ReferralAuthorizationResponseExample*/.text.div',
+        level: 'ERROR',
+        message: "Hyperlink '#Patient_SubscriberExample' at 'div/p/a' for " \
+                 "'See above (Patient/SubscriberExample)' does not resolve"
+      )
+      claim_response_url_warning = make_issue(
+        location: 'Bundle.entry[1].resource/*ClaimResponse/ReferralAuthorizationResponseExample*/' \
+                  'identifier[0].system',
+        level: 'WARNING',
+        message: 'No definition could be found for URL value ' \
+                 "'https://prior-auth.davinci.hl7.org/PATIENT_EVENT_TRACE_NUMBER'"
+      )
+      patient_valueset_warning = make_issue(
+        location: 'Bundle.entry[3].resource/*Patient/SubscriberExample*/' \
+                  'extension[0].value.ofType(CodeableConcept)',
+        level: 'WARNING',
+        message: "ValueSet 'https://valueset.x12.org/x217/005010/request/2010C/INS/1/08/00/584' not found"
+      )
+
+      issues = [
+        first_entry_slicing_hint, org_x12_warning, claim_response_xhtml_error,
+        claim_response_url_warning, third_entry_slicing_hint, patient_valueset_warning,
+        fourth_entry_slicing_hint, bundle_error
+      ]
+
+      result = test_instance.send(:reject_entry_resource_issues, issues)
+
+      expect(result).to contain_exactly(first_entry_slicing_hint, third_entry_slicing_hint,
+                                        fourth_entry_slicing_hint, bundle_error)
+    end
+
+    it 'rejects issues pre-marked as filtered regardless of location' do
+      # A structural-location issue (would normally be kept) but marked filtered by the validator
+      filtered_structural = make_issue(
+        location: 'Bundle.entry[0]',
+        level: 'INFORMATION',
+        message: 'This element does not match any known slice defined in the profile',
+        filtered: true
+      )
+      # An entry-resource issue also marked filtered — rejected both by flag and by location
+      filtered_entry_resource = make_issue(
+        location: 'Bundle.entry[2].resource/*Organization/InsurerExample*/.type[0].coding[0]',
+        level: 'WARNING',
+        message: "A definition for CodeSystem 'https://codesystem.x12.org/005010/98' " \
+                 'could not be found, so the code cannot be validated',
+        filtered: true
+      )
+      # An unfiltered structural issue — should survive
+      unfiltered_structural = make_issue(
+        location: 'Bundle.entry[3]',
+        level: 'INFORMATION',
+        message: 'This element does not match any known slice defined in the profile'
+      )
+
+      result = test_instance.send(:reject_entry_resource_issues,
+                                  [filtered_structural, filtered_entry_resource, unfiltered_structural])
+
+      expect(result).to contain_exactly(unfiltered_structural)
+    end
+
+    it 'returns an empty array when given an empty list' do
+      expect(test_instance.send(:reject_entry_resource_issues, [])).to be_empty
+    end
+  end
 end

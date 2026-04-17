@@ -138,7 +138,8 @@ module DaVinciPASTestKit
       # addition validator clean-up based on Bundle sub-validations where Inferno error supression doesn't
       # work. The test kit validates these instances individually as well, so they are still checked,
       # but in a way that Inferno can supress errors
-      'Unable to find a match for profile'
+      'Unable to find a match for profile',
+      'Unable to find a profile match for'
     ]
   )
   # rubocop:enable Layout/LineLength
