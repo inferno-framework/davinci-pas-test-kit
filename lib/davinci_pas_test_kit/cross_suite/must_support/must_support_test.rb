@@ -9,6 +9,7 @@ module DaVinciPASTestKit
     X12_SYSTEM_FRAGMENT = 'x12.org'.freeze
     X12_SLICE = 'Coverage.relationship.coding:X12Code'.freeze
     X12_CHILD = 'relationship.coding:X12Code.code'.freeze
+    DATA_ABSENT_REASON_URL = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason'.freeze
 
     title 'Generic Must Support Test'
     description 'Generic Must Support Test Description'
@@ -72,6 +73,19 @@ module DaVinciPASTestKit
           missing_must_support_strings.delete(X12_SLICE)
           missing_must_support_strings.delete(X12_CHILD)
         end
+      end
+
+      # PAS v2.2.0 ClaimResponse examples may use DataAbsentReason on request.
+      # Inferno's generic navigation excludes DAR-bearing elements when checking
+      # the parent path, so treat that explicit DAR as satisfying request here.
+      if resource_type == 'ClaimResponse' && missing_must_support_strings.include?('request')
+        has_request_data_absent_reason = resources_of_interest.any? do |resource|
+          resource.request&.extension&.any? do |extension|
+            extension.url == DATA_ABSENT_REASON_URL
+          end
+        end
+
+        missing_must_support_strings.delete('request') if has_request_data_absent_reason
       end
 
       if missing_must_support_strings.present?
