@@ -535,6 +535,8 @@ module DaVinciPASTestKit
         end
       else
         target_resource.source_hash.each_key do |attr|
+          next if claim_response_request_attr?(target_resource, attr)
+
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
             check_presence_of_referenced_resources(value, base_url, resources_to_match)
@@ -543,6 +545,17 @@ module DaVinciPASTestKit
           end
         end
       end
+    end
+
+    # ClaimResponse.request is a back-reference to the submitted Claim. The PAS IG response bundle
+    # profile (profile-pas-response-bundle) has no required Claim entry slice, so the Claim need
+    # not be present in the response bundle. Skipping here matches the identical guard in
+    # ResponseGenerator#referenced_entities, which also skips ClaimResponse.request when
+    # building mock response bundles.
+    def claim_response_request_attr?(resource, attr)
+      attr.to_s == 'request' &&
+        resource.respond_to?(:resourceType) &&
+        resource.resourceType == 'ClaimResponse'
     end
 
     # Extracts resources from a bundle while following "next" links.

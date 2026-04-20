@@ -119,6 +119,7 @@ module DaVinciPASTestKit
       'ValueSet https://valueset.x12.org/x217/005010/response/2010B/NM1/1/01/00/98 not found',
       # additional lines added beyond the errors suppressed in the IG
       'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter', # validator bug, https://github.com/hapifhir/org.hl7.fhir.core/issues/1556
+      'X12278DiagnosisCodes', # ValueSet includes full ICD-10-CM plus unavailable code systems; validator cannot fully expand
       'X12278RequestedServiceType', # X12 code system included in this PAS-defined value set
       'X12278LocationType', # X12 code system included in this PAS-defined value set
       'ValueSet https://valueset.x12.org/x217/005010/response/2010B/NM1/1/01/00/98 not found',
