@@ -97,9 +97,13 @@
   :file_name: client_submit_request_must_support_insurer_test.rb
 - :id: pas_server_v201_submit_response_must_support_insurer
   :file_name: server_submit_response_must_support_insurer_test.rb
+- :id: pas_client_v201_submit_response_must_support_insurer
+  :file_name: client_submit_response_must_support_insurer_test.rb
 - :id: pas_server_v201_inquire_request_must_support_insurer
   :file_name: server_inquire_request_must_support_insurer_test.rb
 - :id: pas_client_v201_inquire_request_must_support_insurer
   :file_name: client_inquire_request_must_support_insurer_test.rb
 - :id: pas_server_v201_inquire_response_must_support_insurer
   :file_name: server_inquire_response_must_support_insurer_test.rb
+- :id: pas_client_v201_inquire_response_must_support_insurer
+  :file_name: client_inquire_response_must_support_insurer_test.rb

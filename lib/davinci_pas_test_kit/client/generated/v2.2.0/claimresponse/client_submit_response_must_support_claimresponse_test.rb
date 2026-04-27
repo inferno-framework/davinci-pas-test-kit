@@ -1,0 +1,103 @@
+require_relative '../../../../cross_suite/must_support/must_support_test'
+
+module DaVinciPASTestKit
+  module DaVinciPASV220
+    class ClientSubmitResponseMustSupportClaimresponseTest < DaVinciPASTestKit::MustSupportTest
+      id :pas_client_v220_submit_response_must_support_claimresponse
+      title 'All must support elements for Profile PAS Claim Response are observed across all instances returned'
+      description %(
+        
+        PAS client systems are required to be able to receive all
+        must support elements on instances of all profiles included in 
+        responses, including instances of the PAS Claim Response Profile.
+        This test checks all identified instances of the PAS Claim Response
+        Profile on responses sent to the client to ensure that the following
+        must support elements are observed:
+
+        * ClaimResponse.addItem
+        * ClaimResponse.addItem.adjudication
+        * ClaimResponse.addItem.adjudication.extension:reviewAction
+        * ClaimResponse.addItem.extension:administrationReferenceNumber
+        * ClaimResponse.addItem.extension:admissionDates
+        * ClaimResponse.addItem.extension:certificationType
+        * ClaimResponse.addItem.extension:dischargeDate
+        * ClaimResponse.addItem.extension:epsdtIndicator
+        * ClaimResponse.addItem.extension:itemTraceNumber
+        * ClaimResponse.addItem.extension:nursingHomeLevelOfCare
+        * ClaimResponse.addItem.extension:nursingHomeResidentialStatus
+        * ClaimResponse.addItem.extension:preAuthIssueDate
+        * ClaimResponse.addItem.extension:preAuthPeriod
+        * ClaimResponse.addItem.extension:previousAuthorizationNumber
+        * ClaimResponse.addItem.extension:productOrServiceCodeEnd
+        * ClaimResponse.addItem.extension:requestType
+        * ClaimResponse.addItem.extension:requestedService
+        * ClaimResponse.addItem.extension:revenue
+        * ClaimResponse.addItem.extension:revenueUnitRateLimit
+        * ClaimResponse.addItem.itemSequence
+        * ClaimResponse.addItem.location[x]
+        * ClaimResponse.addItem.modifier
+        * ClaimResponse.addItem.productOrService
+        * ClaimResponse.addItem.provider
+        * ClaimResponse.addItem.provider.extension:providerType
+        * ClaimResponse.addItem.quantity
+        * ClaimResponse.addItem.serviced[x]
+        * ClaimResponse.addItem.unitPrice
+        * ClaimResponse.adjudication
+        * ClaimResponse.adjudication.extension:reviewAction
+        * ClaimResponse.communicationRequest
+        * ClaimResponse.created
+        * ClaimResponse.error
+        * ClaimResponse.error.code
+        * ClaimResponse.error.extension:errorElement
+        * ClaimResponse.error.extension:errorPath
+        * ClaimResponse.error.extension:followupAction
+        * ClaimResponse.extension:authorizedProvider
+        * ClaimResponse.extension:claimResponseReviewer
+        * ClaimResponse.extension:transmissionIdentifiers
+        * ClaimResponse.identifier
+        * ClaimResponse.identifier.extension:jurisdiction
+        * ClaimResponse.identifier.extension:subDepartment
+        * ClaimResponse.identifier.system
+        * ClaimResponse.identifier.value
+        * ClaimResponse.insurer
+        * ClaimResponse.item
+        * ClaimResponse.item.adjudication
+        * ClaimResponse.item.adjudication.extension:reviewAction
+        * ClaimResponse.item.extension:administrationReferenceNumber
+        * ClaimResponse.item.extension:admissionDates
+        * ClaimResponse.item.extension:authorizedItemDetail
+        * ClaimResponse.item.extension:authorizedProvider
+        * ClaimResponse.item.extension:communicatedDiagnosis
+        * ClaimResponse.item.extension:dischargeDate
+        * ClaimResponse.item.extension:itemTraceNumber
+        * ClaimResponse.item.extension:preAuthIssueDate
+        * ClaimResponse.item.extension:preAuthPeriod
+        * ClaimResponse.item.extension:previousAuthorizationNumber
+        * ClaimResponse.item.extension:requestedServiceDate
+        * ClaimResponse.item.itemSequence
+        * ClaimResponse.item.noteNumber
+        * ClaimResponse.outcome
+        * ClaimResponse.patient
+        * ClaimResponse.preAuthPeriod
+        * ClaimResponse.processNote
+        * ClaimResponse.processNote.number
+        * ClaimResponse.processNote.text
+        * ClaimResponse.request
+        * ClaimResponse.request.extension:DataAbsentReason
+        * ClaimResponse.requestor
+        * ClaimResponse.status
+      )
+
+      config(
+        options: {
+          resource_type: 'ClaimResponse',
+          profile_key: 'claimresponse',
+          user_input_validation: true,
+          ig_version: 'v2.2.0',
+          type: 'response',
+          operation: 'submit'
+        }
+      )
+    end
+  end
+end
