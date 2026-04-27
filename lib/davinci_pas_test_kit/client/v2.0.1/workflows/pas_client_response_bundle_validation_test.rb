@@ -62,13 +62,17 @@ module DaVinciPASTestKit
           :denial_json_response
         when PENDED_WORKFLOW_TAG
           :pended_json_response
+        when MUST_SUPPORT_WORKFLOW_TAG
+          :ms_submit_responses
         end
       end
 
       run do
         load_tagged_requests(workflow_tag, SUBMIT_TAG)
         skip_if requests.empty?, 'No responses to verify because no submit requests were made.'
-        message = if user_inputted_response? target_user_input
+        message = if workflow_tag == MUST_SUPPORT_WORKFLOW_TAG
+                    'Invalid must support response bundle provided:'
+                  elsif user_inputted_response? target_user_input
                     "Invalid response generated from provided input '#{input_title(target_user_input)}':"
                   else
                     'Invalid response generated from the submitted claim:'

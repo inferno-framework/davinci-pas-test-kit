@@ -24,6 +24,7 @@ module DaVinciPASTestKit
           end
           submit_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'submit').generate
+            new(ig_metadata, profile, base_client_output_dir, 'response', 'submit', 'client').generate
           end
 
           inquiry_request_profiles.each do |profile|
@@ -32,6 +33,7 @@ module DaVinciPASTestKit
           end
           inquiry_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'inquire').generate
+            new(ig_metadata, profile, base_client_output_dir, 'response', 'inquire', 'client').generate
           end
         end
       end

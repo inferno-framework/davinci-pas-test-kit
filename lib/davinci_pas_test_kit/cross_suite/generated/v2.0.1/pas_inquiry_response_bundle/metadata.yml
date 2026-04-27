@@ -22,6 +22,7 @@
     :discriminator:
       :type: type
       :code: ClaimResponse
+      :path: resource
   :elements:
   - :path: timestamp
   - :path: entry
@@ -63,3 +64,5 @@
 :tests:
 - :id: pas_server_v201_inquire_response_must_support_pas_inquiry_response_bundle
   :file_name: server_inquire_response_must_support_pas_inquiry_response_bundle_test.rb
+- :id: pas_client_v201_inquire_response_must_support_pas_inquiry_response_bundle
+  :file_name: client_inquire_response_must_support_pas_inquiry_response_bundle_test.rb
