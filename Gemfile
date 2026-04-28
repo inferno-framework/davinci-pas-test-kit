@@ -2,8 +2,6 @@
 
 source "https://rubygems.org"
 
-gem 'subscriptions_test_kit', git: 'https://github.com/inferno-framework/subscriptions-test-kit/', branch: 'wait-outputs-for-scripting'
-
 gemspec
 
 gem "rubocop"

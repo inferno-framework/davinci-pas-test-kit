@@ -1,18 +1,10 @@
-GIT
-  remote: https://github.com/inferno-framework/subscriptions-test-kit
-  revision: b371215d4fdbf93a2852b4723b97107b0592b9e4
-  branch: wait-outputs-for-scripting
-  specs:
-    subscriptions_test_kit (0.12.0)
-      inferno_core (~> 1.0, >= 1.0.2)
-
 PATH
   remote: .
   specs:
     davinci_pas_test_kit (0.14.0)
       inferno_core (~> 1.2.1)
       smart_app_launch_test_kit (~> 1.0)
-      subscriptions_test_kit (~> 0.12.0)
+      subscriptions_test_kit (~> 0.12.1)
       udap_security_test_kit (~> 0.12.0)
 
 GEM
@@ -76,7 +68,7 @@ GEM
       zeitwerk (~> 2.6)
     factory_bot (6.5.1)
       activesupport (>= 6.1.0)
-    faraday (1.10.4)
+    faraday (1.10.5)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -347,6 +339,9 @@ GEM
       unicode-display_width (>= 1.5, < 3.0)
       unicode_utils (~> 1.4)
     strings-ansi (0.2.0)
+    subscriptions_test_kit (0.12.1)
+      faraday (~> 1.10.5)
+      inferno_core (~> 1.2.1)
     thor (1.5.0)
     tilt (2.6.1)
     tls_test_kit (1.0.0)
@@ -397,7 +392,6 @@ DEPENDENCIES
   rubocop
   rubocop-rake (~> 0.6.0)
   rubocop-rspec
-  subscriptions_test_kit!
   webmock (~> 3.11)
 
 BUNDLED WITH
