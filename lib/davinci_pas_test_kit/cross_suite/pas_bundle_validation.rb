@@ -229,15 +229,50 @@ module DaVinciPASTestKit
     # and collects error messages for non-conformant entries. Asserts that there are no validation errors.
     # @param version [String] The version of the IG.
     def validate_bundle_entries_against_profiles(version)
-      bundle_resources_target_profile_map.each_value do |item|
+      bundle_resources_target_profile_map.each do |key, item|
         resource = item[:resource]
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
+
         success_profile = item[:profile_urls].find do |url|
           profile_to_validate = url.starts_with?(base_profile) ? url : "#{url}|#{version}"
-          resource_is_valid?(resource:, profile_url: profile_to_validate)
+          if key == 'bundle'
+            bundle_profile_valid?(resource, profile_to_validate)
+          else
+            resource_is_valid?(resource:, profile_url: profile_to_validate)
+          end
         end
 
         validation_error_messages << generate_non_conformance_message(item) unless success_profile
+      end
+    end
+
+    # Validates a Bundle resource against a profile, filtering out entry-resource-level issues
+    # that are covered by individual resource validation to avoid duplicate messages.
+    # @param bundle [FHIR::Bundle] The Bundle resource to validate.
+    # @param profile_url [String] The profile URL (with version) to validate against.
+    # @return [Boolean] true if no unfiltered errors remain after removing entry-resource issues.
+    def bundle_profile_valid?(bundle, profile_url)
+      response_details = []
+      resource_is_valid?(resource: bundle, profile_url:,
+                         add_messages_to_runnable: false,
+                         validator_response_details: response_details)
+      bundle_level_issues = reject_entry_resource_issues(response_details)
+      bundle_level_issues.each { |issue| messages << { type: issue.severity, message: issue.message } }
+      bundle_level_issues.none? { |issue| issue.severity == 'error' }
+    end
+
+    # Rejects validator issues that are already filtered or are located at/below
+    # Bundle.entry[N].resource, since those are validated individually per resource.
+    # @param issues [Array<ValidatorIssue>] Raw issues from the validator.
+    # @return [Array<ValidatorIssue>] Issues relevant only to the Bundle structure itself.
+    #
+    # TODO (ID-61): This filter currently suppresses bundle-context validation messages for entry resources
+    # that have no PAS profile and are therefore never individually validated (e.g. DocumentReference,
+    # Encounter when reached via the broken extension-Claim.encounter path). Those messages will not
+    # reappear in test results until ID-61 adds direct US Core / base-profile validation for such resources.
+    def reject_entry_resource_issues(issues)
+      issues.reject do |issue|
+        issue.filtered || issue.location&.match?(/\ABundle\.entry\[\d+\]\.resource/)
       end
     end
 
@@ -500,6 +535,8 @@ module DaVinciPASTestKit
         end
       else
         target_resource.source_hash.each_key do |attr|
+          next if claim_response_request_attr?(target_resource, attr)
+
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
             check_presence_of_referenced_resources(value, base_url, resources_to_match)
@@ -508,6 +545,17 @@ module DaVinciPASTestKit
           end
         end
       end
+    end
+
+    # ClaimResponse.request is a back-reference to the submitted Claim. The PAS IG response bundle
+    # profile (profile-pas-response-bundle) has no required Claim entry slice, so the Claim need
+    # not be present in the response bundle. Skipping here matches the identical guard in
+    # ResponseGenerator#referenced_entities, which also skips ClaimResponse.request when
+    # building mock response bundles.
+    def claim_response_request_attr?(resource, attr)
+      attr.to_s == 'request' &&
+        resource.respond_to?(:resourceType) &&
+        resource.resourceType == 'ClaimResponse'
     end
 
     # Extracts resources from a bundle while following "next" links.
