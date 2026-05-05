@@ -244,6 +244,215 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
   end
 
+  describe 'US Core profile inference' do
+    let(:test_instance) do
+      Class.new { include DaVinciPASTestKit::PasBundleValidation }.new
+    end
+
+    def us_core_profile_url(profile_id)
+      "#{described_class::US_CORE_PROFILE_BASE}/#{profile_id}|#{described_class::US_CORE_VERSION}"
+    end
+
+    def codeable_concept(system, code)
+      FHIR::CodeableConcept.new(
+        coding: [
+          FHIR::Coding.new(
+            system:,
+            code:
+          )
+        ]
+      )
+    end
+
+    def bundle_entry(resource, full_url)
+      FHIR::Bundle::Entry.new(
+        fullUrl: full_url,
+        resource:
+      )
+    end
+
+    it 'adds a US Core fallback profile for unprofiled v2.2 bundle entries' do
+      document_reference = FHIR::DocumentReference.new(id: 'doc-1')
+      entry = bundle_entry(document_reference, 'urn:uuid:doc-1')
+      bundle = FHIR::Bundle.new(entry: [entry])
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit'
+      )
+
+      expect(test_instance.bundle_resources_target_profile_map['urn:uuid:doc-1'][:profile_urls])
+        .to contain_exactly(us_core_profile_url('us-core-documentreference'))
+    end
+
+    it 'does not add US Core fallback profiles for earlier PAS versions' do
+      document_reference = FHIR::DocumentReference.new(id: 'doc-1')
+      entry = bundle_entry(document_reference, 'urn:uuid:doc-1')
+      bundle = FHIR::Bundle.new(entry: [entry])
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.0.1',
+        'submit'
+      )
+
+      expect(test_instance.bundle_resources_target_profile_map).to_not have_key('urn:uuid:doc-1')
+    end
+
+    it 'does not add US Core fallback profiles for non-v2.2 versions with a v2.2 prefix' do
+      document_reference = FHIR::DocumentReference.new(id: 'doc-1')
+      entry = bundle_entry(document_reference, 'urn:uuid:doc-1')
+      bundle = FHIR::Bundle.new(entry: [entry])
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.20.0',
+        'submit'
+      )
+
+      expect(test_instance.bundle_resources_target_profile_map).to_not have_key('urn:uuid:doc-1')
+    end
+
+    it 'does not add a fallback when PAS inference already found a target profile' do
+      document_reference = FHIR::DocumentReference.new(id: 'doc-1')
+      entry = bundle_entry(document_reference, 'urn:uuid:doc-1')
+      inferred_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-documentreference'
+
+      test_instance.add_resource_target_profile_to_map('urn:uuid:doc-1', document_reference, inferred_profile)
+      test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.0')
+
+      expect(test_instance.bundle_resources_target_profile_map['urn:uuid:doc-1'][:profile_urls])
+        .to contain_exactly(inferred_profile)
+    end
+
+    it 'selects the Condition US Core profile from category' do
+      encounter_diagnosis = FHIR::Condition.new(
+        category: [codeable_concept(nil, 'encounter-diagnosis')]
+      )
+      health_concern = FHIR::Condition.new(
+        category: [codeable_concept('http://hl7.org/fhir/us/core/CodeSystem/condition-category', 'health-concern')]
+      )
+      uncategorized = FHIR::Condition.new
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, encounter_diagnosis))
+        .to contain_exactly(us_core_profile_url('us-core-condition-encounter-diagnosis'))
+      expect(test_instance.send(:us_core_profile_urls_for_resource, health_concern))
+        .to contain_exactly(us_core_profile_url('us-core-condition-problems-health-concerns'))
+      expect(test_instance.send(:us_core_profile_urls_for_resource, uncategorized))
+        .to contain_exactly(us_core_profile_url('us-core-condition-problems-health-concerns'))
+    end
+
+    it 'does not select the encounter diagnosis Condition profile for the right code on the wrong system' do
+      condition = FHIR::Condition.new(
+        category: [codeable_concept('http://example.com/condition-category', 'encounter-diagnosis')]
+      )
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, condition))
+        .to contain_exactly(us_core_profile_url('us-core-condition-problems-health-concerns'))
+    end
+
+    it 'selects the DiagnosticReport US Core profile from category' do
+      lab_report = FHIR::DiagnosticReport.new(
+        category: [codeable_concept('http://terminology.hl7.org/CodeSystem/v2-0074', 'LAB')]
+      )
+      note_report = FHIR::DiagnosticReport.new(
+        category: [codeable_concept('http://terminology.hl7.org/CodeSystem/v2-0074', 'RAD')]
+      )
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, lab_report))
+        .to contain_exactly(us_core_profile_url('us-core-diagnosticreport-lab'))
+      expect(test_instance.send(:us_core_profile_urls_for_resource, note_report))
+        .to contain_exactly(us_core_profile_url('us-core-diagnosticreport-note'))
+    end
+
+    it 'does not select the lab DiagnosticReport profile for LAB from the wrong system' do
+      lab_report = FHIR::DiagnosticReport.new(
+        category: [codeable_concept('http://example.com/report-category', 'LAB')]
+      )
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, lab_report))
+        .to contain_exactly(us_core_profile_url('us-core-diagnosticreport-note'))
+    end
+
+    it 'selects specific Observation profiles by code before category fallback profiles' do
+      blood_pressure = FHIR::Observation.new(
+        code: codeable_concept('http://loinc.org', '85354-9'),
+        category: [codeable_concept('http://terminology.hl7.org/CodeSystem/observation-category', 'laboratory')]
+      )
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, blood_pressure))
+        .to contain_exactly(us_core_profile_url('us-core-blood-pressure'))
+    end
+
+    it 'adds Observation category fallback profiles when no code-specific profile matches' do
+      lab_observation = FHIR::Observation.new(
+        code: codeable_concept('http://loinc.org', '99999-9'),
+        category: [codeable_concept('http://terminology.hl7.org/CodeSystem/observation-category', 'laboratory')]
+      )
+      social_history_observation = FHIR::Observation.new(
+        code: codeable_concept('http://loinc.org', '99999-8'),
+        category: [codeable_concept('http://terminology.hl7.org/CodeSystem/observation-category', 'social-history')]
+      )
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, lab_observation))
+        .to contain_exactly(
+          us_core_profile_url('us-core-observation-lab'),
+          us_core_profile_url('us-core-simple-observation')
+        )
+      expect(test_instance.send(:us_core_profile_urls_for_resource, social_history_observation))
+        .to contain_exactly(
+          us_core_profile_url('us-core-smokingstatus'),
+          us_core_profile_url('us-core-observation-clinical-result'),
+          us_core_profile_url('us-core-simple-observation')
+        )
+    end
+
+    it 'does not select Observation category fallback profiles from the wrong category system' do
+      lab_observation = FHIR::Observation.new(
+        code: codeable_concept('http://loinc.org', '99999-9'),
+        category: [codeable_concept('http://example.com/observation-category', 'laboratory')]
+      )
+      social_history_observation = FHIR::Observation.new(
+        code: codeable_concept('http://loinc.org', '99999-8'),
+        category: [codeable_concept('http://example.com/observation-category', 'social-history')]
+      )
+
+      expect(test_instance.send(:us_core_profile_urls_for_resource, lab_observation))
+        .to contain_exactly(
+          us_core_profile_url('us-core-observation-clinical-result'),
+          us_core_profile_url('us-core-simple-observation')
+        )
+      expect(test_instance.send(:us_core_profile_urls_for_resource, social_history_observation))
+        .to contain_exactly(
+          us_core_profile_url('us-core-observation-clinical-result'),
+          us_core_profile_url('us-core-simple-observation')
+        )
+    end
+
+    it 'does not append the PAS IG version to versioned US Core profile URLs' do
+      versioned_profile = us_core_profile_url('us-core-documentreference')
+
+      expect(
+        test_instance.send(
+          :profile_url_for_validation,
+          versioned_profile,
+          'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+          '2.2.0'
+        )
+      ).to eq(versioned_profile)
+    end
+  end
+
   describe '#reject_entry_resource_issues' do
     let(:validator_issue_class) { Inferno::DSL::FHIRResourceValidation::ValidatorIssue }
     let(:test_instance) do

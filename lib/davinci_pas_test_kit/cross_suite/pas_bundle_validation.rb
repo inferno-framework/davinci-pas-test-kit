@@ -9,6 +9,71 @@ module DaVinciPASTestKit
     include DaVinciPASTestKit::ValidationTest
     include ParametersHelper
 
+    US_CORE_VERSION = '6.1.0'
+    US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
+    LOINC_SYSTEM = 'http://loinc.org'
+    TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
+    OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
+    DIAGNOSTIC_REPORT_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v2-0074'
+
+    US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE = {
+      'AllergyIntolerance' => 'us-core-allergyintolerance',
+      'CarePlan' => 'us-core-careplan',
+      'CareTeam' => 'us-core-careteam',
+      'Coverage' => 'us-core-coverage',
+      'Device' => 'us-core-implantable-device',
+      'DocumentReference' => 'us-core-documentreference',
+      'Encounter' => 'us-core-encounter',
+      'Goal' => 'us-core-goal',
+      'Immunization' => 'us-core-immunization',
+      'Location' => 'us-core-location',
+      'Medication' => 'us-core-medication',
+      'MedicationDispense' => 'us-core-medicationdispense',
+      'MedicationRequest' => 'us-core-medicationrequest',
+      'Organization' => 'us-core-organization',
+      'Patient' => 'us-core-patient',
+      'Practitioner' => 'us-core-practitioner',
+      'PractitionerRole' => 'us-core-practitionerrole',
+      'Procedure' => 'us-core-procedure',
+      'Provenance' => 'us-core-provenance',
+      'QuestionnaireResponse' => 'us-core-questionnaireresponse',
+      'RelatedPerson' => 'us-core-relatedperson',
+      'ServiceRequest' => 'us-core-servicerequest',
+      'Specimen' => 'us-core-specimen'
+    }.freeze
+
+    US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID = 'us-core-condition-encounter-diagnosis'
+    US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID = 'us-core-condition-problems-health-concerns'
+    US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID = 'us-core-diagnosticreport-lab'
+    US_CORE_DIAGNOSTIC_REPORT_NOTE_PROFILE_ID = 'us-core-diagnosticreport-note'
+    US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID = 'us-core-observation-clinical-result'
+    US_CORE_OBSERVATION_LAB_PROFILE_ID = 'us-core-observation-lab'
+    US_CORE_OBSERVATION_SCREENING_ASSESSMENT_PROFILE_ID = 'us-core-observation-screening-assessment'
+    US_CORE_SIMPLE_OBSERVATION_PROFILE_ID = 'us-core-simple-observation'
+    US_CORE_SMOKING_STATUS_PROFILE_ID = 'us-core-smokingstatus'
+    US_CORE_VITAL_SIGNS_PROFILE_ID = 'us-core-vital-signs'
+
+    US_CORE_OBSERVATION_CODE_PROFILE_IDS = {
+      '11341-5' => 'us-core-observation-occupation',
+      '86645-9' => 'us-core-observation-pregnancyintent',
+      '82810-3' => 'us-core-observation-pregnancystatus',
+      '76690-7' => 'us-core-observation-sexual-orientation',
+      '8289-1' => 'head-occipital-frontal-circumference-percentile',
+      '59576-9' => 'pediatric-bmi-for-age',
+      '77606-2' => 'pediatric-weight-for-height',
+      '85354-9' => 'us-core-blood-pressure',
+      '39156-5' => 'us-core-bmi',
+      '8302-2' => 'us-core-body-height',
+      '8310-5' => 'us-core-body-temperature',
+      '29463-7' => 'us-core-body-weight',
+      '9843-4' => 'us-core-head-circumference',
+      '8867-4' => 'us-core-heart-rate',
+      '59408-5' => 'us-core-pulse-oximetry',
+      '2708-6' => 'us-core-pulse-oximetry',
+      '9279-1' => 'us-core-respiratory-rate',
+      '72166-2' => 'us-core-smokingstatus'
+    }.freeze
+
     def validation_error_messages
       @validation_error_messages ||= []
     end
@@ -186,6 +251,7 @@ module DaVinciPASTestKit
     # The request/response bundle and includes resources are validated against their
     # respective profile.
     def validate_resources_conformance_against_profile(bundle, profile_url, version, request_type)
+      reset_bundle_profile_inference_state
       add_resource_target_profile_to_map('bundle', bundle, profile_url)
 
       bundle_entry = bundle.entry
@@ -201,6 +267,7 @@ module DaVinciPASTestKit
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)
       end
 
+      add_us_core_profiles_to_unprofiled_entries(bundle_entry, version)
       validate_bundle_entries_against_profiles(version)
     end
 
@@ -234,7 +301,7 @@ module DaVinciPASTestKit
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
 
         success_profile = item[:profile_urls].find do |url|
-          profile_to_validate = url.starts_with?(base_profile) ? url : "#{url}|#{version}"
+          profile_to_validate = profile_url_for_validation(url, base_profile, version)
           if key == 'bundle'
             bundle_profile_valid?(resource, profile_to_validate)
           else
@@ -243,6 +310,110 @@ module DaVinciPASTestKit
         end
 
         validation_error_messages << generate_non_conformance_message(item) unless success_profile
+      end
+    end
+
+    def profile_url_for_validation(url, base_profile, version)
+      return url if url.include?('|') || url.start_with?(base_profile)
+
+      "#{url}|#{version}"
+    end
+
+    def reset_bundle_profile_inference_state
+      bundle_resources_target_profile_map.clear
+      @bundle_entry_map = nil
+    end
+
+    def add_us_core_profiles_to_unprofiled_entries(bundle_entry, version)
+      return unless us_core_profile_fallback_enabled?(version)
+
+      bundle_entry.each do |entry|
+        resource = entry.resource
+        next if resource.blank?
+
+        resource_full_url = entry.fullUrl.presence || "#{resource.resourceType}/#{resource.id}"
+        next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
+
+        us_core_profile_urls_for_resource(resource).each do |profile_url|
+          add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
+        end
+      end
+    end
+
+    def us_core_profile_fallback_enabled?(version)
+      version.to_s.delete_prefix('v').match?(/\A2\.2(\.|\z)/)
+    end
+
+    def us_core_profile_urls_for_resource(resource)
+      profile_ids =
+        case resource.resourceType
+        when 'Condition'
+          us_core_condition_profile_ids(resource)
+        when 'DiagnosticReport'
+          us_core_diagnostic_report_profile_ids(resource)
+        when 'Observation'
+          us_core_observation_profile_ids(resource)
+        else
+          Array(US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE[resource.resourceType])
+        end
+
+      us_core_profile_urls(profile_ids)
+    end
+
+    def us_core_condition_profile_ids(resource)
+      if category_code_present?(resource, 'encounter-diagnosis', system: TERMINOLOGY_CONDITION_CATEGORY_SYSTEM)
+        [US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID]
+      else
+        [US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID]
+      end
+    end
+
+    def us_core_diagnostic_report_profile_ids(resource)
+      if category_code_present?(resource, 'LAB', system: DIAGNOSTIC_REPORT_CATEGORY_SYSTEM)
+        [US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID]
+      else
+        [US_CORE_DIAGNOSTIC_REPORT_NOTE_PROFILE_ID]
+      end
+    end
+
+    def us_core_observation_profile_ids(resource)
+      code_profile_id = US_CORE_OBSERVATION_CODE_PROFILE_IDS.find do |code, _profile_id|
+        codeable_concept_has_code?(resource.code, code, system: LOINC_SYSTEM)
+      end&.last
+      return [code_profile_id] if code_profile_id.present?
+
+      profile_ids = []
+      profile_ids << US_CORE_SMOKING_STATUS_PROFILE_ID if category_code_present?(resource, 'social-history',
+                                                                                 system: OBSERVATION_CATEGORY_SYSTEM)
+      profile_ids << US_CORE_VITAL_SIGNS_PROFILE_ID if category_code_present?(resource, 'vital-signs',
+                                                                              system: OBSERVATION_CATEGORY_SYSTEM)
+      if category_code_present?(resource, 'survey', system: OBSERVATION_CATEGORY_SYSTEM)
+        profile_ids << US_CORE_OBSERVATION_SCREENING_ASSESSMENT_PROFILE_ID
+      end
+      # Keep candidate profiles most-specific first because validation stops at the first conformant profile.
+      profile_ids << if category_code_present?(resource, 'laboratory', system: OBSERVATION_CATEGORY_SYSTEM)
+                       US_CORE_OBSERVATION_LAB_PROFILE_ID
+                     else
+                       US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID
+                     end
+      profile_ids << US_CORE_SIMPLE_OBSERVATION_PROFILE_ID
+      profile_ids.uniq
+    end
+
+    def us_core_profile_urls(profile_ids)
+      Array(profile_ids).map { |profile_id| "#{US_CORE_PROFILE_BASE}/#{profile_id}|#{US_CORE_VERSION}" }
+    end
+
+    def category_code_present?(resource, code, system:)
+      codeable_concept_has_code?(resource.category, code, system:)
+    end
+
+    def codeable_concept_has_code?(codeable_concepts, code, system: nil)
+      systems = Array(system).compact
+      Array(codeable_concepts).compact.any? do |codeable_concept|
+        Array(codeable_concept&.coding).compact.any? do |coding|
+          coding.code == code && (systems.blank? || coding.system.blank? || systems.include?(coding.system))
+        end
       end
     end
 
@@ -266,10 +437,7 @@ module DaVinciPASTestKit
     # @param issues [Array<ValidatorIssue>] Raw issues from the validator.
     # @return [Array<ValidatorIssue>] Issues relevant only to the Bundle structure itself.
     #
-    # TODO (ID-61): This filter currently suppresses bundle-context validation messages for entry resources
-    # that have no PAS profile and are therefore never individually validated (e.g. DocumentReference,
-    # Encounter when reached via the broken extension-Claim.encounter path). Those messages will not
-    # reappear in test results until ID-61 adds direct US Core / base-profile validation for such resources.
+    # Entry resources that receive direct PAS or US Core target profiles are validated individually after this filter.
     def reject_entry_resource_issues(issues)
       issues.reject do |issue|
         issue.filtered || issue.location&.match?(/\ABundle\.entry\[\d+\]\.resource/)
