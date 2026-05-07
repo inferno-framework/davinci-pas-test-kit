@@ -246,7 +246,13 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
   describe 'US Core profile inference' do
     let(:test_instance) do
-      Class.new { include DaVinciPASTestKit::PasBundleValidation }.new
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def evaluate_fhirpath(**)
+          []
+        end
+      end.new
     end
 
     def us_core_profile_url(profile_id)
@@ -271,9 +277,9 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       )
     end
 
-    it 'adds a US Core fallback profile for unprofiled v2.2 bundle entries' do
-      document_reference = FHIR::DocumentReference.new(id: 'doc-1')
-      entry = bundle_entry(document_reference, 'urn:uuid:doc-1')
+    it 'adds a US Core fallback profile for unprofiled v2.2 bundle entries without PAS profiles' do
+      questionnaire_response = FHIR::QuestionnaireResponse.new(id: 'questionnaire-response-1')
+      entry = bundle_entry(questionnaire_response, 'urn:uuid:questionnaire-response-1')
       bundle = FHIR::Bundle.new(entry: [entry])
 
       allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
@@ -285,8 +291,8 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         'submit'
       )
 
-      expect(test_instance.bundle_resources_target_profile_map['urn:uuid:doc-1'][:profile_urls])
-        .to contain_exactly(us_core_profile_url('us-core-documentreference'))
+      expect(test_instance.bundle_resources_target_profile_map['urn:uuid:questionnaire-response-1'][:profile_urls])
+        .to contain_exactly(us_core_profile_url('us-core-questionnaireresponse'))
     end
 
     it 'does not add US Core fallback profiles for earlier PAS versions' do
@@ -333,6 +339,79 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       expect(test_instance.bundle_resources_target_profile_map['urn:uuid:doc-1'][:profile_urls])
         .to contain_exactly(inferred_profile)
+    end
+
+    it 'uses declared profiles before US Core fallback for PAS-profiled entries' do
+      encounter = FHIR::Encounter.new(
+        id: 'encounter-1',
+        meta: {
+          profile: ['http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter']
+        }
+      )
+      entry = bundle_entry(encounter, 'urn:uuid:encounter-1')
+      bundle = FHIR::Bundle.new(entry: [entry])
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit'
+      )
+
+      expect(test_instance.bundle_resources_target_profile_map['urn:uuid:encounter-1'][:profile_urls])
+        .to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter')
+    end
+
+    it 'uses unique PAS profiles before US Core fallback for unprofiled PAS resources' do
+      service_request = FHIR::ServiceRequest.new(id: 'service-request-1')
+      entry = bundle_entry(service_request, 'urn:uuid:service-request-1')
+      bundle = FHIR::Bundle.new(entry: [entry])
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit'
+      )
+
+      expect(test_instance.bundle_resources_target_profile_map['urn:uuid:service-request-1'][:profile_urls])
+        .to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-servicerequest')
+    end
+
+    it 'resolves versioned PAS reference target profiles against unversioned metadata keys' do
+      claim = FHIR::Claim.new(id: 'claim-1')
+      encounter = FHIR::Encounter.new(id: 'encounter-1')
+      bundle = FHIR::Bundle.new(
+        entry: [
+          bundle_entry(claim, 'http://example.com/fhir/Claim/claim-1'),
+          bundle_entry(encounter, 'http://example.com/fhir/Encounter/encounter-1')
+        ]
+      )
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+      allow(test_instance).to receive(:evaluate_fhirpath) do |path:, **|
+        if path == 'Claim.extension.value[x]'
+          [{ 'type' => 'Reference', 'element' => FHIR::Reference.new(reference: 'Encounter/encounter-1') }]
+        else
+          []
+        end
+      end
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit'
+      )
+
+      expect(
+        test_instance
+          .bundle_resources_target_profile_map['http://example.com/fhir/Encounter/encounter-1'][:profile_urls]
+      ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter|2.2.0')
     end
 
     it 'selects the Condition US Core profile from category' do

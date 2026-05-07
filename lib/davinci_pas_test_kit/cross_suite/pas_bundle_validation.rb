@@ -11,6 +11,7 @@ module DaVinciPASTestKit
 
     US_CORE_VERSION = '6.1.0'
     US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
+    PAS_PROFILE_BASE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition'
     LOINC_SYSTEM = 'http://loinc.org'
     TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
     OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
@@ -267,6 +268,8 @@ module DaVinciPASTestKit
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)
       end
 
+      add_declared_profiles_to_unprofiled_entries(bundle_entry, version)
+      add_pas_profiles_to_unprofiled_entries(bundle_entry, version)
       add_us_core_profiles_to_unprofiled_entries(bundle_entry, version)
       validate_bundle_entries_against_profiles(version)
     end
@@ -315,6 +318,7 @@ module DaVinciPASTestKit
 
     def profile_url_for_validation(url, base_profile, version)
       return url if url.include?('|') || url.start_with?(base_profile)
+      return "#{url}|#{US_CORE_VERSION}" if us_core_profile_url?(url) && us_core_profile_fallback_enabled?(version)
 
       "#{url}|#{version}"
     end
@@ -331,13 +335,68 @@ module DaVinciPASTestKit
         resource = entry.resource
         next if resource.blank?
 
-        resource_full_url = entry.fullUrl.presence || "#{resource.resourceType}/#{resource.id}"
+        resource_full_url = resource_full_url_for_entry(entry)
         next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
 
         us_core_profile_urls_for_resource(resource).each do |profile_url|
           add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
         end
       end
+    end
+
+    def add_declared_profiles_to_unprofiled_entries(bundle_entry, version)
+      return unless us_core_profile_fallback_enabled?(version)
+
+      bundle_entry.each do |entry|
+        resource = entry.resource
+        next if resource.blank?
+
+        resource_full_url = resource_full_url_for_entry(entry)
+        next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
+
+        Array(resource.meta&.profile).compact.each do |profile_url|
+          add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
+          extract_profiles_to_validate_each_entry(bundle_entry, entry, profile_url, version)
+        end
+      end
+    end
+
+    def add_pas_profiles_to_unprofiled_entries(bundle_entry, version)
+      return unless us_core_profile_fallback_enabled?(version)
+
+      bundle_entry.each do |entry|
+        resource = entry.resource
+        next if resource.blank?
+
+        resource_full_url = resource_full_url_for_entry(entry)
+        next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
+
+        profile_url = unique_pas_profile_url_for_resource(resource.resourceType, version)
+        next if profile_url.blank?
+
+        add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
+        extract_profiles_to_validate_each_entry(bundle_entry, entry, profile_url, version)
+      end
+    end
+
+    def resource_full_url_for_entry(entry)
+      resource = entry.resource
+
+      entry.fullUrl.presence || "#{resource.resourceType}/#{resource.id}"
+    end
+
+    def unique_pas_profile_url_for_resource(resource_type, version)
+      pas_profile_urls_by_resource(version)[resource_type].presence&.then do |profile_urls|
+        profile_urls.one? ? profile_urls.first : nil
+      end
+    end
+
+    def pas_profile_urls_by_resource(version)
+      @pas_profile_urls_by_resource ||= {}
+      @pas_profile_urls_by_resource[version] ||= metadata_map("v#{version}").values
+        .select { |metadata| pas_profile_url?(metadata.profile_url) }
+        .group_by(&:resource)
+        .transform_values { |metadata| metadata.map(&:profile_url).uniq }
     end
 
     def us_core_profile_fallback_enabled?(version)
@@ -404,6 +463,18 @@ module DaVinciPASTestKit
       Array(profile_ids).map { |profile_id| "#{US_CORE_PROFILE_BASE}/#{profile_id}|#{US_CORE_VERSION}" }
     end
 
+    def profile_url_without_version(url)
+      url.to_s.split('|', 2).first
+    end
+
+    def us_core_profile_url?(url)
+      profile_url_without_version(url).start_with?("#{US_CORE_PROFILE_BASE}/")
+    end
+
+    def pas_profile_url?(url)
+      profile_url_without_version(url).start_with?("#{PAS_PROFILE_BASE}/")
+    end
+
     def category_code_present?(resource, code, system:)
       codeable_concept_has_code?(resource.category, code, system:)
     end
@@ -459,7 +530,7 @@ module DaVinciPASTestKit
       return if current_entry.blank?
 
       # NOTE: the IG does not have the metadata for us-core profiles.
-      metadata = metadata_map("v#{version}")[current_entry_profile_url]
+      metadata = metadata_map("v#{version}")[profile_url_without_version(current_entry_profile_url)]
       return if metadata.blank?
 
       bundle_map = bundle_entry_map(bundle_entry)
@@ -534,7 +605,7 @@ module DaVinciPASTestKit
 
       reference_element[:profiles].each do |profile_url|
         # NOTE: the IG does not have the metadata for us-core profiles.
-        target_metadata = metadata_map("v#{version}")[profile_url]
+        target_metadata = metadata_map("v#{version}")[profile_url_without_version(profile_url)]
         resource_type = instance.resource.resourceType
         next unless target_metadata&.resource == resource_type || profile_url.include?(resource_type)
 
@@ -579,9 +650,11 @@ module DaVinciPASTestKit
 
     # Mapping profile url to metadata
     def metadata_map(version)
-      @metadata ||= YAML.load_file(File.join(__dir__, "generated/#{version}/metadata.yml"),
-                                   aliases: true)
-      @metadata_map ||= @metadata[:profiles].each_with_object({}) do |profile_metadata, obj|
+      @metadata ||= {}
+      @metadata[version] ||= YAML.load_file(File.join(__dir__, "generated/#{version}/metadata.yml"),
+                                            aliases: true)
+      @metadata_map ||= {}
+      @metadata_map[version] ||= @metadata[version][:profiles].each_with_object({}) do |profile_metadata, obj|
         obj[profile_metadata[:profile_url]] = Generator::ProfileMetadata.new(profile_metadata)
       end
     end
