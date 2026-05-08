@@ -19,15 +19,15 @@
   :extensions:
   - :id: Task.input:AttachmentsNeeded.extension:paLineNumber
     :path: input.extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber|2.2.0
     :modifier_extension: false
   - :id: Task.input:AttachmentsNeeded.extension:contentModifier
     :path: input.extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier|2.2.0
     :modifier_extension: false
   - :id: Task.input:QuestionnaireContext.extension:paLineNumber
     :path: input.extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber|2.2.0
     :modifier_extension: false
   :slices:
   - :slice_id: Task.input:PayerURL

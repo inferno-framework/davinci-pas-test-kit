@@ -197,6 +197,19 @@ module DaVinciPASTestKit
       if root_entry.present?
         root_resource_profile_url = find_profile_url(request_type)[root_entry.resource.resourceType]
 
+        # In v2.2.0, profile-pas-request-bundle allows either profile-claim or profile-claim-update
+        # for the Claim entry. find_profile_url defaults to profile-claim-update for all submit Claims,
+        # but we must respect the resource's own meta.profile when it explicitly declares profile-claim
+        # (workflow bundles use profile-claim; must-support bundles use profile-claim-update).
+        if version == '2.2.0' && %w[submit submit_request].include?(request_type) &&
+           root_entry.resource.resourceType == 'Claim'
+          meta_profiles = Array(root_entry.resource.meta&.profile)
+          base_claim_url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+          if meta_profiles.include?(base_claim_url) && !meta_profiles.include?(root_resource_profile_url)
+            root_resource_profile_url = base_claim_url
+          end
+        end
+
         add_resource_target_profile_to_map(root_entry.fullUrl, root_entry.resource, root_resource_profile_url)
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)
       end
@@ -462,8 +475,8 @@ module DaVinciPASTestKit
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
       {
-        'Claim' => request_type == 'submit' ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
-        'ClaimResponse' => if request_type == 'submit'
+        'Claim' => request_type.start_with?('submit') ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
+        'ClaimResponse' => if request_type == 'submit' || request_type == 'submit_response'
                              PASConstants::CLAIM_RESPONSE_PROFILE
                            else
                              PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE

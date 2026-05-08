@@ -18,7 +18,7 @@
   :extensions:
   - :id: DeviceRequest.extension:coverage
     :path: extension
-    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information|2.2.0
     :modifier_extension: false
   :slices: []
   :elements:

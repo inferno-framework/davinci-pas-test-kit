@@ -20,11 +20,11 @@
   :extensions:
   - :id: Encounter.extension:patientStatus
     :path: extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-patientStatus
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-patientStatus|2.2.0
     :modifier_extension: false
   - :id: Encounter.extension:nursingHomeResidentialStatus
     :path: extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus|2.2.0
     :modifier_extension: false
   :slices: []
   :elements:

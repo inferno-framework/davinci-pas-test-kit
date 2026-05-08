@@ -18,15 +18,15 @@
   :extensions:
   - :id: CommunicationRequest.extension:serviceLineNumber
     :path: extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber|2.2.0
     :modifier_extension: false
   - :id: CommunicationRequest.payload.extension:communicatedDiagnosis
     :path: payload.extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis|2.2.0
     :modifier_extension: false
   - :id: CommunicationRequest.payload.extension:contentModifier
     :path: payload.extension
-    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier|2.2.0
     :modifier_extension: false
   :slices: []
   :elements:

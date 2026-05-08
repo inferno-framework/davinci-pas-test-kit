@@ -140,7 +140,18 @@ module DaVinciPASTestKit
       # work. The test kit validates these instances individually as well, so they are still checked,
       # but in a way that Inferno can supress errors
       'Unable to find a match for profile',
-      'Unable to find a profile match for'
+      'Unable to find a profile match for',
+      # IG defect: extension context definitions for these extensions don't match where the profiles place them
+      # extension-authorizationNumber context allows Claim.item only, but profile-claim-base marks it must-support on Claim.extension
+      'extension-authorizationNumber is not allowed to be used at this point',
+      'extension-administrationReferenceNumber is not allowed to be used at this point',
+      'extension-communicatedDiagnosis is not allowed to be used at this point',
+      # IG defect: extension-productOrServiceCodeEnd context only lists Claim.item/ClaimResponse, but profile-servicerequest marks it must-support on ServiceRequest
+      'extension-productOrServiceCodeEnd is not allowed to be used at this point',
+      # IG defect: extension-infoChanged and modifierextension-infoCancelled context only lists Claim.item,
+      # but profile-claim-base marks them must-support on Claim.supportingInfo as well
+      'extension-infoChanged is not allowed to be used at this point',
+      'modifierextension-infoCancelled is not allowed to be used at this point'
     ]
   )
   # rubocop:enable Layout/LineLength
