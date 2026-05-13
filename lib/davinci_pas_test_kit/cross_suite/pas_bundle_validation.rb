@@ -269,7 +269,6 @@ module DaVinciPASTestKit
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)
       end
 
-      add_declared_profiles_to_unprofiled_entries(bundle_entry, version)
       add_us_core_profiles_to_unprofiled_entries(bundle_entry, version)
       validate_bundle_entries_against_profiles(version)
     end
@@ -347,23 +346,6 @@ module DaVinciPASTestKit
 
         profile_urls.each do |profile_url|
           add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
-        end
-      end
-    end
-
-    def add_declared_profiles_to_unprofiled_entries(bundle_entry, version)
-      return unless us_core_profile_fallback_enabled?(version)
-
-      bundle_entry.each do |entry|
-        resource = entry.resource
-        next if resource.blank?
-
-        resource_full_url = resource_full_url_for_entry(entry)
-        next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
-
-        Array(resource.meta&.profile).compact.each do |profile_url|
-          add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
-          extract_profiles_to_validate_each_entry(bundle_entry, entry, profile_url, version)
         end
       end
     end

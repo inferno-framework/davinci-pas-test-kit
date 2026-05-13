@@ -469,6 +469,36 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
     end
 
+    it 'uses US Core fallback rather than declared meta.profile for entries not reached by PAS traversal' do
+      claim = FHIR::Claim.new(id: 'claim-1')
+      custom_profile = 'http://example.com/fhir/StructureDefinition/custom-documentreference'
+      document_reference = FHIR::DocumentReference.new(
+        id: 'doc-1',
+        meta: FHIR::Meta.new(profile: [custom_profile])
+      )
+      bundle = FHIR::Bundle.new(
+        entry: [
+          bundle_entry(claim, 'http://example.com/fhir/Claim/claim-1'),
+          bundle_entry(document_reference, 'http://example.com/fhir/DocumentReference/doc-1')
+        ]
+      )
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+      allow(test_instance).to receive(:evaluate_fhirpath).and_return([])
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit'
+      )
+
+      expect(
+        test_instance
+          .bundle_resources_target_profile_map['http://example.com/fhir/DocumentReference/doc-1'][:profile_urls]
+      ).to contain_exactly(us_core_profile_url('us-core-documentreference'))
+    end
+
     describe '#codeable_concept_has_code?' do
       it 'matches when the coding system matches' do
         concept = codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'laboratory')
