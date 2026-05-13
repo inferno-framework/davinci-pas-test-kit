@@ -1,10 +1,20 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientDenialSubmitTest, :request do # rubocop:disable RSpec/SpecFilePathFormat
+require_relative '../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
+
+RSpec.describe DaVinciPASTestKit::AbstractDenialSubmitTest, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
     let(:session_url_path) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
-    let(:test) { described_class }
+    let(:test) do
+      Class.new(described_class) do
+        include DaVinciPASTestKit::DaVinciPASV201::URLs
+
+        def suite_id
+          'davinci_pas_client_suite_v201'
+        end
+      end
+    end
     let(:results_repo) { Inferno::Repositories::Results.new }
     let(:requests_repo) { Inferno::Repositories::Requests.new }
     let(:submit_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::SUBMIT_PATH}" }

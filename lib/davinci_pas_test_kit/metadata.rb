@@ -76,7 +76,12 @@ module DaVinciPASTestKit
       section of the
       [open source code repository](https://github.com/inferno-framework/davinci-pas-test-kit).
     DESCRIPTION
-    suite_ids [:davinci_pas_server_suite_v201, :davinci_pas_client_suite_v201]
+    suite_ids [
+      :davinci_pas_server_suite_v201,
+      :davinci_pas_server_suite_v220,
+      :davinci_pas_client_suite_v201,
+      :davinci_pas_client_suite_v220
+    ]
     tags ['Da Vinci', 'PAS']
     last_updated LAST_UPDATED
     version VERSION
