@@ -85,7 +85,7 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-      igs 'hl7.fhir.us.davinci-pas#2.2.0'
+        igs "hl7.fhir.us.davinci-pas#2.2.0", "hl7.fhir.us.core#6.1.0"
         
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
