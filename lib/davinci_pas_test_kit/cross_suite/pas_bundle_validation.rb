@@ -11,7 +11,8 @@ module DaVinciPASTestKit
 
     US_CORE_VERSION = '6.1.0'
     US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
-    PAS_PROFILE_BASE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition'
+    BASE_R4_PROFILE = :base_r4
+    CLAIM_ENCOUNTER_EXTENSION_URL = 'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter'
     LOINC_SYSTEM = 'http://loinc.org'
     TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
     OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
@@ -269,7 +270,6 @@ module DaVinciPASTestKit
       end
 
       add_declared_profiles_to_unprofiled_entries(bundle_entry, version)
-      add_pas_profiles_to_unprofiled_entries(bundle_entry, version)
       add_us_core_profiles_to_unprofiled_entries(bundle_entry, version)
       validate_bundle_entries_against_profiles(version)
     end
@@ -304,10 +304,13 @@ module DaVinciPASTestKit
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
 
         success_profile = item[:profile_urls].find do |url|
-          profile_to_validate = profile_url_for_validation(url, base_profile, version)
           if key == 'bundle'
+            profile_to_validate = profile_url_for_validation(url, base_profile, version)
             bundle_profile_valid?(resource, profile_to_validate)
+          elsif url == BASE_R4_PROFILE
+            resource_is_valid?(resource:)
           else
+            profile_to_validate = profile_url_for_validation(url, base_profile, version)
             resource_is_valid?(resource:, profile_url: profile_to_validate)
           end
         end
@@ -317,8 +320,9 @@ module DaVinciPASTestKit
     end
 
     def profile_url_for_validation(url, base_profile, version)
-      return url if url.include?('|') || url.start_with?(base_profile)
-      return "#{url}|#{US_CORE_VERSION}" if us_core_profile_url?(url) && us_core_profile_fallback_enabled?(version)
+      url = url.to_s
+      return url if url.include?('|') || profile_url_without_version(url) == base_profile
+      return "#{url}|#{US_CORE_VERSION}" if us_core_profile_url?(url)
 
       "#{url}|#{version}"
     end
@@ -338,7 +342,10 @@ module DaVinciPASTestKit
         resource_full_url = resource_full_url_for_entry(entry)
         next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
 
-        us_core_profile_urls_for_resource(resource).each do |profile_url|
+        profile_urls = us_core_profile_urls_for_resource(resource)
+        profile_urls = [BASE_R4_PROFILE] if profile_urls.blank?
+
+        profile_urls.each do |profile_url|
           add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
         end
       end
@@ -361,42 +368,10 @@ module DaVinciPASTestKit
       end
     end
 
-    def add_pas_profiles_to_unprofiled_entries(bundle_entry, version)
-      return unless us_core_profile_fallback_enabled?(version)
-
-      bundle_entry.each do |entry|
-        resource = entry.resource
-        next if resource.blank?
-
-        resource_full_url = resource_full_url_for_entry(entry)
-        next if bundle_resources_target_profile_map[resource_full_url]&.dig(:profile_urls).present?
-
-        profile_url = unique_pas_profile_url_for_resource(resource.resourceType, version)
-        next if profile_url.blank?
-
-        add_resource_target_profile_to_map(resource_full_url, resource, profile_url)
-        extract_profiles_to_validate_each_entry(bundle_entry, entry, profile_url, version)
-      end
-    end
-
     def resource_full_url_for_entry(entry)
       resource = entry.resource
 
       entry.fullUrl.presence || "#{resource.resourceType}/#{resource.id}"
-    end
-
-    def unique_pas_profile_url_for_resource(resource_type, version)
-      pas_profile_urls_by_resource(version)[resource_type].presence&.then do |profile_urls|
-        profile_urls.one? ? profile_urls.first : nil
-      end
-    end
-
-    def pas_profile_urls_by_resource(version)
-      @pas_profile_urls_by_resource ||= {}
-      @pas_profile_urls_by_resource[version] ||= metadata_map("v#{version}").values
-        .select { |metadata| pas_profile_url?(metadata.profile_url) }
-        .group_by(&:resource)
-        .transform_values { |metadata| metadata.map(&:profile_url).uniq }
     end
 
     def us_core_profile_fallback_enabled?(version)
@@ -471,10 +446,6 @@ module DaVinciPASTestKit
       profile_url_without_version(url).start_with?("#{US_CORE_PROFILE_BASE}/")
     end
 
-    def pas_profile_url?(url)
-      profile_url_without_version(url).start_with?("#{PAS_PROFILE_BASE}/")
-    end
-
     def category_code_present?(resource, code, system:)
       codeable_concept_has_code?(resource.category, code, system:)
     end
@@ -534,7 +505,7 @@ module DaVinciPASTestKit
       return if metadata.blank?
 
       bundle_map = bundle_entry_map(bundle_entry)
-      reference_elements = metadata.references
+      reference_elements = metadata.references.dup
 
       # Special handling for Claim submit profile
       if current_entry_profile_url == PASConstants::CLAIM_PROFILE
@@ -565,7 +536,16 @@ module DaVinciPASTestKit
         ]
       }
 
+      # This temporary traversal handling may be replaced later by shared metadata-driven navigation logic.
+      claim_encounter_ref_element = {
+        path: "Claim.extension.where(url = '#{CLAIM_ENCOUNTER_EXTENSION_URL}').value",
+        profiles: [
+          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter'
+        ]
+      }
+
       reference_elements << claim_ref_element
+      reference_elements << claim_encounter_ref_element
     end
 
     # Processes a given reference element definition from a FHIR bundle entry.
@@ -577,6 +557,12 @@ module DaVinciPASTestKit
     # @param version [String] The FHIR version.
     def process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version)
       fhirpath_result = evaluate_fhirpath(resource: current_entry.resource, path: reference_element[:path])
+      if reference_element[:path].include?('extension-Claim.encounter')
+        puts "=== ENCOUNTER EXTENSION DEBUG ==="
+        puts "Path: #{reference_element[:path]}"
+        puts "Result: #{fhirpath_result.inspect}"
+        puts "================================="
+      end
       reference_element_values = fhirpath_result.filter_map do |entry|
         entry['element']&.reference if entry['type'] == 'Reference'
       end
@@ -850,7 +836,7 @@ module DaVinciPASTestKit
     # This method generates an error message when a resource appears in both the PA request
     # and response bundles but does not have the same fullUrl or identifiers.
     def resource_present_in_pa_request_and_response_msg(resource)
-      "Resource #{resource.resourceType}/#{resource.id} is an entry in both the PA Request Bundle and the Response " /
+      "Resource #{resource.resourceType}/#{resource.id} is an entry in both the PA Request Bundle and the Response " \
         'Bundle, but they do not have the same fullUrl or identifiers'
     end
   end
