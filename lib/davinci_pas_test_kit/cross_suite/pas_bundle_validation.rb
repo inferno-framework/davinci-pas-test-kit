@@ -557,12 +557,6 @@ module DaVinciPASTestKit
     # @param version [String] The FHIR version.
     def process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version)
       fhirpath_result = evaluate_fhirpath(resource: current_entry.resource, path: reference_element[:path])
-      if reference_element[:path].include?('extension-Claim.encounter')
-        puts "=== ENCOUNTER EXTENSION DEBUG ==="
-        puts "Path: #{reference_element[:path]}"
-        puts "Result: #{fhirpath_result.inspect}"
-        puts "================================="
-      end
       reference_element_values = fhirpath_result.filter_map do |entry|
         entry['element']&.reference if entry['type'] == 'Reference'
       end
