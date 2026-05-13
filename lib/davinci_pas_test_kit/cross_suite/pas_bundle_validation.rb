@@ -432,11 +432,11 @@ module DaVinciPASTestKit
       codeable_concept_has_code?(resource.category, code, system:)
     end
 
-    def codeable_concept_has_code?(codeable_concepts, code, system: nil)
+    def codeable_concept_has_code?(codeable_concepts, code, system:)
       systems = Array(system).compact
       Array(codeable_concepts).compact.any? do |codeable_concept|
         Array(codeable_concept&.coding).compact.any? do |coding|
-          coding.code == code && (systems.blank? || coding.system.blank? || systems.include?(coding.system))
+          coding.code == code && systems.include?(coding.system)
         end
       end
     end

@@ -507,11 +507,11 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
                                   system: described_class::OBSERVATION_CATEGORY_SYSTEM)).to be(true)
       end
 
-      it 'matches when the coding system is blank' do
+      it 'does not match when the coding system is blank' do
         concept = codeable_concept(nil, 'laboratory')
 
         expect(test_instance.send(:codeable_concept_has_code?, concept, 'laboratory',
-                                  system: described_class::OBSERVATION_CATEGORY_SYSTEM)).to be(true)
+                                  system: described_class::OBSERVATION_CATEGORY_SYSTEM)).to be(false)
       end
 
       it 'does not match when the coding system differs' do
