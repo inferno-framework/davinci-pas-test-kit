@@ -595,6 +595,11 @@ module DaVinciPASTestKit
         comm_full_url = "urn:uuid:#{comm_request.id}"
         response_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: comm_full_url, resource: comm_request)
         claim_response.communicationRequest = [FHIR::Reference.new(reference: comm_full_url)]
+      end
+
+      if ig_version == 'v2.2.0'
+        task = build_mock_task
+        response_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: "urn:uuid:#{task.id}", resource: task)
 
         practitioner = build_mock_practitioner
         pract_full_url = "urn:uuid:#{practitioner.id}"
@@ -603,9 +608,6 @@ module DaVinciPASTestKit
         practitioner_role = build_mock_practitioner_role(pract_full_url)
         pract_role_full_url = "urn:uuid:#{practitioner_role.id}"
         response_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: pract_role_full_url, resource: practitioner_role)
-
-        task = build_mock_task
-        response_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: "urn:uuid:#{task.id}", resource: task)
       end
 
       response_bundle

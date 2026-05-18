@@ -151,7 +151,12 @@ module DaVinciPASTestKit
       # IG defect: extension-infoChanged and modifierextension-infoCancelled context only lists Claim.item,
       # but profile-claim-base marks them must-support on Claim.supportingInfo as well
       'extension-infoChanged is not allowed to be used at this point',
-      'modifierextension-infoCancelled is not allowed to be used at this point'
+      'modifierextension-infoCancelled is not allowed to be used at this point',
+      # The IG's own PASClaimInquiryExample uses HCPCS code B4184. When the validator checks against
+      # a specific published version of the HCPCS code system (e.g. 2025-01), it reports the code as
+      # unknown because that version snapshot may not include every HCPCS code. Suppressed: the code
+      # is valid per the IG and the code system version mismatch is a validator environment issue.
+      %r{Unknown code .+ in the CodeSystem 'http://www\.cms\.gov/Medicare/Coding/HCPCSReleaseCodeSets'},
     ]
   )
   # rubocop:enable Layout/LineLength
