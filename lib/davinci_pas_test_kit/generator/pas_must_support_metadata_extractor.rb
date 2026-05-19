@@ -13,8 +13,9 @@ module DaVinciPASTestKit
     # When patternIdentifier.type.coding is present, emit a patternCodeableConcept discriminator
     # on path 'type' instead, which inferno_core CAN navigate at runtime.
     def save_pattern_slice(pattern_element, discriminator_path, metadata)
-      if pattern_element.patternIdentifier&.type&.coding&.first
-        coding = pattern_element.patternIdentifier.type.coding.first
+      pi_type = pattern_element.patternIdentifier&.type
+      coding = pi_type&.coding&.first
+      if coding
         runtime_path = navigation_compatible_discriminator_path(discriminator_path)
         path = runtime_path.present? ? "#{runtime_path}.type" : 'type'
         return {
@@ -106,11 +107,12 @@ module DaVinciPASTestKit
     def optional_slices
       ms_slice_names = must_support_slices.map { |s| s[:slice_name] }.compact.to_set
 
-      non_ms_with_ms_children = profile_elements.reject do |e|
+      candidate_slices = profile_elements.reject do |e|
         e.sliceName.blank? ||
           e.path.end_with?('extension') ||
           ms_slice_names.include?(e.sliceName)
-      end.select do |e|
+      end
+      non_ms_with_ms_children = candidate_slices.select do |e|
         all_must_support_elements.any? { |ms_el| ms_el.id.start_with?("#{e.id}.") }
       end
 
@@ -127,55 +129,60 @@ module DaVinciPASTestKit
           optional: true
         }
 
-        if element_discriminators.blank?
-          # Choice-type slice (e.g. timing[x]:timingPeriod) where the parent timing[x] element
-          # has no explicit slicing discriminator — the discrimination is implicit by type.
-          # Infer the type discriminator from the element's own single type constraint.
-          next unless current_element.type&.one?
+        build_optional_slice_discriminator(current_element, element_discriminators, metadata)
+      end
+    end
 
-          type_code = current_element.type.first&.code
-          next if type_code.nil?
+    def build_optional_slice_discriminator(current_element, element_discriminators, metadata)
+      if element_discriminators.blank?
+        return unless current_element.type&.one?
 
-          metadata[:discriminator] = { type: 'type', code: type_code.upcase_first }
-        elsif element_discriminators.first.type == 'type'
-          type_path = discriminator_path(element_discriminators.first)
-          type_element = find_element_by_discriminator_path(current_element, type_path)
-          next if type_element.nil?
+        type_code = current_element.type.first&.code
+        return unless type_code
 
-          type_code = type_element.type&.first&.code
-          next if type_code.nil?
+        metadata[:discriminator] = { type: 'type', code: type_code.upcase_first }
+      elsif element_discriminators.first.type == 'type'
+        type_path = discriminator_path(element_discriminators.first)
+        type_element = find_element_by_discriminator_path(current_element, type_path)
+        return unless type_element
 
-          metadata[:discriminator] = { type: 'type', code: type_code.upcase_first }
+        type_code = type_element.type&.first&.code
+        return unless type_code
+
+        metadata[:discriminator] = { type: 'type', code: type_code.upcase_first }
+      else
+        add_optional_slice_value_discriminator(element_discriminators, current_element, metadata)
+        return unless metadata[:discriminator].present?
+      end
+
+      metadata
+    end
+
+    def add_optional_slice_value_discriminator(element_discriminators, current_element, metadata)
+      fixed_values = []
+      pattern_value = {}
+
+      element_discriminators.each do |discriminator|
+        disc_path = discriminator_path(discriminator)
+        pattern_element = find_element_by_discriminator_path(current_element, disc_path)
+
+        next if pattern_element.nil? && element_discriminators.length > 1
+        next if pattern_element.nil?
+
+        if !pattern_element.fixed.nil?
+          fixed_values << { path: navigation_compatible_discriminator_path(disc_path),
+                            value: pattern_element.fixed }
+        elsif pattern_value.present?
+          next
         else
-          fixed_values = []
-          pattern_value = {}
-
-          element_discriminators.each do |discriminator|
-            disc_path = discriminator_path(discriminator)
-            pattern_element = find_element_by_discriminator_path(current_element, disc_path)
-
-            next if pattern_element.nil? && element_discriminators.length > 1
-            next if pattern_element.nil?
-
-            if !pattern_element.fixed.nil?
-              fixed_values << { path: navigation_compatible_discriminator_path(disc_path), value: pattern_element.fixed }
-            elsif pattern_value.present?
-              next
-            else
-              pattern_value = save_pattern_slice(pattern_element, disc_path, metadata)
-            end
-          end
-
-          if fixed_values.present?
-            metadata[:discriminator] = { type: 'value', values: fixed_values }
-          elsif pattern_value.present?
-            metadata[:discriminator] = pattern_value
-          else
-            next
-          end
+          pattern_value = save_pattern_slice(pattern_element, disc_path, metadata)
         end
+      end
 
-        metadata
+      if fixed_values.present?
+        metadata[:discriminator] = { type: 'value', values: fixed_values }
+      elsif pattern_value.present?
+        metadata[:discriminator] = pattern_value
       end
     end
 

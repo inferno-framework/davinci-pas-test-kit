@@ -475,8 +475,12 @@ module DaVinciPASTestKit
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
       {
-        'Claim' => request_type.start_with?('submit') ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
-        'ClaimResponse' => if request_type == 'submit' || request_type == 'submit_response'
+        'Claim' => if request_type.start_with?('submit')
+                     PASConstants::CLAIM_PROFILE
+                   else
+                     PASConstants::CLAIM_INQUIRY_PROFILE
+                   end,
+        'ClaimResponse' => if %w[submit submit_response].include?(request_type)
                              PASConstants::CLAIM_RESPONSE_PROFILE
                            else
                              PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE

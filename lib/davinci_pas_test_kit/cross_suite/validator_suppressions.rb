@@ -156,7 +156,7 @@ module DaVinciPASTestKit
       # a specific published version of the HCPCS code system (e.g. 2025-01), it reports the code as
       # unknown because that version snapshot may not include every HCPCS code. Suppressed: the code
       # is valid per the IG and the code system version mismatch is a validator environment issue.
-      %r{Unknown code .+ in the CodeSystem 'http://www\.cms\.gov/Medicare/Coding/HCPCSReleaseCodeSets'},
+      %r{Unknown code .+ in the CodeSystem 'http://www\.cms\.gov/Medicare/Coding/HCPCSReleaseCodeSets'}
     ]
   )
   # rubocop:enable Layout/LineLength

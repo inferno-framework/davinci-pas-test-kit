@@ -59,7 +59,8 @@ module DaVinciPASTestKit
 
       errors = []
       grouped_resources.each do |type, resources|
-        missing_must_support_strings = missing_must_support_elements_with_optional_slices(resources, metadata_array[type])
+        missing_must_support_strings = missing_must_support_elements_with_optional_slices(resources,
+                                                                                          metadata_array[type])
         errors << error_message(missing_must_support_strings, resources, type) if missing_must_support_strings.present?
       end
 

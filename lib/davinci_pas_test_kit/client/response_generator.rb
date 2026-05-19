@@ -240,21 +240,25 @@ module DaVinciPASTestKit
                                       else
                                         "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|#{ig_version.delete('v')}"
                                       end),
-        extension: ig_version == 'v2.2.0' ? [
-          FHIR::Extension.new(
-            url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-TransmissionIdentifiers',
-            extension: [
-              FHIR::Extension.new(url: 'applicationSenderCode', valueString: 'SENDER01'),
-              FHIR::Extension.new(url: 'applicationReceiverCode', valueString: 'RECEIVER01')
-            ]
-          ),
-          FHIR::Extension.new(
-            url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-claimResponseReviewer',
-            extension: [
-              FHIR::Extension.new(url: 'wasHumanReviewedFlag', valueBoolean: true)
-            ]
-          )
-        ] : [],
+        extension: if ig_version == 'v2.2.0'
+                     [
+                       FHIR::Extension.new(
+                         url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-TransmissionIdentifiers',
+                         extension: [
+                           FHIR::Extension.new(url: 'applicationSenderCode', valueString: 'SENDER01'),
+                           FHIR::Extension.new(url: 'applicationReceiverCode', valueString: 'RECEIVER01')
+                         ]
+                       ),
+                       FHIR::Extension.new(
+                         url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-claimResponseReviewer',
+                         extension: [
+                           FHIR::Extension.new(url: 'wasHumanReviewedFlag', valueBoolean: true)
+                         ]
+                       )
+                     ]
+                   else
+                     []
+                   end,
         identifier: claim.identifier,
         type: claim.type,
         status: claim.status,
@@ -266,7 +270,7 @@ module DaVinciPASTestKit
         request: claim_full_url.present? ? FHIR::Reference.new(reference: claim_full_url) : nil,
         # v2.2.0 removed 'queued' from ClaimResponseOutcome ValueSet; pended status is
         # conveyed via item.extension:reviewActionCode instead.
-        outcome: (decision == :pended && ig_version != 'v2.2.0') ? 'queued' : 'complete',
+        outcome: decision == :pended && ig_version != 'v2.2.0' ? 'queued' : 'complete',
         preAuthPeriod: FHIR::Period.new(
           start: timestamp.strftime('%Y-%m-%d'),
           end: (timestamp + 1.month).strftime('%Y-%m-%d')
@@ -367,16 +371,20 @@ module DaVinciPASTestKit
                   coding: [FHIR::Coding.new(system: 'http://hl7.org/fhir/sid/icd-10-cm', code: 'J06.9')]
                 )
               ),
-              *(ig_version == 'v2.2.0' ? [
-                FHIR::Extension.new(
-                  url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-admissionDates',
-                  valuePeriod: FHIR::Period.new(start: '2023-01-01')
-                ),
-                FHIR::Extension.new(
-                  url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-dischargeDate',
-                  valueDate: '2023-01-10'
-                )
-              ] : [])
+              *(if ig_version == 'v2.2.0'
+                  [
+                    FHIR::Extension.new(
+                      url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-admissionDates',
+                      valuePeriod: FHIR::Period.new(start: '2023-01-01')
+                    ),
+                    FHIR::Extension.new(
+                      url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-dischargeDate',
+                      valueDate: '2023-01-10'
+                    )
+                  ]
+                else
+                  []
+                end)
             ],
             itemSequence: item.sequence,
             noteNumber: [1],
@@ -406,164 +414,180 @@ module DaVinciPASTestKit
             ]
           )
         end,
-        addItem: ig_version == 'v2.2.0' ? [
-          FHIR::ClaimResponse::AddItem.new(
-            extension: [
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber',
-                valueIdentifier: FHIR::Identifier.new(
-                  system: 'https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER',
-                  value: 'TRACE001'
-                )
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthIssueDate',
-                valueDate: timestamp.strftime('%Y-%m-%d')
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthPeriod',
-                valuePeriod: FHIR::Period.new(
-                  start: timestamp.strftime('%Y-%m-%d'),
-                  end: (timestamp + 1.month).strftime('%Y-%m-%d')
-                )
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber',
-                valueString: 'AUTH456'
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber',
-                valueString: 'ADMIN456'
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator',
-                valueBoolean: false
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus',
-                valueCodeableConcept: FHIR::CodeableConcept.new(
-                  coding: [FHIR::Coding.new(
-                    system: 'https://valueset.x12.org/x217/005010/response/2000F/NX1/1/01/00/1345',
-                    code: '2'
-                  )]
-                )
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare',
-                valueCodeableConcept: FHIR::CodeableConcept.new(
-                  coding: [FHIR::Coding.new(
-                    system: 'https://valueset.x12.org/x217/005010/response/2000F/NX1/1/02/00/1306',
-                    code: '2'
-                  )]
-                )
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd',
-                valueCodeableConcept: FHIR::CodeableConcept.new(
-                  coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/1365', code: 'G0153')]
-                )
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueCode',
-                valueCodeableConcept: FHIR::CodeableConcept.new(
-                  coding: [FHIR::Coding.new(system: 'https://www.nubc.org/CodeSystem/RevenueCodes', code: '0300')]
-                )
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService',
-                valueReference: FHIR::Reference.new(display: 'Mock Requested Service')
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-admissionDates',
-                valuePeriod: FHIR::Period.new(start: '2023-01-01')
-              ),
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-dischargeDate',
-                valueDate: '2023-01-10'
-              )
-            ],
-            itemSequence: [1],
-            provider: [
-              FHIR::Reference.new(
-                display: 'Mock AddItem Provider',
-                extension: [
-                  FHIR::Extension.new(
-                    url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizedProviderType',
-                    valueCodeableConcept: FHIR::CodeableConcept.new(
-                      coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/98', code: 'IL')]
-                    )
-                  )
-                ]
-              )
-            ],
-            productOrService: FHIR::CodeableConcept.new(
-              coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/1365', code: 'G0153')]
-            ),
-            modifier: [
-              FHIR::CodeableConcept.new(
-                coding: [FHIR::Coding.new(system: 'http://www.ama-assn.org/go/cpt', code: '25')]
-              )
-            ],
-            servicedDate: timestamp.strftime('%Y-%m-%d'),
-            locationCodeableConcept: FHIR::CodeableConcept.new(
-              coding: [FHIR::Coding.new(
-                system: 'https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set',
-                code: '11'
-              )]
-            ),
-            quantity: FHIR::Quantity.new(value: 1),
-            unitPrice: FHIR::Money.new(value: 100.0, currency: 'USD'),
-            adjudication: [
-              FHIR::ClaimResponse::Item::Adjudication.new(
-                extension: [
-                  FHIR::Extension.new(
-                    url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
-                    extension: [
-                      FHIR::Extension.new(
-                        url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode',
-                        valueCodeableConcept: FHIR::CodeableConcept.new(
-                          coding: [get_review_action_code(decision)]
-                        )
-                      )
-                    ]
-                  )
-                ],
-                category: FHIR::CodeableConcept.new(
-                  coding: [
-                    FHIR::Coding.new(system: 'http://terminology.hl7.org/CodeSystem/adjudication', code: 'submitted')
-                  ]
-                )
-              )
-            ]
-          )
-        ] : [],
-        adjudication: ig_version == 'v2.2.0' ? [
-          FHIR::ClaimResponse::Item::Adjudication.new(
-            extension: [
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
-                extension: [
-                  # Neither 'code' (profiles extension-reviewActionCode, context excludes ClaimResponse.adjudication)
-                  # nor 'reasonCode' (bound to X12278ReviewDecisionReasonCode, not review-action codes) can be
-                  # used here without triggering a validator error. Use 'number' (plain string, no binding) to
-                  # satisfy the MS check for extension-reviewAction on ClaimResponse.adjudication.
-                  FHIR::Extension.new(url: 'number', valueString: '1')
-                ]
-              )
-            ],
-            category: FHIR::CodeableConcept.new(
-              coding: [
-                FHIR::Coding.new(system: 'http://terminology.hl7.org/CodeSystem/adjudication', code: 'submitted')
-              ]
-            )
-          )
-        ] : [],
-        processNote: ig_version == 'v2.2.0' ? [
-          FHIR::ClaimResponse::ProcessNote.new(
-            number: 1,
-            text: 'Prior authorization processing note'
-          )
-        ] : []
+        addItem: if ig_version == 'v2.2.0'
+                   [
+                     FHIR::ClaimResponse::AddItem.new(
+                       extension: [
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber',
+                           valueIdentifier: FHIR::Identifier.new(
+                             system: 'https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER',
+                             value: 'TRACE001'
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthIssueDate',
+                           valueDate: timestamp.strftime('%Y-%m-%d')
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthPeriod',
+                           valuePeriod: FHIR::Period.new(
+                             start: timestamp.strftime('%Y-%m-%d'),
+                             end: (timestamp + 1.month).strftime('%Y-%m-%d')
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber',
+                           valueString: 'AUTH456'
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber',
+                           valueString: 'ADMIN456'
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator',
+                           valueBoolean: false
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus',
+                           valueCodeableConcept: FHIR::CodeableConcept.new(
+                             coding: [FHIR::Coding.new(
+                               system: 'https://valueset.x12.org/x217/005010/response/2000F/NX1/1/01/00/1345',
+                               code: '2'
+                             )]
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare',
+                           valueCodeableConcept: FHIR::CodeableConcept.new(
+                             coding: [FHIR::Coding.new(
+                               system: 'https://valueset.x12.org/x217/005010/response/2000F/NX1/1/02/00/1306',
+                               code: '2'
+                             )]
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd',
+                           valueCodeableConcept: FHIR::CodeableConcept.new(
+                             coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/1365', code: 'G0153')]
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueCode',
+                           valueCodeableConcept: FHIR::CodeableConcept.new(
+                             coding: [FHIR::Coding.new(system: 'https://www.nubc.org/CodeSystem/RevenueCodes',
+                                                       code: '0300')]
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService',
+                           valueReference: FHIR::Reference.new(display: 'Mock Requested Service')
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-admissionDates',
+                           valuePeriod: FHIR::Period.new(start: '2023-01-01')
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-dischargeDate',
+                           valueDate: '2023-01-10'
+                         )
+                       ],
+                       itemSequence: [1],
+                       provider: [
+                         FHIR::Reference.new(
+                           display: 'Mock AddItem Provider',
+                           extension: [
+                             FHIR::Extension.new(
+                               url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizedProviderType',
+                               valueCodeableConcept: FHIR::CodeableConcept.new(
+                                 coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/98', code: 'IL')]
+                               )
+                             )
+                           ]
+                         )
+                       ],
+                       productOrService: FHIR::CodeableConcept.new(
+                         coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/1365', code: 'G0153')]
+                       ),
+                       modifier: [
+                         FHIR::CodeableConcept.new(
+                           coding: [FHIR::Coding.new(system: 'http://www.ama-assn.org/go/cpt', code: '25')]
+                         )
+                       ],
+                       servicedDate: timestamp.strftime('%Y-%m-%d'),
+                       locationCodeableConcept: FHIR::CodeableConcept.new(
+                         coding: [FHIR::Coding.new(
+                           system: 'https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set',
+                           code: '11'
+                         )]
+                       ),
+                       quantity: FHIR::Quantity.new(value: 1),
+                       unitPrice: FHIR::Money.new(value: 100.0, currency: 'USD'),
+                       adjudication: [
+                         FHIR::ClaimResponse::Item::Adjudication.new(
+                           extension: [
+                             FHIR::Extension.new(
+                               url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
+                               extension: [
+                                 FHIR::Extension.new(
+                                   url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode',
+                                   valueCodeableConcept: FHIR::CodeableConcept.new(
+                                     coding: [get_review_action_code(decision)]
+                                   )
+                                 )
+                               ]
+                             )
+                           ],
+                           category: FHIR::CodeableConcept.new(
+                             coding: [
+                               FHIR::Coding.new(system: 'http://terminology.hl7.org/CodeSystem/adjudication',
+                                                code: 'submitted')
+                             ]
+                           )
+                         )
+                       ]
+                     )
+                   ]
+                 else
+                   []
+                 end,
+        adjudication: if ig_version == 'v2.2.0'
+                        [
+                          FHIR::ClaimResponse::Item::Adjudication.new(
+                            extension: [
+                              FHIR::Extension.new(
+                                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
+                                extension: [
+                                  # 'code' (extension-reviewActionCode, context excludes
+                                  # ClaimResponse.adjudication) and 'reasonCode' (bound to
+                                  # X12278ReviewDecisionReasonCode) cannot be used here without
+                                  # validator errors. Use 'number' (plain string, no binding)
+                                  # to satisfy the MS check for extension-reviewAction.
+                                  FHIR::Extension.new(url: 'number', valueString: '1')
+                                ]
+                              )
+                            ],
+                            category: FHIR::CodeableConcept.new(
+                              coding: [
+                                FHIR::Coding.new(system: 'http://terminology.hl7.org/CodeSystem/adjudication',
+                                                 code: 'submitted')
+                              ]
+                            )
+                          )
+                        ]
+                      else
+                        []
+                      end,
+        processNote: if ig_version == 'v2.2.0'
+                       [
+                         FHIR::ClaimResponse::ProcessNote.new(
+                           number: 1,
+                           text: 'Prior authorization processing note'
+                         )
+                       ]
+                     else
+                       []
+                     end
       )
     end
 
