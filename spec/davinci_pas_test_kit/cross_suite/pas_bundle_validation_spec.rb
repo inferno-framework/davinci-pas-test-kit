@@ -249,10 +249,6 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       Class.new do
         include DaVinciPASTestKit::PasBundleValidation
 
-        def evaluate_fhirpath(**)
-          []
-        end
-
         def messages
           @messages ||= []
         end
@@ -289,8 +285,36 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       )
     end
 
-    def claim_encounter_fhirpath
-      "Claim.extension.where(url = '#{described_class::CLAIM_ENCOUNTER_EXTENSION_URL}').value"
+    def reference_extension(url, reference)
+      FHIR::Extension.new(
+        url:,
+        valueReference: FHIR::Reference.new(reference:)
+      )
+    end
+
+    def claim_with_encounter_reference(reference)
+      FHIR::Claim.new(
+        id: 'claim-1',
+        extension: [
+          reference_extension(described_class::CLAIM_ENCOUNTER_EXTENSION_URL, reference)
+        ]
+      )
+    end
+
+    def claim_with_requested_service_reference(reference)
+      FHIR::Claim.new(
+        id: 'claim-1',
+        item: [
+          FHIR::Claim::Item.new(
+            extension: [
+              reference_extension(
+                'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService',
+                reference
+              )
+            ]
+          )
+        ]
+      )
     end
 
     describe '#us_core_profile_fallback_enabled?' do
@@ -301,6 +325,22 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       it 'returns false for PAS v2.0.1' do
         expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.0.1')).to be(false)
+      end
+    end
+
+    describe '#find_profile_url' do
+      it 'treats compound submit request types as submit operations' do
+        expect(test_instance.send(:find_profile_url, 'submit_request')['Claim'])
+          .to eq(DaVinciPASTestKit::PASConstants::CLAIM_PROFILE)
+        expect(test_instance.send(:find_profile_url, 'submit_response')['ClaimResponse'])
+          .to eq(DaVinciPASTestKit::PASConstants::CLAIM_RESPONSE_PROFILE)
+      end
+
+      it 'treats compound inquire request types as inquiry operations' do
+        expect(test_instance.send(:find_profile_url, 'inquire_request')['Claim'])
+          .to eq(DaVinciPASTestKit::PASConstants::CLAIM_INQUIRY_PROFILE)
+        expect(test_instance.send(:find_profile_url, 'inquire_response')['ClaimResponse'])
+          .to eq(DaVinciPASTestKit::PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE)
       end
     end
 
@@ -484,7 +524,6 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       )
 
       allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
-      allow(test_instance).to receive(:evaluate_fhirpath).and_return([])
 
       test_instance.validate_resources_conformance_against_profile(
         bundle,
@@ -523,7 +562,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
 
     it 'resolves versioned PAS reference target profiles against unversioned metadata keys' do
-      claim = FHIR::Claim.new(id: 'claim-1')
+      claim = claim_with_encounter_reference('Encounter/encounter-1')
       encounter = FHIR::Encounter.new(id: 'encounter-1')
       bundle = FHIR::Bundle.new(
         entry: [
@@ -533,13 +572,6 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       )
 
       allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
-      allow(test_instance).to receive(:evaluate_fhirpath) do |path:, **|
-        if path == 'Claim.extension.value[x]'
-          [{ 'type' => 'Reference', 'element' => FHIR::Reference.new(reference: 'Encounter/encounter-1') }]
-        else
-          []
-        end
-      end
 
       test_instance.validate_resources_conformance_against_profile(
         bundle,
@@ -554,24 +586,17 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter|2.2.0')
     end
 
-    it 'traverses the R5 Claim encounter extension to the PAS Encounter profile' do
-      claim = FHIR::Claim.new(id: 'claim-1')
-      encounter = FHIR::Encounter.new(id: 'encounter-1')
+    it 'traverses Claim requestedService extensions to the PAS ServiceRequest profile before US Core fallback' do
+      claim = claim_with_requested_service_reference('ServiceRequest/service-request-1')
+      service_request = FHIR::ServiceRequest.new(id: 'service-request-1')
       bundle = FHIR::Bundle.new(
         entry: [
           bundle_entry(claim, 'http://example.com/fhir/Claim/claim-1'),
-          bundle_entry(encounter, 'http://example.com/fhir/Encounter/encounter-1')
+          bundle_entry(service_request, 'http://example.com/fhir/ServiceRequest/service-request-1')
         ]
       )
 
       allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
-      allow(test_instance).to receive(:evaluate_fhirpath) do |path:, **|
-        if path == claim_encounter_fhirpath
-          [{ 'type' => 'Reference', 'element' => FHIR::Reference.new(reference: 'Encounter/encounter-1') }]
-        else
-          []
-        end
-      end
 
       test_instance.validate_resources_conformance_against_profile(
         bundle,
@@ -582,8 +607,36 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       expect(
         test_instance
-          .bundle_resources_target_profile_map['http://example.com/fhir/Encounter/encounter-1'][:profile_urls]
-      ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter')
+          .bundle_resources_target_profile_map['http://example.com/fhir/ServiceRequest/service-request-1'][:profile_urls]
+      ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-servicerequest')
+    end
+
+    it 'traverses Claim requestedService extensions for submit_request server validation' do
+      claim = claim_with_requested_service_reference('ServiceRequest/service-request-1')
+      service_request = FHIR::ServiceRequest.new(id: 'service-request-1')
+      bundle = FHIR::Bundle.new(
+        entry: [
+          bundle_entry(claim, 'http://example.com/fhir/Claim/claim-1'),
+          bundle_entry(service_request, 'http://example.com/fhir/ServiceRequest/service-request-1')
+        ]
+      )
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit_request'
+      )
+
+      expect(
+        test_instance.bundle_resources_target_profile_map['http://example.com/fhir/Claim/claim-1'][:profile_urls]
+      ).to include(DaVinciPASTestKit::PASConstants::CLAIM_PROFILE)
+      expect(
+        test_instance
+          .bundle_resources_target_profile_map['http://example.com/fhir/ServiceRequest/service-request-1'][:profile_urls]
+      ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-servicerequest')
     end
 
     it 'uses the base R4 sentinel to validate without a profile URL' do

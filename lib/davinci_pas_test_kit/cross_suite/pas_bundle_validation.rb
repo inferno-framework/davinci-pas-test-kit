@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'inferno/dsl/fhir_resource_navigation'
+
 require_relative '../parameters_helper'
 require_relative 'validation_test'
 require_relative 'pas_constants'
@@ -8,6 +10,15 @@ module DaVinciPASTestKit
   module PasBundleValidation
     include DaVinciPASTestKit::ValidationTest
     include ParametersHelper
+
+    class ReferenceNavigationContext
+      include Inferno::DSL::FHIRResourceNavigation
+      attr_accessor :metadata
+
+      def initialize(metadata)
+        self.metadata = metadata
+      end
+    end
 
     US_CORE_VERSION = '6.1.0'
     US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
@@ -96,7 +107,7 @@ module DaVinciPASTestKit
     end
 
     def perform_response_validation(response_bundle, profile_url, version, request_type, request_bundle = nil)
-      validate_pa_response_body_structure(response_bundle, request_bundle) if request_type == 'submit'
+      validate_pa_response_body_structure(response_bundle, request_bundle) if submit_operation?(request_type)
       validate_resources_conformance_against_profile(response_bundle, profile_url, version, request_type)
     end
 
@@ -106,7 +117,7 @@ module DaVinciPASTestKit
       assert resource.present?, 'Not a FHIR resource'
 
       # For v2.2.0 inquire responses, expect Parameters resource
-      if version == '2.2.0' && request_type == 'inquire' && bundle_type == 'response_bundle'
+      if version == '2.2.0' && inquire_operation?(request_type) && bundle_type == 'response_bundle'
         if resource.resourceType == 'Parameters'
           # Extract and validate each Bundle in the Parameters
           bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
@@ -166,7 +177,7 @@ module DaVinciPASTestKit
 
       check_presence_of_referenced_resources(first_entry, base_url, bundle.entry)
 
-      if request_type == 'submit'
+      if submit_operation?(request_type)
         unless first_entry.is_a?(FHIR::Claim)
           validation_error_messages << "[Bundle/#{bundle.id}]: The first bundle entry must be a Claim"
         end
@@ -496,7 +507,7 @@ module DaVinciPASTestKit
       end
 
       reference_elements.each do |reference_element|
-        process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version)
+        process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version, metadata)
       end
     end
 
@@ -509,7 +520,7 @@ module DaVinciPASTestKit
       return unless current_entry_profile_url == PASConstants::CLAIM_PROFILE
 
       claim_ref_element = {
-        path: 'Claim.item.extension.value',
+        path: 'Claim.item.extension:requestedService.value[x]',
         profiles: [
           'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-medicationrequest',
           'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-servicerequest',
@@ -518,30 +529,23 @@ module DaVinciPASTestKit
         ]
       }
 
-      # This temporary traversal handling may be replaced later by shared metadata-driven navigation logic.
-      claim_encounter_ref_element = {
-        path: "Claim.extension.where(url = '#{CLAIM_ENCOUNTER_EXTENSION_URL}').value",
-        profiles: [
-          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter'
-        ]
-      }
-
       reference_elements << claim_ref_element
-      reference_elements << claim_encounter_ref_element
     end
 
     # Processes a given reference element definition from a FHIR bundle entry.
-    # It evaluates FHIRPath expressions and processes each referenced instance and its profiles.
+    # It walks each reference path and processes referenced instances and their profiles.
     # @param reference_element [Hash] The reference element to process.
     # @param current_entry [Object] The current entry within the FHIR bundle.
     # @param bundle_entry [Array] The bundle.entry.
     # @param bundle_map [Hash] A map of the bundle contents.
     # @param version [String] The FHIR version.
-    def process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version)
-      fhirpath_result = evaluate_fhirpath(resource: current_entry.resource, path: reference_element[:path])
-      reference_element_values = fhirpath_result.filter_map do |entry|
-        entry['element']&.reference if entry['type'] == 'Reference'
-      end
+    def process_reference_element(reference_element, current_entry, bundle_entry, bundle_map, version,
+                                  profile_metadata = nil)
+      reference_element_values = reference_values_for_element(
+        current_entry.resource,
+        reference_element,
+        profile_metadata
+      )
 
       referenced_instances = reference_element_values.filter_map do |value|
         find_referenced_instance_in_bundle(value, current_entry.fullUrl, bundle_map)
@@ -550,6 +554,65 @@ module DaVinciPASTestKit
       referenced_instances.each do |instance|
         process_instance_profiles(instance, bundle_entry, reference_element, version)
       end
+    end
+
+    def reference_values_for_element(resource, reference_element, profile_metadata = nil)
+      navigation_context = reference_navigation_context(profile_metadata)
+      path = navigation_path_for_reference(resource, reference_element, profile_metadata, navigation_context)
+
+      Array.wrap(navigation_context.resolve_path(resource, path))
+        .select { |element| element.is_a?(FHIR::Reference) && element.reference.present? }
+        .map(&:reference)
+    end
+
+    def navigation_path_for_reference(resource, reference_element, profile_metadata = nil,
+                                      navigation_context = reference_navigation_context(profile_metadata))
+      path = resource_relative_reference_path(resource, reference_element[:path])
+      navigation_compatible_reference_path(path, profile_metadata, navigation_context)
+    end
+
+    def resource_relative_reference_path(resource, path)
+      path = path.to_s
+      resource_prefix = "#{resource.resourceType}."
+      path.start_with?(resource_prefix) ? path.delete_prefix(resource_prefix) : path
+    end
+
+    def navigation_compatible_reference_path(path, profile_metadata = nil,
+                                             navigation_context = reference_navigation_context(profile_metadata))
+      logical_segments = []
+
+      navigation_context.path_segments(path).map do |segment|
+        normalized_segment = normalized_reference_path_segment(segment, logical_segments, profile_metadata)
+        logical_segments << segment.split(':').first
+        normalized_segment
+      end.join('.')
+    end
+
+    def normalized_reference_path_segment(segment, logical_segments, profile_metadata)
+      extension_type, extension_name = segment.match(/\A(modifierExtension|extension):(.+)\z/)&.captures
+      return segment if extension_type.blank?
+
+      extension_path = [logical_segments.join('.'), extension_type].reject(&:blank?).join('.')
+      extension_url = extension_url_for_reference_path(profile_metadata, extension_path, extension_type, extension_name)
+      return segment if extension_url.blank?
+
+      "#{extension_type}.where(url='#{extension_url_without_version(extension_url)}')"
+    end
+
+    def extension_url_for_reference_path(profile_metadata, extension_path, extension_type, extension_name)
+      extensions = Array.wrap(profile_metadata&.must_supports&.dig(:extensions))
+      path_matching_extensions = extensions.select { |ext| ext[:path] == extension_path }
+      suffix = "#{extension_type}:#{extension_name}"
+      match = path_matching_extensions.find { |ext| ext[:id].to_s.end_with?(suffix) }
+      match[:url] if match.present?
+    end
+
+    def extension_url_without_version(url)
+      url.to_s.split('|', 2).first
+    end
+
+    def reference_navigation_context(profile_metadata = nil)
+      ReferenceNavigationContext.new(profile_metadata)
     end
 
     # Processes the profiles associated with a given instance in a FHIR bundle.
@@ -664,14 +727,27 @@ module DaVinciPASTestKit
 
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
+      submit_operation = submit_operation?(request_type)
       {
-        'Claim' => request_type == 'submit' ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
-        'ClaimResponse' => if request_type == 'submit'
+        'Claim' => submit_operation ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
+        'ClaimResponse' => if submit_operation
                              PASConstants::CLAIM_RESPONSE_PROFILE
                            else
                              PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE
                            end
       }
+    end
+
+    def submit_operation?(request_type)
+      request_operation(request_type) == 'submit'
+    end
+
+    def inquire_operation?(request_type)
+      request_operation(request_type) == 'inquire'
+    end
+
+    def request_operation(request_type)
+      request_type.to_s.split('_').first
     end
 
     # Checks the following requirement:
