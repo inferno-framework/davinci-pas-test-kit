@@ -79,6 +79,14 @@ module DaVinciPASTestKit
             element.id == "#{current_element.id}.#{target_element}" &&
               element.type.any? { |type| type.code == target_type }
           end
+        elsif step_path.include?(' as ')
+          # Handle FHIR FHIRPath "value as boolean" cast syntax (equivalent to ofType())
+          base_step, cast_type = step_path.split(' as ', 2)
+          target_element_path = "#{base_step.strip}[x]"
+          next_element = profile_elements.find do |element|
+            element.id == "#{current_element.id}.#{target_element_path}" &&
+              element.type.any? { |type| type.code == cast_type.strip }
+          end
         else
           next_element =
             profile_elements.find { |element| element.id == "#{current_element.id}.#{step_path}" } ||

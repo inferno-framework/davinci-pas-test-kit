@@ -95,6 +95,7 @@ module DaVinciPASTestKit
         * Claim.supportingInfo:AdmissionDates.category
         * Claim.supportingInfo:AdmissionDates.sequence
         * Claim.supportingInfo:AdmissionDates.timing[x]
+        * Claim.supportingInfo:AdmissionDates.timing[x]:timingPeriod
         * Claim.supportingInfo:AdmissionDates.timing[x]:timingPeriod.end
         * Claim.supportingInfo:AdmissionDates.timing[x]:timingPeriod.start
         * Claim.supportingInfo:DischargeDates
@@ -105,6 +106,7 @@ module DaVinciPASTestKit
         * Claim.supportingInfo:PatientEvent.category
         * Claim.supportingInfo:PatientEvent.sequence
         * Claim.supportingInfo:PatientEvent.timing[x]
+        * Claim.supportingInfo:PatientEvent.timing[x]:timingPeriod
         * Claim.supportingInfo:PatientEvent.timing[x]:timingPeriod.end
         * Claim.supportingInfo:PatientEvent.timing[x]:timingPeriod.start
         * Claim.use

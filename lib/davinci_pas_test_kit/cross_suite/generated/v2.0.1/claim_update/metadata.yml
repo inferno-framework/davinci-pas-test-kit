@@ -172,6 +172,24 @@
   - :path: item.quantity
   - :path: item.unitPrice
   :optional_slices:
+  - :slice_id: Claim.careTeam:OverallClaimMember
+    :slice_name: OverallClaimMember
+    :path: careTeam
+    :optional: true
+    :discriminator:
+      :type: value
+      :values:
+      - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+        :value: true
+  - :slice_id: Claim.careTeam:ItemClaimMember
+    :slice_name: ItemClaimMember
+    :path: careTeam
+    :optional: true
+    :discriminator:
+      :type: value
+      :values:
+      - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+        :value: false
   - :slice_id: Claim.supportingInfo:PatientEvent
     :slice_name: PatientEvent
     :path: supportingInfo

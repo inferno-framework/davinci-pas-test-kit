@@ -25,7 +25,9 @@ module DaVinciPASTestKit
         * Claim.careTeam.qualification
         * Claim.careTeam.role
         * Claim.careTeam.sequence
+        * Claim.careTeam:ItemClaimMember
         * Claim.careTeam:ItemClaimMember.extension:careTeamClaimScope
+        * Claim.careTeam:OverallClaimMember
         * Claim.careTeam:OverallClaimMember.extension:careTeamClaimScope
         * Claim.diagnosis
         * Claim.diagnosis.diagnosis[x]
@@ -70,12 +72,15 @@ module DaVinciPASTestKit
         * Claim.supportingInfo:AdditionalInformation.category
         * Claim.supportingInfo:AdditionalInformation.sequence
         * Claim.supportingInfo:AdditionalInformation.value[x]
+        * Claim.supportingInfo:AdmissionDates
         * Claim.supportingInfo:AdmissionDates.timing[x]
+        * Claim.supportingInfo:DischargeDates
         * Claim.supportingInfo:DischargeDates.timing[x]
         * Claim.supportingInfo:MessageText
         * Claim.supportingInfo:MessageText.category
         * Claim.supportingInfo:MessageText.sequence
         * Claim.supportingInfo:MessageText.value[x]
+        * Claim.supportingInfo:PatientEvent
         * Claim.supportingInfo:PatientEvent.timing[x]
       )
 
