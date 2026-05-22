@@ -254,6 +254,15 @@ module DaVinciPASTestKit
                          extension: [
                            FHIR::Extension.new(url: 'wasHumanReviewedFlag', valueBoolean: true)
                          ]
+                       ),
+                       FHIR::Extension.new(
+                         url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider',
+                         extension: [
+                           FHIR::Extension.new(
+                             url: 'provider',
+                             valueReference: FHIR::Reference.new(display: 'Mock Authorized Provider')
+                           )
+                         ]
                        )
                      ]
                    else
@@ -482,6 +491,30 @@ module DaVinciPASTestKit
                          FHIR::Extension.new(
                            url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService',
                            valueReference: FHIR::Reference.new(display: 'Mock Requested Service')
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit',
+                           valueDecimal: 100.0
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType',
+                           valueCodeableConcept: FHIR::CodeableConcept.new(
+                             coding: [FHIR::Coding.new(
+                               system: 'https://codesystem.x12.org/005010/1525',
+                               code: 'SC',
+                               display: 'Specialty Care Review'
+                             )]
+                           )
+                         ),
+                         FHIR::Extension.new(
+                           url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType',
+                           valueCodeableConcept: FHIR::CodeableConcept.new(
+                             coding: [FHIR::Coding.new(
+                               system: 'https://codesystem.x12.org/005010/1322',
+                               code: 'I',
+                               display: 'Initial'
+                             )]
+                           )
                          ),
                          FHIR::Extension.new(
                            url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-admissionDates',

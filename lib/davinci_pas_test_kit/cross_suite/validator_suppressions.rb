@@ -152,6 +152,14 @@ module DaVinciPASTestKit
       # but profile-claim-base marks them must-support on Claim.supportingInfo as well
       'extension-infoChanged is not allowed to be used at this point',
       'modifierextension-infoCancelled is not allowed to be used at this point',
+      # IG defect: extension-itemAuthorizedProvider context allows ExplanationOfBenefit/ClaimResponse.item only,
+      # but profile-claimresponse marks ClaimResponse.extension:authorizedProvider as must-support on ClaimResponse root
+      'extension-itemAuthorizedProvider is not allowed to be used at this point',
+      # IG defect: extension-revenueUnitRateLimit, extension-serviceItemRequestType, extension-certificationType
+      # context prohibits ClaimResponse.addItem, but profile-claimresponse marks all three as must-support there
+      'extension-revenueUnitRateLimit is not allowed to be used at this point',
+      'extension-serviceItemRequestType is not allowed to be used at this point',
+      'extension-certificationType is not allowed to be used at this point',
       # The IG's own PASClaimInquiryExample uses HCPCS code B4184. When the validator checks against
       # a specific published version of the HCPCS code system (e.g. 2025-01), it reports the code as
       # unknown because that version snapshot may not include every HCPCS code. Suppressed: the code

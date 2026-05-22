@@ -89,8 +89,10 @@ module DaVinciPASTestKit
       [next_element, remaining_path&.delete_prefix('.')]
     end
 
-    # Returns non-must-support slice elements that have at least one must-support descendant.
-    # These slices are recorded in the metadata as :optional_slices so that the runtime test can:
+    # Returns slice elements whose discriminator cannot be resolved by inferno_core's
+    # must_support_slices (type_slices / value_slices), OR that are genuinely non-MS but have
+    # at least one must-support descendant.  These slices are recorded in the metadata as
+    # :optional_slices so that the runtime test can:
     #   1. Temporarily merge them into :slices for navigation (inferno_core's
     #      find_slice_via_discriminator looks up slices by name from :slices).
     #   2. Conditionally skip must-support failures for elements under an optional slice when
@@ -102,8 +104,13 @@ module DaVinciPASTestKit
     # sent, timing[x] is validated; if PatientEvent is never sent, the timing[x] check is skipped.
     # In v2.2.0, PatientEvent is MS so it appears in the regular :slices instead.
     #
-    # The same pattern applies to type-choice slices: v2.2.0 adds timing[x]:timingPeriod.start
-    # as MS, but timingPeriod (a type-slice of timing[x]) is not itself MS, so it ends up here.
+    # The same pattern applies to nested type-choice sub-slices: in v2.2.0,
+    # timing[x]:timingPeriod is MS=true, but inferno_core's sliced_element helper resolves its
+    # "sliced element" to the generic Claim.supportingInfo.timing[x] snapshot entry (which
+    # carries no slicing discriminator) rather than the contextual
+    # Claim.supportingInfo:PatientEvent.timing[x] entry (which does).  The discriminator lookup
+    # therefore returns nil, causing timingPeriod to be excluded from must_support_slices
+    # entirely.  This method catches it because it still has MS descendants (.start / .end).
     def optional_slices
       ms_slice_names = must_support_slices.map { |s| s[:slice_name] }.compact.to_set
 
