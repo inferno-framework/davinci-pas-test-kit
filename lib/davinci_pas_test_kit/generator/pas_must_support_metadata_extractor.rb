@@ -34,23 +34,6 @@ module DaVinciPASTestKit
       end
     end
 
-    def must_support_extension_elements
-      all_must_support_elements.select { |element| element.path.end_with? 'xtension' }
-    end
-
-    def must_support_extensions
-      must_support_extension_elements.map do |element|
-        {
-          id: element.id,
-          path: element.path.gsub("#{resource}.", ''),
-          url: element.type.first.profile.first,
-          modifier_extension: element.path.end_with?('modifierExtension')
-        }.tap do |metadata|
-          metadata[:by_requirement_extension_only] = true if by_requirement_extension_only?(element)
-        end
-      end
-    end
-
     def find_element_by_discriminator_path(current_element, discriminator_path)
       target_element = current_element
       remaining_path = discriminator_path
