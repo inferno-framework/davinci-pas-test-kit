@@ -28,12 +28,6 @@ module DaVinciPASTestKit
       super
     end
 
-    def must_support_slice_elements
-      all_must_support_elements.select do |element|
-        !element.path.end_with?('xtension') && element.sliceName.present?
-      end
-    end
-
     def find_element_by_discriminator_path(current_element, discriminator_path)
       target_element = current_element
       remaining_path = discriminator_path
