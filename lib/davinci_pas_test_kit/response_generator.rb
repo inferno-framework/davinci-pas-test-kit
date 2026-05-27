@@ -355,7 +355,7 @@ module DaVinciPASTestKit
             value.reference = match.fullUrl
             matches.concat([match], referenced_entities(match.resource, entries, root_url))
           end
-        elsif value.is_a?(Array) && value.all? { |elmt| elmt.is_a?(FHIR::Model) }
+        elsif value.is_a?(Array) && value.all?(FHIR::Model)
           value.each { |val| matches.concat(referenced_entities(val, entries, root_url)) }
         end
       end

@@ -6,6 +6,7 @@ module DaVinciPASTestKit
     module Naming
       class << self
         include DaVinciPASTestKit::PASV201::ResourceList
+
         def resources_with_multiple_profiles
           resources = []
           RESOURCE_SUPPORTED_PROFILES.each do |resource, profile_list|

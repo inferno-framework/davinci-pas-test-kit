@@ -48,7 +48,7 @@ module DaVinciPASTestKit
           file_name:
         }
 
-        self.tests << test_metadata
+        tests << test_metadata
       end
 
       def to_hash

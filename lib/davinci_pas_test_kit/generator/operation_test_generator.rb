@@ -141,7 +141,7 @@ module DaVinciPASTestKit
           Server SHALL support PAS #{operation_name} requests: a POST interaction to
           the /Claim/$#{operation} endpoint.
           This test submits a Prior Authorization #{operation_name} request to the server and verifies that a
-          response is returned with HTTP status 2XX.#{operation == 'submit' ? "\nThe server SHOULD respond within 15 seconds." : ''}
+          response is returned with HTTP status 2XX.#{"\nThe server SHOULD respond within 15 seconds." if operation == 'submit'}
         DESCRIPTION
       end
     end

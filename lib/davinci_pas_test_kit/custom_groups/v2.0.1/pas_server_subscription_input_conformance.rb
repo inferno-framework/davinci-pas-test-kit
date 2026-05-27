@@ -4,6 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASServerSubscriptionInputConformance < Inferno::Test
       include PASSubscriptionVerification
+
       id :pas_server_subscription_input_conformance
       title '[USER INPUT VERIFICATION] Verify Subscription PAS conformance'
       description %(
