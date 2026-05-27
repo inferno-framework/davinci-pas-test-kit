@@ -101,6 +101,10 @@ module DaVinciPASTestKit
           # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching
           SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, ''))
         end
+
+        validation_context do
+          snomedCT '731000124108'
+        end
       end
 
       suite_option :client_type,
