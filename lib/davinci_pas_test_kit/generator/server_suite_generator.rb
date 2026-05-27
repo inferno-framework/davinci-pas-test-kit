@@ -51,6 +51,12 @@ module DaVinciPASTestKit
         "hl7.fhir.us.davinci-pas##{version}"
       end
 
+      def validator_igs_expression
+        identifiers = [ig_identifier]
+        identifiers << 'hl7.fhir.us.core#6.1.0' if ig_metadata.ig_version.start_with?('v2.2')
+        identifiers.map(&:inspect).join(', ')
+      end
+
       def ig_link
         case ig_metadata.ig_version
         when 'v2.0.1'

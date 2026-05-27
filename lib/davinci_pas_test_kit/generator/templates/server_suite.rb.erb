@@ -82,7 +82,7 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-      igs '<%= ig_identifier %>'
+        igs <%= validator_igs_expression %>
         
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
