@@ -195,20 +195,12 @@ module DaVinciPASTestKit
       end
 
       if root_entry.present?
-        root_resource_profile_url = find_profile_url(request_type)[root_entry.resource.resourceType]
-
-        # In v2.2.0, profile-pas-request-bundle allows either profile-claim or profile-claim-update
-        # for the Claim entry. find_profile_url defaults to profile-claim-update for all submit Claims,
-        # but we must respect the resource's own meta.profile when it explicitly declares profile-claim
-        # (workflow bundles use profile-claim; must-support bundles use profile-claim-update).
-        if version == '2.2.0' && %w[submit submit_request].include?(request_type) &&
-           root_entry.resource.resourceType == 'Claim'
-          meta_profiles = Array(root_entry.resource.meta&.profile)
-          base_claim_url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
-          if meta_profiles.include?(base_claim_url) && !meta_profiles.include?(root_resource_profile_url)
-            root_resource_profile_url = base_claim_url
-          end
-        end
+        root_resource_profile_url = if %w[submit submit_request].include?(request_type) &&
+                                       root_entry.resource.resourceType == 'Claim'
+                                       determine_claim_submit_profile_url(version, root_entry.resource)
+                                     else
+                                       find_profile_url(request_type)[root_entry.resource.resourceType]
+                                     end
 
         add_resource_target_profile_to_map(root_entry.fullUrl, root_entry.resource, root_resource_profile_url)
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)
@@ -486,6 +478,26 @@ module DaVinciPASTestKit
                              PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE
                            end
       }
+    end
+
+    # Determines the target profile URL for a Claim resource in a submit request bundle.
+    #
+    # In v2.2.0, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
+    # The structural discriminator is Claim.related: profile-claim-update requires it (must-support)
+    # while profile-claim disallows it (max: 0). For all other versions, profile-claim-update is
+    # used unconditionally.
+    #
+    # @param version [String] The IG version (e.g. '2.2.0').
+    # @param claim [FHIR::Claim] The Claim resource to inspect.
+    # @return [String] The profile URL to validate against.
+    def determine_claim_submit_profile_url(version, claim)
+      return PASConstants::CLAIM_PROFILE unless version == '2.2.0'
+
+      if claim.related.blank?
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+      else
+        PASConstants::CLAIM_PROFILE
+      end
     end
 
     # Checks the following requirement:

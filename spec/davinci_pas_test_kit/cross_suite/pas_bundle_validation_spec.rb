@@ -356,4 +356,32 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       expect(test_instance.send(:reject_entry_resource_issues, [])).to be_empty
     end
   end
+
+  describe '#determine_claim_submit_profile_url' do
+    let(:test_instance) do
+      Class.new { include DaVinciPASTestKit::PasBundleValidation }.new
+    end
+
+    let(:base_claim_url) { 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim' }
+    let(:claim_update_url) { DaVinciPASTestKit::PASConstants::CLAIM_PROFILE }
+
+    context 'when version is 2.0.1' do
+      it 'returns profile-claim-update regardless of Claim.related' do
+        claim = FHIR::Claim.new
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.0.1', claim)).to eq(claim_update_url)
+      end
+    end
+
+    context 'when version is 2.2.0' do
+      it 'returns profile-claim when Claim.related is absent' do
+        claim = FHIR::Claim.new
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(base_claim_url)
+      end
+
+      it 'returns profile-claim-update when Claim.related is present' do
+        claim = FHIR::Claim.new(related: [{ relationship: { coding: [{ code: 'prior' }] } }])
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(claim_update_url)
+      end
+    end
+  end
 end
