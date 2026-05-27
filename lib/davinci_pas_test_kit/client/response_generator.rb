@@ -371,7 +371,6 @@ module DaVinciPASTestKit
       response_bundle
     end
 
-
     def build_mock_practitioner
       FHIR::Practitioner.new(
         id: SecureRandom.uuid,

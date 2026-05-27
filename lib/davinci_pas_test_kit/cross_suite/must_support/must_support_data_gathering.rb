@@ -11,30 +11,6 @@ module DaVinciPASTestKit
       )
     end
 
-    # Wraps missing_must_support_elements to handle :optional_slices in the metadata.
-    #
-    # Some non-MS parent slices (e.g. Claim.supportingInfo:PatientEvent in v2.0.1) have MS
-    # children (e.g. timing[x]). These slices are stored in :optional_slices rather than :slices
-    # so they are not asserted as independently required. However, their discriminator info must
-    # be visible to inferno_core's find_slice_via_discriminator so it can navigate into the slice
-    # to check the MS children.
-    #
-    # This method merges :optional_slices into :slices on a patched copy of the metadata before
-    # calling missing_must_support_elements. The result is returned unchanged: if the parent slice
-    # is absent the child elements will still appear as missing (a failure), and if the parent is
-    # present but a child is absent that child also appears as missing (a failure). The test
-    # passes only when the parent slice is present and all its MS children are populated.
-    def missing_must_support_elements_with_optional_slices(resources, metadata)
-      optional_slices = metadata.must_supports[:optional_slices] || []
-      return missing_must_support_elements(resources, nil, metadata:) if optional_slices.empty?
-
-      patched_ms = metadata.must_supports.merge(
-        slices: (metadata.must_supports[:slices] || []) + optional_slices
-      )
-      working_metadata = Struct.new(:must_supports).new(patched_ms)
-      missing_must_support_elements(resources, nil, metadata: working_metadata)
-    end
-
     def tag
       case operation
       when 'submit'

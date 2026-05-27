@@ -159,7 +159,7 @@ module DaVinciPASTestKit
       # context prohibits ClaimResponse.addItem, but profile-claimresponse marks all three as must-support there
       'extension-revenueUnitRateLimit is not allowed to be used at this point',
       'extension-serviceItemRequestType is not allowed to be used at this point',
-      'extension-certificationType is not allowed to be used at this point',
+      'extension-certificationType is not allowed to be used at this point'
 
     ]
   )

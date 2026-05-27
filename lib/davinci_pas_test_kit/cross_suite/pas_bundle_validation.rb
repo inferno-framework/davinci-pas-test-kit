@@ -197,10 +197,10 @@ module DaVinciPASTestKit
       if root_entry.present?
         root_resource_profile_url = if %w[submit submit_request].include?(request_type) &&
                                        root_entry.resource.resourceType == 'Claim'
-                                       determine_claim_submit_profile_url(version, root_entry.resource)
-                                     else
-                                       find_profile_url(request_type)[root_entry.resource.resourceType]
-                                     end
+                                      determine_claim_submit_profile_url(version, root_entry.resource)
+                                    else
+                                      find_profile_url(request_type)[root_entry.resource.resourceType]
+                                    end
 
         add_resource_target_profile_to_map(root_entry.fullUrl, root_entry.resource, root_resource_profile_url)
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)

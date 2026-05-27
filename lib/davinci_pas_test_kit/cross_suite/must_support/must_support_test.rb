@@ -55,7 +55,7 @@ module DaVinciPASTestKit
         assert resources_of_interest.present?, "No #{resource_type} resources were found"
       end
 
-      missing_must_support_strings = missing_must_support_elements_with_optional_slices(resources_of_interest, metadata)
+      missing_must_support_strings = missing_must_support_elements(resources_of_interest, nil, metadata:)
 
       # Special case: Coverage.relationship.coding:X12Code slice has an empty required binding
       # discriminator values list, so Inferno cannot reliably detect it automatically.
