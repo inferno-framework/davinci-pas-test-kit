@@ -495,7 +495,11 @@ module DaVinciPASTestKit
       reference_elements = metadata.references.dup
 
       # Special handling for Claim submit profile
-      if current_entry_profile_url == PASConstants::CLAIM_PROFILE
+      claim_submit_profile_urls = [
+        PASConstants::CLAIM_PROFILE,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+      ]
+      if claim_submit_profile_urls.include?(current_entry_profile_url)
         handle_claim_profile(reference_elements,
                              current_entry_profile_url)
       end
@@ -511,7 +515,11 @@ module DaVinciPASTestKit
     # @param reference_elements [Array] The array of reference elements to be updated.
     # @param current_entry_profile_url [String] The profile URL of the current entry being processed.
     def handle_claim_profile(reference_elements, current_entry_profile_url)
-      return unless current_entry_profile_url == PASConstants::CLAIM_PROFILE
+      claim_submit_profile_urls = [
+        PASConstants::CLAIM_PROFILE,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+      ]
+      return unless claim_submit_profile_urls.include?(current_entry_profile_url)
 
       claim_ref_element = {
         path: 'Claim.item.extension.value',

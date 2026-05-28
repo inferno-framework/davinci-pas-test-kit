@@ -388,6 +388,134 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       end
     end
 
+    describe 'and populating outcome' do
+      it 'uses complete for pended decisions in v2.2.0 (queued was removed from the value set)' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :pended,
+          nil,
+          'v2.2.0'
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        expect(claim_response.outcome).to eq('complete')
+      end
+
+      it 'uses queued for pended decisions in v2.0.1' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :pended,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        expect(claim_response.outcome).to eq('queued')
+      end
+
+      it 'uses complete for approved decisions regardless of version' do
+        %w[v2.0.1 v2.2.0].each do |version|
+          returned_response_string = module_instance.mock_response_bundle(
+            FHIR.from_contents(submit_request_string),
+            'submit',
+            :approval,
+            nil,
+            version
+          )
+          response_bundle = FHIR.from_contents(returned_response_string)
+          claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+          expect(claim_response.outcome).to eq('complete')
+        end
+      end
+    end
+
+    describe 'and including Practitioner and PractitionerRole for v2.2.0' do
+      it 'includes Practitioner and PractitionerRole entries in v2.2.0 submit responses' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :approval,
+          nil,
+          'v2.2.0'
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        expect(response_bundle.entry.any? { |e| e.resource.is_a?(FHIR::Practitioner) }).to be(true)
+        expect(response_bundle.entry.any? { |e| e.resource.is_a?(FHIR::PractitionerRole) }).to be(true)
+      end
+
+      it 'does not include Practitioner or PractitionerRole entries in v2.0.1 submit responses' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :approval,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        expect(response_bundle.entry.any? { |e| e.resource.is_a?(FHIR::Practitioner) }).to be(false)
+        expect(response_bundle.entry.any? { |e| e.resource.is_a?(FHIR::PractitionerRole) }).to be(false)
+      end
+
+      it 'populates the mock Practitioner with an NPI identifier and name' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :approval,
+          nil,
+          'v2.2.0'
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        practitioner = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::Practitioner) }&.resource
+        npi = practitioner.identifier.find { |i| i.system == 'http://hl7.org/fhir/sid/us-npi' }
+        expect(npi).to_not be_nil
+        expect(practitioner.name).to_not be_empty
+      end
+    end
+
+    describe 'and populating version-specific error extensions' do
+      let(:error_element_url) { 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorElement' }
+
+      it 'uses a nested extension for extension-errorElement in v2.2.0' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :approval,
+          nil,
+          'v2.2.0'
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        first_error = claim_response.error&.first
+        error_ext = first_error&.extension&.find { |e| e.url == error_element_url }
+        expect(error_ext).to_not be_nil
+        expect(error_ext.extension).to_not be_empty
+        expect(error_ext.valueString).to be_nil
+      end
+
+      it 'uses valueString for extension-errorElement in v2.0.1' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :approval,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        first_error = claim_response.error&.first
+        error_ext = first_error&.extension&.find { |e| e.url == error_element_url }
+        expect(error_ext).to_not be_nil
+        expect(error_ext.valueString).to_not be_nil
+        expect(error_ext.extension).to be_empty
+      end
+    end
+
     describe 'and including referenced entries' do
       it 'all entries included when using absolute url references' do
         returned_response_string = module_instance.mock_response_bundle(
