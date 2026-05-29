@@ -879,7 +879,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       Class.new { include DaVinciPASTestKit::PasBundleValidation }.new
     end
 
-    let(:base_claim_url) { 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim' }
+    let(:base_claim_url) { DaVinciPASTestKit::PASConstants::CLAIM_PROFILE_FIRST_SUBMIT }
     let(:claim_update_url) { DaVinciPASTestKit::PASConstants::CLAIM_PROFILE }
 
     context 'when version is 2.0.1' do

@@ -256,42 +256,6 @@ module DaVinciPASTestKit
           start: timestamp.strftime('%Y-%m-%d'),
           end: (timestamp + 1.month).strftime('%Y-%m-%d')
         ),
-        communicationRequest: [
-          FHIR::Reference.new(display: 'Mock Communication Request')
-        ],
-        error: [
-          FHIR::ClaimResponse::Error.new(
-            extension: [
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorFollowupAction',
-                valueCodeableConcept: FHIR::CodeableConcept.new(
-                  coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/889', code: 'N')]
-                )
-              ),
-              if ig_version == 'v2.2.0'
-                # In v2.2.0 extension-errorElement is a complex extension; valueString is no longer allowed
-                FHIR::Extension.new(
-                  url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorElement',
-                  extension: [
-                    FHIR::Extension.new(url: 'error', valueString: 'ClaimResponse.status')
-                  ]
-                )
-              else
-                FHIR::Extension.new(
-                  url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorElement',
-                  valueString: 'ClaimResponse.status'
-                )
-              end,
-              FHIR::Extension.new(
-                url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorPath',
-                valueString: 'ClaimResponse.status'
-              )
-            ],
-            code: FHIR::CodeableConcept.new(
-              coding: [FHIR::Coding.new(system: 'https://codesystem.x12.org/005010/901', code: '04')]
-            )
-          )
-        ],
         item: claim.item.map do |item|
           FHIR::ClaimResponse::Item.new(
             extension: [
@@ -358,81 +322,7 @@ module DaVinciPASTestKit
       )
       response_bundle.entry.concat(referenced_entities(claim_response, request_bundle.entry, root_url))
 
-      if ig_version == 'v2.2.0'
-        practitioner = build_mock_practitioner
-        pract_full_url = "urn:uuid:#{practitioner.id}"
-        response_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: pract_full_url, resource: practitioner)
-
-        practitioner_role = build_mock_practitioner_role(pract_full_url)
-        pract_role_full_url = "urn:uuid:#{practitioner_role.id}"
-        response_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: pract_role_full_url, resource: practitioner_role)
-      end
-
       response_bundle
-    end
-
-    def build_mock_practitioner
-      FHIR::Practitioner.new(
-        id: SecureRandom.uuid,
-        meta: FHIR::Meta.new(
-          profile: ['http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitioner']
-        ),
-        identifier: [
-          FHIR::Identifier.new(
-            system: 'http://hl7.org/fhir/sid/us-npi',
-            value: '1234567893'
-          )
-        ],
-        name: [
-          FHIR::HumanName.new(family: 'WATSON', given: ['SUSAN'])
-        ],
-        address: [
-          FHIR::Address.new(
-            line: ['123 Main St'],
-            city: 'Springfield',
-            state: 'IL',
-            postalCode: '62701',
-            country: 'US'
-          )
-        ],
-        telecom: [
-          FHIR::ContactPoint.new(system: 'phone', value: '5555550100')
-        ]
-      )
-    end
-
-    def build_mock_practitioner_role(practitioner_full_url)
-      FHIR::PractitionerRole.new(
-        id: SecureRandom.uuid,
-        meta: FHIR::Meta.new(
-          profile: ['http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-practitionerrole']
-        ),
-        practitioner: FHIR::Reference.new(reference: practitioner_full_url),
-        organization: FHIR::Reference.new(display: 'Mock Organization'),
-        code: [
-          FHIR::CodeableConcept.new(
-            coding: [FHIR::Coding.new(
-              system: 'http://nucc.org/provider-taxonomy',
-              code: '208D00000X',
-              display: 'General Practice Physician'
-            )]
-          )
-        ],
-        specialty: [
-          FHIR::CodeableConcept.new(
-            coding: [FHIR::Coding.new(
-              system: 'http://nucc.org/provider-taxonomy',
-              code: '208D00000X',
-              display: 'General Practice Physician'
-            )]
-          )
-        ],
-        location: [FHIR::Reference.new(display: 'Mock Location')],
-        endpoint: [FHIR::Reference.new(display: 'Mock Endpoint')],
-        telecom: [
-          FHIR::ContactPoint.new(system: 'phone', value: '5555550100')
-        ]
-      )
     end
 
     def build_mock_notification_status_entry(status_parameters, subscription_reference)

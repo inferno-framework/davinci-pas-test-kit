@@ -497,7 +497,7 @@ module DaVinciPASTestKit
       # Special handling for Claim submit profile
       claim_submit_profile_urls = [
         PASConstants::CLAIM_PROFILE,
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+        PASConstants::CLAIM_PROFILE_FIRST_SUBMIT
       ]
       if claim_submit_profile_urls.include?(current_entry_profile_url)
         handle_claim_profile(reference_elements,
@@ -517,7 +517,7 @@ module DaVinciPASTestKit
     def handle_claim_profile(reference_elements, current_entry_profile_url)
       claim_submit_profile_urls = [
         PASConstants::CLAIM_PROFILE,
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+        PASConstants::CLAIM_PROFILE_FIRST_SUBMIT
       ]
       return unless claim_submit_profile_urls.include?(current_entry_profile_url)
 
@@ -705,7 +705,7 @@ module DaVinciPASTestKit
       return PASConstants::CLAIM_PROFILE unless version == '2.2.0'
 
       if claim.related.blank?
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+        PASConstants::CLAIM_PROFILE_FIRST_SUBMIT
       else
         PASConstants::CLAIM_PROFILE
       end

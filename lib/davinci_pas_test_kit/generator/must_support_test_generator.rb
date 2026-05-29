@@ -110,9 +110,6 @@ module DaVinciPASTestKit
         slice_names = profile_metadata.must_supports[:slices]
           .map { |slice| slice[:slice_id] }
 
-        optional_slice_names = profile_metadata.must_supports[:optional_slices]
-          &.map { |slice| slice[:slice_id] } || []
-
         element_names = profile_metadata.must_supports[:elements]
           .map { |element| "#{resource_type}.#{element[:path]}" }
 
@@ -131,7 +128,7 @@ module DaVinciPASTestKit
           element_names << "#{element_paths} or #{extension_ids}"
         end
 
-        (slice_names + optional_slice_names + element_names + extension_names)
+        (slice_names + element_names + extension_names)
           .uniq
           .sort
           .map { |name| "#{' ' * 8}* #{name}" }
