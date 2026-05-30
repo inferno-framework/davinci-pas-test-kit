@@ -125,7 +125,7 @@ module DaVinciPASTestKit
           choice[:extension_ids].each { |id| extension_names.delete(id.to_s) } if choice[:extension_ids].present?
 
           element_paths = choice[:paths].map { |path| "#{resource_type}.#{path}" }.join(' or ')
-          extension_ids = choice[:extension_ids].map(&:to_s).join(' or ')
+          extension_ids = choice[:extension_ids].join(' or ')
 
           element_names << "#{element_paths} or #{extension_ids}"
         end

@@ -34,46 +34,100 @@
   - :id: Claim.extension:levelOfServiceType
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-levelOfServiceCode
+    :modifier_extension: false
   - :id: Claim.extension:certificationType
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType
+    :modifier_extension: false
   - :id: Claim.careTeam.extension:careTeamClaimScope
     :path: careTeam.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
+    :modifier_extension: false
   - :id: Claim.careTeam:OverallClaimMember.extension:careTeamClaimScope
     :path: careTeam.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
+    :modifier_extension: false
   - :id: Claim.careTeam:ItemClaimMember.extension:careTeamClaimScope
     :path: careTeam.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
+    :modifier_extension: false
   - :id: Claim.item.extension:itemTraceNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber
+    :modifier_extension: false
   - :id: Claim.item.extension:authorizationNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber
+    :modifier_extension: false
   - :id: Claim.item.extension:administrationReferenceNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber
+    :modifier_extension: false
   - :id: Claim.item.extension:requestType
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType
+    :modifier_extension: false
   - :id: Claim.item.extension:certificationType
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType
+    :modifier_extension: false
   - :id: Claim.item.extension:certIssueDate
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemCertificationIssueDate
+    :modifier_extension: false
   - :id: Claim.item.extension:certExpirationDate
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemCertificationExpirationDate
+    :modifier_extension: false
   - :id: Claim.item.extension:certEffectiveDate
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemCertificationEffectiveDate
+    :modifier_extension: false
   - :id: Claim.item.extension:reviewActionCode
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode
-  :slices: []
+    :modifier_extension: false
+  :slices:
+  - :slice_id: Claim.careTeam:OverallClaimMember
+    :slice_name: OverallClaimMember
+    :path: careTeam
+    :discriminator:
+      :type: value
+      :values:
+      - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+        :value: true
+  - :slice_id: Claim.careTeam:ItemClaimMember
+    :slice_name: ItemClaimMember
+    :path: careTeam
+    :discriminator:
+      :type: value
+      :values:
+      - :path: extension.where(url='http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope').valueBoolean
+        :value: false
+  - :slice_id: Claim.supportingInfo:PatientEvent
+    :slice_name: PatientEvent
+    :path: supportingInfo
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: category
+      :code: patientEvent
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
+  - :slice_id: Claim.supportingInfo:AdmissionDates
+    :slice_name: AdmissionDates
+    :path: supportingInfo
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: category
+      :code: admissionDates
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
+  - :slice_id: Claim.supportingInfo:DischargeDates
+    :slice_name: DischargeDates
+    :path: supportingInfo
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: category
+      :code: dischargeDates
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
   :elements:
   - :path: identifier
   - :path: billablePeriod

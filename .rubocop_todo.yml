@@ -40,7 +40,7 @@ Metrics/CyclomaticComplexity:
 # ForbiddenPrefixes: is_, has_, have_
 # AllowedMethods: is_a?
 # MethodDefinitionMacros: define_method, define_singleton_method
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Exclude:
     - 'spec/**/*'
     - 'lib/davinci_pas_test_kit/must_support_test.rb'

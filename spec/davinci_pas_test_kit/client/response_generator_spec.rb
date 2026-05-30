@@ -38,6 +38,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
     Class.new(Inferno::Test) do
       include DaVinciPASTestKit::ResponseGenerator
       include SubscriptionsTestKit::NotificationConformanceVerification
+
       fhir_resource_validator do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 

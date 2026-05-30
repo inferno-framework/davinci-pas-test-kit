@@ -5,6 +5,7 @@ module DaVinciPASTestKit
     # TODO: none of file name, class name, or ID match
     class PasUpdateNotificationTest < Inferno::Test
       include URLs
+
       id :prior_auth_claim_response_update_notification_validation
       title 'Server notifies the client that the pended claim was updated.'
       description %(
