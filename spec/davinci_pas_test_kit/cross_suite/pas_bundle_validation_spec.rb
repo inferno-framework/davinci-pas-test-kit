@@ -683,6 +683,36 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         test_instance.send(:profile_url_for_validation, base_profile, base_profile, '2.2.0')
       ).to eq(base_profile)
     end
+
+    describe '#generate_non_conformance_message' do
+      it 'renders every target profile with its version regardless of how it was collected' do
+        base_profile = 'http://hl7.org/fhir/StructureDefinition/ServiceRequest'
+        item = {
+          resource: FHIR::ServiceRequest.new(id: 'sr-1'),
+          profile_urls: [
+            # unversioned PAS reference target (e.g. hardcoded requestedService list)
+            'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-servicerequest',
+            # same profile already carrying a version (e.g. declared meta.profile) - should collapse via uniq
+            'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-servicerequest|2.2.0',
+            # versioned US Core fallback profile
+            us_core_profile_url('us-core-servicerequest'),
+            # base R4 sentinel - validated without a profile, displayed as the base resource URL
+            described_class::BASE_R4_PROFILE
+          ]
+        }
+
+        message = test_instance.send(:generate_non_conformance_message, item, base_profile, '2.2.0')
+
+        expect(message).to start_with('ServiceRequest/sr-1 is not conformant to any of the target profiles:')
+        expect(message).to include('profile-servicerequest|2.2.0')
+        expect(message).to include('us-core-servicerequest|6.1.0')
+        expect(message).to include(base_profile)
+        # No unversioned PAS profile leaks through, the duplicate is collapsed, and the sentinel symbol is gone
+        expect(message).to_not match(/profile-servicerequest(?!\|)/)
+        expect(message.scan('profile-servicerequest').length).to eq(1)
+        expect(message).to_not include('base_r4')
+      end
+    end
   end
 
   describe '#reject_entry_resource_issues' do

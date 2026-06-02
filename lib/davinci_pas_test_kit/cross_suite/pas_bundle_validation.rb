@@ -325,7 +325,9 @@ module DaVinciPASTestKit
           end
         end
 
-        validation_error_messages << generate_non_conformance_message(item) unless success_profile
+        next if success_profile
+
+        validation_error_messages << generate_non_conformance_message(item, base_profile, version)
       end
     end
 
@@ -479,9 +481,21 @@ module DaVinciPASTestKit
       end
     end
 
-    def generate_non_conformance_message(item)
+    def generate_non_conformance_message(item, base_profile, version)
+      target_profiles = item[:profile_urls].map { |url| display_target_profile_url(url, base_profile, version) }.uniq
       "#{item[:resource].resourceType}/#{item[:resource].id} is not conformant to any of the " \
-        "target profiles: #{item[:profile_urls]}."
+        "target profiles: #{target_profiles}."
+    end
+
+    # Renders a stored target profile URL for display in non-conformance messages. Mirrors how the profile
+    # was actually validated (see #profile_url_for_validation) so the listed profiles consistently carry a
+    # version, regardless of whether they were collected from versioned metadata, the unversioned
+    # requestedService reference list, or a declared meta.profile. The collected map is left untouched, so
+    # metadata lookups that rely on #profile_url_without_version are unaffected.
+    def display_target_profile_url(url, base_profile, version)
+      return base_profile if url == BASE_R4_PROFILE
+
+      profile_url_for_validation(url, base_profile, version)
     end
 
     # Processes each entry in a FHIR bundle to extract resource and possible profiles to validate against.
