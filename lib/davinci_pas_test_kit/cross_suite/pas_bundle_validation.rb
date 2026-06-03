@@ -263,7 +263,12 @@ module DaVinciPASTestKit
       end
 
       if root_entry.present?
-        root_resource_profile_url = find_profile_url(request_type)[root_entry.resource.resourceType]
+        root_resource_profile_url = if %w[submit submit_request].include?(request_type) &&
+                                       root_entry.resource.resourceType == 'Claim'
+                                      determine_claim_submit_profile_url(version, root_entry.resource)
+                                    else
+                                      find_profile_url(request_type)[root_entry.resource.resourceType]
+                                    end
 
         add_resource_target_profile_to_map(root_entry.fullUrl, root_entry.resource, root_resource_profile_url)
         extract_profiles_to_validate_each_entry(bundle_entry, root_entry, root_resource_profile_url, version)
@@ -490,7 +495,11 @@ module DaVinciPASTestKit
       reference_elements = metadata.references.dup
 
       # Special handling for Claim submit profile
-      if current_entry_profile_url == PASConstants::CLAIM_PROFILE
+      claim_submit_profile_urls = [
+        PASConstants::CLAIM_PROFILE,
+        PASConstants::CLAIM_PROFILE_FIRST_SUBMIT
+      ]
+      if claim_submit_profile_urls.include?(current_entry_profile_url)
         handle_claim_profile(reference_elements,
                              current_entry_profile_url)
       end
@@ -506,7 +515,11 @@ module DaVinciPASTestKit
     # @param reference_elements [Array] The array of reference elements to be updated.
     # @param current_entry_profile_url [String] The profile URL of the current entry being processed.
     def handle_claim_profile(reference_elements, current_entry_profile_url)
-      return unless current_entry_profile_url == PASConstants::CLAIM_PROFILE
+      claim_submit_profile_urls = [
+        PASConstants::CLAIM_PROFILE,
+        PASConstants::CLAIM_PROFILE_FIRST_SUBMIT
+      ]
+      return unless claim_submit_profile_urls.include?(current_entry_profile_url)
 
       claim_ref_element = {
         path: 'Claim.item.extension.value',
@@ -665,13 +678,37 @@ module DaVinciPASTestKit
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
       {
-        'Claim' => request_type == 'submit' ? PASConstants::CLAIM_PROFILE : PASConstants::CLAIM_INQUIRY_PROFILE,
-        'ClaimResponse' => if request_type == 'submit'
+        'Claim' => if request_type.start_with?('submit')
+                     PASConstants::CLAIM_PROFILE
+                   else
+                     PASConstants::CLAIM_INQUIRY_PROFILE
+                   end,
+        'ClaimResponse' => if %w[submit submit_response].include?(request_type)
                              PASConstants::CLAIM_RESPONSE_PROFILE
                            else
                              PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE
                            end
       }
+    end
+
+    # Determines the target profile URL for a Claim resource in a submit request bundle.
+    #
+    # In v2.2.0, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
+    # The structural discriminator is Claim.related: profile-claim-update requires it (must-support)
+    # while profile-claim disallows it (max: 0). For all other versions, profile-claim-update is
+    # used unconditionally.
+    #
+    # @param version [String] The IG version (e.g. '2.2.0').
+    # @param claim [FHIR::Claim] The Claim resource to inspect.
+    # @return [String] The profile URL to validate against.
+    def determine_claim_submit_profile_url(version, claim)
+      return PASConstants::CLAIM_PROFILE unless version == '2.2.0'
+
+      if claim.related.blank?
+        PASConstants::CLAIM_PROFILE_FIRST_SUBMIT
+      else
+        PASConstants::CLAIM_PROFILE
+      end
     end
 
     # Checks the following requirement:

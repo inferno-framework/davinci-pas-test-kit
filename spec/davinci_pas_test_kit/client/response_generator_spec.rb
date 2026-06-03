@@ -388,6 +388,50 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       end
     end
 
+    describe 'and populating outcome' do
+      it 'uses complete for pended decisions in v2.2.0 (queued was removed from the value set)' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :pended,
+          nil,
+          'v2.2.0'
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        expect(claim_response.outcome).to eq('complete')
+      end
+
+      it 'uses queued for pended decisions in v2.0.1' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :pended,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        expect(claim_response.outcome).to eq('queued')
+      end
+
+      it 'uses complete for approved decisions regardless of version' do
+        %w[v2.0.1 v2.2.0].each do |version|
+          returned_response_string = module_instance.mock_response_bundle(
+            FHIR.from_contents(submit_request_string),
+            'submit',
+            :approval,
+            nil,
+            version
+          )
+          response_bundle = FHIR.from_contents(returned_response_string)
+          claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+          expect(claim_response.outcome).to eq('complete')
+        end
+      end
+    end
+
     describe 'and including referenced entries' do
       it 'all entries included when using absolute url references' do
         returned_response_string = module_instance.mock_response_bundle(

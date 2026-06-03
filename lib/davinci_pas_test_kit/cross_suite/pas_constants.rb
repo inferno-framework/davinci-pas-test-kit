@@ -1,6 +1,7 @@
 module DaVinciPASTestKit
   module PASConstants
     CLAIM_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim-update'.freeze
+    CLAIM_PROFILE_FIRST_SUBMIT = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'.freeze
     CLAIM_RESPONSE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse'.freeze
     CLAIM_INQUIRY_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim-inquiry'.freeze
     CLAIM_INQUIRY_RESPONSE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'.freeze

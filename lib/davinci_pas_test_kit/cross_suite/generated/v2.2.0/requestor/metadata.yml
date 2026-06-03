@@ -35,9 +35,10 @@
     :slice_name: PI
     :path: identifier
     :discriminator:
-      :type: patternIdentifier
-      :path: ''
-      :system:
+      :type: patternCodeableConcept
+      :path: type
+      :code: payerid
+      :system: http://hl7.org/fhir/us/carin-bb/CodeSystem/C4BBIdentifierType
   :elements:
   - :path: identifier
   - :path: active

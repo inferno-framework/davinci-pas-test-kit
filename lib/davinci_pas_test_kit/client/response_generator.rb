@@ -249,7 +249,13 @@ module DaVinciPASTestKit
         insurer: absolute_reference(claim.insurer, request_bundle.entry, root_url),
         requestor: absolute_reference(claim.provider, request_bundle.entry, root_url),
         request: claim_full_url.present? ? FHIR::Reference.new(reference: claim_full_url) : nil,
-        outcome: decision == :pended ? 'queued' : 'complete',
+        # v2.2.0 removed 'queued' from ClaimResponseOutcome ValueSet; pended status is
+        # conveyed via item.extension:reviewActionCode instead.
+        outcome: decision == :pended && ig_version != 'v2.2.0' ? 'queued' : 'complete',
+        preAuthPeriod: FHIR::Period.new(
+          start: timestamp.strftime('%Y-%m-%d'),
+          end: (timestamp + 1.month).strftime('%Y-%m-%d')
+        ),
         item: claim.item.map do |item|
           FHIR::ClaimResponse::Item.new(
             extension: [
@@ -315,6 +321,7 @@ module DaVinciPASTestKit
         ]
       )
       response_bundle.entry.concat(referenced_entities(claim_response, request_bundle.entry, root_url))
+
       response_bundle
     end
 

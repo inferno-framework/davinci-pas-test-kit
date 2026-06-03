@@ -297,6 +297,8 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       it 'returns true for PAS v2.2.x versions' do
         expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.2.0')).to be(true)
         expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.2.1')).to be(true)
+        # Accepts v-prefixed version strings as used by ig_version inputs
+        expect(test_instance.send(:us_core_profile_fallback_enabled?, 'v2.2.0')).to be(true)
       end
 
       it 'returns false for PAS v2.0.1' do
@@ -499,6 +501,96 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       ).to contain_exactly(us_core_profile_url('us-core-documentreference'))
     end
 
+    describe '#profile_url_without_version' do
+      it 'strips the version suffix from a versioned URL' do
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.0'
+        expect(test_instance.send(:profile_url_without_version, url))
+          .to eq('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim')
+      end
+
+      it 'returns the URL unchanged when no version suffix is present' do
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+        expect(test_instance.send(:profile_url_without_version, url)).to eq(url)
+      end
+
+      it 'converts the BASE_R4_PROFILE sentinel symbol to a string without appending anything' do
+        result = test_instance.send(:profile_url_without_version, described_class::BASE_R4_PROFILE)
+        expect(result).to eq(described_class::BASE_R4_PROFILE.to_s)
+      end
+    end
+
+    describe '#us_core_profile_url?' do
+      it 'returns true for an unversioned US Core profile URL' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-patient"
+        expect(test_instance.send(:us_core_profile_url?, url)).to be(true)
+      end
+
+      it 'returns true for a versioned US Core profile URL' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter|#{described_class::US_CORE_VERSION}"
+        expect(test_instance.send(:us_core_profile_url?, url)).to be(true)
+      end
+
+      it 'returns false for a PAS profile URL' do
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim'
+        expect(test_instance.send(:us_core_profile_url?, url)).to be(false)
+      end
+    end
+
+    describe '#profile_url_for_validation' do
+      let(:base_profile) { 'http://hl7.org/fhir/StructureDefinition/Encounter' }
+
+      it 'returns a URL that already includes a version separator unchanged' do
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.0'
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.0')).to eq(url)
+      end
+
+      it 'appends the US Core version to an unversioned US Core URL' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter"
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.0'))
+          .to eq("#{url}|#{described_class::US_CORE_VERSION}")
+      end
+
+      it 'returns a base R4 profile URL unchanged when it matches the base profile' do
+        expect(test_instance.send(:profile_url_for_validation, base_profile, base_profile, '2.2.0'))
+          .to eq(base_profile)
+      end
+
+      it 'appends the IG version to an unversioned PAS profile URL' do
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter'
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.0'))
+          .to eq("#{url}|2.2.0")
+      end
+    end
+
+    describe '#resource_full_url_for_entry' do
+      it 'returns the entry fullUrl when present' do
+        patient = FHIR::Patient.new(id: 'patient-1')
+        entry = FHIR::Bundle::Entry.new(fullUrl: 'http://example.com/fhir/Patient/patient-1', resource: patient)
+        expect(test_instance.send(:resource_full_url_for_entry, entry))
+          .to eq('http://example.com/fhir/Patient/patient-1')
+      end
+
+      it 'falls back to ResourceType/id when fullUrl is absent' do
+        patient = FHIR::Patient.new(id: 'patient-1')
+        entry = FHIR::Bundle::Entry.new(resource: patient)
+        expect(test_instance.send(:resource_full_url_for_entry, entry)).to eq('Patient/patient-1')
+      end
+    end
+
+    describe '#reset_bundle_profile_inference_state' do
+      it 'clears the profile map so a subsequent call starts fresh' do
+        patient = FHIR::Patient.new(id: 'patient-1')
+        test_instance.add_resource_target_profile_to_map(
+          'urn:uuid:patient-1', patient, us_core_profile_url('us-core-patient')
+        )
+        expect(test_instance.bundle_resources_target_profile_map).to_not be_empty
+
+        test_instance.send(:reset_bundle_profile_inference_state)
+
+        expect(test_instance.bundle_resources_target_profile_map).to be_empty
+      end
+    end
+
     describe '#codeable_concept_has_code?' do
       it 'matches when the coding system matches' do
         concept = codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'laboratory')
@@ -584,6 +676,43 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         test_instance
           .bundle_resources_target_profile_map['http://example.com/fhir/Encounter/encounter-1'][:profile_urls]
       ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter')
+    end
+
+    it 'traverses the R5 Claim encounter extension for profile-claim-update claims (regression)' do
+      # A claim with .related triggers profile-claim-update in v2.2.0; encounter extension must
+      # still be traversed and assigned profile-encounter (not a US Core fallback).
+      claim = FHIR::Claim.new(
+        id: 'claim-1',
+        related: [{ relationship: { coding: [{ code: 'prior' }] } }]
+      )
+      encounter = FHIR::Encounter.new(id: 'encounter-1')
+      bundle = FHIR::Bundle.new(
+        entry: [
+          bundle_entry(claim, 'http://example.com/fhir/Claim/claim-1'),
+          bundle_entry(encounter, 'http://example.com/fhir/Encounter/encounter-1')
+        ]
+      )
+
+      allow(test_instance).to receive(:validate_bundle_entries_against_profiles)
+      allow(test_instance).to receive(:evaluate_fhirpath) do |path:, **|
+        if path == claim_encounter_fhirpath
+          [{ 'type' => 'Reference', 'element' => FHIR::Reference.new(reference: 'Encounter/encounter-1') }]
+        else
+          []
+        end
+      end
+
+      test_instance.validate_resources_conformance_against_profile(
+        bundle,
+        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
+        '2.2.0',
+        'submit'
+      )
+
+      expect(
+        test_instance
+          .bundle_resources_target_profile_map['http://example.com/fhir/Encounter/encounter-1'][:profile_urls]
+      ).to include('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter')
     end
 
     it 'uses the base R4 sentinel to validate without a profile URL' do
@@ -742,6 +871,39 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
     it 'returns an empty array when given an empty list' do
       expect(test_instance.send(:reject_entry_resource_issues, [])).to be_empty
+    end
+  end
+
+  describe '#determine_claim_submit_profile_url' do
+    let(:test_instance) do
+      Class.new { include DaVinciPASTestKit::PasBundleValidation }.new
+    end
+
+    let(:base_claim_url) { DaVinciPASTestKit::PASConstants::CLAIM_PROFILE_FIRST_SUBMIT }
+    let(:claim_update_url) { DaVinciPASTestKit::PASConstants::CLAIM_PROFILE }
+
+    context 'when version is 2.0.1' do
+      it 'returns profile-claim-update regardless of Claim.related' do
+        claim = FHIR::Claim.new
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.0.1', claim)).to eq(claim_update_url)
+      end
+    end
+
+    context 'when version is 2.2.0' do
+      it 'returns profile-claim when Claim.related is absent' do
+        claim = FHIR::Claim.new
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(base_claim_url)
+      end
+
+      it 'returns profile-claim when Claim.related is an empty array' do
+        claim = FHIR::Claim.new(related: [])
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(base_claim_url)
+      end
+
+      it 'returns profile-claim-update when Claim.related is present' do
+        claim = FHIR::Claim.new(related: [{ relationship: { coding: [{ code: 'prior' }] } }])
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(claim_update_url)
+      end
     end
   end
 end

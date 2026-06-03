@@ -140,7 +140,27 @@ module DaVinciPASTestKit
       # work. The test kit validates these instances individually as well, so they are still checked,
       # but in a way that Inferno can supress errors
       'Unable to find a match for profile',
-      'Unable to find a profile match for'
+      'Unable to find a profile match for',
+      # IG defect: extension context definitions for these extensions don't match where the profiles place them
+      # extension-authorizationNumber context allows Claim.item only, but profile-claim-base marks it must-support on Claim.extension
+      /extension-authorizationNumber( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      /extension-administrationReferenceNumber( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      /extension-communicatedDiagnosis( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      # IG defect: extension-productOrServiceCodeEnd context only lists Claim.item/ClaimResponse, but profile-servicerequest marks it must-support on ServiceRequest
+      /extension-productOrServiceCodeEnd( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      # IG defect: extension-infoChanged and modifierextension-infoCancelled context only lists Claim.item,
+      # but profile-claim-base marks them must-support on Claim.supportingInfo as well
+      /extension-infoChanged( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      /modifierextension-infoCancelled( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      # IG defect: extension-itemAuthorizedProvider context allows ExplanationOfBenefit/ClaimResponse.item only,
+      # but profile-claimresponse marks ClaimResponse.extension:authorizedProvider as must-support on ClaimResponse root
+      /extension-itemAuthorizedProvider( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      # IG defect: extension-revenueUnitRateLimit, extension-serviceItemRequestType, extension-certificationType
+      # context prohibits ClaimResponse.addItem, but profile-claimresponse marks all three as must-support there
+      /extension-revenueUnitRateLimit( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      /extension-serviceItemRequestType( v\d+\.\d+\.\d+)? is not allowed to be used at this point/,
+      /extension-certificationType( v\d+\.\d+\.\d+)? is not allowed to be used at this point/
+
     ]
   )
   # rubocop:enable Layout/LineLength
