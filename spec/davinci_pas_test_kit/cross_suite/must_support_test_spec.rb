@@ -13,11 +13,11 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
   end
 
-  def preset_v220_response_bundle(input_name)
+  def preset_v221_response_bundle(input_name)
     preset =
       JSON.parse(
         File.read(
-          File.join(__dir__, '..', '..', '..', 'config', 'presets', 'pas_client_v220_must_support_preset.json')
+          File.join(__dir__, '..', '..', '..', 'config', 'presets', 'pas_client_v221_must_support_preset.json')
         )
       )
 
@@ -184,7 +184,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
             resource_type: 'Coverage',
             profile_key: 'coverage',
             user_input_validation: false,
-            ig_version: 'v2.2.0',
+            ig_version: 'v2.2.1',
             type: 'request',
             operation: 'submit'
           }
@@ -261,7 +261,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
             resource_type: 'ClaimResponse',
             profile_key: 'claimresponse',
             user_input_validation: false,
-            ig_version: 'v2.2.0',
+            ig_version: 'v2.2.1',
             type: 'response',
             operation: 'submit'
           }
@@ -276,7 +276,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
             resource_type: 'ClaimResponse',
             profile_key: 'claiminquiryresponse',
             user_input_validation: false,
-            ig_version: 'v2.2.0',
+            ig_version: 'v2.2.1',
             type: 'response',
             operation: 'inquire'
           }
@@ -285,14 +285,14 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     end
 
     it 'treats request as present when submit responses use DataAbsentReason' do
-      create_submit_request('', preset_v220_response_bundle('ms_submit_responses'), [DaVinciPASTestKit::SUBMIT_TAG])
+      create_submit_request('', preset_v221_response_bundle('ms_submit_responses'), [DaVinciPASTestKit::SUBMIT_TAG])
 
       result = run(submit_test)
       expect(result.result).to eq('pass')
     end
 
     it 'treats request as present when inquire responses use DataAbsentReason' do
-      create_inquire_request('', preset_v220_response_bundle('ms_inquire_responses'), [DaVinciPASTestKit::INQUIRE_TAG])
+      create_inquire_request('', preset_v221_response_bundle('ms_inquire_responses'), [DaVinciPASTestKit::INQUIRE_TAG])
 
       result = run(inquire_test)
       expect(result.result).to eq('pass')

@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module PASNotificationVerification
     PAS_RESPONSE_BUNDLE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'.freeze
 
-    def verify_pas_notification(notification_json_str, ig_version: 'v2.2.0') # rubocop:disable Lint/UnusedMethodArgument
+    def verify_pas_notification(notification_json_str, ig_version: 'v2.2.1') # rubocop:disable Lint/UnusedMethodArgument
       assert_valid_json(notification_json_str)
       notification_bundle = FHIR.from_contents(notification_json_str)
 

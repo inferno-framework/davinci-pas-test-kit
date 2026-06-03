@@ -162,7 +162,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
   end
 
-  describe '#validate_pas_bundle_json for v2.2.0' do
+  describe '#validate_pas_bundle_json for v2.2.1' do
     let(:test) do
       Class.new(Inferno::Test) do
         include DaVinciPASTestKit::PasBundleValidation
@@ -175,7 +175,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           validate_pas_bundle_json(
             response_json,
             profile_url,
-            '2.2.0',
+            '2.2.1',
             'inquire',
             'response_bundle'
           )
@@ -225,7 +225,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
     end
 
-    context 'when invalid response is provided for v2.2.0' do
+    context 'when invalid response is provided for v2.2.1' do
       it 'fails with error if Bundle provided instead of Parameters' do
         bundle_json = File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
 
@@ -236,7 +236,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       it 'passes if Parameters is empty (no return parameters)' do
         parameters = FHIR::Parameters.new
-        # No parameters added - valid per v2.2.0 (no matching results)
+        # No parameters added - valid per v2.2.1 (no matching results)
 
         result = run(test, server_endpoint:, response_json: parameters.to_json)
         expect(result.result).to eq('pass')
@@ -295,10 +295,10 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
     describe '#us_core_profile_fallback_enabled?' do
       it 'returns true for PAS v2.2.x versions' do
-        expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.2.0')).to be(true)
+        expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.2.1')).to be(true)
         expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.2.1')).to be(true)
         # Accepts v-prefixed version strings as used by ig_version inputs
-        expect(test_instance.send(:us_core_profile_fallback_enabled?, 'v2.2.0')).to be(true)
+        expect(test_instance.send(:us_core_profile_fallback_enabled?, 'v2.2.1')).to be(true)
       end
 
       it 'returns false for PAS v2.0.1' do
@@ -435,7 +435,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         pas_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-documentreference'
 
         test_instance.add_resource_target_profile_to_map('urn:uuid:doc-1', document_reference, pas_profile)
-        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.0')
+        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.1')
 
         expect(test_instance.bundle_resources_target_profile_map['urn:uuid:doc-1'][:profile_urls])
           .to contain_exactly(pas_profile)
@@ -454,7 +454,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         patient = FHIR::Patient.new(id: 'patient-1')
         entry = bundle_entry(patient, 'urn:uuid:patient-1')
 
-        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.0')
+        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.1')
 
         expect(test_instance.bundle_resources_target_profile_map['urn:uuid:patient-1'][:profile_urls])
           .to contain_exactly(us_core_profile_url('us-core-patient'))
@@ -464,7 +464,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         nutrition_order = FHIR::NutritionOrder.new(id: 'nutrition-order-1')
         entry = bundle_entry(nutrition_order, 'urn:uuid:nutrition-order-1')
 
-        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.0')
+        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.1')
 
         expect(test_instance.bundle_resources_target_profile_map['urn:uuid:nutrition-order-1'][:profile_urls])
           .to contain_exactly(described_class::BASE_R4_PROFILE)
@@ -491,7 +491,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       test_instance.validate_resources_conformance_against_profile(
         bundle,
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
-        '2.2.0',
+        '2.2.1',
         'submit'
       )
 
@@ -503,7 +503,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
     describe '#profile_url_without_version' do
       it 'strips the version suffix from a versioned URL' do
-        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.0'
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.1'
         expect(test_instance.send(:profile_url_without_version, url))
           .to eq('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim')
       end
@@ -540,25 +540,25 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       let(:base_profile) { 'http://hl7.org/fhir/StructureDefinition/Encounter' }
 
       it 'returns a URL that already includes a version separator unchanged' do
-        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.0'
-        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.0')).to eq(url)
+        url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.1'
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq(url)
       end
 
       it 'appends the US Core version to an unversioned US Core URL' do
         url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter"
-        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.0'))
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1'))
           .to eq("#{url}|#{described_class::US_CORE_VERSION}")
       end
 
       it 'returns a base R4 profile URL unchanged when it matches the base profile' do
-        expect(test_instance.send(:profile_url_for_validation, base_profile, base_profile, '2.2.0'))
+        expect(test_instance.send(:profile_url_for_validation, base_profile, base_profile, '2.2.1'))
           .to eq(base_profile)
       end
 
       it 'appends the IG version to an unversioned PAS profile URL' do
         url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter'
-        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.0'))
-          .to eq("#{url}|2.2.0")
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1'))
+          .to eq("#{url}|2.2.1")
       end
     end
 
@@ -636,14 +636,14 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       test_instance.validate_resources_conformance_against_profile(
         bundle,
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
-        '2.2.0',
+        '2.2.1',
         'submit'
       )
 
       expect(
         test_instance
           .bundle_resources_target_profile_map['http://example.com/fhir/Encounter/encounter-1'][:profile_urls]
-      ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter|2.2.0')
+      ).to contain_exactly('http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-encounter|2.2.1')
     end
 
     it 'traverses the R5 Claim encounter extension to the PAS Encounter profile' do
@@ -668,7 +668,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       test_instance.validate_resources_conformance_against_profile(
         bundle,
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
-        '2.2.0',
+        '2.2.1',
         'submit'
       )
 
@@ -679,7 +679,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
 
     it 'traverses the R5 Claim encounter extension for profile-claim-update claims (regression)' do
-      # A claim with .related triggers profile-claim-update in v2.2.0; encounter extension must
+      # A claim with .related triggers profile-claim-update in v2.2.1; encounter extension must
       # still be traversed and assigned profile-encounter (not a US Core fallback).
       claim = FHIR::Claim.new(
         id: 'claim-1',
@@ -705,7 +705,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       test_instance.validate_resources_conformance_against_profile(
         bundle,
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
-        '2.2.0',
+        '2.2.1',
         'submit'
       )
 
@@ -726,7 +726,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       allow(test_instance).to receive(:resource_is_valid?).with(resource: nutrition_order).and_return(true)
 
-      test_instance.validate_bundle_entries_against_profiles('2.2.0')
+      test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
       expect(test_instance).to have_received(:resource_is_valid?).with(resource: nutrition_order)
       expect(test_instance.validation_error_messages).to be_empty
@@ -743,20 +743,20 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           :profile_url_for_validation,
           versioned_profile,
           base_profile,
-          '2.2.0'
+          '2.2.1'
         )
       ).to eq(versioned_profile)
       expect(
-        test_instance.send(:profile_url_for_validation, unversioned_us_core_profile, base_profile, '2.2.0')
+        test_instance.send(:profile_url_for_validation, unversioned_us_core_profile, base_profile, '2.2.1')
       ).to eq(versioned_profile)
       expect(
         test_instance.send(:profile_url_for_validation, unversioned_us_core_profile, base_profile, '2.0.1')
       ).to eq(versioned_profile)
       expect(
-        test_instance.send(:profile_url_for_validation, pas_profile, base_profile, '2.2.0')
-      ).to eq("#{pas_profile}|2.2.0")
+        test_instance.send(:profile_url_for_validation, pas_profile, base_profile, '2.2.1')
+      ).to eq("#{pas_profile}|2.2.1")
       expect(
-        test_instance.send(:profile_url_for_validation, base_profile, base_profile, '2.2.0')
+        test_instance.send(:profile_url_for_validation, base_profile, base_profile, '2.2.1')
       ).to eq(base_profile)
     end
   end
@@ -889,20 +889,20 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
     end
 
-    context 'when version is 2.2.0' do
+    context 'when version is 2.2.1' do
       it 'returns profile-claim when Claim.related is absent' do
         claim = FHIR::Claim.new
-        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(base_claim_url)
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.1', claim)).to eq(base_claim_url)
       end
 
       it 'returns profile-claim when Claim.related is an empty array' do
         claim = FHIR::Claim.new(related: [])
-        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(base_claim_url)
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.1', claim)).to eq(base_claim_url)
       end
 
       it 'returns profile-claim-update when Claim.related is present' do
         claim = FHIR::Claim.new(related: [{ relationship: { coding: [{ code: 'prior' }] } }])
-        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.0', claim)).to eq(claim_update_url)
+        expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.1', claim)).to eq(claim_update_url)
       end
     end
   end

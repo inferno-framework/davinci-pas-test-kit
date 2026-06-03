@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       if ig_version == 'v2.0.1'
         verify_pas_subscription_v201(subscription)
       else
-        verify_pas_subscription_v220(subscription)
+        verify_pas_subscription_v221(subscription)
       end
 
       assert messages.none? { |msg| msg[:type] == 'error' },
@@ -40,17 +40,17 @@ module DaVinciPASTestKit
           ))
     end
 
-    def verify_pas_subscription_v220(subscription)
-      verify_v220_profile(subscription)
-      verify_v220_criteria_format(subscription)
+    def verify_pas_subscription_v221(subscription)
+      verify_v221_profile(subscription)
+      verify_v221_criteria_format(subscription)
     end
 
-    def verify_v220_profile(subscription)
+    def verify_v221_profile(subscription)
       resource = FHIR.from_contents(subscription.to_json)
       resource_is_valid?(resource: resource, profile_url: PAS_SUBSCRIPTION_PROFILE)
     end
 
-    def verify_v220_criteria_format(subscription)
+    def verify_v221_criteria_format(subscription)
       filter_criteria = subscription.dig('_criteria', 'extension')
         &.select { |ext| ext['url'] == BACKPORT_FILTER_CRITERIA_URL }
 
@@ -58,7 +58,7 @@ module DaVinciPASTestKit
 
       filter_criteria.each do |fc|
         value = fc['valueString']
-        # PAS v2.2.0 requires filter criteria in the format 'org-identifier=<identifier>'
+        # PAS v2.2.1 requires filter criteria in the format 'org-identifier=<identifier>'
         # where <identifier> is a non-whitespace organization identifier string
         next if value.present? && value.match?(/\Aorg-identifier=\S+\z/)
 

@@ -1,5 +1,5 @@
 module DaVinciPASTestKit
-  # Helper module for working with FHIR Parameters resources in v2.2.0
+  # Helper module for working with FHIR Parameters resources in v2.2.1
   # Provides utilities to extract Bundles from Parameters.parameter entries
   module ParametersHelper
     # Extracts Bundles from a PAS Inquiry Response Parameters resource

@@ -105,8 +105,8 @@ module DaVinciPASTestKit
       resource = FHIR.from_contents(json)
       assert resource.present?, 'Not a FHIR resource'
 
-      # For v2.2.0 inquire responses, expect Parameters resource
-      if version == '2.2.0' && request_type == 'inquire' && bundle_type == 'response_bundle'
+      # For v2.2.1 inquire responses, expect Parameters resource
+      if version == '2.2.1' && request_type == 'inquire' && bundle_type == 'response_bundle'
         if resource.resourceType == 'Parameters'
           # Extract and validate each Bundle in the Parameters
           bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
@@ -116,13 +116,13 @@ module DaVinciPASTestKit
           end
         elsif resource.is_a?(FHIR::Bundle)
           # Bundle received instead of Parameters - validate it but log an error
-          validation_error_messages << 'Expected Parameters resource for v2.2.0 inquire response, but received ' \
+          validation_error_messages << 'Expected Parameters resource for v2.2.1 inquire response, but received ' \
                                        'Bundle. The response Bundle should be wrapped in a ' \
                                        'Parameters resource with a return parameter.'
           perform_response_validation(resource, profile_url, version, request_type)
         else
           assert false,
-                 "Expected Parameters resource for v2.2.0 inquire response, but received #{resource.resourceType}"
+                 "Expected Parameters resource for v2.2.1 inquire response, but received #{resource.resourceType}"
         end
       else
         # For v2.0.1 or non-inquire operations, expect Bundle resource
@@ -693,16 +693,16 @@ module DaVinciPASTestKit
 
     # Determines the target profile URL for a Claim resource in a submit request bundle.
     #
-    # In v2.2.0, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
+    # In v2.2.1, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
     # The structural discriminator is Claim.related: profile-claim-update requires it (must-support)
     # while profile-claim disallows it (max: 0). For all other versions, profile-claim-update is
     # used unconditionally.
     #
-    # @param version [String] The IG version (e.g. '2.2.0').
+    # @param version [String] The IG version (e.g. '2.2.1').
     # @param claim [FHIR::Claim] The Claim resource to inspect.
     # @return [String] The profile URL to validate against.
     def determine_claim_submit_profile_url(version, claim)
-      return PASConstants::CLAIM_PROFILE unless version == '2.2.0'
+      return PASConstants::CLAIM_PROFILE unless version == '2.2.1'
 
       if claim.related.blank?
         PASConstants::CLAIM_PROFILE_FIRST_SUBMIT

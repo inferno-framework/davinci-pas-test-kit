@@ -104,7 +104,7 @@ module DaVinciPASTestKit
 
     # Determines the IG version from the suite_id
     def ig_version
-      @ig_version ||= suite_id.include?('v220') ? 'v2.2.0' : 'v2.0.1'
+      @ig_version ||= suite_id.include?('v221') ? 'v2.2.1' : 'v2.0.1'
     end
 
     private

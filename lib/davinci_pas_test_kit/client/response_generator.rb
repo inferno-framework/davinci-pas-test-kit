@@ -28,8 +28,8 @@ module DaVinciPASTestKit
                                             claim_response_uuid, ig_version)
       return nil unless response.present?
 
-      # For v2.2.0 inquire operations, wrap the Bundle in a Parameters resource
-      response = wrap_bundle_in_parameters(response) if ig_version == 'v2.2.0' && operation == 'inquire'
+      # For v2.2.1 inquire operations, wrap the Bundle in a Parameters resource
+      response = wrap_bundle_in_parameters(response) if ig_version == 'v2.2.1' && operation == 'inquire'
 
       response.to_json
     end
@@ -43,8 +43,8 @@ module DaVinciPASTestKit
       response_resource = FHIR.from_contents(user_inputted_response)
       return user_inputted_response unless response_resource.present?
 
-      # For v2.2.0 inquire responses, wrap user's Bundle in Parameters if needed
-      if ig_version == 'v2.2.0' && operation == 'inquire' && response_resource.is_a?(FHIR::Bundle)
+      # For v2.2.1 inquire responses, wrap user's Bundle in Parameters if needed
+      if ig_version == 'v2.2.1' && operation == 'inquire' && response_resource.is_a?(FHIR::Bundle)
         response_resource = wrap_bundle_in_parameters(response_resource)
       end
 
@@ -123,7 +123,7 @@ module DaVinciPASTestKit
 
     def update_response_bundle(response_bundle, claim_full_url, now, ig_version)
       response_bundle.timestamp = now.iso8601 if response_bundle&.timestamp.present?
-      if ig_version == 'v2.2.0' && response_bundle.identifier.blank?
+      if ig_version == 'v2.2.1' && response_bundle.identifier.blank?
         response_bundle.identifier = FHIR::Identifier.new(system: 'urn:ietf:rfc:3986',
                                                           value: "urn:uuid:#{SecureRandom.uuid}")
       end
@@ -135,7 +135,7 @@ module DaVinciPASTestKit
 
       if claim_response_entry.resource.request.present?
         claim_response_entry.resource.request.reference = claim_full_url
-      elsif ig_version == 'v2.2.0'
+      elsif ig_version == 'v2.2.1'
         claim_response_entry.resource.request = FHIR::Reference.new(reference: claim_full_url)
       end
     end
@@ -249,9 +249,9 @@ module DaVinciPASTestKit
         insurer: absolute_reference(claim.insurer, request_bundle.entry, root_url),
         requestor: absolute_reference(claim.provider, request_bundle.entry, root_url),
         request: claim_full_url.present? ? FHIR::Reference.new(reference: claim_full_url) : nil,
-        # v2.2.0 removed 'queued' from ClaimResponseOutcome ValueSet; pended status is
+        # v2.2.1 removed 'queued' from ClaimResponseOutcome ValueSet; pended status is
         # conveyed via item.extension:reviewActionCode instead.
-        outcome: decision == :pended && ig_version != 'v2.2.0' ? 'queued' : 'complete',
+        outcome: decision == :pended && ig_version != 'v2.2.1' ? 'queued' : 'complete',
         preAuthPeriod: FHIR::Period.new(
           start: timestamp.strftime('%Y-%m-%d'),
           end: (timestamp + 1.month).strftime('%Y-%m-%d')
@@ -307,7 +307,7 @@ module DaVinciPASTestKit
                                       else
                                         "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle|#{ig_version.delete('v')}"
                                       end),
-        identifier: if ig_version == 'v2.2.0'
+        identifier: if ig_version == 'v2.2.1'
                       FHIR::Identifier.new(
                         system: 'urn:ietf:rfc:3986',
                         value: "urn:uuid:#{SecureRandom.uuid}"
@@ -474,7 +474,7 @@ module DaVinciPASTestKit
       "urn:uuid:#{SecureRandom.uuid}"
     end
 
-    # Wraps a Bundle in a Parameters resource for v2.2.0 inquire responses
+    # Wraps a Bundle in a Parameters resource for v2.2.1 inquire responses
     # @param bundle [FHIR::Bundle] The Bundle to wrap
     # @return [FHIR::Parameters] Parameters resource with the bundle as a return parameter
     def wrap_bundle_in_parameters(bundle)

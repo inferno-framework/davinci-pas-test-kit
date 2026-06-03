@@ -125,7 +125,7 @@ module DaVinciPASTestKit
               authorization request with a `denied` decision.
             DESCRIPTION
           when 'pended'
-            if ig_version == 'v2.2.0'
+            if ig_version == 'v2.2.1'
               <<~DESCRIPTION
                 Demonstrate a complete prior authorization workflow including a period
                 during which the final decision is pending. This includes demonstrating

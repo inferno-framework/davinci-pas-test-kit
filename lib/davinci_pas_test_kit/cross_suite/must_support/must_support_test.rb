@@ -75,7 +75,7 @@ module DaVinciPASTestKit
         end
       end
 
-      # PAS v2.2.0 ClaimResponse examples may use DataAbsentReason on request.
+      # PAS v2.2.1 ClaimResponse examples may use DataAbsentReason on request.
       # Inferno's generic navigation excludes DAR-bearing elements when checking
       # the parent path, so treat that explicit DAR as satisfying request here.
       if resource_type == 'ClaimResponse' && missing_must_support_strings.include?('request')

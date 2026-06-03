@@ -133,13 +133,13 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         expect(claim_response.meta&.profile&.find { |profile| profile == claim_response_profile }).to_not be_nil
       end
 
-      it 'returns Parameters resource for $inquire responses in v2.2.0' do
+      it 'returns Parameters resource for $inquire responses in v2.2.1' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_string),
           'inquire',
           :approval,
           nil,
-          'v2.2.0'
+          'v2.2.1'
         )
 
         returned_resource = FHIR.from_contents(returned_response_string)
@@ -155,17 +155,17 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         bundle = return_param.resource
         claim_response = bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
         expect(claim_response).to_not be_nil
-        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|2.2.0'
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|2.2.1'
         expect(claim_response.meta&.profile&.find { |profile| profile == claim_response_profile }).to_not be_nil
       end
 
-      it 'still returns Bundle for $submit operations in v2.2.0' do
+      it 'still returns Bundle for $submit operations in v2.2.1' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_string),
           'submit',
           :approval,
           nil,
-          'v2.2.0'
+          'v2.2.1'
         )
 
         returned_bundle = FHIR.from_contents(returned_response_string)
@@ -389,13 +389,13 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
     end
 
     describe 'and populating outcome' do
-      it 'uses complete for pended decisions in v2.2.0 (queued was removed from the value set)' do
+      it 'uses complete for pended decisions in v2.2.1 (queued was removed from the value set)' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_string),
           'submit',
           :pended,
           nil,
-          'v2.2.0'
+          'v2.2.1'
         )
 
         response_bundle = FHIR.from_contents(returned_response_string)
@@ -417,7 +417,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       end
 
       it 'uses complete for approved decisions regardless of version' do
-        %w[v2.0.1 v2.2.0].each do |version|
+        %w[v2.0.1 v2.2.1].each do |version|
           returned_response_string = module_instance.mock_response_bundle(
             FHIR.from_contents(submit_request_string),
             'submit',
@@ -558,7 +558,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       expect(returned_response_string).to eq(non_fhir_json_string)
     end
 
-    describe 'with v2.2.0 Parameters responses' do
+    describe 'with v2.2.1 Parameters responses' do
       let(:parameters_response_string) do
         # Create a Parameters response with Bundle inside
         parameters = FHIR::Parameters.new
@@ -577,7 +577,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         returned_response_string = module_instance.update_tester_provided_response(
           parameters_response_string,
           nil,
-          'v2.2.0',
+          'v2.2.1',
           'inquire'
         )
 
@@ -610,7 +610,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         returned_response_string = module_instance.update_tester_provided_response(
           parameters.to_json,
           updated_claim_reference,
-          'v2.2.0',
+          'v2.2.1',
           'inquire'
         )
 

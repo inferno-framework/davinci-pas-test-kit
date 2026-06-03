@@ -95,7 +95,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
     end
   end
 
-  describe 'v2.2.0 subscription verification' do
+  describe 'v2.2.1 subscription verification' do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:access_token) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
@@ -110,12 +110,12 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
             disableDefaultResourceFetcher true
           end
 
-          igs('hl7.fhir.us.davinci-pas#2.2.0')
+          igs('hl7.fhir.us.davinci-pas#2.2.1')
         end
 
         config(
           options: {
-            ig_version: 'v2.2.0'
+            ig_version: 'v2.2.1'
           }
         )
       end
@@ -124,11 +124,11 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
     let(:result) { repo_create(:result, test_session_id: test_session.id) }
     let(:requests_repo) { Inferno::Repositories::Requests.new }
     let(:subscription_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
-    let(:good_v220_subscription) do
-      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_v220_good.json')))
+    let(:good_v221_subscription) do
+      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_v221_good.json')))
     end
-    let(:bad_v220_subscription) do
-      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_v220_bad.json')))
+    let(:bad_v221_subscription) do
+      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_v221_bad.json')))
     end
 
     def create_subscription_request(subscription)
@@ -152,10 +152,10 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
       )
     end
 
-    it 'passes with a valid v2.2.0 subscription' do
+    it 'passes with a valid v2.2.1 subscription' do
       stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
-      create_subscription_request(good_v220_subscription)
+      create_subscription_request(good_v221_subscription)
       result = run(test)
       expect(result.result).to eq('pass')
     end
@@ -168,7 +168,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionPASConformanceTest, :request do
     it 'fails with non-conformant subscription' do
       stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
-      create_subscription_request(bad_v220_subscription)
+      create_subscription_request(bad_v221_subscription)
       result = run(test)
       expect(result.result).to eq('fail')
 

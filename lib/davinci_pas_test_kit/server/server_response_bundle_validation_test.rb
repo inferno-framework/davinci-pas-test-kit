@@ -30,13 +30,13 @@ module DaVinciPASTestKit
         resource = FHIR.from_contents(response_body)
         next unless resource.present?
 
-        # Handle Parameters resource (v2.2.0 inquire responses)
+        # Handle Parameters resource (v2.2.1 inquire responses)
         if resource.resourceType == 'Parameters'
           # Extract all Bundles from Parameters.parameter entries
           parameter_bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
           bundles.concat(parameter_bundles)
         elsif resource.is_a?(FHIR::Bundle)
-          # Handle Bundle resource (v2.0.1 or v2.2.0 non-inquire)
+          # Handle Bundle resource (v2.0.1 or v2.2.1 non-inquire)
           bundles << resource
         end
       rescue StandardError

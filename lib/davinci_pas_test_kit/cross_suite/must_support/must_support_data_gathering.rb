@@ -38,7 +38,7 @@ module DaVinciPASTestKit
 
         next unless response_resource.present?
 
-        # Handle Parameters resource (v2.2.0 inquire responses)
+        # Handle Parameters resource (v2.2.1 inquire responses)
         if response_resource.resourceType == 'Parameters'
           bundles = extract_bundles_from_pas_inquiry_response_parameters(response_resource)
           bundles.each do |bundle|
@@ -49,7 +49,7 @@ module DaVinciPASTestKit
             resources.concat(entry_resources)
           end
         elsif response_resource.is_a?(FHIR::Bundle)
-          # Handle Bundle resource (v2.0.1 or v2.2.0 non-inquire)
+          # Handle Bundle resource (v2.0.1 or v2.2.1 non-inquire)
           resources << response_resource
           entry_resources = response_resource.entry.map(&:resource)
           resources.concat(entry_resources)

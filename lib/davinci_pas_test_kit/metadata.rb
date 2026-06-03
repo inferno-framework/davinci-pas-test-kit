@@ -78,9 +78,9 @@ module DaVinciPASTestKit
     DESCRIPTION
     suite_ids [
       :davinci_pas_server_suite_v201,
-      :davinci_pas_server_suite_v220,
+      :davinci_pas_server_suite_v221,
       :davinci_pas_client_suite_v201,
-      :davinci_pas_client_suite_v220
+      :davinci_pas_client_suite_v221
     ]
     tags ['Da Vinci', 'PAS']
     last_updated LAST_UPDATED
