@@ -2,7 +2,7 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
   let(:suite_id) { 'davinci_pas_server_suite_v201' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:pa_request_valid_bundle) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
   end
 
   let(:test) do

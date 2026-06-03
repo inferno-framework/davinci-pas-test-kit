@@ -18,13 +18,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
     end
     let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{session_url_path}" }
     let(:subscription_create_response_full_resource) do
-      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
     end
     let(:submit_request_json) do
-      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
     end
     let(:notification_bundle) do
-      File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_notification_example_id_only.json'))
+      File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_notification_example_id_only.json'))
     end
 
     def create_subscription_request
@@ -147,7 +147,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
       describe 'and the tester provides a submit response body' do
         let(:pended_response_json) do
-          File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+          File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json'))
         end
 
         it 'echoes the response body' do
@@ -257,7 +257,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
       describe 'and the tester provides an inquire response body' do
         let(:approval_response_json) do
-          File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+          File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json'))
         end
 
         it 'echoes the response body' do
@@ -328,7 +328,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
 
       describe 'and the tester provides a notification body' do
         let(:notification_json_bundle) do
-          File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_notification_example_full_resource.json'))
+          File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_notification_example_full_resource.json'))
         end
 
         it 'echoes the notification' do

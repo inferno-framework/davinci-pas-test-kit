@@ -1,4 +1,4 @@
-require_relative '../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
+require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
 
 RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }

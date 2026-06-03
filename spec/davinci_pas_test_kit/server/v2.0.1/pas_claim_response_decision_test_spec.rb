@@ -1,10 +1,13 @@
-RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable do
+RSpec.describe DaVinciPASTestKit::PasClaimResponseDecisionTest, :runnable do
   let(:suite_id) { 'davinci_pas_server_suite_v201' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
   let(:pa_response_valid_bundle) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json'))
+  end
+  let(:pa_response_valid_bundle_denial) do
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle_denial.json'))
   end
 
   let(:test) do
@@ -12,8 +15,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
       config(
         options: {
           use_case: 'approval',
-          operation: 'submit',
-          ig_version: 'v2.0.1'
+          operation: 'submit'
         }
       )
     end
@@ -32,25 +34,18 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     )
   end
 
-  def entity_result_messages(runnable)
-    results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
-      .first
-      .messages
-  end
-
-  it 'fails if no requests made' do
+  it 'skips if no requests made' do
     result = run(test)
-    expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/No successful \$submit requests made during the Approval workflow tests./)
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to match(/No Bundles to check/)
   end
 
   it 'fails if no requests made for the right workflow' do
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::PENDED_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
     result = run(test)
-    expect(result.result).to eq('fail')
-    expect(result.result_message)
-      .to match(/No successful \$submit requests made during the Approval workflow tests./)
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to match(/No Bundles to check/)
   end
 
   it 'fails if no responses are FHIR Bundles' do
@@ -59,14 +54,11 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     create_submit_request('not json', tags)
     create_submit_request(FHIR::Patient.new.to_json, tags)
     result = run(test)
-    expect(result.result).to eq('fail')
-    expect(result.result_message)
-      .to match(/No successful \$submit requests made during the Approval workflow tests./)
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to match(/No Bundles to check/)
   end
 
   it 'passes when valid Bundles were returned' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
 
@@ -76,8 +68,8 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
 
   it 'only analyzes duplicate Bundles once' do
     call_count = 0
-    allow_any_instance_of(test).to receive(:perform_bundle_validation) { call_count += 1 }.and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
+    allow_any_instance_of(test)
+      .to receive(:response_has_expected_adjudication_code?) { call_count += 1 }.and_return(true)
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
     create_submit_request(pa_response_valid_bundle,
@@ -88,21 +80,15 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     expect(call_count).to eq(1)
   end
 
-  it 'fails if validation errors found' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages)
-      .and_return(['this is an error', 'this is another error'])
+  it 'fails if the wrong adjudication code found' do
     create_submit_request(pa_response_valid_bundle,
+                          [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
+    create_submit_request(pa_response_valid_bundle_denial,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
 
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/Bundle response\(s\) returned are not conformant. Check messages for issues found./)
-    messages = entity_result_messages(test)
-    expect(messages.size).to eq(2)
-    expect(messages.all? { |message| message.type == 'error' }).to be(true)
-    expect(messages[0].message).to eq('this is an error')
-    expect(messages[1].message).to eq('this is another error')
+      .to match(/One or more response Bundles did not have the expected adjudication code A1./)
   end
 end

@@ -13,7 +13,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidati
     }
   end
   let(:valid_request_string) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
   end
   let(:approval_test) do
     Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidationTest) do

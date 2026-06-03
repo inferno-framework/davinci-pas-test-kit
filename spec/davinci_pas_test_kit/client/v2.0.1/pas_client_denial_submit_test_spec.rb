@@ -1,6 +1,6 @@
-require_relative '../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
+require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
 
-RSpec.describe DaVinciPASTestKit::AbstractApprovalSubmitTest, :request do
+RSpec.describe DaVinciPASTestKit::AbstractDenialSubmitTest, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
   describe 'responding to requests from the client under tests' do
@@ -19,7 +19,7 @@ RSpec.describe DaVinciPASTestKit::AbstractApprovalSubmitTest, :request do
     let(:requests_repo) { Inferno::Repositories::Requests.new }
     let(:submit_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::SUBMIT_PATH}" }
     let(:submit_request_json) do
-      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
     end
 
     it 'passes when a submit request received' do
@@ -51,17 +51,17 @@ RSpec.describe DaVinciPASTestKit::AbstractApprovalSubmitTest, :request do
       post_json(submit_url, submit_request_json)
 
       requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBMIT_TAG,
-                                                                        DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG])
+                                                                        DaVinciPASTestKit::DENIAL_WORKFLOW_TAG])
       expect(requests.length).to be(1)
     end
 
     describe 'when the tester does not provide a response body' do
       it 'generates an approved response body' do
+        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         inputs = { session_url_path: }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         post_json(submit_url, submit_request_json)
         fhir_body = FHIR.from_contents(last_response.body)
         expect(fhir_body).to be_a(FHIR::Bundle)
@@ -78,7 +78,7 @@ RSpec.describe DaVinciPASTestKit::AbstractApprovalSubmitTest, :request do
           end
           expect(review_action_code).to_not be_nil
           expect(review_action_code.valueCodeableConcept).to_not be_nil
-          expect(review_action_code.valueCodeableConcept.coding&.dig(0)&.code).to eq('A1')
+          expect(review_action_code.valueCodeableConcept.coding&.dig(0)&.code).to eq('A3')
         end
       end
 
@@ -90,21 +90,21 @@ RSpec.describe DaVinciPASTestKit::AbstractApprovalSubmitTest, :request do
         result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
         expect(result_messages.length).to be(1)
         expect(result_messages[0].type).to eq('info')
-        expect(result_messages[0].message).to match(/No approved response provided/)
+        expect(result_messages[0].message).to match(/No denied response provided/)
       end
     end
 
     describe 'when the tester provides a response body' do
       let(:approved_response_json) do
-        File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+        File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json'))
       end
 
       it 'echoes the response body' do
-        inputs = { session_url_path:, approval_json_response: approved_response_json }
+        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
+        inputs = { session_url_path:, denial_json_response: approved_response_json }
         result = run(test, inputs)
         expect(result.result).to eq('wait')
 
-        allow(SecureRandom).to receive(:uuid).and_return(static_uuid)
         post_json(submit_url, submit_request_json)
         fhir_body = FHIR.from_contents(last_response.body)
         expect(fhir_body).to be_a(FHIR::Bundle)
@@ -114,7 +114,7 @@ RSpec.describe DaVinciPASTestKit::AbstractApprovalSubmitTest, :request do
       end
 
       it 'fails when a non-json response provided' do
-        inputs = { session_url_path:, approval_json_response: 'not json' }
+        inputs = { session_url_path:, denial_json_response: 'not json' }
         result = run(test, inputs)
         expect(result.result).to eq('fail')
         expect(result.result_message).to match(/must be valid JSON/)

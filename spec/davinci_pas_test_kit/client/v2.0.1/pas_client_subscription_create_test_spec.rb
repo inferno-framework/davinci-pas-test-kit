@@ -1,4 +1,4 @@
-require_relative '../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
+require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
 
 RSpec.describe DaVinciPASTestKit::AbstractSubscriptionCreateTest, :request do
   describe 'when responding to requests from the client under tests' do
@@ -19,10 +19,10 @@ RSpec.describe DaVinciPASTestKit::AbstractSubscriptionCreateTest, :request do
     let(:requests_repo) { Inferno::Repositories::Requests.new }
     let(:subscription_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
     let(:subscription_create_response_full_resource) do
-      JSON.parse(File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_Subscription_example_full_resource.json')))
     end
     let(:notification_json_bundle) do
-      File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_notification_example_full_resource.json'))
+      File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_notification_example_full_resource.json'))
     end
 
     it 'remains in wait status when a Subscription Creation request received' do

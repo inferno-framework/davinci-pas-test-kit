@@ -1,4 +1,4 @@
-require_relative '../../../lib/davinci_pas_test_kit/server/v2.0.1/server_urls'
+require_relative '../../../../lib/davinci_pas_test_kit/server/v2.0.1/server_urls'
 
 RSpec.describe DaVinciPASTestKit::AbstractPASSubscriptionNotificationWaitTest, :request do
   let(:suite_id) { 'davinci_pas_server_suite_v201' }
@@ -16,7 +16,7 @@ RSpec.describe DaVinciPASTestKit::AbstractPASSubscriptionNotificationWaitTest, :
   let(:notification_url) { '/custom/subscriptions_r5_backport_r4_server/subscription/channel/notification_listener' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:notification_body) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_notification_example_id_only.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_notification_example_id_only.json'))
   end
 
   it 'passes when a notification is received' do

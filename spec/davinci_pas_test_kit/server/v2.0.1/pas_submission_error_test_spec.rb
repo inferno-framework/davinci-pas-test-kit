@@ -9,7 +9,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasSubmissionErrorTest do
   end
   let(:error_outcome) { FHIR::OperationOutcome.new(issue: [{ severity: 'error' }]) }
   let(:pa_request_payload) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'nonconformant_pas_bundle_v110.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'nonconformant_pas_bundle_v110.json'))
   end
 
   it 'passes if the HTTP status is not within 2xx range' do

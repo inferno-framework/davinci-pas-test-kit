@@ -16,7 +16,7 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
   end
 
   let(:pa_inquire_request_payload) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
   end
 
   describe 'when dealing with invalid inputs' do

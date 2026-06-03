@@ -1,6 +1,7 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest, :request do
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:access_token) { '1234' }
+  let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:fhirpath_url) { 'https://example.com/fhirpath/evaluate' }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
@@ -12,11 +13,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
       sessionId: 'b8cf5547-1dc7-4714-a797-dc2347b93fe2'
     }
   end
-  let(:valid_response_string) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_response_bundle.json'))
+  let(:valid_request_string) do
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_inquire_bundle_v110.json'))
   end
   let(:approval_test) do
-    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest) do
       fhir_resource_validator do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
@@ -29,13 +30,26 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
         igs('hl7.fhir.us.davinci-pas#2.0.1')
       end
 
-      input :approval_json_response, optional: true
-
       config({ options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG } })
     end
   end
+  let(:no_workflow_test) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleValidationTest) do
+      fhir_resource_validator do
+        url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
-  def create_submit_response(bundle_string, tags_list)
+        cli_context do
+          txServer nil
+          displayWarnings true
+          disableDefaultResourceFetcher true
+        end
+
+        igs('hl7.fhir.us.davinci-pas#2.0.1')
+      end
+    end
+  end
+
+  def create_submit_request(bundle_string, tags_list)
     headers ||= [
       {
         type: 'request',
@@ -49,7 +63,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
       url: submit_url,
       test_session_id: test_session.id,
       result:,
-      response_body: bundle_string,
+      request_body: bundle_string,
       tags: tags_list,
       status: 201,
       headers:
@@ -63,8 +77,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
     end
 
     it 'skips when no requests made for the specific workflow' do
-      create_submit_response(valid_response_string,
-                             [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
+      create_submit_request(valid_request_string,
+                            [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::INQUIRE_TAG])
       result = run(approval_test)
       expect(result.result).to eq('skip')
     end
@@ -72,55 +86,45 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
     it 'passes with a valid response' do
       stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
-      stub_request(:post, /#{fhirpath_url}\?path=ClaimResponse.*/)
+      stub_request(:post, /#{fhirpath_url}\?path=Claim.*/)
         .to_return(status: 200, body: [].to_json)
       stub_request(:post, /#{fhirpath_url}\?path=Patient.*/)
         .to_return(status: 200, body: [].to_json)
       stub_request(:post, /#{fhirpath_url}\?path=Organization.*/)
         .to_return(status: 200, body: [].to_json)
-      stub_request(:post, "#{fhirpath_url}?path=ClaimResponse.patient")
+      stub_request(:post, "#{fhirpath_url}?path=Claim.patient")
         .to_return(status: 200, body: [{ type: 'Reference',
                                          element: { reference: 'Patient/SubscriberExample' } }].to_json)
-      stub_request(:post, "#{fhirpath_url}?path=ClaimResponse.insurer")
+      stub_request(:post, "#{fhirpath_url}?path=Claim.insurer")
         .to_return(status: 200, body: [{ type: 'Reference',
                                          element: { reference: 'Organization/InsurerExample' } }].to_json)
-      stub_request(:post, "#{fhirpath_url}?path=ClaimResponse.requestor")
+      stub_request(:post, "#{fhirpath_url}?path=Claim.requestor")
         .to_return(status: 200, body: [{ type: 'Reference',
                                          element: { reference: 'Organization/UMOExample' } }].to_json)
-      create_submit_response(valid_response_string,
-                             [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                              DaVinciPASTestKit::SUBMIT_TAG])
+      create_submit_request(valid_request_string,
+                            [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
+                             DaVinciPASTestKit::INQUIRE_TAG])
 
-      inputs = { approval_json_response: nil }
-      result = run(approval_test, inputs)
+      result = run(approval_test)
 
       expect(result.result).to eq('pass')
     end
 
-    describe 'and failing' do
-      it 'indicates the response was generated when no user input' do
-        create_submit_response('NOT JSON',
-                               [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                                DaVinciPASTestKit::SUBMIT_TAG])
+    it 'finds any inquire request when no workflow specified' do
+      allow_any_instance_of(described_class).to receive(:validate_pas_bundle_json).and_return(nil)
+      create_submit_request(valid_request_string,
+                            [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::INQUIRE_TAG])
+      result = run(no_workflow_test)
+      expect(result.result).to eq('pass')
+    end
 
-        inputs = { approval_json_response: nil }
-        result = run(approval_test, inputs)
+    it 'fails on a bad request' do
+      create_submit_request('NOT JSON',
+                            [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
+                             DaVinciPASTestKit::INQUIRE_TAG])
+      result = run(approval_test)
 
-        expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/Invalid response generated from the submitted claim:/)
-      end
-
-      it 'indicates the response came from the user when user input provided' do
-        create_submit_response('NOT JSON',
-                               [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                                DaVinciPASTestKit::SUBMIT_TAG])
-
-        inputs = { approval_json_response: 'NOT JSON' }
-        result = run(approval_test, inputs)
-
-        expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/Invalid response generated from provided input/)
-      end
+      expect(result.result).to eq('fail')
     end
   end
 end

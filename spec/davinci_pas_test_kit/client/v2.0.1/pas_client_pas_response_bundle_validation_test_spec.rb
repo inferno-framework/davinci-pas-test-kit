@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundleValidationTest, :request do
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:access_token) { '1234' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
@@ -13,10 +13,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
     }
   end
   let(:valid_response_string) do
-    File.read(File.join(__dir__, '../..', 'fixtures', 'valid_pa_inquire_response_bundle.json'))
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json'))
   end
   let(:approval_test) do
-    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundleValidationTest) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest) do
       fhir_resource_validator do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
@@ -29,13 +29,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
         igs('hl7.fhir.us.davinci-pas#2.0.1')
       end
 
-      input :inquire_json_response, optional: true
+      input :approval_json_response, optional: true
 
       config({ options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG } })
     end
   end
 
-  def create_inquire_response(bundle_string, tags_list)
+  def create_submit_response(bundle_string, tags_list)
     headers ||= [
       {
         type: 'request',
@@ -63,8 +63,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
     end
 
     it 'skips when no requests made for the specific workflow' do
-      create_inquire_response(valid_response_string,
-                              [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
+      create_submit_response(valid_response_string,
+                             [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
       result = run(approval_test)
       expect(result.result).to eq('skip')
     end
@@ -87,11 +87,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
       stub_request(:post, "#{fhirpath_url}?path=ClaimResponse.requestor")
         .to_return(status: 200, body: [{ type: 'Reference',
                                          element: { reference: 'Organization/UMOExample' } }].to_json)
-      create_inquire_response(valid_response_string,
-                              [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                               DaVinciPASTestKit::INQUIRE_TAG])
+      create_submit_response(valid_response_string,
+                             [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
+                              DaVinciPASTestKit::SUBMIT_TAG])
 
-      inputs = { inquire_json_response: nil }
+      inputs = { approval_json_response: nil }
       result = run(approval_test, inputs)
 
       expect(result.result).to eq('pass')
@@ -99,11 +99,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
 
     describe 'and failing' do
       it 'indicates the response was generated when no user input' do
-        create_inquire_response('NOT JSON',
-                                [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                                 DaVinciPASTestKit::INQUIRE_TAG])
+        create_submit_response('NOT JSON',
+                               [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
+                                DaVinciPASTestKit::SUBMIT_TAG])
 
-        inputs = { inquire_json_response: nil }
+        inputs = { approval_json_response: nil }
         result = run(approval_test, inputs)
 
         expect(result.result).to eq('skip')
@@ -111,11 +111,11 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
       end
 
       it 'indicates the response came from the user when user input provided' do
-        create_inquire_response('NOT JSON',
-                                [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                                 DaVinciPASTestKit::INQUIRE_TAG])
+        create_submit_response('NOT JSON',
+                               [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
+                                DaVinciPASTestKit::SUBMIT_TAG])
 
-        inputs = { inquire_json_response: 'NOT JSON' }
+        inputs = { approval_json_response: 'NOT JSON' }
         result = run(approval_test, inputs)
 
         expect(result.result).to eq('skip')
