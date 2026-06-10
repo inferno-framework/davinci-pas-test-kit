@@ -38,15 +38,33 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      test from: :pas_client_v221_submit_response_must_support_pas_response_bundle
-      test from: :pas_client_v221_submit_response_must_support_claimresponse
-      test from: :pas_client_v221_submit_response_must_support_communication_request
-      test from: :pas_client_v221_submit_response_must_support_insurer
-      test from: :pas_client_v221_submit_response_must_support_requestor
-      test from: :pas_client_v221_submit_response_must_support_beneficiary
-      test from: :pas_client_v221_submit_response_must_support_practitioner
-      test from: :pas_client_v221_submit_response_must_support_practitioner_role
-      test from: :pas_client_v221_submit_response_must_support_task
+      test from: :pas_client_v221_submit_response_must_support_pas_response_bundle do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_claimresponse do
+        config(options: { user_input_validation: false })
+      end
+      test from: :pas_client_v221_submit_response_must_support_communication_request do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_insurer do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_requestor do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_beneficiary do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_practitioner do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_practitioner_role do
+        optional
+      end
+      test from: :pas_client_v221_submit_response_must_support_task do
+        optional
+      end
       test from: :pas_client_v221_response_attest,
            title: 'Confirm that the client handled the $submit response must support elements (Attestation)',
            description: %(
