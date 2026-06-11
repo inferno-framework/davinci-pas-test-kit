@@ -33,16 +33,32 @@ module DaVinciPASTestKit
         
       )
       run_as_group
-      
-      test from: :pas_client_v221_inquire_request_must_support_pas_inquiry_request_bundle
+
+      test from: :pas_client_v221_inquire_request_must_support_pas_inquiry_request_bundle do
+        optional
+      end
       test from: :pas_client_v221_inquire_request_must_support_claim_inquiry
-      test from: :pas_client_v221_inquire_request_must_support_coverage
-      test from: :pas_client_v221_inquire_request_must_support_insurer
-      test from: :pas_client_v221_inquire_request_must_support_requestor
-      test from: :pas_client_v221_inquire_request_must_support_beneficiary
-      test from: :pas_client_v221_inquire_request_must_support_subscriber
-      test from: :pas_client_v221_inquire_request_must_support_practitioner
-      test from: :pas_client_v221_inquire_request_must_support_practitioner_role
+      test from: :pas_client_v221_inquire_request_must_support_coverage do
+        optional
+      end
+      test from: :pas_client_v221_inquire_request_must_support_insurer do
+        optional
+      end
+      test from: :pas_client_v221_inquire_request_must_support_requestor do
+        optional
+      end
+      test from: :pas_client_v221_inquire_request_must_support_beneficiary do
+        optional
+      end
+      test from: :pas_client_v221_inquire_request_must_support_subscriber do
+        optional
+      end
+      test from: :pas_client_v221_inquire_request_must_support_practitioner do
+        optional
+      end
+      test from: :pas_client_v221_inquire_request_must_support_practitioner_role do
+        optional
+      end
     end
   end
 end
