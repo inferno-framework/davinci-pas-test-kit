@@ -41,7 +41,6 @@ module DaVinciPASTestKit
         
       )
       run_as_group
-      optional
 
       test from: :pas_client_v221_must_support_request_profiles do
         optional
@@ -49,9 +48,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_submit_request_must_support_pas_request_bundle do
         optional
       end
-      test from: :pas_client_v221_submit_request_must_support_claim_update do
-        optional
-      end
+      test from: :pas_client_v221_submit_request_must_support_claim_update
       test from: :pas_client_v221_submit_request_must_support_coverage do
         optional
       end

@@ -39,9 +39,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_inquire_response_must_support_pas_inquiry_response_bundle do
         optional
       end
-      test from: :pas_client_v221_inquire_response_must_support_claiminquiryresponse do
-        config(options: { user_input_validation: false })
-      end
+      test from: :pas_client_v221_inquire_response_must_support_claiminquiryresponse
       test from: :pas_client_v221_inquire_response_must_support_insurer do
         optional
       end
