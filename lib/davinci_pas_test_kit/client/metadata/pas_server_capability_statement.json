@@ -1,0 +1,62 @@
+{
+  "resourceType": "CapabilityStatement",
+  "id": "pas-intermediary-server",
+  "instantiates": [
+    "http://hl7.org/fhir/us/davinci-pas/CapabilityStatement/IntermediaryCapabilities"
+  ],
+  "name": "PASIntermediaryServerMetadata",
+  "title": "Da Vinci PAS Test Kit Simulated Intermediary Server",
+  "status": "active",
+  "experimental": true,
+  "date": "2023-08-08",
+  "publisher": "Inferno",
+  "description": "CapabilityStatement for the Da Vinci PAS Test Kit simulated payer/intermediary server. Declares support for the PAS $submit and $inquire operations on Claim and for Subscription create/update/delete so that clients can discover subscription support.",
+  "kind": "instance",
+  "software": {
+    "name": "Da Vinci PAS Test Kit"
+  },
+  "fhirVersion": "4.0.1",
+  "format": [
+    "json"
+  ],
+  "rest": [
+    {
+      "mode": "server",
+      "resource": [
+        {
+          "type": "Claim",
+          "operation": [
+            {
+              "name": "PAS Claim Request",
+              "definition": "http://hl7.org/fhir/us/davinci-pas/OperationDefinition/Claim-submit|2.2.1"
+            },
+            {
+              "name": "PAS Claim Inquiry",
+              "definition": "http://hl7.org/fhir/us/davinci-pas/OperationDefinition/Claim-inquiry|2.2.1"
+            }
+          ]
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical",
+              "valueCanonical": "http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic"
+            }
+          ],
+          "type": "Subscription",
+          "interaction": [
+            {
+              "code": "create"
+            },
+            {
+              "code": "update"
+            },
+            {
+              "code": "delete"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
