@@ -776,6 +776,7 @@ module DaVinciPASTestKit
       else
         target_resource.source_hash.each_key do |attr|
           next if claim_response_request_attr?(target_resource, attr)
+          next if claim_related_attr?(target_resource, attr)
 
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
@@ -796,6 +797,17 @@ module DaVinciPASTestKit
       attr.to_s == 'request' &&
         resource.respond_to?(:resourceType) &&
         resource.resourceType == 'ClaimResponse'
+    end
+
+    # Claim.related.claim points to the Claim being updated. Whether that Claim (and, for a
+    # multi-level update, the grandparent it in turn references) is included in the Bundle is
+    # governed by the Claim Update rules (spec-65/66): the immediately-prior Claim SHALL be
+    # included but its own referenced Claim SHALL NOT. Skipping Claim.related here keeps the
+    # generic reference-presence check from flagging the deliberately-omitted grandparent.
+    def claim_related_attr?(resource, attr)
+      attr.to_s == 'related' &&
+        resource.respond_to?(:resourceType) &&
+        resource.resourceType == 'Claim'
     end
 
     # Extracts resources from a bundle while following "next" links.
