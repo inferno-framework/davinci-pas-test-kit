@@ -1,0 +1,60 @@
+{
+  "resourceType" : "CapabilityStatement",
+  "name" : "DaVinciPASClientSuiteV221SimulatedPayerServer",
+  "title" : "Da Vinci PAS Client Suite v2.2.1 Simulated Payer Server",
+  "status" : "active",
+  "experimental" : false,
+  "date" : "2026-06-15",
+  "description" : "CapabilityStatement for the Da Vinci PAS Client Suite v2.2.1 simulated payer/intermediary server. Declares support for the PAS $submit and $inquire operations on Claim and Subscription create/update/delete so that clients under test can discover subscription support.",
+  "kind" : "instance",
+  "software" : {
+    "name" : "DaVinciPASClientSuiteV221SimulatedPayerServer"
+  },
+  "implementation" : {
+    "description" : "Inferno Da Vinci PAS Client Suite v2.2.1 Simulated Payer Server"
+  },
+  "fhirVersion" : "4.0.1",
+  "format" : [
+    "json"
+  ],
+  "rest" : [
+    {
+      "mode" : "server",
+      "resource" : [
+        {
+          "type" : "Claim",
+          "operation" : [
+            {
+              "name" : "PAS Claim Request",
+              "definition" : "http://hl7.org/fhir/us/davinci-pas/OperationDefinition/Claim-submit|2.2.1"
+            },
+            {
+              "name" : "PAS Claim Inquiry",
+              "definition" : "http://hl7.org/fhir/us/davinci-pas/OperationDefinition/Claim-inquiry|2.2.1"
+            }
+          ]
+        },
+        {
+          "extension" : [
+            {
+              "url" : "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical",
+              "valueCanonical" : "http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic"
+            }
+          ],
+          "type" : "Subscription",
+          "interaction" : [
+            {
+              "code" : "create"
+            },
+            {
+              "code" : "update"
+            },
+            {
+              "code" : "delete"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

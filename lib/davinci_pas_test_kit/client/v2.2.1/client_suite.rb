@@ -7,6 +7,7 @@ require_relative '../endpoints/claim_endpoint'
 require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
+require_relative '../metadata/mock_pas_server'
 require_relative '../pas_client_options'
 require_relative 'pas_client_workflows_group'
 require_relative 'pas_client_must_support_group'
@@ -124,6 +125,15 @@ module DaVinciPASTestKit
       })
       route(:get, SMARTAppLaunch::SMART_DISCOVERY_PATH, lambda { |_env|
         SMARTAppLaunch::MockSMARTServer.smart_server_metadata(id)
+      })
+
+      # FHIR capability statement for the simulated PAS payer server, declaring
+      # subscription support as required by the PAS IG.
+      route(:get, FHIR_METADATA_PATH, lambda { |env|
+        MockPASServer.capability_statement_response(env)
+      })
+      route(:get, SESSION_FHIR_METADATA_PATH, lambda { |env|
+        MockPASServer.capability_statement_response(env)
       })
 
       suite_endpoint :post, UDAPSecurityTestKit::REGISTRATION_PATH,
