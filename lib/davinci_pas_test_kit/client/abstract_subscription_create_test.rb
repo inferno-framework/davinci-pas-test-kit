@@ -37,7 +37,7 @@ module DaVinciPASTestKit
 
     run do
       wait_identifier = session_wait_identifier(client_id, session_url_path)
-      subscription_endpoint = session_endpont_url(:subscription, client_id, session_url_path)
+      subscription_endpoint = session_endpoint_url(:subscription, client_id, session_url_path)
 
       wait(
         identifier: wait_identifier,
