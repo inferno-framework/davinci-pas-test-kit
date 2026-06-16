@@ -1,4 +1,5 @@
 require_relative '../../v2.2.1/must_support/pas_client_must_support_request_profiles_test'
+require_relative '../../v2.2.1/must_support/pas_client_must_support_attestation_test'
 require_relative 'pas_request_bundle/client_submit_request_must_support_pas_request_bundle_test'
 require_relative 'claim_update/client_submit_request_must_support_claim_update_test'
 require_relative 'coverage/client_submit_request_must_support_coverage_test'
@@ -41,37 +42,55 @@ module DaVinciPASTestKit
         
       )
       run_as_group
+      
+      # At least one of the PAS request profiles must be present; unobserved must support
+      # elements on the request profiles that are present may be attested as not collected.
+      test from: :pas_client_v221_must_support_attestation do
+        id :pas_client_v221_submit_request_profiles_must_support_attestation
+        title 'At least one request profile is observed with its must support elements (or attested)'
+        config(
+          options: {
+            require_one_of: true,
+            profiles: [
+              { resource_type: 'DeviceRequest', profile_key: 'device_request', title: 'PAS Device Request' },
+              { resource_type: 'MedicationRequest', profile_key: 'medication_request', title: 'PAS Medication Request' },
+              { resource_type: 'NutritionOrder', profile_key: 'nutrition_order', title: 'PAS Nutrition Order' },
+              { resource_type: 'ServiceRequest', profile_key: 'service_request', title: 'PAS Service Request' }
+            ],
+            ig_version: 'v2.2.1',
+            type: 'request',
+            operation: 'submit'
+          }
+        )
+      end
 
-      test from: :pas_client_v221_must_support_request_profiles do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_pas_request_bundle do
-        optional
-      end
+      # Mandatory - the PAS Claim Update profile must always be demonstrated.
       test from: :pas_client_v221_submit_request_must_support_claim_update
-      test from: :pas_client_v221_submit_request_must_support_coverage do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_encounter do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_insurer do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_requestor do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_beneficiary do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_subscriber do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_practitioner do
-        optional
-      end
-      test from: :pas_client_v221_submit_request_must_support_practitioner_role do
-        optional
+
+      # All other submit request profiles - unobserved must support elements may be attested
+      # as not collected by the client system.
+      test from: :pas_client_v221_must_support_attestation do
+        id :pas_client_v221_submit_request_other_must_support_attestation
+        title 'All other submit request profile must support elements are observed (or attested)'
+        config(
+          options: {
+            require_one_of: false,
+            profiles: [
+              { resource_type: 'Bundle', profile_key: 'pas_request_bundle', title: 'PAS Request Bundle' },
+              { resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' },
+              { resource_type: 'Encounter', profile_key: 'encounter', title: 'PAS Encounter' },
+              { resource_type: 'Organization', profile_key: 'insurer', title: 'PAS Insurer Organization' },
+              { resource_type: 'Organization', profile_key: 'requestor', title: 'PAS Requestor Organization' },
+              { resource_type: 'Patient', profile_key: 'beneficiary', title: 'PAS Beneficiary Patient' },
+              { resource_type: 'Patient', profile_key: 'subscriber', title: 'PAS Subscriber Patient' },
+              { resource_type: 'Practitioner', profile_key: 'practitioner', title: 'PAS Practitioner' },
+              { resource_type: 'PractitionerRole', profile_key: 'practitioner_role', title: 'PAS PractitionerRole' }
+            ],
+            ig_version: 'v2.2.1',
+            type: 'request',
+            operation: 'submit'
+          }
+        )
       end
     end
   end

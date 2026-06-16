@@ -1,3 +1,4 @@
+require_relative '../../v2.2.1/must_support/pas_client_must_support_attestation_test'
 require_relative 'pas_inquiry_request_bundle/client_inquire_request_must_support_pas_inquiry_request_bundle_test'
 require_relative 'claim_inquiry/client_inquire_request_must_support_claim_inquiry_test'
 require_relative 'coverage/client_inquire_request_must_support_coverage_test'
@@ -33,31 +34,34 @@ module DaVinciPASTestKit
         
       )
       run_as_group
-
-      test from: :pas_client_v221_inquire_request_must_support_pas_inquiry_request_bundle do
-        optional
-      end
+      
+      # Mandatory - the PAS Claim Inquiry profile must always be demonstrated.
       test from: :pas_client_v221_inquire_request_must_support_claim_inquiry
-      test from: :pas_client_v221_inquire_request_must_support_coverage do
-        optional
-      end
-      test from: :pas_client_v221_inquire_request_must_support_insurer do
-        optional
-      end
-      test from: :pas_client_v221_inquire_request_must_support_requestor do
-        optional
-      end
-      test from: :pas_client_v221_inquire_request_must_support_beneficiary do
-        optional
-      end
-      test from: :pas_client_v221_inquire_request_must_support_subscriber do
-        optional
-      end
-      test from: :pas_client_v221_inquire_request_must_support_practitioner do
-        optional
-      end
-      test from: :pas_client_v221_inquire_request_must_support_practitioner_role do
-        optional
+
+      # All other inquire request profiles - unobserved must support elements may be attested
+      # as not collected by the client system.
+      test from: :pas_client_v221_must_support_attestation do
+        id :pas_client_v221_inquire_request_other_must_support_attestation
+        title 'All other inquire request profile must support elements are observed (or attested)'
+        config(
+          options: {
+            require_one_of: false,
+            profiles: [
+              { resource_type: 'Bundle', profile_key: 'pas_inquiry_request_bundle',
+                title: 'PAS Inquiry Request Bundle' },
+              { resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' },
+              { resource_type: 'Organization', profile_key: 'insurer', title: 'PAS Insurer Organization' },
+              { resource_type: 'Organization', profile_key: 'requestor', title: 'PAS Requestor Organization' },
+              { resource_type: 'Patient', profile_key: 'beneficiary', title: 'PAS Beneficiary Patient' },
+              { resource_type: 'Patient', profile_key: 'subscriber', title: 'PAS Subscriber Patient' },
+              { resource_type: 'Practitioner', profile_key: 'practitioner', title: 'PAS Practitioner' },
+              { resource_type: 'PractitionerRole', profile_key: 'practitioner_role', title: 'PAS PractitionerRole' }
+            ],
+            ig_version: 'v2.2.1',
+            type: 'request',
+            operation: 'inquire'
+          }
+        )
       end
     end
   end
