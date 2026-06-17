@@ -136,7 +136,7 @@ module DaVinciPASTestKit
         "**#{profile_title}**\n#{missing.map { |element| "  * #{element}" }.join("\n")}"
       end.join("\n\n")
 
-      %(
+      <<~MESSAGE
         The following must support elements were **not observed** in the #{operation} requests made
         by the client:
 
@@ -148,7 +148,7 @@ module DaVinciPASTestKit
         [Click here](#{attest_true_url}) if the above statement is **true**. The test will **pass**.
 
         [Click here](#{attest_false_url}) if the above statement is **false**. The test will **fail**.
-      )
+      MESSAGE
     end
   end
 end
