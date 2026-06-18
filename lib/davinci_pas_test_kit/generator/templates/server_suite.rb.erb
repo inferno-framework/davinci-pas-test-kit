@@ -73,7 +73,7 @@ module DaVinciPASTestKit
         {
           identifier: 'hl7.fhir.us.davinci-pas_<%= ig_metadata.ig_version.delete_prefix('v') %>',
           title: 'Da Vinci Prior Authorization Support (PAS) <%= ig_metadata.ig_version %>',
-          actor: 'Server'
+          actor: '<%= pas_requirement_set_actor %>'
         },
         {
           identifier: 'hl7.fhir.uv.subscriptions_1.1.0',

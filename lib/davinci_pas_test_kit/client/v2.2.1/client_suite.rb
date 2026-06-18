@@ -83,7 +83,7 @@ module DaVinciPASTestKit
         {
           identifier: 'hl7.fhir.us.davinci-pas_2.2.1',
           title: 'Da Vinci Prior Authorization Support (PAS) v2.2.1',
-          actor: 'Client'
+          actor: 'PAS Client'
         },
         {
           identifier: 'hl7.fhir.uv.subscriptions_1.1.0',

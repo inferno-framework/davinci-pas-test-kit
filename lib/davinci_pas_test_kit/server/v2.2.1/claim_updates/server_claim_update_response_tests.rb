@@ -86,13 +86,12 @@ module DaVinciPASTestKit
       include ServerClaimUpdateResponseValidation
 
       id :pas_server_v221_claim_update_item_sequence_echo_test
-      title 'Server echoes item.sequence values in Claim Update responses (spec-34)'
+      title 'Server echoes item.sequence values in Claim Update responses'
       description %(
-        Verifies [spec-34](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-34):
-        each item returned on the PAS ClaimResponse **SHALL** echo the same `item.sequence` as that same item had
-        on the Claim. This test reloads each Claim Update submission sent to the server (by its tag) and confirms
-        that every `ClaimResponse.item.itemSequence` in the server's response corresponds to an `item.sequence`
-        that was present on the submitted Claim.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-34)
+        that each item returned on a ClaimResponse echoes the same `item.sequence` it had on the submitted Claim.
+        This test checks each Claim Update made during this group and confirms that every item returned in the
+        server's response corresponds to an item that was submitted.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-34'
 
@@ -108,8 +107,6 @@ module DaVinciPASTestKit
                  "item.itemSequence value(s) #{unexpected.join(', ')} that were not present on the submitted " \
                  'Claim. Each returned item SHALL echo an item.sequence from the submitted Claim.'
         end
-
-        pass 'Every ClaimResponse item echoes an item.sequence from the submitted Claim Update.'
       end
     end
 
@@ -118,14 +115,12 @@ module DaVinciPASTestKit
       include ServerClaimUpdateResponseValidation
 
       id :pas_server_v221_claim_update_current_results_test
-      title 'Server returns current results for all submitted items in Claim Update responses (spec-46)'
+      title 'Server returns current results for all submitted items in Claim Update responses'
       description %(
-        Verifies [spec-46](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-46):
-        the returned ClaimResponse **SHALL** include the current results for all submitted items, including any
-        items changed or canceled since the original authorization request. Because a conformant Claim Update
-        carries all items from the original and prior updates (spec-68), this test reloads each Claim Update
-        submission sent to the server (by its tag) and confirms the server's ClaimResponse includes an
-        `item.itemSequence` for every `item.sequence` on the submitted Claim.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-46)
+        that a ClaimResponse includes the current results for all submitted items, including any items changed or
+        canceled since the original authorization request. This test checks each Claim Update made during this
+        group and confirms the server's response includes a result for every submitted item.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-46'
 
@@ -142,8 +137,6 @@ module DaVinciPASTestKit
                  'ClaimResponse SHALL include the current results for all submitted items, including changed or ' \
                  'canceled items.'
         end
-
-        pass "The server's Claim Update responses include current results for all submitted items."
       end
     end
   end

@@ -19,8 +19,7 @@ module DaVinciPASTestKit
         conformant. The tester provides the four request Bundles (the same Bundles used to drive the Client
         Suite's Claim Update tests can be reused here).
 
-        After the sequence is sent, the verification tests reload each response and check the server's handling
-        of updates against the
+        After the sequence is sent, the verification tests check the server's handling of updates against the
         [updating authorization requests](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#updating-authorization-requests)
         requirements of the PAS IG - that the returned ClaimResponse echoes submitted item sequences and
         includes current results for all submitted items, including changed or canceled items.
@@ -93,9 +92,8 @@ module DaVinciPASTestKit
       group do
         title "Verify the server's responses to the claim updates"
         description %(
-          These tests reload the responses the server returned during the submission sequence (by their tags)
-          and verify that the server returned current results for all submitted items and echoed the submitted
-          item sequences.
+          These tests check the server's responses from the submission sequence and verify that the server
+          returned current results for all submitted items and echoed the submitted item sequences.
         )
 
         test from: :pas_server_v221_claim_update_item_sequence_echo_test

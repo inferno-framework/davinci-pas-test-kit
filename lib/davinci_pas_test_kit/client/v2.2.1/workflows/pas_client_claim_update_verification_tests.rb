@@ -191,12 +191,12 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_referenced_claim_test
-      title 'Claim Update references and includes the Claim being updated (spec-65)'
+      title 'Claim Update references and includes the Claim being updated'
       description %(
-        Verifies [spec-65](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-65):
-        the Claim that is being updated **SHALL** be referenced in the `Claim.related.claim` element and
-        included in the Bundle. This test reloads each Claim Update submission by its tag and confirms that
-        the update Claim references a prior Claim and that the referenced Claim is present in the Bundle.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-65)
+        that the Claim being updated is referenced in the `Claim.related.claim` element and included in the
+        Bundle. This test checks each Claim Update made during this group and confirms that it references a
+        prior Claim and that the referenced Claim is present in the Bundle.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-65'
 
@@ -216,9 +216,6 @@ module DaVinciPASTestKit
                    'must be included in the Bundle.'
           end
         end
-
-        pass 'Each Claim Update references the Claim being updated in Claim.related.claim and includes it ' \
-             'in the Bundle.'
       end
     end
 
@@ -227,11 +224,11 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_grandparent_excluded_test
-      title 'Claim Update referencing another update omits the grandparent Claim (spec-66)'
+      title 'Claim Update referencing another update omits the grandparent Claim'
       description %(
-        Verifies [spec-66](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-66):
-        if the Claim being updated is itself a Claim Update, its referenced Claim **SHALL NOT** be included.
-        This test reloads each Claim Update submission whose referenced Claim is itself an update and confirms
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-66)
+        that when the Claim being updated is itself a Claim Update, its referenced (grandparent) Claim is not
+        included. This test checks each Claim Update whose referenced Claim is itself an update and confirms
         that the grandparent Claim is not included in the Bundle.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-66'
@@ -261,8 +258,6 @@ module DaVinciPASTestKit
                  "Update, so its referenced Claim (#{step[:grandparent_reference]}) SHALL NOT be included in " \
                  'the Bundle.'
         end
-
-        pass 'Claim Updates that reference another update correctly omit the grandparent Claim from the Bundle.'
       end
     end
 
@@ -272,13 +267,12 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::PasBundleValidation
 
       id :pas_client_v221_claim_update_referenced_resources_test
-      title 'All resources referenced by a Claim Update are included in the Bundle (spec-67)'
+      title 'All resources referenced by a Claim Update are included in the Bundle'
       description %(
-        Verifies [spec-67](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-67):
-        all other referenced resources **SHALL** be included in the Bundle. This test reuses the existing PAS
-        Request Bundle reference-presence check (`check_presence_of_referenced_resources`) against each reloaded
-        Claim Update submission, confirming every resource referenced by the Claim is present in the Bundle
-        exactly once.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-67)
+        that all other referenced resources are included in the Bundle. This test checks each Claim Update made
+        during this group and confirms every resource referenced by the Claim is present in the Bundle exactly
+        once.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-67'
 
@@ -299,8 +293,6 @@ module DaVinciPASTestKit
                  "In the #{step[:label]} request, not all resources referenced by the Claim are included " \
                  "in the Bundle exactly once:#{validation_error_messages.join(' ')}"
         end
-
-        pass 'All resources referenced within each Claim Update Bundle are present in the Bundle.'
       end
     end
 
@@ -309,13 +301,13 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_entries_preserved_test
-      title 'Claim Update preserves all prior item and supportingInfo entries (spec-68)'
+      title 'Claim Update preserves all prior item and supportingInfo entries'
       description %(
-        Verifies [spec-68](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-68):
-        when changing the details of the request, the Claim instance **SHALL** contain all item and
-        supportingInfo entries from the original Claim and any previous update Claims with `sequence` values
-        preserved. This test compares each detail-bearing Claim Update against the immediately prior Claim and
-        confirms that every prior item and supportingInfo sequence is still present.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-68)
+        that when changing the details of the request, the Claim contains all item and supportingInfo entries
+        from the original Claim and any previous update Claims, with `sequence` values preserved. This test
+        compares each detail-bearing Claim Update against the immediately prior Claim and confirms that every
+        prior item and supportingInfo sequence is still present.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-68'
 
@@ -338,9 +330,6 @@ module DaVinciPASTestKit
                  "#{comparison[:prior_label]} Claim with their sequence values preserved. " \
                  "Missing supportingInfo sequence(s): #{missing_supporting_info.join(', ')}."
         end
-
-        pass 'Each Claim Update retains all item and supportingInfo entries from prior versions with preserved ' \
-             'sequence values.'
       end
     end
 
@@ -349,12 +338,12 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_cancelled_entries_test
-      title 'Canceled entries carry the infoCancelled modifier extension (spec-69)'
+      title 'Canceled entries carry the infoCancelled modifier extension'
       description %(
-        Verifies [spec-69](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-69):
-        item and supportingInfo entries that have been removed from the request **SHALL** include the
-        infoCancelled modifier extension with a valueBoolean of `true`. This test reloads each Claim Update,
-        finds entries marked as canceled, and confirms the infoCancelled modifier extension is present and `true`.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-69)
+        that item and supportingInfo entries removed from the request include the infoCancelled modifier
+        extension with a valueBoolean of `true`. This test checks each Claim Update for entries marked as
+        canceled and confirms the infoCancelled modifier extension is present and `true`.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-69'
 
@@ -378,8 +367,6 @@ module DaVinciPASTestKit
                  "A canceled #{entry_kind(entry)} (sequence #{entry.sequence}) in the #{cancelled[:step][:label]} " \
                  'must include the infoCancelled modifier extension with a valueBoolean of true.'
         end
-
-        pass 'Canceled item and supportingInfo entries include the infoCancelled modifier extension set to true.'
       end
     end
 
@@ -388,12 +375,12 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_cancelled_items_certtype_test
-      title 'Canceled items carry a certificationType extension with code 3 (spec-70)'
+      title 'Canceled items carry a certificationType extension with code 3'
       description %(
-        Verifies [spec-70](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-70):
-        canceled items **SHALL** additionally contain a certificationType extension with a code of 3 (Cancel)
-        in the `Claim.item.extension` element. This test reloads each Claim Update, finds canceled items, and
-        confirms the certificationType Cancel extension is present.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-70)
+        that canceled items additionally contain a certificationType extension with a code of 3 (Cancel) in the
+        `Claim.item.extension` element. This test checks each Claim Update for canceled items and confirms the
+        certificationType Cancel extension is present.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-70'
 
@@ -417,8 +404,6 @@ module DaVinciPASTestKit
                  "A canceled item (sequence #{item.sequence}) in the #{cancelled[:step][:label]} must contain " \
                  'a certificationType extension with a code of 3 (Cancel) in Claim.item.extension.'
         end
-
-        pass 'Canceled items contain a certificationType extension with code 3 (Cancel).'
       end
     end
 
@@ -427,11 +412,11 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_changed_entries_test
-      title 'Added, modified, or canceled entries carry an infoChanged extension (spec-71)'
+      title 'Added, modified, or canceled entries carry an infoChanged extension'
       description %(
-        Verifies [spec-71](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-71):
-        entries added, modified, or canceled compared to the immediately prior version of the Claim referenced
-        in `Claim.related.claim` **SHALL** contain an infoChanged extension within the `Claim.item` or
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-71)
+        that entries added, modified, or canceled compared to the immediately prior version of the Claim
+        referenced in `Claim.related.claim` contain an infoChanged extension within the `Claim.item` or
         `Claim.supportingInfo` element. This test compares each detail-bearing Claim Update against the
         immediately prior Claim, classifies each entry as added/modified/canceled (comparing content while
         ignoring the change-tracking extensions), and confirms changed entries are marked.
@@ -448,8 +433,6 @@ module DaVinciPASTestKit
           assert_changed_entries_marked(comparison[:current].supportingInfo, comparison[:prior].supportingInfo,
                                         'supportingInfo', comparison)
         end
-
-        pass 'Entries added, modified, or canceled relative to the prior Claim carry an infoChanged extension.'
       end
 
       def assert_changed_entries_marked(current_entries, prior_entries, kind, comparison)
@@ -479,10 +462,10 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_info_changed_code_test
-      title 'infoChanged extensions use the correct valueCode (spec-72)'
+      title 'infoChanged extensions use the correct valueCode'
       description %(
-        Verifies [spec-72](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-72):
-        the infoChanged extension valueCode distinguishes added entries from modified or canceled entries.
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-72)
+        that the infoChanged extension valueCode distinguishes added entries from modified or canceled entries.
 
         The bound [PAS Information Change Mode value set](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/ValueSet-PASInformationChangeMode.html)
         defines exactly two codes: `added` ("new information that was not sent previously") and `changed`
@@ -505,8 +488,6 @@ module DaVinciPASTestKit
           assert_info_changed_codes(comparison[:current].supportingInfo, comparison[:prior].supportingInfo,
                                     'supportingInfo', comparison)
         end
-
-        pass 'infoChanged extensions use valueCodes consistent with the PAS Information Change Mode value set.'
       end
 
       def assert_info_changed_codes(current_entries, prior_entries, kind, comparison)

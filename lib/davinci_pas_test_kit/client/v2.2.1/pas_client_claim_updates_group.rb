@@ -17,8 +17,8 @@ module DaVinciPASTestKit
         request. Inferno never sends a Subscription notification during these interactions, even if
         the configured response indicates the request was pended.
 
-        Once all submissions have been received, the verification tests reload each request by its tag
-        and check the conformance of the submitted PAS Claim Update Bundles against the
+        Once all submissions have been received, the verification tests check each Claim Update made
+        during this group for conformance with the
         [updating authorization requests](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#updating-authorization-requests)
         requirements of the PAS IG.
       )
@@ -52,8 +52,8 @@ module DaVinciPASTestKit
       group do
         title 'Verify the claim update interactions'
         description %(
-          These tests reload the requests received during the submission sequence (by their tags) and
-          verify the conformance of the submitted PAS Claim Update Bundles.
+          These tests check each Claim Update made during the submission sequence for conformance of
+          the submitted PAS Claim Update Bundles.
         )
 
         test from: :pas_client_v221_claim_update_referenced_claim_test

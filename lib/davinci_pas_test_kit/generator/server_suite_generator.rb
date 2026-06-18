@@ -107,6 +107,13 @@ module DaVinciPASTestKit
         "pas_server_#{ig_metadata.reformatted_version}_claim_updates"
       end
 
+      # The PAS requirement set renamed its server-side actor from "Server" (v2.0.1) to "PAS Payer"
+      # (v2.2.1). The actor must match the requirement source exactly or `verifies_requirements`
+      # annotations will not resolve.
+      def pas_requirement_set_actor
+        ig_metadata.ig_version.start_with?('v2.2') ? 'PAS Payer' : 'Server'
+      end
+
       def must_support_group_id
         @must_support_group_id ||= groups.map { |group| group[:id] }
           .reject { |id| id.include?('client') }
