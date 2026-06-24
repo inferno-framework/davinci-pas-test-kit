@@ -13,8 +13,14 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      <%- profile_test_ids.each do |id| -%>
-      test from: :<%= id %>
+      <%- profile_tests.each do |profile_test| -%>
+      <%- if profile_test[:optional] -%>
+      test from: :<%= profile_test[:id] %> do
+        optional
+      end
+      <%- else -%>
+      test from: :<%= profile_test[:id] %>
+      <%- end -%>
       <%- end -%>
       test from: :pas_client_<%= ig_version_for_id %>_response_attest,
            title: 'Confirm that the client handled the $<%= operation %> response must support elements (Attestation)',

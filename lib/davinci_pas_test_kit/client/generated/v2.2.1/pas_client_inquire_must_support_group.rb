@@ -1,13 +1,5 @@
-require_relative '../../v2.2.1/must_support/pas_client_must_support_attestation_test'
-require_relative 'pas_inquiry_request_bundle/client_inquire_request_must_support_pas_inquiry_request_bundle_test'
+require_relative '../../v2.2.1/must_support/must_support_with_attestation_option'
 require_relative 'claim_inquiry/client_inquire_request_must_support_claim_inquiry_test'
-require_relative 'coverage/client_inquire_request_must_support_coverage_test'
-require_relative 'insurer/client_inquire_request_must_support_insurer_test'
-require_relative 'requestor/client_inquire_request_must_support_requestor_test'
-require_relative 'beneficiary/client_inquire_request_must_support_beneficiary_test'
-require_relative 'subscriber/client_inquire_request_must_support_subscriber_test'
-require_relative 'practitioner/client_inquire_request_must_support_practitioner_test'
-require_relative 'practitioner_role/client_inquire_request_must_support_practitioner_role_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -38,17 +30,16 @@ module DaVinciPASTestKit
       # Mandatory - the PAS Claim Inquiry profile must always be demonstrated.
       test from: :pas_client_v221_inquire_request_must_support_claim_inquiry
 
-      # All other inquire request profiles - unobserved must support elements may be attested
-      # as not collected by the client system.
-      test from: :pas_client_v221_must_support_attestation do
-        id :pas_client_v221_inquire_request_other_must_support_attestation
-        title 'All other inquire request profile must support elements are observed (or attested)'
+      # All other inquire request profiles - unobserved must support elements may be
+      # attested as not collected by the client system.
+      test from: :pas_client_v221_must_support_with_attestation_option do
+        id :pas_client_v221_inquire_request_other_must_support_with_attestation_option
+        title 'All other inquire request profile must support elements are observed'
         config(
           options: {
             require_one_of: false,
             profiles: [
-              { resource_type: 'Bundle', profile_key: 'pas_inquiry_request_bundle',
-                title: 'PAS Inquiry Request Bundle' },
+              { resource_type: 'Bundle', profile_key: 'pas_inquiry_request_bundle', title: 'PAS Inquiry Request Bundle' },
               { resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' },
               { resource_type: 'Organization', profile_key: 'insurer', title: 'PAS Insurer Organization' },
               { resource_type: 'Organization', profile_key: 'requestor', title: 'PAS Requestor Organization' },

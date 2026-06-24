@@ -1,15 +1,5 @@
-require_relative '../../v2.2.1/must_support/pas_client_must_support_request_profiles_test'
-require_relative '../../v2.2.1/must_support/pas_client_must_support_attestation_test'
-require_relative 'pas_request_bundle/client_submit_request_must_support_pas_request_bundle_test'
+require_relative '../../v2.2.1/must_support/must_support_with_attestation_option'
 require_relative 'claim_update/client_submit_request_must_support_claim_update_test'
-require_relative 'coverage/client_submit_request_must_support_coverage_test'
-require_relative 'encounter/client_submit_request_must_support_encounter_test'
-require_relative 'insurer/client_submit_request_must_support_insurer_test'
-require_relative 'requestor/client_submit_request_must_support_requestor_test'
-require_relative 'beneficiary/client_submit_request_must_support_beneficiary_test'
-require_relative 'subscriber/client_submit_request_must_support_subscriber_test'
-require_relative 'practitioner/client_submit_request_must_support_practitioner_test'
-require_relative 'practitioner_role/client_submit_request_must_support_practitioner_role_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -45,9 +35,9 @@ module DaVinciPASTestKit
       
       # At least one of the PAS request profiles must be present; unobserved must support
       # elements on the request profiles that are present may be attested as not collected.
-      test from: :pas_client_v221_must_support_attestation do
-        id :pas_client_v221_submit_request_profiles_must_support_attestation
-        title 'At least one request profile is observed with its must support elements (or attested)'
+      test from: :pas_client_v221_must_support_with_attestation_option do
+        id :pas_client_v221_submit_request_profiles_must_support_with_attestation_option
+        title 'At least one request profile is observed with its must support elements'
         config(
           options: {
             require_one_of: true,
@@ -67,11 +57,11 @@ module DaVinciPASTestKit
       # Mandatory - the PAS Claim Update profile must always be demonstrated.
       test from: :pas_client_v221_submit_request_must_support_claim_update
 
-      # All other submit request profiles - unobserved must support elements may be attested
-      # as not collected by the client system.
-      test from: :pas_client_v221_must_support_attestation do
-        id :pas_client_v221_submit_request_other_must_support_attestation
-        title 'All other submit request profile must support elements are observed (or attested)'
+      # All other submit request profiles - unobserved must support elements may be
+      # attested as not collected by the client system.
+      test from: :pas_client_v221_must_support_with_attestation_option do
+        id :pas_client_v221_submit_request_other_must_support_with_attestation_option
+        title 'All other submit request profile must support elements are observed'
         config(
           options: {
             require_one_of: false,

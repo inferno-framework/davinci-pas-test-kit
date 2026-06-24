@@ -142,6 +142,45 @@ module DaVinciPASTestKit
         target_profiles.map { |profile_metadata| test_id_for_profile(profile_metadata) }
       end
 
+      # The collapsed attestation structure / optional response tests are only applied to v2.2.1.
+      def optional_must_support_enabled?
+        ig_version == 'v2.2.1'
+      end
+
+      # The Claim (request) / ClaimResponse (response) profiles remain mandatory standalone tests.
+      def mandatory_profile?(profile_metadata)
+        %w[Claim ClaimResponse].include?(profile_metadata.resource)
+      end
+
+      # Response groups: pairs each per-profile test id with whether it should be marked optional.
+      def profile_tests
+        profiles.map do |profile_metadata|
+          {
+            id: test_id_for_profile(profile_metadata),
+            optional: optional_must_support_enabled? && !mandatory_profile?(profile_metadata)
+          }
+        end
+      end
+
+      # Collapsed request groups: the mandatory Claim profile(s) kept as standalone tests.
+      def claim_profiles
+        required_profiles.select { |profile_metadata| profile_metadata.resource == 'Claim' }
+      end
+
+      # Collapsed request groups: every other supporting profile, assessed by the attestation test.
+      def other_profiles
+        required_profiles.reject { |profile_metadata| profile_metadata.resource == 'Claim' }
+      end
+
+      # Formats a profiles list for an attestation test's config, one hash literal per line.
+      def attestation_profiles_block(profile_metadatas)
+        profile_metadatas.map do |profile_metadata|
+          "              { resource_type: '#{profile_metadata.resource}', " \
+            "profile_key: '#{profile_identifier(profile_metadata)}', " \
+            "title: '#{profile_metadata.profile_name}' }"
+        end.join(",\n")
+      end
+
       def profile_test_files
         target_profiles = type == 'response' ? profiles : required_profiles
         target_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
