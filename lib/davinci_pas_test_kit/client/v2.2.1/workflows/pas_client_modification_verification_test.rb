@@ -39,7 +39,7 @@ module DaVinciPASTestKit
         requests.each { |submit_request| check_modification_response(submit_request) }
 
         assert_no_error_messages('The $submit response does not represent a payer modification. ' \
-                                 'See the Messages tab for details.')
+                                 'See Messages for details.')
       end
 
       def check_modification_response(submit_request)
