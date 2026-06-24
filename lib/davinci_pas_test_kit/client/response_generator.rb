@@ -298,19 +298,13 @@ module DaVinciPASTestKit
         end
       )
 
-      # For payer modifications, the ClaimResponse.item entries carry the A6 'Modified'
-      # adjudication (set above via the decision code) and each is paired with a
-      # ClaimResponse.addItem entry, referenced by the same itemSequence, that conveys
-      # the details of what the payer actually authorized.
       add_modified_items(claim_response, claim) if decision == :modification
 
       claim_response
     end
 
-    # Builds a ClaimResponse.addItem for each requested item, referencing the item via
-    # itemSequence, to represent the service the payer authorized in place of the
-    # requested one. The added item is itself marked 'Certified in total' (A1) since,
-    # as modified, it has been approved.
+    # Pairs each modified item (already marked A6 above) with a ClaimResponse.addItem, referenced by
+    # the same itemSequence, conveying what the payer authorized (marked A1, 'Certified in total').
     def add_modified_items(claim_response, claim)
       claim_response.addItem = claim.item.map do |item|
         FHIR::ClaimResponse::AddItem.new(
