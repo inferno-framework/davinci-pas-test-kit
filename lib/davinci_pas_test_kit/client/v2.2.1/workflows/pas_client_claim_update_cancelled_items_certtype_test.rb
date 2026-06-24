@@ -40,7 +40,7 @@ module DaVinciPASTestKit
         end
 
         assert_no_error_messages('One or more canceled items did not carry a certificationType extension with ' \
-                                 'code 3 (Cancel).')
+                                 'code 3 (Cancel). See Messages for details.')
       end
     end
   end

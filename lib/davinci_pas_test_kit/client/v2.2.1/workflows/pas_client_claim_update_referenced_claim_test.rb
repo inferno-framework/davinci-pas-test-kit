@@ -38,7 +38,8 @@ module DaVinciPASTestKit
           end
         end
 
-        assert_no_error_messages('One or more Claim Updates did not reference and include the Claim being updated.')
+        assert_no_error_messages('One or more Claim Updates did not reference and include the Claim being ' \
+                                 'updated. See Messages for details.')
       end
     end
   end

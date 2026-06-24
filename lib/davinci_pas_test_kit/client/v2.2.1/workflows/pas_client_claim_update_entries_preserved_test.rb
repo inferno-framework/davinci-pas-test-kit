@@ -42,7 +42,7 @@ module DaVinciPASTestKit
         end
 
         assert_no_error_messages('One or more Claim Updates did not preserve all prior item or supportingInfo ' \
-                                 'entries.')
+                                 'entries. See Messages for details.')
       end
     end
   end

@@ -44,7 +44,8 @@ module DaVinciPASTestKit
                       'the Bundle.')
         end
 
-        assert_no_error_messages('One or more Claim Updates included the grandparent Claim that SHALL NOT be present.')
+        assert_no_error_messages('One or more Claim Updates included the grandparent Claim that SHALL NOT be ' \
+                                 'present. See Messages for details.')
       end
     end
   end

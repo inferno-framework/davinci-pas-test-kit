@@ -41,7 +41,7 @@ module DaVinciPASTestKit
         end
 
         assert_no_error_messages('One or more changed entries were missing an infoChanged extension or used an ' \
-                                 'incorrect valueCode.')
+                                 'incorrect valueCode. See Messages for details.')
       end
 
       def check_changed_entries_marked(current_entries, prior_entries, kind, comparison)

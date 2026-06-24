@@ -40,7 +40,8 @@ module DaVinciPASTestKit
                       'valueBoolean of true.')
         end
 
-        assert_no_error_messages('One or more canceled entries did not carry the infoCancelled modifier extension.')
+        assert_no_error_messages('One or more canceled entries did not carry the infoCancelled modifier ' \
+                                 'extension. See Messages for details.')
       end
     end
   end

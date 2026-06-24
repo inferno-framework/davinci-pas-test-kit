@@ -36,7 +36,7 @@ module DaVinciPASTestKit
         end
 
         assert_no_error_messages('Not all resources referenced by a Claim Update are included in the Bundle ' \
-                                 'exactly once.')
+                                 'exactly once. See Messages for details.')
       end
     end
   end
