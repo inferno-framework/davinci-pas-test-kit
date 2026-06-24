@@ -20,10 +20,8 @@ module DaVinciPASTestKit
       title 'Must support elements are observed across requests'
       description %(
         This test reviews the must support elements observed across the listed profiles in the
-        requests made by the client. Each unobserved element is logged as an info message. If any
-        were not observed, the tester has the opportunity to attest that the client system does not
-        collect that data (and is not required to under the PAS implementation guide). When every
-        must support element was observed, the test passes without requiring any input.
+        requests made by the client. If any were not observed, the tester has the opportunity to attest that the client system does not
+        collect that data (and is not required to under the PAS implementation guide).
       )
 
       # config.options:
