@@ -95,7 +95,7 @@ module DaVinciPASTestKit
         output attest_true_url: "#{resume_pass_url}?token=#{identifier}",
                attest_false_url: "#{resume_fail_url}?token=#{identifier}"
 
-        wait(identifier:, message: attestation_message)
+        wait(identifier:, message: attestation_message(unobserved_by_profile))
       end
 
       # @return unobserved must support elements keyed by profile title
@@ -115,11 +115,19 @@ module DaVinciPASTestKit
         end
       end
 
-      def attestation_message
+      def attestation_message(unobserved_by_profile)
+        unobserved_list = unobserved_by_profile.flat_map do |profile_title, elements|
+          elements.map { |element| "- #{profile_title}: #{element}" }
+        end.join("\n")
+
         <<~MESSAGE
-          Attest that the client system does **not** collect the data for the unobserved
-          #{operation} request must support elements recorded by this test (and is not required to
-          under the PAS implementation guide).
+          The following #{operation} request must support elements were not observed in the
+          requests made by the client:
+
+          #{unobserved_list}
+
+          Attest that the client system does **not** collect the data for these unobserved
+          must support elements (and is not required to under the PAS implementation guide).
 
           [Click here](#{attest_true_url}) if the above statement is **true**. The test will **pass**.
 
