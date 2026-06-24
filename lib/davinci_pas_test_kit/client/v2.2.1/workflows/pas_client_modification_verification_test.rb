@@ -34,19 +34,35 @@ module DaVinciPASTestKit
         load_tagged_requests(MODIFICATION_WORKFLOW_TAG, SUBMIT_TAG)
         skip_if requests.empty?, 'No responses to verify because no submit requests were made.'
 
-        claim_response = claim_response_from_response_body(request.response_body)
-        assert claim_response.present?, 'No ClaimResponse was found in the $submit response.'
+        # Log findings directly to the result rather than asserting inline so that every issue
+        # across all received responses is reported in a single run instead of halting on the first.
+        requests.each { |submit_request| check_modification_response(submit_request) }
+
+        assert_no_error_messages('The $submit response does not represent a payer modification. ' \
+                                 'See the Messages tab for details.')
+      end
+
+      def check_modification_response(submit_request)
+        claim_response = claim_response_from_response_body(submit_request.response_body)
+        if claim_response.blank?
+          add_message('error', 'No ClaimResponse was found in the $submit response.')
+          return
+        end
 
         modified_sequences = modified_item_sequences(claim_response)
-        assert modified_sequences.present?,
-               'Expected at least one ClaimResponse.item entry with an adjudication review action code of ' \
-               "'#{MODIFIED_REVIEW_ACTION_CODE}' (Modified), but none were found."
+        if modified_sequences.blank?
+          add_message('error',
+                      'Expected at least one ClaimResponse.item entry with an adjudication review action code of ' \
+                      "'#{MODIFIED_REVIEW_ACTION_CODE}' (Modified), but none were found.")
+        end
 
         add_item_sequences = Array(claim_response.addItem).flat_map { |add_item| Array(add_item.itemSequence) }
         missing = modified_sequences.reject { |sequence| add_item_sequences.include?(sequence) }
-        assert missing.empty?,
-               'Each modified item must be paired with a ClaimResponse.addItem entry that has the same ' \
-               "itemSequence. No matching addItem was found for itemSequence(s): #{missing.join(', ')}."
+        return if missing.empty?
+
+        add_message('error',
+                    'Each modified item must be paired with a ClaimResponse.addItem entry that has the same ' \
+                    "itemSequence. No matching addItem was found for itemSequence(s): #{missing.join(', ')}.")
       end
 
       # Extracts the ClaimResponse from a $submit response body, unwrapping the Parameters resource
