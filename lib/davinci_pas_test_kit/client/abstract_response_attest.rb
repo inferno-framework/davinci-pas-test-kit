@@ -27,6 +27,10 @@ module DaVinciPASTestKit
         'Pended'
       when MUST_SUPPORT_WORKFLOW_TAG
         'Must Support'
+      when OPERATION_FAILURE_WORKFLOW_TAG
+        'Operation Failure'
+      when PROCESSING_ERROR_WORKFLOW_TAG
+        'Processing Error'
       end
     end
 

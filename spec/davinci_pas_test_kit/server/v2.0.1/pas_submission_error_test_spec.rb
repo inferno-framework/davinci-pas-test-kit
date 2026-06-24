@@ -1,8 +1,8 @@
-RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasSubmissionErrorTest do
+RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasServerSubmissionErrorTest do
   let(:suite_id) { 'davinci_pas_server_suite_v201' }
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:test) do
-    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasSubmissionErrorTest) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasServerSubmissionErrorTest) do
       fhir_client { url :server_endpoint }
       input :server_endpoint
     end

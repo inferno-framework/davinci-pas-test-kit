@@ -1,6 +1,6 @@
 module DaVinciPASTestKit
   module DaVinciPASV221
-    class PasInquiryErrorTest < Inferno::Test
+    class PasServerInquiryErrorTest < Inferno::Test
       id :pas_server_v221_prior_auth_inquiry_error
       title %(
         Server returns OperationOutcome instance when invoking the $inquire operation on the Claim endpoint
