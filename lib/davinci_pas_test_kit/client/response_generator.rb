@@ -233,7 +233,7 @@ module DaVinciPASTestKit
       claim_response_uuid = SecureRandom.uuid if claim_response_uuid.blank?
       return FHIR::ClaimResponse.new(id: claim_response_uuid) if claim.blank?
 
-      FHIR::ClaimResponse.new(
+      claim_response = FHIR::ClaimResponse.new(
         id: claim_response_uuid,
         meta: FHIR::Meta.new(profile: if operation == 'submit'
                                         "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse|#{ig_version.delete('v')}"
@@ -297,6 +297,51 @@ module DaVinciPASTestKit
           )
         end
       )
+
+      # For payer modifications, the ClaimResponse.item entries carry the A6 'Modified'
+      # adjudication (set above via the decision code) and each is paired with a
+      # ClaimResponse.addItem entry, referenced by the same itemSequence, that conveys
+      # the details of what the payer actually authorized.
+      add_modified_items(claim_response, claim) if decision == :modification
+
+      claim_response
+    end
+
+    # Builds a ClaimResponse.addItem for each requested item, referencing the item via
+    # itemSequence, to represent the service the payer authorized in place of the
+    # requested one. The added item is itself marked 'Certified in total' (A1) since,
+    # as modified, it has been approved.
+    def add_modified_items(claim_response, claim)
+      claim_response.addItem = claim.item.map do |item|
+        FHIR::ClaimResponse::AddItem.new(
+          itemSequence: [item.sequence],
+          productOrService: item.productOrService,
+          adjudication: [
+            FHIR::ClaimResponse::Item::Adjudication.new(
+              extension: [
+                FHIR::Extension.new(
+                  url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
+                  extension: [
+                    FHIR::Extension.new(
+                      url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode',
+                      valueCodeableConcept: FHIR::CodeableConcept.new(
+                        coding: [
+                          get_review_action_code(:approval)
+                        ]
+                      )
+                    )
+                  ]
+                )
+              ],
+              category: FHIR::CodeableConcept.new(
+                coding: [
+                  FHIR::Coding.new(system: 'http://terminology.hl7.org/CodeSystem/adjudication', code: 'submitted')
+                ]
+              )
+            )
+          ]
+        )
+      end
     end
 
     def build_mock_bundle(claim_response, request_bundle, root_url, operation, timestamp, ig_version = 'v2.0.1')
@@ -401,6 +446,9 @@ module DaVinciPASTestKit
       when :pended
         code = 'A4'
         display = 'Pending'
+      when :modification
+        code = 'A6'
+        display = 'Modified'
       else # approval or no workflow
         code = 'A1'
         display = 'Certified in total'

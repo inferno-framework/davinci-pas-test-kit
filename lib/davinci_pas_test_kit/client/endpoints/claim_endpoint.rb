@@ -42,6 +42,8 @@ module DaVinciPASTestKit
         :denial
       when /.*approval.*/
         :approval
+      when /.*modification.*/
+        :modification
       end
     end
 
@@ -52,7 +54,8 @@ module DaVinciPASTestKit
     WORKFLOW_TAG_MAP = {
       pended: PENDED_WORKFLOW_TAG,
       denial: DENIAL_WORKFLOW_TAG,
-      approval: APPROVAL_WORKFLOW_TAG
+      approval: APPROVAL_WORKFLOW_TAG,
+      modification: MODIFICATION_WORKFLOW_TAG
     }.freeze
 
     def make_response

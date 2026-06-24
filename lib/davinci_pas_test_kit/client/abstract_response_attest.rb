@@ -25,6 +25,8 @@ module DaVinciPASTestKit
         'Denial'
       when PENDED_WORKFLOW_TAG
         'Pended'
+      when MODIFICATION_WORKFLOW_TAG
+        'Payer Modification'
       when MUST_SUPPORT_WORKFLOW_TAG
         'Must Support'
       end
