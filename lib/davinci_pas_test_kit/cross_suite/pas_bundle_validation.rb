@@ -755,7 +755,13 @@ module DaVinciPASTestKit
     # @param target_resource [FHIR::Model] The FHIR resource to traverse and validate.
     # @param base_url [String] The server base url.
     # @param resources_to_match [Array<FHIR:Bundle:Entry] The list of FHIR bundle entries to match references against.
-    def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match)
+    # @param skip_claim_related [Boolean] When true, a Claim's `related` element is not traversed. This is set
+    #   for any Claim reached by following a reference (i.e. a non-primary Claim in a Claim Update chain), whose
+    #   own Claim.related.claim (the grandparent) is deliberately omitted from the Bundle per spec-65/66. The
+    #   primary Claim passed in by the caller keeps `skip_claim_related: false`, so its parent reference - and the
+    #   parent's own referenced resources - are still checked.
+    def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match,
+                                               skip_claim_related: false)
       return if target_resource.blank?
 
       if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
@@ -771,18 +777,23 @@ module DaVinciPASTestKit
         end
 
         if matching_resources.length.positive?
-          check_presence_of_referenced_resources(matching_resources.first, base_url, resources_to_match)
+          # A resource reached by following a reference is an included resource, not the primary Claim
+          # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
+          check_presence_of_referenced_resources(matching_resources.first, base_url, resources_to_match,
+                                                 skip_claim_related: true)
         end
       else
         target_resource.source_hash.each_key do |attr|
           next if claim_response_request_attr?(target_resource, attr)
-          next if claim_related_attr?(target_resource, attr)
+          next if skip_claim_related && claim_related_attr?(target_resource, attr)
 
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
-            check_presence_of_referenced_resources(value, base_url, resources_to_match)
+            check_presence_of_referenced_resources(value, base_url, resources_to_match, skip_claim_related:)
           elsif value.is_a?(Array) && value.all? { |elmt| elmt.is_a?(FHIR::Model) }
-            value.each { |elmt| check_presence_of_referenced_resources(elmt, base_url, resources_to_match) }
+            value.each do |elmt|
+              check_presence_of_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:)
+            end
           end
         end
       end
@@ -799,11 +810,10 @@ module DaVinciPASTestKit
         resource.resourceType == 'ClaimResponse'
     end
 
-    # Claim.related.claim points to the Claim being updated. Whether that Claim (and, for a
-    # multi-level update, the grandparent it in turn references) is included in the Bundle is
-    # governed by the Claim Update rules (spec-65/66): the immediately-prior Claim SHALL be
-    # included but its own referenced Claim SHALL NOT. Skipping Claim.related here keeps the
-    # generic reference-presence check from flagging the deliberately-omitted grandparent.
+    # Claim.related.claim points to the Claim being updated. For a non-primary Claim in a Claim Update
+    # chain (one reached by following a reference), that prior Claim is the grandparent, which spec-65/66
+    # require to be omitted from the Bundle. Used with the `skip_claim_related` flag so the generic
+    # reference-presence check does not flag the deliberately-omitted grandparent as missing.
     def claim_related_attr?(resource, attr)
       attr.to_s == 'related' &&
         resource.respond_to?(:resourceType) &&

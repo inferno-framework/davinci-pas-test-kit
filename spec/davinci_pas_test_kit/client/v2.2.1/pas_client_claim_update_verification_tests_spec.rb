@@ -204,7 +204,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     end
   end
 
-  describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateChangedEntriesTest do # spec-71
+  describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateChangedEntriesTest do # spec-71 and spec-72
     it 'passes when added, modified, and canceled entries are all marked with infoChanged' do
       seed_conformant_sequence
       expect(run(described_class).result).to eq('pass')
@@ -227,13 +227,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
                    bundle_json(entry(urn3, claim3_unmarked), entry(urn2, claim2)))
       expect(run(described_class).result).to eq('fail')
     end
-  end
-
-  describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateInfoChangedCodeTest do # spec-72
-    it 'passes when infoChanged valueCodes match the value set semantics' do
-      seed_conformant_sequence
-      expect(run(described_class).result).to eq('pass')
-    end
 
     it 'fails when an added entry uses valueCode changed instead of added' do
       claim2_wrong_code = build_claim('claim-2', related_ref: urn1,
@@ -250,6 +243,25 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(urn1, claim1)))
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
                    bundle_json(entry(urn2, claim2_bad_code), entry(urn1, claim1)))
+      expect(run(described_class).result).to eq('fail')
+    end
+  end
+
+  describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateCancelRequestTest do # cancel entire request
+    it 'skips when no cancel-entire-request update was received' do
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+      expect(run(described_class).result).to eq('skip')
+    end
+
+    it 'passes when the cancel-entire-request update carries a certificationType Cancel extension' do
+      seed_conformant_sequence
+      expect(run(described_class).result).to eq('pass')
+    end
+
+    it 'fails when the cancel-entire-request update lacks the certificationType Cancel extension' do
+      claim4_no_cert = build_claim('claim-4', related_ref: urn3)
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_CANCEL_ALL_TAG,
+                   bundle_json(entry(urn4, claim4_no_cert), entry(urn3, claim3)))
       expect(run(described_class).result).to eq('fail')
     end
   end

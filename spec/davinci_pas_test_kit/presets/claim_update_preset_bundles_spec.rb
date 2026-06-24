@@ -39,8 +39,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     'spec-68' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateEntriesPreservedTest,
     'spec-69' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateCancelledEntriesTest,
     'spec-70' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateCancelledItemsCertificationTypeTest,
-    'spec-71' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateChangedEntriesTest,
-    'spec-72' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateInfoChangedCodeTest
+    'spec-71 and spec-72' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateChangedEntriesTest,
+    'the cancel-entire-request check' => DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateCancelRequestTest
   }.each do |spec_id, test_class|
     it "example bundles satisfy #{spec_id}" do
       expect(run(test_class).result).to eq('pass')

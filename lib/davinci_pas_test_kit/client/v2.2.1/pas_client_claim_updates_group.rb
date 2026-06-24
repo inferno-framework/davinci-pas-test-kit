@@ -1,5 +1,12 @@
 require_relative 'workflows/pas_client_claim_update_submit_tests'
-require_relative 'workflows/pas_client_claim_update_verification_tests'
+require_relative 'workflows/pas_client_claim_update_referenced_claim_test'
+require_relative 'workflows/pas_client_claim_update_grandparent_excluded_test'
+require_relative 'workflows/pas_client_claim_update_referenced_resources_test'
+require_relative 'workflows/pas_client_claim_update_entries_preserved_test'
+require_relative 'workflows/pas_client_claim_update_cancelled_entries_test'
+require_relative 'workflows/pas_client_claim_update_cancelled_items_certtype_test'
+require_relative 'workflows/pas_client_claim_update_changed_entries_test'
+require_relative 'workflows/pas_client_claim_update_cancel_request_test'
 require_relative '../../cross_suite/tags'
 
 module DaVinciPASTestKit
@@ -63,7 +70,7 @@ module DaVinciPASTestKit
         test from: :pas_client_v221_claim_update_cancelled_entries_test
         test from: :pas_client_v221_claim_update_cancelled_items_certtype_test
         test from: :pas_client_v221_claim_update_changed_entries_test
-        test from: :pas_client_v221_claim_update_info_changed_code_test
+        test from: :pas_client_v221_claim_update_cancel_request_test
       end
     end
   end
