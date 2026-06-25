@@ -14,7 +14,9 @@ module DaVinciPASTestKit
         extension with a valueBoolean of `true`. This test checks each Claim Update for entries marked as
         canceled and confirms the infoCancelled modifier extension is present and `true`.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-69'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-69',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-7',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-8'
 
       run do
         steps = received_claim_update_steps

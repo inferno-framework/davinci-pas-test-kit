@@ -1,4 +1,6 @@
 require_relative 'workflows/pas_client_claim_update_submit_tests'
+require_relative 'workflows/pas_client_request_bundle_validation_test'
+require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative 'workflows/pas_client_claim_update_referenced_claim_test'
 require_relative 'workflows/pas_client_claim_update_grandparent_excluded_test'
 require_relative 'workflows/pas_client_claim_update_referenced_resources_test'
@@ -24,8 +26,10 @@ module DaVinciPASTestKit
         request. Inferno never sends a Subscription notification during these interactions, even if
         the configured response indicates the request was pended.
 
-        Once all submissions have been received, the verification tests check each Claim Update made
-        during this group for conformance with the
+        Once all submissions have been received, Inferno validates the conformance of each submitted
+        request Bundle and of the response Bundle it returned against the PAS Request and Response
+        Bundle profiles, and the verification tests check each Claim Update made during this group for
+        conformance with the
         [updating authorization requests](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#updating-authorization-requests)
         requirements of the PAS IG.
       )
@@ -43,6 +47,17 @@ module DaVinciPASTestKit
                   :client_id,
                   :session_url_path
 
+      claim_update_submit_steps = [
+        { key: 'initial', title: 'Initial submission',
+          submit: :pas_client_v221_claim_update_initial_submit_test, tag: CLAIM_UPDATE_INITIAL_TAG },
+        { key: 'add_item', title: 'Update: add an item',
+          submit: :pas_client_v221_claim_update_add_item_submit_test, tag: CLAIM_UPDATE_ADD_ITEM_TAG },
+        { key: 'modify_cancel', title: 'Update: modify an item and cancel an item',
+          submit: :pas_client_v221_claim_update_modify_cancel_submit_test, tag: CLAIM_UPDATE_MODIFY_CANCEL_TAG },
+        { key: 'cancel_all', title: 'Update: cancel the entire request',
+          submit: :pas_client_v221_claim_update_cancel_all_submit_test, tag: CLAIM_UPDATE_CANCEL_ALL_TAG }
+      ]
+
       group do
         title 'Submit the claim update sequence'
         description %(
@@ -50,10 +65,30 @@ module DaVinciPASTestKit
           auto-continues when its request is received; no Subscription notifications are triggered.
         )
 
-        test from: :pas_client_v221_claim_update_initial_submit_test
-        test from: :pas_client_v221_claim_update_add_item_submit_test
-        test from: :pas_client_v221_claim_update_modify_cancel_submit_test
-        test from: :pas_client_v221_claim_update_cancel_all_submit_test
+        claim_update_submit_steps.each { |step| test from: step[:submit] }
+      end
+
+      group do
+        title 'Validate the claim update request and response Bundles'
+        description %(
+          For each submission received above, these tests validate the conformance of the request Bundle
+          the client submitted and of the response Bundle Inferno returned against the PAS Request and
+          Response Bundle profiles.
+        )
+
+        claim_update_submit_steps.each do |step|
+          test from: :pas_client_v221_request_bundle_validation_test do
+            id :"pas_client_v221_claim_update_request_validation_#{step[:key]}"
+            title "#{step[:title]}: submit request Bundle is valid"
+            config options: { workflow_tag: step[:tag] }
+          end
+
+          test from: :pas_client_v221_response_bundle_validation_test do
+            id :"pas_client_v221_claim_update_response_validation_#{step[:key]}"
+            title "#{step[:title]}: submit response Bundle is valid"
+            config options: { workflow_tag: step[:tag] }
+          end
+        end
       end
 
       group do

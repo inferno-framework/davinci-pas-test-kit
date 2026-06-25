@@ -15,7 +15,9 @@ module DaVinciPASTestKit
         compares each detail-bearing Claim Update against the immediately prior Claim and confirms that every
         prior item and supportingInfo sequence is still present.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-68'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-68',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-5',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-6'
 
       run do
         comparisons = claim_update_detail_comparisons

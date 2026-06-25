@@ -766,8 +766,6 @@ module DaVinciPASTestKit
 
       if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
         ref = target_resource.reference
-        return if ref.blank?
-
         absolute_ref = absolute_url(ref, base_url)
         matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
 
@@ -779,7 +777,7 @@ module DaVinciPASTestKit
         if matching_resources.length.positive?
           # A resource reached by following a reference is an included resource, not the primary Claim
           # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
-          check_presence_of_referenced_resources(matching_resources.first, base_url, resources_to_match,
+          check_presence_of_referenced_resources(matching_resources.first.resource, base_url, resources_to_match,
                                                  skip_claim_related: true)
         end
       else

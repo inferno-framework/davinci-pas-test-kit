@@ -27,7 +27,10 @@ module DaVinciPASTestKit
         **Note:** the spec-72 conformance text states added entries use `changed`, which conflicts with the
         value set's definition of `added`; this test follows the value set definitions.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-71', 'hl7.fhir.us.davinci-pas_2.2.1@spec-72'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-71',
+                            'hl7.fhir.us.davinci-pas_2.2.1@spec-72',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-9',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-10'
 
       run do
         comparisons = claim_update_detail_comparisons

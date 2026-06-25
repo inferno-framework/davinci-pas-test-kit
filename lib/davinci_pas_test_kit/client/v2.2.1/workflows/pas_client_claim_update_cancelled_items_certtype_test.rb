@@ -14,7 +14,7 @@ module DaVinciPASTestKit
         `Claim.item.extension` element. This test checks each Claim Update for canceled items and confirms the
         certificationType Cancel extension is present.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-70'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-70', 'hl7.fhir.us.davinci-pas_2.2.1@prof-7'
 
       run do
         steps = received_claim_update_steps

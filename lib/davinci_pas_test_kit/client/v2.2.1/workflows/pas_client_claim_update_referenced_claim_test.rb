@@ -14,7 +14,7 @@ module DaVinciPASTestKit
         Bundle. This test checks each Claim Update made during this group and confirms that it references a
         prior Claim and that the referenced Claim is present in the Bundle.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-65'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-65', 'hl7.fhir.us.davinci-pas_2.2.1@prof-4'
 
       run do
         steps = received_claim_update_steps(claim_update_updates)
