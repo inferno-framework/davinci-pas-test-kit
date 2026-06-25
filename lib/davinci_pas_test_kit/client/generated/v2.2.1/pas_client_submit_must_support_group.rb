@@ -52,6 +52,7 @@ module DaVinciPASTestKit
             operation: 'submit'
           }
         )
+        description MustSupportWithAttestationOption.build_description(config.options)
       end
 
       # Mandatory - the PAS Claim Update profile must always be demonstrated.
@@ -81,6 +82,7 @@ module DaVinciPASTestKit
             operation: 'submit'
           }
         )
+        description MustSupportWithAttestationOption.build_description(config.options)
       end
     end
   end

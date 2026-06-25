@@ -20,8 +20,9 @@ module DaVinciPASTestKit
       title 'Must support elements are observed across requests'
       description %(
         This test reviews the must support elements observed across the listed profiles in the
-        requests made by the client. If any were not observed, the tester has the opportunity to attest that the client system does not
-        collect that data (and is not required to under the PAS implementation guide).
+        requests made by the client. If any were not observed, the tester has the opportunity to
+        attest that the client system does not collect that data (and is not required to under the
+        PAS implementation guide).
       )
 
       # config.options:
@@ -67,7 +68,7 @@ module DaVinciPASTestKit
       output :attest_true_url
       output :attest_false_url
 
-      # Hard-fail unless at least one of the target resource types is present. 
+      # Hard-fail unless at least one of the target resource types is present.
       # This is the only true failure path that isn't an attestation.
       run do
         if require_one_of
@@ -99,17 +100,25 @@ module DaVinciPASTestKit
       # @return unobserved must support elements keyed by profile title
       def gather_unobserved_elements
         profiles.each_with_object({}) do |profile, result|
+          profile_title = profile[:title] || profile[:resource_type]
           resources = grouped_resources[profile[:resource_type]] || []
 
-          # In require_one_of mode only assess the alternatives that are actually present, since the
-          # tester is only expected to demonstrate at least one of them.
-          next if require_one_of && resources.blank?
+          if resources.blank?
+            # In require_one_of mode the tester only needs to demonstrate one of the alternatives,
+            # so a profile with no instances is not flagged. Otherwise, the absence of any instance
+            # means the profile's must support elements could not be observed at all - flag the
+            # resource type itself rather than enumerating every element.
+            next if require_one_of
+
+            result[profile_title] = ["(no #{profile[:resource_type]} instances were observed)"]
+            next
+          end
 
           metadata = load_metadata_for_profile_version(profile[:profile_key], ig_version)
           missing = missing_must_support_elements(resources, nil, metadata:)
           missing = remove_must_support_false_positives(missing, resources, profile[:resource_type])
 
-          result[profile[:title] || profile[:resource_type]] = missing if missing.present?
+          result[profile_title] = missing if missing.present?
         end
       end
 
@@ -131,6 +140,40 @@ module DaVinciPASTestKit
 
           [Click here](#{attest_false_url}) if the above statement is **false**. The test will **fail**.
         MESSAGE
+      end
+
+      # Builds the test's description from the configured profiles' metadata at load time, so the
+      # generated group files stay lean and the listed must support elements stay in sync with the
+      # IG metadata. Called from the generated groups: `description build_description(config.options)`.
+      def self.build_description(options)
+        profiles = options[:profiles] || []
+        operation = options[:operation]
+
+        sections = profiles.map do |profile|
+          metadata = load_profile_metadata(profile[:profile_key], options[:ig_version])
+          "### #{profile[:title] || profile[:resource_type]}\n#{metadata.must_support_list_string(indent: 0)}"
+        end.join("\n\n")
+
+        "#{description_intro(operation, require_one_of: options[:require_one_of])}\n\n#{sections}"
+      end
+
+      def self.description_intro(operation, require_one_of:)
+        if require_one_of
+          'The PAS IG defines several request profiles for the specifics of the requested service or ' \
+            'product. A client must support at least one of them. For each request profile present in the ' \
+            "client's $#{operation} requests, this test checks all of its must support elements; any " \
+            'element that was not observed may be attested as not collected by the client (and is not ' \
+            'required under the PAS implementation guide).'
+        else
+          "This test reviews the listed PAS profiles in the client's $#{operation} requests and checks " \
+            'all of their must support elements. Any element that was not observed may be attested as ' \
+            'not collected by the client (and is not required under the PAS implementation guide).'
+        end
+      end
+
+      def self.load_profile_metadata(profile_key, version)
+        path = File.join(__dir__, '..', '..', '..', 'cross_suite', 'generated', version, profile_key, 'metadata.yml')
+        Generator::ProfileMetadata.new(YAML.load_file(path, aliases: true))
       end
     end
   end

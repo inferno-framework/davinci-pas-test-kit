@@ -53,6 +53,7 @@ module DaVinciPASTestKit
             operation: 'inquire'
           }
         )
+        description MustSupportWithAttestationOption.build_description(config.options)
       end
     end
   end
