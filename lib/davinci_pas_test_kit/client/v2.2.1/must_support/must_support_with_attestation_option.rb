@@ -65,13 +65,20 @@ module DaVinciPASTestKit
         @grouped_resources ||= (resources_of_interest || []).group_by(&:resourceType)
       end
 
+      # Query the repository directly instead of the data gathering default (load_tagged_requests): these
+      # requests are owned by the gather test, so associating them here would duplicate that
+      # association onto each attestation test's result.
+      def must_support_requests
+        @must_support_requests ||= Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [tag])
+      end
+
       output :attest_true_url
       output :attest_false_url
 
       # Hard-fail if no requests were received at all, and (for require_one_of) if none of the
       # target request profiles are present. These are the only failure paths that aren't attestations.
       run do
-        assert tagged_resources.present?, "No #{operation} requests received."
+        assert must_support_requests.present?, "No #{operation} requests received."
 
         if require_one_of
           assert resources_of_interest.present?,
@@ -159,7 +166,7 @@ module DaVinciPASTestKit
       end
 
       # The require_one_of intro reproduces the original PasClientMustSupportRequestProfilesTest
-      # description, tweaked only to describe the attestation option. 
+      # description, tweaked only to describe the attestation option.
       def self.description_intro(require_one_of:)
         if require_one_of
           <<~INTRO.chomp

@@ -55,12 +55,21 @@ module DaVinciPASTestKit
       @tagged_resources ||= fetch_tagged_resources
     end
 
+    # The tagged requests whose bodies are assessed for must support. By default this uses
+    # load_tagged_requests, which also associates the requests with this test's result. Tests that
+    # should not own (and thereby duplicate) that association can override must_support_requests to
+    # read the requests without associating them.
+    def must_support_requests
+      load_tagged_requests(tag)
+      requests
+    end
+
     def fetch_tagged_resources
       resources = []
-      load_tagged_requests(tag)
-      return resources if requests.empty?
+      tagged = must_support_requests
+      return resources if tagged.blank?
 
-      requests.each do |req|
+      tagged.each do |req|
         begin
           response_resource = FHIR.from_contents(type == 'request' ? req.request_body : req.response_body)
         rescue StandardError
