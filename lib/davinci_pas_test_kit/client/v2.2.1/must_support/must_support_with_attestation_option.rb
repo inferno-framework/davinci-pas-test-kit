@@ -68,9 +68,11 @@ module DaVinciPASTestKit
       output :attest_true_url
       output :attest_false_url
 
-      # Hard-fail unless at least one of the target resource types is present.
-      # This is the only true failure path that isn't an attestation.
+      # Hard-fail if no requests were received at all, and (for require_one_of) if none of the
+      # target request profiles are present. These are the only failure paths that aren't attestations.
       run do
+        assert tagged_resources.present?, "No #{operation} requests received."
+
         if require_one_of
           assert resources_of_interest.present?,
                  "#{type.titleize} Bundle(s) must include at least one instance of one of these " \
@@ -147,27 +149,52 @@ module DaVinciPASTestKit
       # IG metadata. Called from the generated groups: `description build_description(config.options)`.
       def self.build_description(options)
         profiles = options[:profiles] || []
-        operation = options[:operation]
 
         sections = profiles.map do |profile|
           metadata = load_profile_metadata(profile[:profile_key], options[:ig_version])
           "### #{profile[:title] || profile[:resource_type]}\n#{metadata.must_support_list_string(indent: 0)}"
         end.join("\n\n")
 
-        "#{description_intro(operation, require_one_of: options[:require_one_of])}\n\n#{sections}"
+        "#{description_intro(require_one_of: options[:require_one_of])}\n\n#{sections}"
       end
 
-      def self.description_intro(operation, require_one_of:)
+      # The require_one_of intro reproduces the original PasClientMustSupportRequestProfilesTest
+      # description, tweaked only to describe the attestation option. 
+      def self.description_intro(require_one_of:)
         if require_one_of
-          'The PAS IG defines several request profiles for the specifics of the requested service or ' \
-            'product. A client must support at least one of them. For each request profile present in the ' \
-            "client's $#{operation} requests, this test checks all of its must support elements; any " \
-            'element that was not observed may be attested as not collected by the client (and is not ' \
-            'required under the PAS implementation guide).'
+          <<~INTRO.chomp
+            The PAS IG includes four profiles for providing the specifics of the service or product requested
+            in the prior authorization request. Any one of these profiles can be referenced in
+            the must support element `Claim.item.extension:requestedService`:
+
+            * PAS Medication Request
+            * PAS Service Request
+            * PAS Device Request
+            * PAS Nutrition Order
+
+            System are allowed to support only the request profiles that fit their use cases. However,
+            they must support at least one of them (because `Claim.item.extension:requestedService` is a
+            must support element) and for any request profiles they support, they must be able to
+            populate all of the defined must support elements as long as that data is collected within
+            and displayed by the system.
+
+            This test ensures that the submitted request bundles include at least one instance of a
+            profile listed above. Then for each profile observed, it checks for the presence of
+            each must support element defined in that profile. For must support elements not observed
+            on an included request profile, testers can attest that they are not supported by the
+            client system.
+
+            The test will look through the instances included in submissions made by the client
+            for the following must support elements:
+          INTRO
         else
-          "This test reviews the listed PAS profiles in the client's $#{operation} requests and checks " \
-            'all of their must support elements. Any element that was not observed may be attested as ' \
-            'not collected by the client (and is not required under the PAS implementation guide).'
+          <<~INTRO.chomp
+            PAS client systems are required to be able to populate must support elements representing
+            data collected and displayed to users on instances of all profiles included in requests.
+            This test checks all identified instances of the profiles listed below within requests sent
+            by the client to ensure that the must support elements are observed. For those not observed,
+            testers can attest that they are not supported by the client system.
+          INTRO
         end
       end
 

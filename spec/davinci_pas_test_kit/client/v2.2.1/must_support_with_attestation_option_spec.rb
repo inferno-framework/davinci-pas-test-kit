@@ -21,6 +21,21 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
     end
   end
 
+  # Same as coverage_test but for the $inquire operation, to check the operation-aware message.
+  let(:inquire_coverage_test) do
+    Class.new(described_class) do
+      config(
+        options: {
+          profiles: [{ resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' }],
+          require_one_of: false,
+          ig_version: 'v2.2.1',
+          type: 'request',
+          operation: 'inquire'
+        }
+      )
+    end
+  end
+
   let(:require_one_of_test) do
     Class.new(described_class) do
       config(
@@ -262,12 +277,18 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
     it 'hard-fails a require_one_of test' do
       result = run(require_one_of_test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/must include at least one/)
     end
 
-    it 'does not silently pass a require_one_of: false test' do
+    it 'fails a require_one_of: false test with a "no requests received" message' do
       result = run(coverage_test)
-      expect(result.result).to_not eq('pass')
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to match(/No submit requests received/)
+    end
+
+    it 'uses the operation in the message for an $inquire test' do
+      result = run(inquire_coverage_test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to match(/No inquire requests received/)
     end
   end
 
@@ -296,7 +317,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       description = described_class.build_description(options)
       expect(description).to include('### PAS Coverage')
       expect(description).to match(/^\* Coverage\./) # at least one must support element listed
-      expect(description).to match(/must support elements/) # intro text
+      expect(description).to include('PAS client systems are required') # other-profiles intro
+      expect(description).to match(/testers can attest that they are not supported/) # attestation option
     end
 
     it 'uses the "at least one" intro when require_one_of is true' do
@@ -307,6 +329,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       description = described_class.build_description(options)
       expect(description).to match(/must support at least one of them/)
+      expect(description).to match(/as long as that data is collected within/)
+      expect(description).to match(/testers can attest that they are not supported/) # attestation option
       expect(description).to include('### PAS Device Request')
     end
   end

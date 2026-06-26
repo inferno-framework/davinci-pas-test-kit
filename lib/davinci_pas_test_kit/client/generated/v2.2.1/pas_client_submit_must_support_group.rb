@@ -37,7 +37,7 @@ module DaVinciPASTestKit
       # elements on the request profiles that are present may be attested as not collected.
       test from: :pas_client_v221_must_support_with_attestation_option do
         id :pas_client_v221_submit_request_profiles_must_support_with_attestation_option
-        title 'At least one request profile is observed with its must support elements'
+        title 'At least one instance of a request profile (PAS Medication Request, PAS Service Request, PAS Device Request, or PAS Nutrition Order) is observed with all of its must support elements'
         config(
           options: {
             require_one_of: true,
