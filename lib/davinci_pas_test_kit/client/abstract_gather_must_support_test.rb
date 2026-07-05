@@ -14,10 +14,12 @@ module DaVinciPASTestKit
       previous workflow tests will also be considered.
 
       Because Inferno's mocked responses do not cover all must support elements, in order to pass
-      these tests testers will need to provide lists of response bundles for Inferno to return when
-      responding to $submit and $inquire requests. For the nth request to a given operation during this test,
-      Inferno will respond with the nth provided response bundle. If no nth response is available,
-      Inferno will generate a default response.
+      these tests testers will need to provide response bundles for Inferno to return when
+      responding to $submit and $inquire requests. Each response input takes either a single JSON
+      FHIR Bundle or a JSON list of Bundles. For each request, Inferno will respond with the first
+      Bundle in the list that meets its selection criteria, generating a default response if none
+      match. See the input descriptions for details on specifying selection criteria on a Bundle
+      and on substituting values from the request into the returned response.
 
       This enables testers to verify that their client can handle responses containing all required
       must support elements.
@@ -40,20 +42,54 @@ module DaVinciPASTestKit
           type: 'textarea',
           optional: true,
           description: %(
-            An optional list of JSON response bundles for Inferno to return when responding to
-            $submit requests during must support testing. Provide as a JSON array of bundle objects,
-            e.g., `[bundle_1, bundle_2]`. The nth $submit request will receive the nth bundle in
-            this list. If not provided or if the list is exhausted, Inferno will generate a default response.
+            An optional JSON FHIR Bundle, or list of Bundles, for Inferno to return when responding
+            to $submit requests during must support testing. For each request, Inferno will respond
+            with the first Bundle in the list that meets its selection criteria. If none match, or
+            if no Bundles are provided, Inferno will generate a default response.
+
+            Selection criteria are specified using extensions placed in an `extension` array at the
+            top level of a Bundle's JSON:
+
+            - Request range (url `urn:inferno:pas:request-range`): a `valueString` containing
+              comma-separated request numbers or ranges, e.g., `"1-2,4"`. Met when the number of
+              $submit requests received during this test, counting this one, is among the listed values.
+            - Inclusion criteria (url `urn:inferno:pas:inclusion-criteria`): a `valueExpression` whose
+              `expression` contains a FHIRPath expression. Met when the expression evaluates to a
+              single truthy value against the incoming request Bundle.
+
+            A Bundle with no criteria extensions matches any request, and a Bundle with both criteria
+            must meet both. Inferno removes these extensions from the Bundle before returning it.
+
+            A Bundle may also contain tokens of the form `{{fhirpath}}`, e.g.,
+            `{{Bundle.entry.first.resource.id}}`. Inferno replaces each token in the selected Bundle
+            with the result of evaluating the FHIRPath expression against the incoming request Bundle.
           )
     input :ms_inquire_responses,
           title: 'Must Support $inquire Response Bundles',
           type: 'textarea',
           optional: true,
           description: %(
-            An optional list of JSON response bundles for Inferno to return when responding to
-            $inquire requests during must support testing. Provide as a JSON array of bundle objects,
-            e.g., `[bundle_1, bundle_2]`. The nth $inquire request will receive the nth bundle in
-            this list. If not provided or if the list is exhausted, Inferno will generate a default response.
+            An optional JSON FHIR Bundle, or list of Bundles, for Inferno to return when responding
+            to $inquire requests during must support testing. For each request, Inferno will respond
+            with the first Bundle in the list that meets its selection criteria. If none match, or
+            if no Bundles are provided, Inferno will generate a default response.
+
+            Selection criteria are specified using extensions placed in an `extension` array at the
+            top level of a Bundle's JSON:
+
+            - Request range (url `urn:inferno:pas:request-range`): a `valueString` containing
+              comma-separated request numbers or ranges, e.g., `"1-2,4"`. Met when the number of
+              $inquire requests received during this test, counting this one, is among the listed values.
+            - Inclusion criteria (url `urn:inferno:pas:inclusion-criteria`): a `valueExpression` whose
+              `expression` contains a FHIRPath expression. Met when the expression evaluates to a
+              single truthy value against the incoming request Bundle.
+
+            A Bundle with no criteria extensions matches any request, and a Bundle with both criteria
+            must meet both. Inferno removes these extensions from the Bundle before returning it.
+
+            A Bundle may also contain tokens of the form `{{fhirpath}}`, e.g.,
+            `{{Bundle.entry.first.resource.id}}`. Inferno replaces each token in the selected Bundle
+            with the result of evaluating the FHIRPath expression against the incoming request Bundle.
           )
     config options: { accepts_multiple_requests: true }
     output :confirmation_url

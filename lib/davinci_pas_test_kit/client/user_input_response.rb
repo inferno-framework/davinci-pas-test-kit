@@ -14,18 +14,21 @@ module DaVinciPASTestKit
       nil
     end
 
-    # Returns the nth response from a list of tester-provided responses for the must support workflow.
-    # The input value should be a JSON array of response bundles, e.g., [bundle_1, bundle_2].
-    # Returns nil if the input is not present, not parseable, or n exceeds the list length.
-    def self.nth_user_inputted_response(result, operation, request_index)
+    # Returns the tester-provided response candidates for the must support workflow
+    # as a list of parsed JSON hashes. The input value may be a single JSON bundle
+    # object or a JSON array of bundle objects. Candidates are kept as raw hashes
+    # rather than FHIR model instances so that Inferno selection criteria extensions
+    # at the top level of each bundle, which the FHIR Bundle model does not support,
+    # are preserved for selection.
+    # Returns nil if the input is not present, not parseable, or not object-valued.
+    def self.response_bundles(result, operation)
       input_name = operation == 'submit' ? 'ms_submit_responses' : 'ms_inquire_responses'
       input_value = JSON.parse(result.input_json)&.find { |i| i['name'] == input_name }&.dig('value')
       return unless input_value.present?
 
-      responses = JSON.parse(input_value)
-      return unless responses.is_a?(Array) && request_index < responses.length
-
-      responses[request_index].is_a?(String) ? responses[request_index] : responses[request_index].to_json
+      bundles = JSON.parse(input_value)
+      bundles = [bundles] unless bundles.is_a?(Array)
+      bundles if bundles.all?(Hash)
     rescue JSON::ParserError
       nil
     end
