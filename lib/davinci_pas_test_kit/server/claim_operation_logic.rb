@@ -10,8 +10,12 @@ module DaVinciPASTestKit
       config.options[:use_case]
     end
 
+    # The workflow tag applied to (and used to reload) the request. Tests that run a single
+    # tagged submission per use case (e.g. Claim Updates) set an explicit `request_tag`; the
+    # standard workflow tests fall back to the use-case-derived `*_WORKFLOW_TAG`.
     def use_case_tag
-      DaVinciPASTestKit.const_get(:"#{use_case.upcase}_WORKFLOW_TAG")
+      config.options[:request_tag].presence ||
+        DaVinciPASTestKit.const_get(:"#{use_case.upcase}_WORKFLOW_TAG")
     end
 
     def request_bundles(request_payload)

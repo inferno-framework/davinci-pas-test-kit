@@ -132,8 +132,8 @@ module DaVinciPASTestKit
         end
 
         wait_identifier = session_wait_identifier(client_id, session_url_path)
-        submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
-        inquire_endpoint = session_endpont_url(:inquire, client_id, session_url_path)
+        submit_endpoint = session_endpoint_url(:submit, client_id, session_url_path)
+        inquire_endpoint = session_endpoint_url(:inquire, client_id, session_url_path)
 
         confirmation_url = "#{resume_pass_url}?token=#{wait_identifier}"
         output(confirmation_url:)
