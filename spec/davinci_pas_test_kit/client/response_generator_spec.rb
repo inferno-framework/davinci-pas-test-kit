@@ -313,6 +313,44 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         end
       end
 
+      it 'can use a modification decision' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_multiple_items_string),
+          'submit',
+          :modification,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        expect(response_bundle).to_not be_nil
+        claim_response = response_bundle.entry.find do |entry|
+          entry.resource.is_a?(FHIR::ClaimResponse)
+        end&.resource
+        expect(claim_response).to_not be_nil
+
+        add_item_sequences = Array(claim_response.addItem).flat_map { |add_item| Array(add_item.itemSequence) }
+        expect(add_item_sequences).to_not be_empty
+
+        claim_response.item&.each do |item|
+          expect(item.adjudication).to_not be_nil
+          expect(item.adjudication.length).to be >= 1
+          modified_review_action_code = nil
+          item.adjudication.each do |adjudication|
+            review_action_ext = adjudication.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction' }
+            review_action_code_ext = review_action_ext&.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode' }
+            next unless review_action_code_ext.present?
+
+            modified_review_action_code = review_action_code_ext.valueCodeableConcept&.coding&.find do |coding|
+              coding.code == 'A6'
+            end
+            break if modified_review_action_code.present?
+          end
+          expect(modified_review_action_code).to_not be_nil
+          # each modified item is paired with an addItem referencing the same itemSequence
+          expect(add_item_sequences).to include(item.itemSequence)
+        end
+      end
+
       it 'defaults to an approved decision' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_multiple_items_string),
