@@ -31,7 +31,7 @@ module DaVinciPASTestKit
     end
 
     def user_inputted_response?(input_key)
-      send(input_key).present?
+      input_key.present? && send(input_key).present?
     end
 
     def input_title(input_key)

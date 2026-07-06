@@ -22,9 +22,15 @@ module DaVinciPASTestKit
       config.options[:use_case]
     end
 
+    # Tests that tag a single submission with an explicit `request_tag` (e.g. Claim Updates)
+    # reload by that tag; standard workflow tests fall back to the use-case-derived tag.
+    def workflow_tag
+      config.options[:request_tag].presence || DaVinciPASTestKit.use_case_tag(use_case)
+    end
+
     def response_bundles
       requests = load_tagged_requests(DaVinciPASTestKit.operation_tag(operation),
-                                      DaVinciPASTestKit.use_case_tag(use_case))
+                                      workflow_tag)
       bundles = []
       requests.map(&:response_body).compact.uniq.each do |response_body|
         resource = FHIR.from_contents(response_body)

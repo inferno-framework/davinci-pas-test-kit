@@ -11,7 +11,7 @@ module DaVinciPASTestKit
       test_session_id
     end
 
-    def session_endpont_url(endpoint, client_id, session_url_path)
+    def session_endpoint_url(endpoint, client_id, session_url_path)
       path =
         if client_id.present?
           ''

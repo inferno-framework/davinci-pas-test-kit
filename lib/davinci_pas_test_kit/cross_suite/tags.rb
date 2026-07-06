@@ -9,6 +9,12 @@ module DaVinciPASTestKit
   PENDED_WORKFLOW_TAG = 'pas_pended_workflow'
   MODIFICATION_WORKFLOW_TAG = 'pas_modified_workflow'
   MUST_SUPPORT_WORKFLOW_TAG = 'pas_must_support_workflow'
+  # Claim update workflow: a unique tag per submission so verification tests can
+  # reload each specific request (initial submit, then each subsequent update).
+  CLAIM_UPDATE_INITIAL_TAG = 'pas_claim_update_initial'
+  CLAIM_UPDATE_ADD_ITEM_TAG = 'pas_claim_update_add_item'
+  CLAIM_UPDATE_MODIFY_CANCEL_TAG = 'pas_claim_update_modify_cancel'
+  CLAIM_UPDATE_CANCEL_ALL_TAG = 'pas_claim_update_cancel_all'
   NOTIFICATION_TAG = 'subscription_notification'
   SUBSCRIPTION_CREATE_TAG = 'subscription_create'
   SUBSCRIPTION_READ_TAG = 'subscription_read'
