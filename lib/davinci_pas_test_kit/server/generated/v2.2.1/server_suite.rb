@@ -1,6 +1,7 @@
 require_relative '../../../cross_suite/validator_suppressions'
 require_relative '../../v2.2.1/pas_error_group'
 require_relative '../../v2.2.1/pas_server_subscription_setup'
+require_relative '../../v2.2.1/pas_server_claim_updates_group'
 require_relative 'pas_server_approval_use_case_group'
 require_relative 'pas_server_denial_use_case_group'
 require_relative 'pas_server_pended_use_case_group'
@@ -75,7 +76,7 @@ module DaVinciPASTestKit
         {
           identifier: 'hl7.fhir.us.davinci-pas_2.2.1',
           title: 'Da Vinci Prior Authorization Support (PAS) v2.2.1',
-          actor: 'Server'
+          actor: 'PAS Payer'
         },
         {
           identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
@@ -134,6 +135,7 @@ module DaVinciPASTestKit
         group from: :pas_server_v221_approval_use_case
         group from: :pas_server_v221_denial_use_case
         group from: :pas_server_v221_pended_use_case
+        group from: :pas_server_v221_claim_updates
       end
       group from: :pas_server_v221_must_support
       group from: :pas_v221_error_group

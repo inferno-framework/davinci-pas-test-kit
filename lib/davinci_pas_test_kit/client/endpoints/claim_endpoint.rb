@@ -31,7 +31,21 @@ module DaVinciPASTestKit
       tag_list = [operation_tag]
       tag_list << workflow_tag if workflow_tag.present?
       tag_list << MUST_SUPPORT_WORKFLOW_TAG if must_support_workflow?
+      tag_list << claim_update_request_tag if claim_update_request_tag.present?
       tag_list
+    end
+
+    # A unique tag set by each Claim Update wait test (via config option) so that
+    # verification tests can reload that specific submission by tag.
+    def claim_update_request_tag
+      test.config.options[:claim_update_tag]
+    end
+
+    # Claim Update wait tests set this so that Inferno never sends a Subscription
+    # notification in response to their submission, even when the configured
+    # response indicates the request was pended.
+    def suppress_notifications?
+      test.config.options[:suppress_notifications] == true
     end
 
     def workflow
@@ -42,6 +56,8 @@ module DaVinciPASTestKit
         :denial
       when /.*approval.*/
         :approval
+      when /.*modification.*/
+        :modification
       end
     end
 
@@ -52,7 +68,8 @@ module DaVinciPASTestKit
     WORKFLOW_TAG_MAP = {
       pended: PENDED_WORKFLOW_TAG,
       denial: DENIAL_WORKFLOW_TAG,
-      approval: APPROVAL_WORKFLOW_TAG
+      approval: APPROVAL_WORKFLOW_TAG,
+      modification: MODIFICATION_WORKFLOW_TAG
     }.freeze
 
     def make_response
@@ -88,6 +105,9 @@ module DaVinciPASTestKit
 
       response.body = response_bundle_json
 
+      # Claim Update wait tests must never trigger a Subscription notification,
+      # even if the tester supplies a pended response body.
+      return if suppress_notifications?
       return unless workflow == :pended && operation == 'submit'
 
       start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
