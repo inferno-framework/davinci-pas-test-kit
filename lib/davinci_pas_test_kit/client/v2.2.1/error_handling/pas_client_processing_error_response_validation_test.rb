@@ -11,7 +11,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_processing_error_response_validation_test
       title 'Processing Error Response Bundle is valid and contains error entries'
       description %(
-        **USER INPUT VERIFICATION**: This test verifies input provided by the tester instead of the system under test.
+        This test verifies input provided by the tester instead of the system under test.
         Errors encountered will be treated as a skip instead of a failure.
 
         This test verifies the conformity of the PAS Response Bundle returned by Inferno during the
@@ -52,14 +52,8 @@ module DaVinciPASTestKit
         )
 
         bundle = FHIR.from_contents(response_body)
-        skip_if bundle.nil?, 'The Processing Error response body could not be parsed as a FHIR resource.'
-
-        claim_response_entry = bundle.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
-        skip_if claim_response_entry.nil?,
-                'No ClaimResponse entry found in the Processing Error response bundle.'
-
-        claim_response = claim_response_entry.resource
-        skip_if claim_response.error.blank?,
+        claim_response = bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }&.resource
+        skip_if claim_response&.error.blank?,
                 'The ClaimResponse in the Processing Error response bundle contains no error entries. ' \
                 "The '#{input_title(:processing_error_response)}' input must include a ClaimResponse " \
                 'with at least one error entry.'

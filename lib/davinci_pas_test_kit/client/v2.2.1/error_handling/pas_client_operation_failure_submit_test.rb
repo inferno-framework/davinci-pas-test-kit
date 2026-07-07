@@ -18,8 +18,6 @@ module DaVinciPASTestKit
         Upon receipt, Inferno will return the provided OperationOutcome with the configured
         HTTP status code (default 400).
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@38', 'hl7.fhir.us.davinci-pas_2.2.1@39',
-                            'hl7.fhir.us.davinci-pas_2.2.1@40', 'hl7.fhir.us.davinci-pas_2.2.1@41'
 
       input :operation_failure_operation_outcome,
             title: 'Operation Failure OperationOutcome JSON',

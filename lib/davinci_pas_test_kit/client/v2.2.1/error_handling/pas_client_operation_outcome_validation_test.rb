@@ -32,7 +32,9 @@ module DaVinciPASTestKit
         skip_if !operation_outcome.is_a?(FHIR::OperationOutcome),
                 "Expected an OperationOutcome but received #{operation_outcome.resourceType}."
 
-        resource_is_valid?(resource: operation_outcome)
+        skip_if !resource_is_valid?(resource: operation_outcome),
+                'The OperationOutcome returned during the Operation Failure workflow is not conformant ' \
+                'with the base FHIR R4 OperationOutcome resource definition.'
       end
     end
   end

@@ -18,7 +18,6 @@ module DaVinciPASTestKit
         Upon receipt, Inferno will return the provided response bundle containing one or
         more ClaimResponse.error entries.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@38', 'hl7.fhir.us.davinci-pas_2.2.1@39'
 
       input :processing_error_response,
             title: 'Processing Error Response Bundle JSON',
