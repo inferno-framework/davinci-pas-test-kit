@@ -88,6 +88,39 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(messages[0].message).to match(/SHALL appear exactly once in the Bundle, but found 0/)
       end
     end
+
+    context 'when a multi-level Claim Update bundle is provided' do
+      grandparent_urn = 'urn:uuid:11111111-1111-4111-8111-111111111111'
+      parent_urn = 'urn:uuid:22222222-2222-4222-8222-222222222222'
+      update_urn = 'urn:uuid:33333333-3333-4333-8333-333333333333'
+      missing_urn = 'urn:uuid:99999999-9999-4999-8999-999999999999'
+
+      # An Update Claim (primary) that references its parent Claim, which is itself an update that in turn
+      # references the grandparent. Per spec-65/66 the grandparent is deliberately omitted from the Bundle.
+      define_method(:update_bundle) do |parent_extra = {}|
+        parent_claim = { resourceType: 'Claim', id: 'claim-2', status: 'active', use: 'preauthorization',
+                         related: [{ claim: { reference: grandparent_urn } }] }.merge(parent_extra)
+        { resourceType: 'Bundle', type: 'collection',
+          entry: [
+            { fullUrl: update_urn,
+              resource: { resourceType: 'Claim', id: 'claim-3', status: 'active', use: 'preauthorization',
+                          related: [{ claim: { reference: parent_urn } }] } },
+            { fullUrl: parent_urn, resource: parent_claim }
+          ] }.to_json
+      end
+
+      it 'does not flag the deliberately-omitted grandparent Claim' do
+        result = run(test, server_endpoint:, pa_request_payload: update_bundle)
+        expect(result.result).to eq('pass')
+      end
+
+      it 'still flags a resource referenced only by the non-primary (parent) Claim' do
+        result = run(test, server_endpoint:, pa_request_payload: update_bundle(provider: { reference: missing_urn }))
+        expect(result.result).to eq('skip')
+        messages = entity_result_messages(test)
+        expect(messages.map(&:message).join).to match(/SHALL appear exactly once in the Bundle, but found 0/)
+      end
+    end
   end
 
   describe '#validate_pa_response_body_structure' do

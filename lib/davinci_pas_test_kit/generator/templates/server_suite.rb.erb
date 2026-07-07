@@ -1,7 +1,8 @@
 require_relative '../../../cross_suite/validator_suppressions'
 require_relative '<%= error_group_file_name %>'
 require_relative '../../<%= ig_metadata.ig_version %>/pas_server_subscription_setup'
-<% group_file_list.each do |file_name| %>require_relative '<%= file_name %>'
+<% if claim_updates_group? %>require_relative '<%= claim_updates_group_file_name %>'
+<% end %><% group_file_list.each do |file_name| %>require_relative '<%= file_name %>'
 <% end %>
 module DaVinciPASTestKit
   module <%= module_name %>
@@ -72,7 +73,7 @@ module DaVinciPASTestKit
         {
           identifier: 'hl7.fhir.us.davinci-pas_<%= ig_metadata.ig_version.delete_prefix('v') %>',
           title: 'Da Vinci Prior Authorization Support (PAS) <%= ig_metadata.ig_version %>',
-          actor: 'Server'
+          actor: '<%= pas_requirement_set_actor %>'
         },
         {
           identifier: 'hl7.fhir.uv.subscriptions_1.1.0',
@@ -128,7 +129,8 @@ module DaVinciPASTestKit
           conformant and also contain the correct codes.
         )
         <% group_id_list.each do |id| %>
-        group from: :<%= id %><% end %>
+        group from: :<%= id %><% end %><% if claim_updates_group? %>
+        group from: :<%= claim_updates_group_id %><% end %>
       end
       group from: :<%= must_support_group_id %>
       group from: :<%= error_group_id %>

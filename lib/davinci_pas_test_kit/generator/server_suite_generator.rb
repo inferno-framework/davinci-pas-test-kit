@@ -93,6 +93,27 @@ module DaVinciPASTestKit
         "pas_#{ig_metadata.reformatted_version}_error_group"
       end
 
+      # Claim Updates is a v2.2.x feature (it relies on the PAS Claim Update profile), so it is only
+      # wired into the v2.2+ server suites.
+      def claim_updates_group?
+        ig_metadata.ig_version.start_with?('v2.2')
+      end
+
+      def claim_updates_group_file_name
+        "../../#{ig_metadata.ig_version}/pas_server_claim_updates_group"
+      end
+
+      def claim_updates_group_id
+        "pas_server_#{ig_metadata.reformatted_version}_claim_updates"
+      end
+
+      # The PAS requirement set renamed its server-side actor from "Server" (v2.0.1) to "PAS Payer"
+      # (v2.2.1). The actor must match the requirement source exactly or `verifies_requirements`
+      # annotations will not resolve.
+      def pas_requirement_set_actor
+        ig_metadata.ig_version.start_with?('v2.2') ? 'PAS Payer' : 'Server'
+      end
+
       def must_support_group_id
         @must_support_group_id ||= groups.map { |group| group[:id] }
           .reject { |id| id.include?('client') }

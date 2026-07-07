@@ -62,6 +62,8 @@ module DaVinciPASTestKit
           :denial_json_response
         when PENDED_WORKFLOW_TAG
           :pended_json_response
+        when MODIFICATION_WORKFLOW_TAG
+          :modification_json_response
         when MUST_SUPPORT_WORKFLOW_TAG
           :ms_submit_responses
         end

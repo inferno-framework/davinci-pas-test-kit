@@ -55,7 +55,7 @@ module DaVinciPASTestKit
                           "Input '#{input_title(:operation_failure_operation_outcome)}' must be valid JSON."
 
         wait_identifier = session_wait_identifier(client_id, session_url_path)
-        submit_endpoint = session_endpont_url(:submit, client_id, session_url_path)
+        submit_endpoint = session_endpoint_url(:submit, client_id, session_url_path)
 
         wait(
           identifier: wait_identifier,
