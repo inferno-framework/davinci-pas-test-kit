@@ -61,7 +61,7 @@ module DaVinciPASTestKit
             must meet both. Inferno removes these extensions from the Bundle before returning it.
 
             A Bundle may also contain tokens of the form `{{fhirpath}}`, e.g.,
-            `{{Bundle.entry.first.resource.id}}`. Inferno replaces each token in the selected Bundle
+            `{{Bundle.entry.first().resource.id}}`. Inferno replaces each token in the selected Bundle
             with the result of evaluating the FHIRPath expression against the incoming request Bundle.
           )
     input :ms_inquire_responses,
@@ -88,7 +88,7 @@ module DaVinciPASTestKit
             must meet both. Inferno removes these extensions from the Bundle before returning it.
 
             A Bundle may also contain tokens of the form `{{fhirpath}}`, e.g.,
-            `{{Bundle.entry.first.resource.id}}`. Inferno replaces each token in the selected Bundle
+            `{{Bundle.entry.first().resource.id}}`. Inferno replaces each token in the selected Bundle
             with the result of evaluating the FHIRPath expression against the incoming request Bundle.
           )
     config options: { accepts_multiple_requests: true }
