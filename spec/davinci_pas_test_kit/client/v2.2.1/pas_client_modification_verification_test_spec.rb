@@ -108,7 +108,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientModificationVerificat
 
   def error_messages(result)
     Inferno::Repositories::Messages.new.messages_for_result(result.id)
-                                  .select { |message| message.type == 'error' }
-                                  .map(&:message).join("\n")
+      .select { |message| message.type == 'error' }
+      .map(&:message).join("\n")
   end
 end
