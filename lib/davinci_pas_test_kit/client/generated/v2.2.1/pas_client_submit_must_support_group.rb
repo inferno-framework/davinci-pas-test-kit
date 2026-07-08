@@ -1,14 +1,5 @@
-require_relative '../../v2.2.1/must_support/pas_client_must_support_request_profiles_test'
-require_relative 'pas_request_bundle/client_submit_request_must_support_pas_request_bundle_test'
+require_relative '../../v2.2.1/must_support/must_support_with_attestation_option'
 require_relative 'claim_update/client_submit_request_must_support_claim_update_test'
-require_relative 'coverage/client_submit_request_must_support_coverage_test'
-require_relative 'encounter/client_submit_request_must_support_encounter_test'
-require_relative 'insurer/client_submit_request_must_support_insurer_test'
-require_relative 'requestor/client_submit_request_must_support_requestor_test'
-require_relative 'beneficiary/client_submit_request_must_support_beneficiary_test'
-require_relative 'subscriber/client_submit_request_must_support_subscriber_test'
-require_relative 'practitioner/client_submit_request_must_support_practitioner_test'
-require_relative 'practitioner_role/client_submit_request_must_support_practitioner_role_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -42,17 +33,57 @@ module DaVinciPASTestKit
       )
       run_as_group
       
-      test from: :pas_client_v221_must_support_request_profiles
-      test from: :pas_client_v221_submit_request_must_support_pas_request_bundle
+      # At least one of the PAS request profiles must be present; unobserved must support
+      # elements on the request profiles that are present may be attested as not collected.
+      test from: :pas_client_v221_must_support_with_attestation_option do
+        id :pas_client_v221_submit_request_profiles_must_support_with_attestation_option
+        title 'At least one instance of a request profile (PAS Medication Request, PAS Service Request, PAS Device Request, or PAS Nutrition Order) is observed with all of its must support elements'
+        config(
+          options: {
+            require_one_of: true,
+            profiles: [
+              { resource_type: 'DeviceRequest', profile_key: 'device_request', title: 'PAS Device Request' },
+              { resource_type: 'MedicationRequest', profile_key: 'medication_request', title: 'PAS Medication Request' },
+              { resource_type: 'NutritionOrder', profile_key: 'nutrition_order', title: 'PAS Nutrition Order' },
+              { resource_type: 'ServiceRequest', profile_key: 'service_request', title: 'PAS Service Request' }
+            ],
+            ig_version: 'v2.2.1',
+            type: 'request',
+            operation: 'submit'
+          }
+        )
+        description MustSupportWithAttestationOption.build_description(config.options)
+      end
+
+      # Mandatory - the PAS Claim Update profile must always be demonstrated.
       test from: :pas_client_v221_submit_request_must_support_claim_update
-      test from: :pas_client_v221_submit_request_must_support_coverage
-      test from: :pas_client_v221_submit_request_must_support_encounter
-      test from: :pas_client_v221_submit_request_must_support_insurer
-      test from: :pas_client_v221_submit_request_must_support_requestor
-      test from: :pas_client_v221_submit_request_must_support_beneficiary
-      test from: :pas_client_v221_submit_request_must_support_subscriber
-      test from: :pas_client_v221_submit_request_must_support_practitioner
-      test from: :pas_client_v221_submit_request_must_support_practitioner_role
+
+      # All other submit request profiles - unobserved must support elements may be
+      # attested as not collected by the client system.
+      test from: :pas_client_v221_must_support_with_attestation_option do
+        id :pas_client_v221_submit_request_other_must_support_with_attestation_option
+        title 'All other submit request profile must support elements are observed'
+        config(
+          options: {
+            require_one_of: false,
+            profiles: [
+              { resource_type: 'Bundle', profile_key: 'pas_request_bundle', title: 'PAS Request Bundle' },
+              { resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' },
+              { resource_type: 'Encounter', profile_key: 'encounter', title: 'PAS Encounter' },
+              { resource_type: 'Organization', profile_key: 'insurer', title: 'PAS Insurer Organization' },
+              { resource_type: 'Organization', profile_key: 'requestor', title: 'PAS Requestor Organization' },
+              { resource_type: 'Patient', profile_key: 'beneficiary', title: 'PAS Beneficiary Patient' },
+              { resource_type: 'Patient', profile_key: 'subscriber', title: 'PAS Subscriber Patient' },
+              { resource_type: 'Practitioner', profile_key: 'practitioner', title: 'PAS Practitioner' },
+              { resource_type: 'PractitionerRole', profile_key: 'practitioner_role', title: 'PAS PractitionerRole' }
+            ],
+            ig_version: 'v2.2.1',
+            type: 'request',
+            operation: 'submit'
+          }
+        )
+        description MustSupportWithAttestationOption.build_description(config.options)
+      end
     end
   end
 end

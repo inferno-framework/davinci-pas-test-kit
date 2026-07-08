@@ -20,7 +20,9 @@ module DaVinciPASTestKit
 
           submit_request_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'request', 'submit').generate
-            new(ig_metadata, profile, base_client_output_dir, 'request', 'submit', 'client').generate
+            if generate_client_request_test?(ig_metadata, profile)
+              new(ig_metadata, profile, base_client_output_dir, 'request', 'submit', 'client').generate
+            end
           end
           submit_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'submit').generate
@@ -29,12 +31,25 @@ module DaVinciPASTestKit
 
           inquiry_request_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'request', 'inquire').generate
-            new(ig_metadata, profile, base_client_output_dir, 'request', 'inquire', 'client').generate
+            if generate_client_request_test?(ig_metadata, profile)
+              new(ig_metadata, profile, base_client_output_dir, 'request', 'inquire', 'client').generate
+            end
           end
           inquiry_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'inquire').generate
             new(ig_metadata, profile, base_client_output_dir, 'response', 'inquire', 'client').generate
           end
+        end
+
+        # For v2.2.1 the client request must support tests are collapsed into the attestation tests
+        # (see ClientMustSupportGroupGenerator), so only the mandatory Claim profile keeps a
+        # standalone per-profile client request test. Other profiles are covered by the attestation
+        # tests and their per-profile client request tests are not generated. Server tests and
+        # earlier IG versions are unaffected.
+        def generate_client_request_test?(ig_metadata, profile)
+          return true unless ig_metadata.ig_version == 'v2.2.1'
+
+          profile.resource == 'Claim'
         end
       end
 
@@ -103,36 +118,7 @@ module DaVinciPASTestKit
       end
 
       def must_support_list_string
-        build_must_support_list_string
-      end
-
-      def build_must_support_list_string
-        slice_names = profile_metadata.must_supports[:slices]
-          .map { |slice| slice[:slice_id] }
-
-        element_names = profile_metadata.must_supports[:elements]
-          .map { |element| "#{resource_type}.#{element[:path]}" }
-
-        extension_names = profile_metadata.must_supports[:extensions]
-          .map { |extension| extension[:id] }
-
-        profile_metadata.must_supports[:choices]&.each do |choice|
-          next unless choice.key?(:paths)
-
-          choice[:paths].each { |path| element_names.delete("#{resource_type}.#{path}") }
-          choice[:extension_ids].each { |id| extension_names.delete(id.to_s) } if choice[:extension_ids].present?
-
-          element_paths = choice[:paths].map { |path| "#{resource_type}.#{path}" }.join(' or ')
-          extension_ids = choice[:extension_ids].map(&:to_s).join(' or ')
-
-          element_names << "#{element_paths} or #{extension_ids}"
-        end
-
-        (slice_names + element_names + extension_names)
-          .uniq
-          .sort
-          .map { |name| "#{' ' * 8}* #{name}" }
-          .join("\n")
+        profile_metadata.must_support_list_string(indent: 8)
       end
 
       def verifies_requirements

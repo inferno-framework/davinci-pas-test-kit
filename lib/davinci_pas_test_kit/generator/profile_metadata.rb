@@ -40,6 +40,33 @@ module DaVinciPASTestKit
         !['Patient', 'Claim', 'ClaimResponse'].include?(resource)
       end
 
+      # A sorted, bulleted markdown list of this profile's must support elements (slices, elements,
+      # extensions, and choices), each line prefixed with `indent` spaces. Shared by the per-profile
+      # must support tests and the collapsed attestation tests so both stay in sync with the metadata.
+      def must_support_list_string(indent: 8)
+        slice_names = must_supports[:slices].map { |slice| slice[:slice_id] }
+        element_names = must_supports[:elements].map { |element| "#{resource}.#{element[:path]}" }
+        extension_names = must_supports[:extensions].map { |extension| extension[:id] }
+
+        must_supports[:choices]&.each do |choice|
+          next unless choice.key?(:paths)
+
+          choice[:paths].each { |path| element_names.delete("#{resource}.#{path}") }
+          choice[:extension_ids].each { |id| extension_names.delete(id.to_s) } if choice[:extension_ids].present?
+
+          element_paths = choice[:paths].map { |path| "#{resource}.#{path}" }.join(' or ')
+          extension_ids = choice[:extension_ids].map(&:to_s).join(' or ')
+
+          element_names << "#{element_paths} or #{extension_ids}"
+        end
+
+        (slice_names + element_names + extension_names)
+          .uniq
+          .sort
+          .map { |name| "#{' ' * indent}* #{name}" }
+          .join("\n")
+      end
+
       def add_test(id:, file_name:)
         self.tests ||= []
 

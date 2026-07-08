@@ -235,5 +235,3 @@
 :tests:
 - :id: pas_server_v221_submit_request_must_support_encounter
   :file_name: server_submit_request_must_support_encounter_test.rb
-- :id: pas_client_v221_submit_request_must_support_encounter
-  :file_name: client_submit_request_must_support_encounter_test.rb
