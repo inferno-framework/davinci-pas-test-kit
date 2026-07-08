@@ -3,7 +3,7 @@ require_relative 'error_tests/pas_inquiry_error_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
-    class PASErrorGroup < Inferno::TestGroup
+    class PASServerErrorGroup < Inferno::TestGroup
       title 'Demonstrate Error Handling'
       description %(
         Validates Prior Authorization transaction error handling for malformed

@@ -4,14 +4,19 @@ module DaVinciPASTestKit
       klass.extend ClassMethods
     end
 
+    # Reads an arbitrary input value by name from result.input_json.
+    def self.read_input(result, input_name)
+      JSON.parse(result.input_json)&.find { |i| i['name'] == input_name.to_s }&.dig('value')
+    rescue JSON::ParserError
+      nil
+    end
+
     def self.user_inputted_response(configurable, operation, result)
       config_key = operation == 'submit' ? :submit_respond_with : :inquire_respond_with
       input_key = configurable.config.options[config_key]
       return unless input_key.present?
 
-      JSON.parse(result.input_json)&.find { |i| i['name'] == input_key.to_s }&.dig('value')
-    rescue JSON::ParserError
-      nil
+      read_input(result, input_key)
     end
 
     # Returns the nth response from a list of tester-provided responses for the must support workflow.

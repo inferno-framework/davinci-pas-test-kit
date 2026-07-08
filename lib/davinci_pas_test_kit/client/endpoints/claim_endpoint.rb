@@ -56,6 +56,10 @@ module DaVinciPASTestKit
         :denial
       when /.*approval.*/
         :approval
+      when /.*operation_failure.*/
+        :operation_failure
+      when /.*processing_error.*/
+        :processing_error
       when /.*modification.*/
         :modification
       end
@@ -69,14 +73,28 @@ module DaVinciPASTestKit
       pended: PENDED_WORKFLOW_TAG,
       denial: DENIAL_WORKFLOW_TAG,
       approval: APPROVAL_WORKFLOW_TAG,
+      operation_failure: OPERATION_FAILURE_WORKFLOW_TAG,
+      processing_error: PROCESSING_ERROR_WORKFLOW_TAG,
       modification: MODIFICATION_WORKFLOW_TAG
     }.freeze
 
     def make_response
       return if response.status == 401 # set in update_result (expired token handling there)
 
-      response.status = 200
       response.format = :json
+
+      # Handle the operation failure and processing error workflows, which require a user-provided response.
+      if workflow == :operation_failure
+        make_operation_failure_response
+        return
+      end
+
+      if workflow == :processing_error
+        make_processing_error_response
+        return
+      end
+
+      response.status = 200
 
       req_bundle = FHIR.from_contents(request.body.string)
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
@@ -163,6 +181,48 @@ module DaVinciPASTestKit
         issue: FHIR::OperationOutcome::Issue.new(severity: 'fatal', code: 'required',
                                                  details: FHIR::CodeableConcept.new(text: details))
       ).to_json
+    end
+
+    def make_operation_failure_response
+      user_provided_oo = UserInputResponse.user_inputted_response(test, operation, result)
+      unless user_provided_oo.present?
+        response.status = 400
+        response.body = FHIR::OperationOutcome.new(
+          issue: FHIR::OperationOutcome::Issue.new(
+            severity: 'fatal', code: 'required',
+            details: FHIR::CodeableConcept.new(
+              text: 'The operation_failure_operation_outcome input is required for this test and was not provided.'
+            )
+          )
+        ).to_json
+        return
+      end
+
+      http_status_str = UserInputResponse.read_input(result, 'operation_failure_http_status')
+      http_status = http_status_str.present? ? http_status_str.to_i : 400
+      http_status = 400 unless (400..599).include?(http_status)
+
+      response.status = http_status
+      response.body = user_provided_oo
+    end
+
+    def make_processing_error_response
+      user_provided_bundle = UserInputResponse.user_inputted_response(test, operation, result)
+      unless user_provided_bundle.present?
+        response.status = 400
+        response.body = FHIR::OperationOutcome.new(
+          issue: FHIR::OperationOutcome::Issue.new(
+            severity: 'fatal', code: 'required',
+            details: FHIR::CodeableConcept.new(
+              text: 'The processing_error_response input is required for this test and was not provided.'
+            )
+          )
+        ).to_json
+        return
+      end
+
+      response.status = 200
+      response.body = user_provided_bundle
     end
 
     def operation

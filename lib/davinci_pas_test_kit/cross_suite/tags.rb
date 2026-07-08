@@ -22,6 +22,8 @@ module DaVinciPASTestKit
   REST_HOOK_HANDSHAKE_NOTIFICATION_TAG = 'rest_hook_handshake_notification'
   REST_HOOK_EVENT_NOTIFICATION_TAG = 'rest_hook_event_notification'
   OTHER_AUTH_TAG = 'other_auth'
+  OPERATION_FAILURE_WORKFLOW_TAG = 'pas_operation_failure_workflow'
+  PROCESSING_ERROR_WORKFLOW_TAG = 'pas_processing_error_workflow'
 
   def self.use_case_tag(use_case)
     const_get(:"#{use_case.upcase}_WORKFLOW_TAG")

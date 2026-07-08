@@ -1,6 +1,6 @@
 module DaVinciPASTestKit
   module DaVinciPASV221
-    class PasSubmissionErrorTest < Inferno::Test
+    class PasServerSubmissionErrorTest < Inferno::Test
       id :pas_server_v221_prior_auth_submission_error
       title %(
         Server returns OperationOutcome instance when invoking the $submit operation on the Claim endpoint
