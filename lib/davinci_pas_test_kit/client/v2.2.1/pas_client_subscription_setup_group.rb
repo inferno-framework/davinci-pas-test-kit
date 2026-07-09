@@ -17,7 +17,8 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_subscription_create_test
       test from: :pas_client_subscription_pas_conformance_test,
            config: { options: { ig_version: 'v2.2.1' } }
-      test from: :subscriptions_r4_client_handshake_notification_verification
+      test from: :subscriptions_r4_client_handshake_notification_verification,
+           title: "PAS client responds correctly to Inferno's Subscription handshake"
     end
   end
 end

@@ -7,7 +7,7 @@ module DaVinciPASTestKit
     include PASSubscriptionVerification
 
     id :pas_client_subscription_pas_conformance_test
-    title 'Client Subscription PAS Conformance Verification'
+    title 'PAS client Subscription has the correct structure and content'
     description %(
       This test verifies that the Subscription created by the client under test
       is conformant to PAS requirements on the Subscription, including

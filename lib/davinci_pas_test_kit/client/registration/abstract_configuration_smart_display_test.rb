@@ -1,12 +1,13 @@
 module DaVinciPASTestKit
   class AbstractRegistrationConfigurationSMARTDisplay < Inferno::Test
     id :pas_client_reg_config_smart_display
-    title 'Confirm client configuration'
+    title 'PAS client registers Inferno as a PAS server'
     description %(
       This test provides all the information needed for testers to configure
       the client under test to communicate with Inferno's simulated PAS server
       including SMART endpoints to obtain access tokens.
     )
+    attestation
 
     input :client_id
     output :confirmation_url
