@@ -143,12 +143,13 @@ module DaVinciPASTestKit
       end
     end
 
-    # Selects the first tester-provided response bundle whose selection criteria all match
-    # the incoming request, strips the criteria extensions, and replaces {{fhirpath}} tokens
-    # with values from the request. Returns nil, causing Inferno to generate a default
-    # response, if no response bundles are provided or none match.
+    # Selects the first tester-provided response candidate whose selection criteria all
+    # match the incoming request, extracts its response Bundle (unwrapping it when the
+    # candidate pairs the Bundle with criteria), and replaces {{fhirpath}} tokens with
+    # values from the request. Returns nil, causing Inferno to generate a default
+    # response, if no candidates are provided or none match.
     def select_must_support_response(req_bundle)
-      candidates = UserInputResponse.response_bundles(result, operation)
+      candidates = UserInputResponse.response_candidates(result, operation)
       return if candidates.blank?
 
       operation_url_suffix = "$#{operation}"
@@ -167,8 +168,7 @@ module DaVinciPASTestKit
         "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
         "for #{operation_url_suffix} request ##{request_number}."
       )
-      selected = strip_inferno_extensions(candidates[selected_index])
-      replace_tokens(selected, req_bundle)
+      replace_tokens(entity_bundle(candidates[selected_index]), req_bundle)
     end
 
     # Round-trips the selected bundle through the FHIR model to normalize it after

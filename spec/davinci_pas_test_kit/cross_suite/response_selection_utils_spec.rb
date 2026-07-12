@@ -16,13 +16,10 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
     instance
   end
   let(:request_bundle) { FHIR::Bundle.new(id: 'example-request') }
+  let(:inner_bundle) { { 'resourceType' => 'Bundle', 'id' => 'inner' } }
 
-  def range_extension(range)
-    { 'url' => described_class::REQUEST_RANGE_EXTENSION_URL, 'valueString' => range }
-  end
-
-  def inclusion_extension(expression)
-    { 'url' => described_class::INCLUSION_CRITERIA_EXTENSION_URL, 'valueExpression' => { 'expression' => expression } }
+  def wrapper(criteria = nil)
+    { 'criteria' => criteria, 'bundle' => inner_bundle }.compact
   end
 
   def stub_previous_requests(*requests)
@@ -41,24 +38,36 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
   end
 
   describe '#include_entity?' do
-    it 'includes an entity with no criteria extensions' do
-      expect(utils.include_entity?({ 'resourceType' => 'Bundle' }, request_bundle, '$submit')).to be(true)
+    it 'includes a bare bundle' do
+      expect(utils.include_entity?(inner_bundle, request_bundle, '$submit')).to be(true)
     end
 
-    it 'includes an entity whose request range covers the current request number' do
+    it 'includes a wrapper with no criteria' do
+      expect(utils.include_entity?(wrapper, request_bundle, '$submit')).to be(true)
+    end
+
+    it 'includes a wrapper whose request range covers the current request number' do
       stub_previous_requests
 
-      entity = { 'extension' => [range_extension('1')] }
+      entity = wrapper({ 'requestRange' => '1' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(true)
     end
 
-    it 'excludes an entity whose request range does not cover the current request number' do
+    it 'excludes a wrapper whose request range does not cover the current request number' do
       stub_previous_requests
 
-      entity = { 'extension' => [range_extension('2-3')] }
+      entity = wrapper({ 'requestRange' => '2-3' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(false)
+    end
+
+    it 'accepts a request range given as a number' do
+      stub_previous_requests
+
+      entity = wrapper({ 'requestRange' => 1 })
+
+      expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(true)
     end
 
     it 'counts only previous successful requests to the same operation' do
@@ -68,31 +77,31 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
         previous_request('https://inferno.test/custom/suite/fhir/Claim/$inquire')
       )
 
-      entity = { 'extension' => [range_extension('2')] }
+      entity = wrapper({ 'requestRange' => '2' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(true)
     end
 
-    it 'includes an entity whose inclusion criteria evaluate to true against the request' do
+    it 'includes a wrapper whose fhirpath criteria evaluate to true against the request' do
       stub_fhirpath_service('Bundle.id.exists()', [{ type: 'boolean', element: true }])
 
-      entity = { 'extension' => [inclusion_extension('Bundle.id.exists()')] }
+      entity = wrapper({ 'fhirpath' => 'Bundle.id.exists()' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(true)
     end
 
-    it 'excludes an entity whose inclusion criteria evaluate to false against the request' do
+    it 'excludes a wrapper whose fhirpath criteria evaluate to false against the request' do
       stub_fhirpath_service('Bundle.id.exists()', [{ type: 'boolean', element: false }])
 
-      entity = { 'extension' => [inclusion_extension('Bundle.id.exists()')] }
+      entity = wrapper({ 'fhirpath' => 'Bundle.id.exists()' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(false)
     end
 
-    it 'excludes an entity whose inclusion criteria return no results' do
+    it 'excludes a wrapper whose fhirpath criteria return no results' do
       stub_fhirpath_service('Bundle.wrong', [])
 
-      entity = { 'extension' => [inclusion_extension('Bundle.wrong')] }
+      entity = wrapper({ 'fhirpath' => 'Bundle.wrong' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(false)
     end
@@ -101,18 +110,42 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
       stub_previous_requests
       stub_fhirpath_service('Bundle.id.exists()', [{ type: 'boolean', element: false }])
 
-      entity = { 'extension' => [range_extension('1'), inclusion_extension('Bundle.id.exists()')] }
+      entity = wrapper({ 'requestRange' => '1', 'fhirpath' => 'Bundle.id.exists()' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(false)
     end
 
-    it 'includes an entity when both criteria are met' do
+    it 'includes a wrapper when both criteria are met' do
       stub_previous_requests
       stub_fhirpath_service('Bundle.id.exists()', [{ type: 'boolean', element: true }])
 
-      entity = { 'extension' => [range_extension('1'), inclusion_extension('Bundle.id.exists()')] }
+      entity = wrapper({ 'requestRange' => '1', 'fhirpath' => 'Bundle.id.exists()' })
 
       expect(utils.include_entity?(entity, request_bundle, '$submit')).to be(true)
+    end
+  end
+
+  describe '#entity_bundle' do
+    it 'returns a bare bundle unchanged' do
+      expect(utils.entity_bundle(inner_bundle)).to eq(inner_bundle)
+    end
+
+    it 'returns the inner bundle of a wrapper' do
+      expect(utils.entity_bundle(wrapper({ 'requestRange' => '1' }))).to eq(inner_bundle)
+    end
+  end
+
+  describe '#entity_criteria' do
+    it 'returns no criteria for a bare bundle' do
+      expect(utils.entity_criteria(inner_bundle)).to eq({})
+    end
+
+    it 'returns no criteria for a wrapper without them' do
+      expect(utils.entity_criteria(wrapper)).to eq({})
+    end
+
+    it 'returns the criteria of a wrapper' do
+      expect(utils.entity_criteria(wrapper({ 'requestRange' => '1' }))).to eq({ 'requestRange' => '1' })
     end
   end
 
@@ -131,28 +164,6 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
     it 'raises a TestSuiteImplementationException for an inverted range' do
       expect { utils.ranges_cover_value?(1, '3-2') }
         .to raise_error(Inferno::Exceptions::TestSuiteImplementationException, /Inverted range/)
-    end
-  end
-
-  describe '#strip_inferno_extensions' do
-    it 'removes Inferno selection criteria extensions and keeps others' do
-      other_extension = { 'url' => 'http://example.com/other', 'valueString' => 'keep' }
-      entity = { 'resourceType' => 'Bundle',
-                 'extension' => [range_extension('1'), other_extension, inclusion_extension('Bundle.id.exists()')] }
-
-      expect(utils.strip_inferno_extensions(entity)['extension']).to eq([other_extension])
-    end
-
-    it 'removes the extension element entirely when only Inferno extensions are present' do
-      entity = { 'resourceType' => 'Bundle', 'extension' => [range_extension('1')] }
-
-      expect(utils.strip_inferno_extensions(entity)).to_not have_key('extension')
-    end
-
-    it 'leaves an entity without extensions unchanged' do
-      entity = { 'resourceType' => 'Bundle' }
-
-      expect(utils.strip_inferno_extensions(entity)).to eq({ 'resourceType' => 'Bundle' })
     end
   end
 end

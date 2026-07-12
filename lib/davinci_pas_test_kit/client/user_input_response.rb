@@ -15,22 +15,27 @@ module DaVinciPASTestKit
     end
 
     # Returns the tester-provided response candidates for the must support workflow
-    # as a list of parsed JSON hashes. The input value may be a single JSON bundle
-    # object or a JSON array of bundle objects. Candidates are kept as raw hashes
-    # rather than FHIR model instances so that Inferno selection criteria extensions
-    # at the top level of each bundle, which the FHIR Bundle model does not support,
-    # are preserved for selection.
-    # Returns nil if the input is not present, not parseable, or not object-valued.
-    def self.response_bundles(result, operation)
+    # as a list of parsed JSON hashes. The input value may be a single entry or a
+    # JSON array of entries, where each entry is either a bare FHIR Bundle or a
+    # wrapper object holding the response Bundle under "bundle" alongside optional
+    # selection "criteria".
+    # Returns nil if the input is not present, not parseable, or malformed.
+    def self.response_candidates(result, operation)
       input_name = operation == 'submit' ? 'ms_submit_responses' : 'ms_inquire_responses'
       input_value = JSON.parse(result.input_json)&.find { |i| i['name'] == input_name }&.dig('value')
       return unless input_value.present?
 
-      bundles = JSON.parse(input_value)
-      bundles = [bundles] unless bundles.is_a?(Array)
-      bundles if bundles.all?(Hash)
+      candidates = JSON.parse(input_value)
+      candidates = [candidates] unless candidates.is_a?(Array)
+      candidates if candidates.all? { |candidate| valid_candidate?(candidate) }
     rescue JSON::ParserError
       nil
+    end
+
+    def self.valid_candidate?(candidate)
+      return false unless candidate.is_a?(Hash)
+
+      candidate['resourceType'] == 'Bundle' || candidate['bundle'].is_a?(Hash)
     end
 
     def user_inputted_response?(input_key)
