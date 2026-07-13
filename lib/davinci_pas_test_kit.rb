@@ -1,3 +1,4 @@
+require_relative 'davinci_pas_test_kit/ext/inferno_core/runnable'
 require_relative 'davinci_pas_test_kit/metadata'
 require_relative 'davinci_pas_test_kit/client/v2.0.1/client_suite'
 require_relative 'davinci_pas_test_kit/client/v2.2.1/client_suite'
