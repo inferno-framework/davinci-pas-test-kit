@@ -1,0 +1,25 @@
+require_relative 'pas_client_approval_group'
+require_relative 'pas_client_denial_group'
+require_relative 'pas_client_pended_group'
+require_relative 'pas_client_claim_updates_group'
+require_relative 'pas_client_modification_group'
+
+module DaVinciPASTestKit
+  module DaVinciPASV221
+    class PASClientWorkflowsGroup < Inferno::TestGroup
+      id :pas_client_v221_workflows
+      title 'PAS Workflows'
+      description %(
+        The workflow tests verify that the client can participate in complete end-to-end prior
+        authorization interactions, initiating requests and reacting appropriately to the
+        responses returned.
+      )
+
+      group from: :pas_client_v221_approval_group
+      group from: :pas_client_v221_denial_group
+      group from: :pas_client_v221_pended_group
+      group from: :pas_client_v221_claim_updates_group
+      group from: :pas_client_v221_modification_group
+    end
+  end
+end

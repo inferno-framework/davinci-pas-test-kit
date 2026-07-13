@@ -1,0 +1,43 @@
+<%- profile_test_files.each do |file_name| -%>
+require_relative '<%= file_name %>'
+<%- end -%>
+require_relative '../../<%= ig_version %>/workflows/pas_client_response_attest'
+
+module DaVinciPASTestKit
+  module <%= module_name %>
+    class <%= class_name %> < Inferno::TestGroup
+      id :<%= group_id %>
+      title '<%= title %>'
+      description %(
+        <%= description.gsub("\n", "\n" + " "*8) %>
+      )
+      run_as_group
+
+      <%- profile_tests.each do |profile_test| -%>
+      <%- if profile_test[:optional] -%>
+      test from: :<%= profile_test[:id] %> do
+        optional
+      end
+      <%- else -%>
+      test from: :<%= profile_test[:id] %> do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      <%- end -%>
+      <%- end -%>
+      test from: :pas_client_<%= ig_version_for_id %>_response_attest,
+           title: 'PAS client handled the $<%= operation %> response must support elements',
+           description: %(
+             This test provides the tester an opportunity to verify that their client
+             correctly processed and used the must support elements present in the
+             $<%= operation %> responses received from Inferno during these tests.
+           ),
+           config: { options: {
+             workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+             attest_message: "I attest that the client system correctly processed the must support elements " \
+                             "contained in the $<%= operation %> responses received from Inferno and did not error."
+           } } do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+      end
+    end
+  end
+end

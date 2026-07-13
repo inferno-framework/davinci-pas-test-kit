@@ -1,0 +1,34 @@
+{
+    "resourceType": "Subscription",
+    "id": "pas-subscription-v221-good",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription",
+            "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscription"
+        ]
+    },
+    "status": "requested",
+    "reason": "Prior Authorization Update Notification Subscription",
+    "criteria": "http://hl7.org/fhir/us/davinci-pas/SubscriptionTopic/PASSubscriptionTopic",
+    "_criteria": {
+        "extension": [
+            {
+                "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria",
+                "valueString": "org-identifier=8189991234"
+            }
+        ]
+    },
+    "channel": {
+        "type": "rest-hook",
+        "endpoint": "https://subscriptions.argo.run/fhir/r4/$subscription-hook",
+        "payload": "application/json",
+        "_payload": {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content",
+                    "valueCode": "full-resource"
+                }
+            ]
+        }
+    }
+}

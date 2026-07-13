@@ -1,0 +1,16 @@
+{
+  "resourceType" : "Bundle",
+  "id" : "ReferralAuthorizationBundleExample",
+  "meta" : {
+    "profile" : [
+      "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle"
+    ]
+  },
+  "identifier" : {
+    "system" : "http://example.org/SUBMITTER_TRANSACTION_IDENTIFIER",
+    "value" : "A12345"
+  },
+  "type" : "collection",
+  "timestamp" : "2005-05-02T11:01:00+05:00",
+  "entry" : []
+}

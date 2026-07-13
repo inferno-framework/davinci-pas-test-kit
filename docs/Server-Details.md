@@ -3,6 +3,8 @@
 The Da Vinci PAS Server Suite validates the conformance of server systems 
 to the STU 2 version of the HL7® FHIR® 
 [Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/STU2/).
+There is also an in-progress suite for the [2.2.1 version of the IG](https://hl7.org/fhir/us/davinci-pas/2.2.1/).
+The documentation on this wiki currently covers only the 2.0.1 version of the server suite.
 
 These tests are a **DRAFT** intended to allow PAS server implementers to perform 
 preliminary checks of their servers against PAS IG requirements and [provide 

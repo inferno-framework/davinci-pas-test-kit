@@ -1,4 +1,4 @@
-RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disable RSpec/SpecFilePathFormat
+RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:operation_outcome_success) do
@@ -76,7 +76,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
         notification_verification(notification_bundle_string, 'event-notification',
                                   subscription_id: subscription_url.split('/').last, status:)
         if notification_type == 'full-resource'
-          full_resource_event_notification_verification(notification_bundle_string, 'ClaimResponse')
+          full_resource_event_notification_verification(notification_bundle_string, 'Bundle')
         else
           id_only_event_notification_verification(notification_bundle_string, 'ClaimResponse')
         end
@@ -109,7 +109,7 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
           nil
         )
 
-        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse'
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse|2.0.1'
         returned_bundle = FHIR.from_contents(returned_response_string)
         expect(returned_bundle).to be_a(FHIR::Bundle)
         claim_response = returned_bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
@@ -117,20 +117,60 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
         expect(claim_response.meta&.profile&.find { |profile| profile == claim_response_profile }).to_not be_nil
       end
 
-      it 'indicates claiminquiryresponse for $inquire responses' do
+      it 'indicates claiminquiryresponse for $inquire responses (v2.0.1 default)' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_string),
           'inquire',
           :approval,
           nil
+          # No ig_version = defaults to v2.0.1
         )
 
-        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|2.0.1'
         returned_bundle = FHIR.from_contents(returned_response_string)
         expect(returned_bundle).to be_a(FHIR::Bundle)
         claim_response = returned_bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
         expect(claim_response).to_not be_nil
         expect(claim_response.meta&.profile&.find { |profile| profile == claim_response_profile }).to_not be_nil
+      end
+
+      it 'returns Parameters resource for $inquire responses in v2.2.1' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'inquire',
+          :approval,
+          nil,
+          'v2.2.1'
+        )
+
+        returned_resource = FHIR.from_contents(returned_response_string)
+        expect(returned_resource).to be_a(FHIR::Parameters)
+        expect(returned_resource.parameter.length).to be >= 1
+
+        # Extract the Bundle from Parameters
+        return_param = returned_resource.parameter.find { |p| p.name == 'return' }
+        expect(return_param).to_not be_nil
+        expect(return_param.resource).to be_a(FHIR::Bundle)
+
+        # Verify the Bundle inside has the correct profile
+        bundle = return_param.resource
+        claim_response = bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
+        expect(claim_response).to_not be_nil
+        claim_response_profile = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|2.2.1'
+        expect(claim_response.meta&.profile&.find { |profile| profile == claim_response_profile }).to_not be_nil
+      end
+
+      it 'still returns Bundle for $submit operations in v2.2.1' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :approval,
+          nil,
+          'v2.2.1'
+        )
+
+        returned_bundle = FHIR.from_contents(returned_response_string)
+        expect(returned_bundle).to be_a(FHIR::Bundle)
       end
     end
 
@@ -274,6 +314,44 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
         end
       end
 
+      it 'can use a modification decision' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_multiple_items_string),
+          'submit',
+          :modification,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        expect(response_bundle).to_not be_nil
+        claim_response = response_bundle.entry.find do |entry|
+          entry.resource.is_a?(FHIR::ClaimResponse)
+        end&.resource
+        expect(claim_response).to_not be_nil
+
+        add_item_sequences = Array(claim_response.addItem).flat_map { |add_item| Array(add_item.itemSequence) }
+        expect(add_item_sequences).to_not be_empty
+
+        claim_response.item&.each do |item|
+          expect(item.adjudication).to_not be_nil
+          expect(item.adjudication.length).to be >= 1
+          modified_review_action_code = nil
+          item.adjudication.each do |adjudication|
+            review_action_ext = adjudication.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction' }
+            review_action_code_ext = review_action_ext&.extension&.find { |ext| ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode' }
+            next unless review_action_code_ext.present?
+
+            modified_review_action_code = review_action_code_ext.valueCodeableConcept&.coding&.find do |coding|
+              coding.code == 'A6'
+            end
+            break if modified_review_action_code.present?
+          end
+          expect(modified_review_action_code).to_not be_nil
+          # each modified item is paired with an addItem referencing the same itemSequence
+          expect(add_item_sequences).to include(item.itemSequence)
+        end
+      end
+
       it 'defaults to an approved decision' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_multiple_items_string),
@@ -349,6 +427,50 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
       end
     end
 
+    describe 'and populating outcome' do
+      it 'uses complete for pended decisions in v2.2.1 (queued was removed from the value set)' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :pended,
+          nil,
+          'v2.2.1'
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        expect(claim_response.outcome).to eq('complete')
+      end
+
+      it 'uses queued for pended decisions in v2.0.1' do
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(submit_request_string),
+          'submit',
+          :pended,
+          nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+        expect(claim_response.outcome).to eq('queued')
+      end
+
+      it 'uses complete for approved decisions regardless of version' do
+        %w[v2.0.1 v2.2.1].each do |version|
+          returned_response_string = module_instance.mock_response_bundle(
+            FHIR.from_contents(submit_request_string),
+            'submit',
+            :approval,
+            nil,
+            version
+          )
+          response_bundle = FHIR.from_contents(returned_response_string)
+          claim_response = response_bundle.entry.find { |e| e.resource.is_a?(FHIR::ClaimResponse) }&.resource
+          expect(claim_response.outcome).to eq('complete')
+        end
+      end
+    end
+
     describe 'and including referenced entries' do
       it 'all entries included when using absolute url references' do
         returned_response_string = module_instance.mock_response_bundle(
@@ -405,7 +527,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
       allow(Time).to receive(:now).and_return(time_now)
       returned_response_string = module_instance.update_tester_provided_response(
         submit_response_string,
-        nil
+        nil,
+        'submit'
       )
 
       bundle = FHIR.from_contents(returned_response_string)
@@ -428,7 +551,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
       updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
       returned_response_string = module_instance.update_tester_provided_response(
         bundle_with_claim.to_json,
-        updated_claim_reference
+        updated_claim_reference,
+        'submit'
       )
 
       bundle = FHIR.from_contents(returned_response_string)
@@ -440,7 +564,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
     it 'leaves Claim references alone if no updated reference provided' do
       returned_response_string = module_instance.update_tester_provided_response(
         submit_response_string,
-        nil
+        nil,
+        'submit'
       )
 
       bundle = FHIR.from_contents(returned_response_string)
@@ -453,7 +578,8 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
       updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
       returned_response_string = module_instance.update_tester_provided_response(
         submit_response_missing_elements,
-        updated_claim_reference
+        updated_claim_reference,
+        'submit'
       )
 
       expect(returned_response_string).to eq(submit_response_missing_elements)
@@ -464,10 +590,74 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do # rubocop:disa
       updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
       returned_response_string = module_instance.update_tester_provided_response(
         non_fhir_json_string,
-        updated_claim_reference
+        updated_claim_reference,
+        'submit'
       )
 
       expect(returned_response_string).to eq(non_fhir_json_string)
+    end
+
+    describe 'with v2.2.1 Parameters responses' do
+      let(:parameters_response_string) do
+        # Create a Parameters response with Bundle inside
+        parameters = FHIR::Parameters.new
+        bundle = FHIR.from_contents(submit_response_string)
+        parameters.parameter << FHIR::Parameters::Parameter.new(
+          name: 'return',
+          resource: bundle
+        )
+        parameters.to_json
+      end
+
+      it 'updates timestamps in Bundles within Parameters' do
+        time_now = Time.now
+        allow(Time).to receive(:now).and_return(time_now)
+
+        returned_response_string = module_instance.update_tester_provided_response(
+          parameters_response_string,
+          nil,
+          'v2.2.1',
+          'inquire'
+        )
+
+        parameters = FHIR.from_contents(returned_response_string)
+        expect(parameters).to be_a(FHIR::Parameters)
+
+        bundle = parameters.parameter.find { |p| p.name == 'return' }.resource
+        expect(bundle.timestamp).to eq(time_now.iso8601)
+
+        claim_response = bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
+        expect(claim_response.created).to eq(time_now.iso8601)
+      end
+
+      it 'updates Claim references in Bundles within Parameters' do
+        parameters = FHIR::Parameters.new
+        bundle_with_claim = FHIR.from_contents(submit_response_string)
+        claim_response_with_claim = bundle_with_claim.entry.find do |entry|
+          entry.resource.is_a?(FHIR::ClaimResponse)
+        end.resource
+        old_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
+        claim_response_with_claim.request = FHIR::Reference.new(
+          reference: old_claim_reference
+        )
+        parameters.parameter << FHIR::Parameters::Parameter.new(
+          name: 'return',
+          resource: bundle_with_claim
+        )
+
+        updated_claim_reference = "urn:uuid:#{SecureRandom.uuid}"
+        returned_response_string = module_instance.update_tester_provided_response(
+          parameters.to_json,
+          updated_claim_reference,
+          'v2.2.1',
+          'inquire'
+        )
+
+        returned_parameters = FHIR.from_contents(returned_response_string)
+        bundle = returned_parameters.parameter.find { |p| p.name == 'return' }.resource
+        claim_response = bundle.entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
+        expect(claim_response.request.reference).to eq(updated_claim_reference)
+      end
     end
   end
 

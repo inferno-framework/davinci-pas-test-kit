@@ -1,0 +1,45 @@
+require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
+
+RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
+  let(:suite_id) { 'davinci_pas_client_suite_v201' }
+  let(:random_id) { '1234' }
+  let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{random_id}" }
+  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{random_id}" }
+  let(:approval_attest_test) do
+    Class.new(described_class) do
+      include DaVinciPASTestKit::DaVinciPASV201::URLs
+
+      def suite_id
+        'davinci_pas_client_suite_v201'
+      end
+
+      config(
+        options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
+                   attest_message: 'blah blah' }
+      )
+    end
+  end
+
+  describe 'When asking for an attestation' do
+    it 'passes when responding true' do
+      allow_any_instance_of(approval_attest_test).to receive(:test_session_id).and_return(random_id)
+      result = run(approval_attest_test)
+      expect(result.result).to eq('wait')
+
+      get continue_pass_url
+      result = results_repo.find(result.id)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'passes when responding false' do
+      allow_any_instance_of(approval_attest_test).to receive(:test_session_id).and_return(random_id)
+      result = run(approval_attest_test)
+      expect(result.result).to eq('wait')
+
+      get continue_fail_url
+      result = results_repo.find(result.id)
+      expect(result.result).to eq('fail')
+    end
+  end
+end

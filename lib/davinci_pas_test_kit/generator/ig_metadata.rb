@@ -1,35 +1,10 @@
 module DaVinciPASTestKit
   class Generator
     class IGMetadata
-      attr_accessor :ig_version, :groups, :use_case_groups
+      attr_accessor :ig_version, :profiles, :use_case_groups
 
       def reformatted_version
         @reformatted_version ||= ig_version.delete('.-')
-      end
-
-      def ordered_groups
-        @ordered_groups ||=
-          [patient_group] + non_delayed_groups + delayed_groups
-      end
-
-      def patient_group
-        @patient_group ||=
-          groups.find { |group| group.resource == 'Patient' }
-      end
-
-      def delayed_groups
-        @delayed_groups ||=
-          groups.select(&:delayed?)
-      end
-
-      def non_delayed_groups
-        @non_delayed_groups ||=
-          groups.reject(&:delayed?) - [patient_group]
-      end
-
-      def delayed_profiles
-        @delayed_profiles ||=
-          delayed_groups.map(&:profile_url)
       end
 
       def add_use_case_groups(id, file_name)
@@ -37,29 +12,61 @@ module DaVinciPASTestKit
         @use_case_groups << { id:, file_name: }
       end
 
-      def bundle_groups
-        @bundle_groups ||=
-          groups.select { |group| group.resource == 'Bundle' }
-            .reject { |group| group.profile_name.include?('Base') }
-      end
-
-      def claim_groups
-        @claim_groups ||=
-          groups.select { |group| group.resource == 'Claim' }
-            .reject { |group| group.profile_name.include?('Base') }
-      end
-
-      def postprocess_groups(ig_resources)
-        groups.each do |group|
-          group.add_delayed_references(delayed_profiles, ig_resources)
-        end
-      end
-
       def to_hash
         {
           ig_version:,
-          groups: groups.map(&:to_hash)
+          profiles: profiles.map(&:to_hash)
         }
+      end
+
+      def resources_with_multiple_profiles
+        @resources_with_multiple_profiles ||= fetch_resources_with_multiple_profiles
+      end
+
+      def fetch_resources_with_multiple_profiles
+        metadata = YAML.load_file(File.join(__dir__, '..', 'cross_suite', 'generated', 'v2.0.1', 'metadata.yml'),
+                                  aliases: true)
+        resource_supported_profiles = metadata[:profiles].each_with_object({}) do |profile, dict|
+          dict[profile[:resource]] ||= []
+          dict[profile[:resource]] << profile[:profile_url]
+        end
+
+        resources = []
+        resource_supported_profiles.each do |resource, profile_list|
+          resources << resource.to_s if profile_list.length > 1
+        end
+        resources
+      end
+
+      def resource_has_multiple_profiles?(resource)
+        resources_with_multiple_profiles.include? resource
+      end
+
+      def request_type_for_bundle_or_claim
+        {
+          'PAS Request Bundle' => 'submit_request',
+          'PAS Response Bundle' => 'submit_response',
+          'PAS Inquiry Request Bundle' => 'inquire_request',
+          'PAS Inquiry Response Bundle' => 'inquire_response',
+          'PAS Claim' => 'submit_request',
+          'PAS Claim Response' => 'submit_response',
+          'PAS Claim Inquiry' => 'inquire_request',
+          'PAS Claim Inquiry Response' => 'inquire_response',
+          'PAS Claim Update' => 'update_request'
+        }
+      end
+
+      def snake_case_for_profile(profile_metadata)
+        resource = profile_metadata.resource
+        return resource.underscore unless resource_has_multiple_profiles?(resource)
+
+        profile_metadata.name
+          .delete_prefix('profile_')
+          .underscore
+      end
+
+      def upper_camel_case_for_profile(profile_metadata)
+        snake_case_for_profile(profile_metadata).camelize
       end
     end
   end

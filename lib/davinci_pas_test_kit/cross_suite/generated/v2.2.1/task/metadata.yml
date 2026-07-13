@@ -1,0 +1,237 @@
+---
+:name: profile_task
+:class_name: ProfileTaskSequence
+:version: v2.2.1
+:reformatted_version: v221
+:resource: Task
+:profile_url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-task
+:profile_name: PAS Task
+:profile_version: 2.2.1
+:title: Task
+:short_description: Verify support for the server capabilities required by the PAS
+  Task.
+:interactions: []
+:operations: []
+:required_concepts:
+- code
+- input.valueCodeableConcept
+:must_supports:
+  :extensions:
+  - :id: Task.input:AttachmentsNeeded.extension:paLineNumber
+    :path: input.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
+    :modifier_extension: false
+  - :id: Task.input:AttachmentsNeeded.extension:contentModifier
+    :path: input.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier
+    :modifier_extension: false
+  - :id: Task.input:QuestionnaireContext.extension:paLineNumber
+    :path: input.extension
+    :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
+    :modifier_extension: false
+  :slices:
+  - :slice_id: Task.input:PayerURL
+    :slice_name: PayerURL
+    :path: input
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: payer-url
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
+  - :slice_id: Task.input:AttachmentsNeeded
+    :slice_name: AttachmentsNeeded
+    :path: input
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: attachments-needed
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
+  - :slice_id: Task.input:QuestionnaireContext
+    :slice_name: QuestionnaireContext
+    :path: input
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: questionnaire-context
+      :system: http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes
+  :elements:
+  - :path: identifier
+  - :path: status
+  - :path: statusReason
+  - :path: intent
+  - :path: code
+  - :path: for
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary|2.2.1
+  - :path: requester
+    :types:
+    - Reference
+  - :path: requester.identifier
+  - :path: owner
+    :types:
+    - Reference
+  - :path: owner.identifier
+  - :path: reasonCode.coding.code
+    :fixed_value: priorAuthorization
+  - :path: reasonReference
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.1
+  - :path: restriction.period
+  - :path: input
+  - :path: input:AttachmentsNeeded.type
+  - :path: input:AttachmentsNeeded.value[x]
+  - :path: input:QuestionnaireContext.type
+  - :path: input:QuestionnaireContext.value[x]
+:mandatory_elements:
+- Task.identifier
+- Task.status
+- Task.intent
+- Task.code
+- Task.for
+- Task.requester.identifier
+- Task.owner.identifier
+- Task.reasonCode
+- Task.reasonReference
+- Task.input
+- Task.input.type
+- Task.input.value[x]
+- Task.input.extension
+- Task.output.type
+- Task.output.value[x]
+:bindings:
+- :type: code
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/languages
+  :path: language
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-hrex/ValueSet/hrex-task-status
+  :path: status
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: statusReason
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: businessStatus
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/task-intent
+  :path: intent
+- :type: code
+  :strength: required
+  :system: http://hl7.org/fhir/ValueSet/request-priority
+  :path: priority
+- :type: CodeableConcept
+  :strength: required
+  :system: http://hl7.org/fhir/us/davinci-pas/ValueSet/PASTaskCodes
+  :path: code
+- :type: uri
+  :strength: extensible
+  :system: http://hl7.org/fhir/ValueSet/resource-types
+  :path: requester.type
+- :type: CodeableConcept
+  :strength: preferred
+  :system: http://hl7.org/fhir/ValueSet/performer-role
+  :path: performerType
+- :type: uri
+  :strength: extensible
+  :system: http://hl7.org/fhir/ValueSet/resource-types
+  :path: owner.type
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: reasonCode
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: input.type
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: input.type
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: input.type
+- :type: CodeableConcept
+  :strength: required
+  :system: http://loinc.org/vs/valid-hl7-attachment-requests
+  :path: input.value
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: input.type
+- :type: CodeableConcept
+  :strength: example
+  :system:
+  :path: output.type
+:references:
+- :path: Task.basedOn
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Resource|4.0.1
+- :path: Task.partOf
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Task|4.0.1
+- :path: Task.focus
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Resource|4.0.1
+- :path: Task.for
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary|2.2.1
+- :path: Task.encounter
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Encounter|4.0.1
+- :path: Task.requester
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Device|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Organization|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Patient|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/RelatedPerson|4.0.1
+- :path: Task.owner
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Organization|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/CareTeam|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/HealthcareService|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Patient|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Device|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/RelatedPerson|4.0.1
+- :path: Task.location
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Location|4.0.1
+- :path: Task.reasonReference
+  :profiles:
+  - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.1
+- :path: Task.insurance
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Coverage|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/ClaimResponse|4.0.1
+- :path: Task.relevantHistory
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Provenance|4.0.1
+- :path: Task.restriction.recipient
+  :profiles:
+  - http://hl7.org/fhir/StructureDefinition/Patient|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/PractitionerRole|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/RelatedPerson|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Group|4.0.1
+  - http://hl7.org/fhir/StructureDefinition/Organization|4.0.1
+:tests:
+- :id: pas_server_v221_submit_response_must_support_task
+  :file_name: server_submit_response_must_support_task_test.rb
+- :id: pas_client_v221_submit_response_must_support_task
+  :file_name: client_submit_response_must_support_task_test.rb
+- :id: pas_server_v221_inquire_response_must_support_task
+  :file_name: server_inquire_response_must_support_task_test.rb
+- :id: pas_client_v221_inquire_response_must_support_task
+  :file_name: client_inquire_response_must_support_task_test.rb

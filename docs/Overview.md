@@ -4,7 +4,11 @@ This document provides a high-level overview of the Da Vinci Prior Authorization
 
 ## Purpose
 
-The Da Vinci PAS Test Kit is designed to validate the conformance of healthcare IT systems against [version 2.0.1 of the HL7 FHIR Da Vinci Prior Authorization Support (PAS) Implementation Guide (IG)](https://hl7.org/fhir/us/davinci-pas/STU2/). It helps implementers ensure their systems can correctly participate in electronic prior authorization workflows as defined by the PAS IG.
+The Da Vinci PAS Test Kit is designed to validate the conformance of healthcare IT systems against
+the HL7 FHIR Da Vinci Prior Authorization Support (PAS) Implementation Guide (IG) and includes suites
+for both [v2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/) and [v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/)
+of the specification. It helps implementers ensure their systems can correctly participate in electronic
+prior authorization workflows as defined by the PAS IG.
 
 The test kit is built using the [Inferno Framework](https://inferno-framework.github.io/), an open-source platform for building FHIR-based test kits.
 
@@ -47,21 +51,19 @@ authentication flows like SMART Backend Services and UDAP B2B.
 
 Several areas are generally considered out of scope for automated testing. This
 includes the proprietary details of X12 transactions, such as X12-based
-terminology validation, the semantic meaning of X12 codes, and X12-based
-matching logic. Additional workflows and features not currently covered include
-Prior Authorization Updates (`Claim/$update`), comprehensive handling of
-Requests for Additional Information (RFAI), processing of various attachment
-types (PDF, CDA, JPG), full US Core Profile support, and advanced subscription
-details beyond basic mechanics.
+terminology validation and X12-based
+matching logic. Additionally, not all workflows and requirements are covered
+by all suites in this test kit.
 
 For a details on specific specific limitations, detailed requirements, and known
-issues, please consult the following resources: the [Client Testing
-Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#testing-limitations),
-the [Server Testing
-Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details#testing-limitations),
-the [PAS Requirements Spreadsheet](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx),
-and the project's [GitHub Issues
-page](https://github.com/inferno-framework/davinci-pas-test-kit/issues).
+issues, please consult the following resources: 
+- [Client Testing Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#testing-limitations)
+- [Server Testing Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details#testing-limitations)
+- Relevant [requirements](https://inferno-framework.github.io/docs/advanced-test-features/requirements.html)
+  including those in the PAS Requirements Spreadsheets
+   - [v2.0.1](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx)
+   - [v2.2.1](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.2.1_requirements.xlsx)
+- [PAS Test Kit GitHub Issues page](https://github.com/inferno-framework/davinci-pas-test-kit/issues).
 
 ## Conformance Criteria & Interpreting Results
 
@@ -71,8 +73,10 @@ A test run is considered successful if all mandatory tests pass:
 * **Warnings**: Highlight potential concerns that require manual review
 * **Skipped Tests**: Occur when prerequisites are not met
 
-Given the known limitations, especially regarding X12, passing all automated tests does **not** solely constitute full PAS IG conformance. Systems should also meet requirements verified through attestation or other means.
+Given the known limitations, especially regarding X12, passing all automated tests does **not**
+solely constitute full PAS IG conformance.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
-* [Client Walkthrough](Client-Walkthrough.md)
-* [Server Walkthrough](Server-Walkthrough.md)
+* [Client v2.0.1 Instructions](Client-Instructions-v2.0.1.md)
+* [Client v2.2.1 Instructions](Client-Instructions-v2.2.1.md)
+* [Server v2.0.1 Instructions](Server-Instructions-v2.0.1.md)
