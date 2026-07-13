@@ -23,7 +23,7 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
     it 'skips if no bundles to submit provided' do
       result = run(test, server_endpoint:)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No bundle request provided/)
+      expect(result.result_message).to include('No bundle request provided')
     end
 
     it 'fails if provided bundle is invalid json' do
@@ -58,7 +58,7 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
 
       result = run(test, pa_inquire_request_payload:, server_endpoint:)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Unexpected response status/)
+      expect(result.result_message).to include('Unexpected response status')
       requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::INQUIRE_TAG,
                                                                         DaVinciPASTestKit::PENDED_WORKFLOW_TAG])
       expect(requests.size).to eq(1)
@@ -73,7 +73,7 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
 
       result = run(test, pa_inquire_request_payload:, server_endpoint:)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Unexpected resource type/)
+      expect(result.result_message).to include('Unexpected resource type')
       requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::INQUIRE_TAG,
                                                                         DaVinciPASTestKit::PENDED_WORKFLOW_TAG])
       expect(requests.size).to eq(1)

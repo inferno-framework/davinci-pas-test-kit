@@ -5,12 +5,11 @@ require 'json'
 # checks (spec-65..72) implemented by the Client Suite verification tests. This keeps the example
 # data (used by the loopback "Run Against the PAS Client Suite" preset) conformant over time.
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :runnable do
-  preset_path = File.expand_path(
-    '../../../config/presets/pas_server_v221_run_against_pas_client.json.erb', __dir__
-  )
-
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
+  let(:preset_path) do
+    File.expand_path('../../../config/presets/pas_server_v221_run_against_pas_client.json.erb', __dir__)
+  end
   let(:preset_inputs) do
     raw = File.read(preset_path)
     JSON.parse(raw.gsub(/<%=?.*?%>/m, 'PLACEHOLDER'))['inputs']

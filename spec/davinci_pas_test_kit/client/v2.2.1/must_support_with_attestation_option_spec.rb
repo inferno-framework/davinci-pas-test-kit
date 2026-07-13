@@ -218,7 +218,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       result = run(require_one_of_test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/must include at least one/)
+      expect(result.result_message).to include('must include at least one')
     end
   end
 
@@ -229,7 +229,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       result = run(coverage_test)
       expect(result.result).to eq('wait')
-      expect(result.result_message).to match(/no Coverage instances were observed/)
+      expect(result.result_message).to include('no Coverage instances were observed')
     end
   end
 
@@ -240,7 +240,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       # Present -> not a hard fail; missing elements -> not a pass, so it must wait for attestation.
       result = run(require_one_of_test)
       expect(result.result).to eq('wait')
-      expect(result.result_message).to match(/PAS Device Request/)
+      expect(result.result_message).to include('PAS Device Request')
     end
   end
 
@@ -253,10 +253,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(result.result).to eq('wait')
 
       message = result.result_message
-      expect(message).to match(/PAS Service Request/)     # present -> assessed
-      expect(message).to_not match(/PAS Device Request/)  # absent -> skipped (not flagged)
-      expect(message).to_not match(/PAS Medication Request/)
-      expect(message).to_not match(/PAS Nutrition Order/)
+      expect(message).to include('PAS Service Request')     # present -> assessed
+      expect(message).to_not include('PAS Device Request')  # absent -> skipped (not flagged)
+      expect(message).to_not include('PAS Medication Request')
+      expect(message).to_not include('PAS Nutrition Order')
     end
   end
 
@@ -268,8 +268,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(result.result).to eq('wait')
 
       message = result.result_message
-      expect(message).to match(/PAS Insurer Organization/)
-      expect(message).to match(/PAS Requestor Organization/)
+      expect(message).to include('PAS Insurer Organization')
+      expect(message).to include('PAS Requestor Organization')
     end
   end
 
@@ -282,13 +282,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
     it 'fails a require_one_of: false test with a "no requests received" message' do
       result = run(coverage_test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/No submit requests received/)
+      expect(result.result_message).to include('No submit requests received')
     end
 
     it 'uses the operation in the message for an $inquire test' do
       result = run(inquire_coverage_test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/No inquire requests received/)
+      expect(result.result_message).to include('No inquire requests received')
     end
   end
 
@@ -318,7 +318,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(description).to include('### PAS Coverage')
       expect(description).to match(/^\* Coverage\./) # at least one must support element listed
       expect(description).to include('PAS client systems are required') # other-profiles intro
-      expect(description).to match(/testers can attest that they are not supported/) # attestation option
+      expect(description).to include('testers can attest that they are not supported') # attestation option
     end
 
     it 'uses the "at least one" intro when require_one_of is true' do
@@ -328,9 +328,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       }
 
       description = described_class.build_description(options)
-      expect(description).to match(/must support at least one of them/)
-      expect(description).to match(/as long as that data is collected within/)
-      expect(description).to match(/testers can attest that they are not supported/) # attestation option
+      expect(description).to include('must support at least one of them')
+      expect(description).to include('as long as that data is collected within')
+      expect(description).to include('testers can attest that they are not supported') # attestation option
       expect(description).to include('### PAS Device Request')
     end
   end
@@ -344,7 +344,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       expect(test).to_not be_nil
       expect(test.description).to include('### PAS Device Request')
-      expect(test.description).to match(/\* DeviceRequest\./)
+      expect(test.description).to include('* DeviceRequest.')
     end
   end
 end

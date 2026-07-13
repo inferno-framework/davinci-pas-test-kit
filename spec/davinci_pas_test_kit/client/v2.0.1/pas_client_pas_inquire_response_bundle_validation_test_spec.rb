@@ -107,7 +107,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
         result = run(approval_test, inputs)
 
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/Invalid response generated from the submitted claim:/)
+        expect(result.result_message).to include('Invalid response generated from the submitted claim:')
       end
 
       it 'indicates the response came from the user when user input provided' do
@@ -119,7 +119,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
         result = run(approval_test, inputs)
 
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/Invalid response generated from provided input/)
+        expect(result.result_message).to include('Invalid response generated from provided input')
       end
     end
   end

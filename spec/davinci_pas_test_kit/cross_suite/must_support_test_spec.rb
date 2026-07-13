@@ -76,7 +76,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/Could not find/)
+      expect(result.result_message).to include('Could not find')
     end
   end
 
@@ -108,7 +108,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Could not find/)
+      expect(result.result_message).to include('Could not find')
     end
   end
 
@@ -140,7 +140,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/Could not find/)
+      expect(result.result_message).to include('Could not find')
     end
   end
 
@@ -172,7 +172,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Could not find/)
+      expect(result.result_message).to include('Could not find')
     end
   end
 
@@ -318,7 +318,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     it 'skips if no resources of a given type were returned in previous tests' do
       result = run(test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No Patient resources were found/)
+      expect(result.result_message).to include('No Patient resources were found')
     end
 
     it 'pulls tagged requests from multiple workflows' do

@@ -90,7 +90,7 @@ RSpec.describe DaVinciPASTestKit::AbstractDenialSubmitTest, :request do
         result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
         expect(result_messages.length).to be(1)
         expect(result_messages[0].type).to eq('info')
-        expect(result_messages[0].message).to match(/No denied response provided/)
+        expect(result_messages[0].message).to include('No denied response provided')
       end
     end
 
@@ -117,7 +117,7 @@ RSpec.describe DaVinciPASTestKit::AbstractDenialSubmitTest, :request do
         inputs = { session_url_path:, denial_json_response: 'not json' }
         result = run(test, inputs)
         expect(result.result).to eq('fail')
-        expect(result.result_message).to match(/must be valid JSON/)
+        expect(result.result_message).to include('must be valid JSON')
       end
     end
   end

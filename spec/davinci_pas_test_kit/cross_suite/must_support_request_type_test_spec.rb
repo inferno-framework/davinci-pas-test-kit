@@ -79,7 +79,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportRequestTypeTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Could not find/)
+      expect(result.result_message).to include('Could not find')
     end
   end
 
@@ -89,11 +89,11 @@ RSpec.describe DaVinciPASTestKit::MustSupportRequestTypeTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Could not find/)
-      expect(result.result_message).to match(/provided DeviceRequest/)
-      expect(result.result_message).to match(/provided MedicationRequest/)
-      expect(result.result_message).to match(/provided NutritionOrder/)
-      expect(result.result_message).to match(/provided ServiceRequest/)
+      expect(result.result_message).to include('Could not find')
+      expect(result.result_message).to include('provided DeviceRequest')
+      expect(result.result_message).to include('provided MedicationRequest')
+      expect(result.result_message).to include('provided NutritionOrder')
+      expect(result.result_message).to include('provided ServiceRequest')
     end
 
     it 'does not indicate problems for request types with no missing must supports' do
@@ -102,11 +102,11 @@ RSpec.describe DaVinciPASTestKit::MustSupportRequestTypeTest, :runnable do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Could not find/)
-      expect(result.result_message).to_not match(/provided DeviceRequest/)
-      expect(result.result_message).to match(/provided MedicationRequest/)
-      expect(result.result_message).to match(/provided NutritionOrder/)
-      expect(result.result_message).to match(/provided ServiceRequest/)
+      expect(result.result_message).to include('Could not find')
+      expect(result.result_message).to_not include('provided DeviceRequest')
+      expect(result.result_message).to include('provided MedicationRequest')
+      expect(result.result_message).to include('provided NutritionOrder')
+      expect(result.result_message).to include('provided ServiceRequest')
     end
   end
 end

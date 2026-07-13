@@ -44,7 +44,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/no Subscription/)
+      expect(result.result_message).to include('no Subscription')
     end
 
     it 'continues after a resume request' do
@@ -172,7 +172,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           inputs = { session_url_path:, pended_json_response: 'not json' }
           result = run(test, inputs)
           expect(result.result).to eq('fail')
-          expect(result.result_message).to match(/must be valid JSON/)
+          expect(result.result_message).to include('must be valid JSON')
         end
       end
     end
@@ -282,7 +282,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           inputs = { session_url_path:, inquire_json_response: 'not json' }
           result = run(test, inputs)
           expect(result.result).to eq('fail')
-          expect(result.result_message).to match(/must be valid JSON/)
+          expect(result.result_message).to include('must be valid JSON')
         end
       end
     end
@@ -362,7 +362,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           inputs = { session_url_path:, notification_bundle: 'not json' }
           result = run(test, inputs)
           expect(result.result).to eq('fail')
-          expect(result.result_message).to match(/must be valid JSON/)
+          expect(result.result_message).to include('must be valid JSON')
         end
       end
     end

@@ -93,7 +93,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       grandparent_urn = 'urn:uuid:11111111-1111-4111-8111-111111111111'
       parent_urn = 'urn:uuid:22222222-2222-4222-8222-222222222222'
       update_urn = 'urn:uuid:33333333-3333-4333-8333-333333333333'
-      missing_urn = 'urn:uuid:99999999-9999-4999-8999-999999999999'
+      let(:missing_urn) { 'urn:uuid:99999999-9999-4999-8999-999999999999' }
 
       # An Update Claim (primary) that references its parent Claim, which is itself an update that in turn
       # references the grandparent. Per spec-65/66 the grandparent is deliberately omitted from the Bundle.

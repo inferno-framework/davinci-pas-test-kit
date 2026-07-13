@@ -32,6 +32,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasServerSubmissionErrorTest d
 
     result = run(test, server_endpoint:)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/HTTP status code should not be within the 2xx range/)
+    expect(result.result_message).to include('HTTP status code should not be within the 2xx range')
   end
 end

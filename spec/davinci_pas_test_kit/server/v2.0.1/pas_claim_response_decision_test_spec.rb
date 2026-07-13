@@ -37,7 +37,7 @@ RSpec.describe DaVinciPASTestKit::PasClaimResponseDecisionTest, :runnable do
   it 'skips if no requests made' do
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No Bundles to check/)
+    expect(result.result_message).to include('No Bundles to check')
   end
 
   it 'fails if no requests made for the right workflow' do
@@ -45,7 +45,7 @@ RSpec.describe DaVinciPASTestKit::PasClaimResponseDecisionTest, :runnable do
                           [DaVinciPASTestKit::PENDED_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No Bundles to check/)
+    expect(result.result_message).to include('No Bundles to check')
   end
 
   it 'fails if no responses are FHIR Bundles' do
@@ -55,7 +55,7 @@ RSpec.describe DaVinciPASTestKit::PasClaimResponseDecisionTest, :runnable do
     create_submit_request(FHIR::Patient.new.to_json, tags)
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No Bundles to check/)
+    expect(result.result_message).to include('No Bundles to check')
   end
 
   it 'passes when valid Bundles were returned' do

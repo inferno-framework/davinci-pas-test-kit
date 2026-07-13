@@ -5,16 +5,15 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
+  let(:info_changed_url) { 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged' }
+  let(:info_cancelled_url) { 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/modifierextension-infoCancelled' }
+  let(:initial_urn) { 'urn:uuid:11111111-1111-4111-8111-111111111111' }
+  let(:add_item_urn) { 'urn:uuid:22222222-2222-4222-8222-222222222222' }
+  let(:modify_cancel_urn) { 'urn:uuid:33333333-3333-4333-8333-333333333333' }
+  let(:cancel_all_urn) { 'urn:uuid:44444444-4444-4444-8444-444444444444' }
 
   cert_url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType'
-  info_changed_url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged'
-  info_cancelled_url = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/modifierextension-infoCancelled'
   x12_system = 'https://codesystem.x12.org/005010/1322'
-
-  urn1 = 'urn:uuid:11111111-1111-4111-8111-111111111111'
-  urn2 = 'urn:uuid:22222222-2222-4222-8222-222222222222'
-  urn3 = 'urn:uuid:33333333-3333-4333-8333-333333333333'
-  urn4 = 'urn:uuid:44444444-4444-4444-8444-444444444444'
 
   define_method(:cancel_extension) do
     { url: cert_url, valueCodeableConcept: { coding: [{ system: x12_system, code: '3' }] } }
@@ -64,23 +63,24 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
   # Conformant reusable Claim resources.
   define_method(:claim1) { build_claim('claim-1', items: [build_item(1)]) }
   define_method(:claim2) do
-    build_claim('claim-2', related_ref: urn1, items: [build_item(1), build_item(2, info_changed: 'added')])
+    build_claim('claim-2', related_ref: initial_urn, items: [build_item(1), build_item(2, info_changed: 'added')])
   end
   define_method(:claim3) do
-    build_claim('claim-3', related_ref: urn2,
+    build_claim('claim-3', related_ref: add_item_urn,
                            items: [build_item(1, info_changed: 'changed', serviced: '2026-02-02'),
                                    build_item(2, cancel: true, info_changed: 'changed')])
   end
-  define_method(:claim4) { build_claim('claim-4', related_ref: urn3, cancel_all: true) }
+  define_method(:claim4) { build_claim('claim-4', related_ref: modify_cancel_urn, cancel_all: true) }
 
   # Seeds a fully conformant initial submission + three updates.
   define_method(:seed_conformant_sequence) do
-    seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(urn1, claim1)))
-    seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+    seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(initial_urn, claim1)))
+    seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
+                 bundle_json(entry(add_item_urn, claim2), entry(initial_urn, claim1)))
     seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                 bundle_json(entry(urn3, claim3), entry(urn2, claim2)))
+                 bundle_json(entry(modify_cancel_urn, claim3), entry(add_item_urn, claim2)))
     seed_request(DaVinciPASTestKit::CLAIM_UPDATE_CANCEL_ALL_TAG,
-                 bundle_json(entry(urn4, claim4), entry(urn3, claim3)))
+                 bundle_json(entry(cancel_all_urn, claim4), entry(modify_cancel_urn, claim3)))
   end
 
   describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateReferencedClaimTest do # spec-65
@@ -94,21 +94,22 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     end
 
     it 'fails when the referenced Claim is not included in the Bundle' do
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(add_item_urn, claim2)))
       result = run(described_class)
       expect(result.result).to eq('fail')
     end
 
     it 'fails when an update has no Claim.related.claim' do
       no_related = build_claim('claim-2', items: [build_item(1)])
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, no_related)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(add_item_urn, no_related)))
       expect(run(described_class).result).to eq('fail')
     end
   end
 
   describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateGrandparentExcludedTest do # spec-66
     it 'skips when no update references another update' do
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
+                   bundle_json(entry(add_item_urn, claim2), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('skip')
     end
 
@@ -120,7 +121,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     it 'fails when the grandparent Claim is included' do
       # claim3 references claim2 (itself an update referencing claim1); including claim1 violates spec-66.
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                   bundle_json(entry(urn3, claim3), entry(urn2, claim2), entry(urn1, claim1)))
+                   bundle_json(entry(modify_cancel_urn, claim3), entry(add_item_urn, claim2),
+                               entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('fail')
     end
   end
@@ -132,10 +134,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     end
 
     it 'fails when a referenced resource (other than the related Claim) is missing' do
-      claim_missing_provider = build_claim('claim-2', related_ref: urn1, items: [build_item(1)],
+      claim_missing_provider = build_claim('claim-2', related_ref: initial_urn, items: [build_item(1)],
                                                       provider_ref: 'urn:uuid:99999999-9999-4999-8999-999999999999')
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
-                   bundle_json(entry(urn2, claim_missing_provider), entry(urn1, claim1)))
+                   bundle_json(entry(add_item_urn, claim_missing_provider), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('fail')
     end
 
@@ -143,7 +145,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
       # The modify-and-cancel bundle includes claim2 (an update referencing absent claim1); spec-67
       # must not treat that omission as a missing referenced resource.
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                   bundle_json(entry(urn3, claim3), entry(urn2, claim2)))
+                   bundle_json(entry(modify_cancel_urn, claim3), entry(add_item_urn, claim2)))
       expect(run(described_class).result).to eq('pass')
     end
   end
@@ -155,18 +157,20 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     end
 
     it 'fails when a prior item sequence is dropped' do
-      claim3_missing_item1 = build_claim('claim-3', related_ref: urn2,
+      claim3_missing_item1 = build_claim('claim-3', related_ref: add_item_urn,
                                                     items: [build_item(2, cancel: true, info_changed: 'changed')])
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
+                   bundle_json(entry(add_item_urn, claim2), entry(initial_urn, claim1)))
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                   bundle_json(entry(urn3, claim3_missing_item1), entry(urn2, claim2)))
+                   bundle_json(entry(modify_cancel_urn, claim3_missing_item1), entry(add_item_urn, claim2)))
       expect(run(described_class).result).to eq('fail')
     end
   end
 
   describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateCancelledEntriesTest do # spec-69
     it 'skips when no entries are canceled' do
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
+                   bundle_json(entry(add_item_urn, claim2), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('skip')
     end
 
@@ -178,10 +182,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     it 'fails when a canceled item is missing the infoCancelled modifier extension' do
       # certificationType Cancel present but no infoCancelled modifier extension.
       cancelled_item = build_item(2, info_changed: 'changed', certification_only: true)
-      claim3_bad = build_claim('claim-3', related_ref: urn2,
+      claim3_bad = build_claim('claim-3', related_ref: add_item_urn,
                                           items: [build_item(1, info_changed: 'changed'), cancelled_item])
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                   bundle_json(entry(urn3, claim3_bad), entry(urn2, claim2)))
+                   bundle_json(entry(modify_cancel_urn, claim3_bad), entry(add_item_urn, claim2)))
       expect(run(described_class).result).to eq('fail')
     end
   end
@@ -196,10 +200,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
       cancelled_no_cert = { sequence: 2, productOrService: { text: 'service-2' },
                             extension: [{ url: info_changed_url, valueCode: 'changed' }],
                             modifierExtension: [{ url: info_cancelled_url, valueBoolean: true }] }
-      claim3_bad = build_claim('claim-3', related_ref: urn2,
+      claim3_bad = build_claim('claim-3', related_ref: add_item_urn,
                                           items: [build_item(1, info_changed: 'changed'), cancelled_no_cert])
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                   bundle_json(entry(urn3, claim3_bad), entry(urn2, claim2)))
+                   bundle_json(entry(modify_cancel_urn, claim3_bad), entry(add_item_urn, claim2)))
       expect(run(described_class).result).to eq('fail')
     end
   end
@@ -211,45 +215,47 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     end
 
     it 'fails when an added item is not marked with infoChanged' do
-      claim2_unmarked = build_claim('claim-2', related_ref: urn1, items: [build_item(1), build_item(2)])
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(urn1, claim1)))
+      claim2_unmarked = build_claim('claim-2', related_ref: initial_urn, items: [build_item(1), build_item(2)])
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(initial_urn, claim1)))
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
-                   bundle_json(entry(urn2, claim2_unmarked), entry(urn1, claim1)))
+                   bundle_json(entry(add_item_urn, claim2_unmarked), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('fail')
     end
 
     it 'fails when a modified item is not marked with infoChanged' do
-      claim3_unmarked = build_claim('claim-3', related_ref: urn2,
+      claim3_unmarked = build_claim('claim-3', related_ref: add_item_urn,
                                                items: [build_item(1, serviced: '2026-02-02'),
                                                        build_item(2, cancel: true, info_changed: 'changed')])
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
+                   bundle_json(entry(add_item_urn, claim2), entry(initial_urn, claim1)))
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_MODIFY_CANCEL_TAG,
-                   bundle_json(entry(urn3, claim3_unmarked), entry(urn2, claim2)))
+                   bundle_json(entry(modify_cancel_urn, claim3_unmarked), entry(add_item_urn, claim2)))
       expect(run(described_class).result).to eq('fail')
     end
 
     it 'fails when an added entry uses valueCode changed instead of added' do
-      claim2_wrong_code = build_claim('claim-2', related_ref: urn1,
+      claim2_wrong_code = build_claim('claim-2', related_ref: initial_urn,
                                                  items: [build_item(1), build_item(2, info_changed: 'changed')])
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(initial_urn, claim1)))
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
-                   bundle_json(entry(urn2, claim2_wrong_code), entry(urn1, claim1)))
+                   bundle_json(entry(add_item_urn, claim2_wrong_code), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('fail')
     end
 
     it 'fails when an infoChanged valueCode is not in the value set' do
-      claim2_bad_code = build_claim('claim-2', related_ref: urn1,
+      claim2_bad_code = build_claim('claim-2', related_ref: initial_urn,
                                                items: [build_item(1), build_item(2, info_changed: 'bogus')])
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG, bundle_json(entry(initial_urn, claim1)))
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
-                   bundle_json(entry(urn2, claim2_bad_code), entry(urn1, claim1)))
+                   bundle_json(entry(add_item_urn, claim2_bad_code), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('fail')
     end
   end
 
   describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateCancelRequestTest do # cancel entire request
     it 'skips when no cancel-entire-request update was received' do
-      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG, bundle_json(entry(urn2, claim2), entry(urn1, claim1)))
+      seed_request(DaVinciPASTestKit::CLAIM_UPDATE_ADD_ITEM_TAG,
+                   bundle_json(entry(add_item_urn, claim2), entry(initial_urn, claim1)))
       expect(run(described_class).result).to eq('skip')
     end
 
@@ -259,9 +265,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ClaimUpdateValidationUtils, :r
     end
 
     it 'fails when the cancel-entire-request update lacks the certificationType Cancel extension' do
-      claim4_no_cert = build_claim('claim-4', related_ref: urn3)
+      claim4_no_cert = build_claim('claim-4', related_ref: modify_cancel_urn)
       seed_request(DaVinciPASTestKit::CLAIM_UPDATE_CANCEL_ALL_TAG,
-                   bundle_json(entry(urn4, claim4_no_cert), entry(urn3, claim3)))
+                   bundle_json(entry(cancel_all_urn, claim4_no_cert), entry(modify_cancel_urn, claim3)))
       expect(run(described_class).result).to eq('fail')
     end
   end

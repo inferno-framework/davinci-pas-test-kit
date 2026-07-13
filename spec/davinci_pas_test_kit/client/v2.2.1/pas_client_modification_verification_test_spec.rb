@@ -96,14 +96,14 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientModificationVerificat
     create_submit_response(approval_only_response, modification_tags)
     result = run(described_class)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/A6/)
+    expect(error_messages(result)).to include('A6')
   end
 
   it 'fails when a modified item has no matching addItem' do
     create_submit_response(modification_without_add_item_response, modification_tags)
     result = run(described_class)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/addItem/)
+    expect(error_messages(result)).to include('addItem')
   end
 
   def error_messages(result)
