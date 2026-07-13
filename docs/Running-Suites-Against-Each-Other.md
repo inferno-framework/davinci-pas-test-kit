@@ -77,7 +77,7 @@ dedicated hostname.
 ## Basic Execution (v2.2.1)
 
 Note that some client groups are not included in this execution. Additionally, the v2.2.1 server suite is a work
-in progress, so 
+in progress, so some tests do not fully align yet.
 
 1.  **Setup the Client Test Session**:
     *   Open your Inferno instance and select "Da Vinci Prior Authorization Support (PAS) v2.2.1" test kit.

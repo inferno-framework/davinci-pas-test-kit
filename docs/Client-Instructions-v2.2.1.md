@@ -26,7 +26,7 @@ In order to pass all tests in the suite, a PAS client implementation must
 Additionally, because the [mocked responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic)
 created by Inferno's simulation do not demonstrate all of the PAS must support elements defined
 on the ClaimResponse profiles, testers will need to provide some custom responses that demonstrate all
-of those elements. See the [Response and Notification Content](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#response-and-notification-content)
+of those elements. See the [Response and Notification Content](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#response-and-notification-content)
 section for details on specifying custom responses.
 
 ## Quick Start
@@ -80,7 +80,7 @@ generate a [mocked pended response and a notification with the rendered decision
 During the "Must Support Elements" group, the client will submit multiple $submit and $inquire requests
 to demonstrate all required must support elements, including on both the requests and response.
 These tests can be run without providing custom responses, but because Inferno's mocked responses
-will not populate all ClaimResponse must support elements, [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#response-and-notification-content)
+will not populate all ClaimResponse must support elements, [custom responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#response-and-notification-content)
 will be needed to pass the group.
 
 ### Testing Error Responses

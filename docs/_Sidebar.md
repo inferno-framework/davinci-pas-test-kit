@@ -6,13 +6,12 @@
 
 **Client Suite**
 *   [Client Testing Details](Client-Details)
-*   [Client v2.0.1 Testing Walkthrough](Client-Instructions)
+*   [Client v2.0.1 Testing Walkthrough](Client-Instructions-v2.0.1)
 *   [Client v2.2.1 Testing Instructions](Client-Instructions-v2.2.1)
 
 **Server Suite**
 *   [Server Testing Details](Server-Details)
-*   [Server v2.0.1 Testing Instructions](Server-Instructions)
-*   [Server v2.2.1 Testing Instructions](Server-Instructions-v2.2.1)
+*   [Server v2.0.1 Testing Instructions](Server-Instructions-v2.0.1)
 
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)
