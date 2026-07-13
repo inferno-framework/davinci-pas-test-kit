@@ -166,6 +166,11 @@ The following test inputs control Inferno messaging behavior:
 - **Inquire approved response JSON**: If populated, this used in the "Pended Workflow"
   group to respond to `$inquire` requests. The response needs to indicate to the system that the
   prior auth request has been approved.
+- **Must Support $submit Response Bundles** and **Must Support $inquire Response Bundles**: Used for
+  tester specification of responses during the must support tests. Unlike other tests, the client may
+  send multiple requests. The tester can specify a list of responses along with criteria for when to
+  use each entry, including both a request range and FHIRPath criteria executed on the request body.
+  See the input descriptions for additional details. 
 
 ### Generation Logic
 
