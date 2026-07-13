@@ -119,7 +119,37 @@ not been updated for the 2.2.1 version of the PAS IG so many failures are expect
 execution. However, it can give you a sense for what executing the Inferno tests against a 
 client system will look like.
 
-TODO
+1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "Other Authentication"
+   option for the Client Security Type suite option.
+2. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
+   click the "Submit" button to start the tests.
+3. When "User Action Required" dialog appears asking for an attestation, click a link to attest.
+4. When a new "User Action Required" dialog appears asking for confirmation that the client is setup
+   to hit Inferno's PAS FHIR server, copy the FHIR base URL provided for later use and confirm configuration.
+5. In a new browser tab, navigate to `https://crd-request-generator.davinci.hl7.org/`.
+6. If needed because you've used this tool before and reconfigured it, reset to the default configuration
+   using the gear button in the upper right and then clicking the "Reset to Defaults" button.
+7. Select a patient and an order by
+   - Clicking on the "Patient Select" button.
+   - Choosing an entry from the first patient's "Request" dropdown (e.g. (E0250) Hospital bed fixed height with any type of side rails, mattress).
+   - Clicking on the "Patient Information" box for the first patient to select them.
+8. Click the "Submit to CRD and Launch DTR" button which will open a new tab.
+9. In the new tab, provide the login information displayed and click "Sign In".
+10. In the form that gets displayed, type something in the required "Signature" field in the lower left
+    and then click the "Proceed to Prior Auth" button in the lower right.
+11. In the "Select PriorAuth Endpoint" text box, put the FHIR Base URL from step 4.
+12. Edit the Bundle at the right so that the first Bundle entry has a `fullUrl` field before the `resource` field
+    with a value of `urn:uuid:0583c759-bc19-4bfa-815c-8f43c1d488ea` or other uuid.
+12. Before, submitting return to the client session, select group "**11.1** Approval Workflow", click
+    the "Run Tests" button in the upper right, and click the "Submit" button on the input dialog that appears.
+13. When the "User Action Required" dialog appears asking for a $submit request, return to the crd-request-generator
+    tab and click the "Submit" button. A response should be returned and the Inferno session will now
+    check the request and response for conformance.
+    - NOTE: currently the RI does not pull in the added `fullURL` value so it will indicate a failure.
+      Inferno will still verify the request.
+14. In the Inferno session, once the interaction has been checked for conformance a "User Action Required"
+    dialog will appear asking for confirmation that the client displayed the submitted Claim as "approved".
+    Click the appropriate link to complete the demonstration.
 
 ## Inferno Client vs Server Execution
 
