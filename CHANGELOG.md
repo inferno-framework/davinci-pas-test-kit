@@ -1,3 +1,8 @@
+# 0.14.1
+* Fix requirements spreadsheet link by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/50
+* Replace ASTP with ONC by @FlexonyoPizza in https://github.com/inferno-framework/davinci-pas-test-kit/pull/63
+* gem updates and snomedCT validation to fhir resource validators by @FlexonyoPizza in https://github.com/inferno-framework/davinci-pas-test-kit/pull/70
+
 # 0.14.0
 * FI-4182: Remove inferno@groups.mitre.org email from gemspec by @arscan in https://github.com/inferno-framework/davinci-pas-test-kit/pull/47
 

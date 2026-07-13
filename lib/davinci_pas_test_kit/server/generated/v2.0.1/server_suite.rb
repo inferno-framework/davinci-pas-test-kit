@@ -93,6 +93,10 @@ module DaVinciPASTestKit
           SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, '')) ||
             message.message.downcase.include?('x12')
         end
+
+        validation_context do
+          snomedCT '731000124108'
+        end
       end
 
       input :server_endpoint,

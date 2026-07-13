@@ -11,6 +11,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientPendedGroup < Inferno::TestGroup
       include UserInputResponse
+
       id :pas_client_v201_pended_group
       title 'Pended Workflow'
       description %(

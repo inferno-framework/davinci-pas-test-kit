@@ -635,8 +635,8 @@ module DaVinciPASTestKit
     end
 
     def bundle_entry_map(bundle_entry)
-      @bundle_entry_map ||= bundle_entry.each_with_object({}) do |entry, obj|
-        obj[entry.fullUrl] = entry
+      @bundle_entry_map ||= bundle_entry.to_h do |entry|
+        [entry.fullUrl, entry]
       end
     end
 

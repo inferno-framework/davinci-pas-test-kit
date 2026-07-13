@@ -475,7 +475,7 @@ module DaVinciPASTestKit
             matches << match
             referenced_entities(match.resource, entries, root_url, matches)
           end
-        elsif value.is_a?(Array) && value.all? { |elmt| elmt.is_a?(FHIR::Model) }
+        elsif value.is_a?(Array) && value.all?(FHIR::Model)
           value.each { |val| referenced_entities(val, entries, root_url, matches) }
         end
       end

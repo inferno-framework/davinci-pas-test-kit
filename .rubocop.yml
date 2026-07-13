@@ -61,7 +61,15 @@ Metrics/PerceivedComplexity:
 Metrics/ParameterLists:
   Enabled: false
 
+Naming/PredicateMethod:
+  AllowedMethods:
+    - run_as_group
+    - skip_if_empty
+
 RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/LeakyLocalVariable:
   Enabled: false
 
 RSpec/DescribeClass:
