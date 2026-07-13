@@ -12,7 +12,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientInquireMustSupportGroup < Inferno::TestGroup
       id :pas_client_v201_inquire_must_support
-      title 'Inquiry Request Must Support'
+      title '$inquire Request Must Support Coverage'
       description %(
         Check that the client can demonstrate `$inquire` requests that contain
         all PAS-defined profiles and their must support elements.

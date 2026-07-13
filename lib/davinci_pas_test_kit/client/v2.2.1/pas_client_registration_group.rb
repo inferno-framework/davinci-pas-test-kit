@@ -20,6 +20,7 @@ module DaVinciPASTestKit
 
       # smart registration tests
       test from: :smart_client_registration_bsca_verification,
+           title: 'PAS client registers with Inferno as a SMART confidential asymmetric client',
            required_suite_options: {
              client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
            }
@@ -30,6 +31,7 @@ module DaVinciPASTestKit
 
       # udap registration tests
       test from: :udap_client_registration_interaction,
+           title: 'PAS client invokes the registration endpoint to register as a UDAP client',
            required_suite_options: {
              client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
            },
@@ -37,6 +39,7 @@ module DaVinciPASTestKit
              options: { endpoint_suite_id: :davinci_pas_client_suite_v221 }
            }
       test from: :udap_client_registration_cc_verification,
+           title: 'PAS client registered using the UDAP client credentials grant type',
            required_suite_options: {
              client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
            },

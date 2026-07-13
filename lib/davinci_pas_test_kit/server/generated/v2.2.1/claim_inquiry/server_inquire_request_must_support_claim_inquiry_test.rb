@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ServerInquireRequestMustSupportClaimInquiryTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v221_inquire_request_must_support_claim_inquiry
-      title 'All must support elements for Profile PAS Claim Inquiry are observed across all instances submitted'
+      title 'All must support elements for profile PAS Claim Inquiry are observed on $inquire requests'
       description %(
         
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.

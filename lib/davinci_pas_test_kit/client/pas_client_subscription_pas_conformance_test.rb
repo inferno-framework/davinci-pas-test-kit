@@ -7,7 +7,7 @@ module DaVinciPASTestKit
     include PASSubscriptionVerification
 
     id :pas_client_subscription_pas_conformance_test
-    title 'Client Subscription PAS Conformance Verification'
+    title 'Subscription creation request has the correct structure and content'
     description %(
       This test verifies that the Subscription created by the client under test
       is conformant to PAS requirements on the Subscription, including
@@ -15,6 +15,8 @@ module DaVinciPASTestKit
         Topic](https://hl7.org/fhir/us/davinci-pas/STU2/SubscriptionTopic-PASSubscriptionTopic.html), and
       - Inclusion of filter criteria for the client's organization.
     )
+
+    verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-62'
 
     def ig_version
       config.options[:ig_version]

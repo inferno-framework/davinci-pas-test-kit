@@ -26,7 +26,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_operation_failure_submit_test
       test from: :pas_client_v221_operation_outcome_validation_test
       test from: :pas_client_v221_response_attest,
-           title: 'Check that the client handles the operation failure appropriately (Attestation)',
+           title: 'PAS client handles the operation failure appropriately',
            description: %(
              This test provides the tester an opportunity to observe their client following
              the receipt of the operation failure response and attest that the error details

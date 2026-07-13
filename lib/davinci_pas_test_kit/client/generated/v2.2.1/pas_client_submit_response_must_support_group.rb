@@ -13,7 +13,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASClientSubmitResponseMustSupportGroup < Inferno::TestGroup
       id :pas_client_v221_submit_response_must_support
-      title 'Submit Response Must Support'
+      title '$submit Response Must Support Coverage'
       description %(
         Check that `$submit` responses provided to the client contain
         all PAS-defined profiles and their must support elements.
@@ -23,15 +23,15 @@ module DaVinciPASTestKit
         
         For `$submit` responses, this includes the following profiles:
         
-        - [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-response-bundle.html)
-        - [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claimresponse.html)
-        - [PAS CommunicationRequest](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-communicationrequest.html)
-        - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-        - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-        - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
+        - [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
+        - [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claimresponse.html)
+        - [PAS CommunicationRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-communicationrequest.html)
+        - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+        - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+        - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
+        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-task.html)
         
         
         
@@ -41,7 +41,9 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_submit_response_must_support_pas_response_bundle do
         optional
       end
-      test from: :pas_client_v221_submit_response_must_support_claimresponse
+      test from: :pas_client_v221_submit_response_must_support_claimresponse do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
       test from: :pas_client_v221_submit_response_must_support_communication_request do
         optional
       end
@@ -64,7 +66,7 @@ module DaVinciPASTestKit
         optional
       end
       test from: :pas_client_v221_response_attest,
-           title: 'Confirm that the client handled the $submit response must support elements (Attestation)',
+           title: 'PAS client handled the $submit response must support elements',
            description: %(
              This test provides the tester an opportunity to verify that their client
              correctly processed and used the must support elements present in the
@@ -73,8 +75,10 @@ module DaVinciPASTestKit
            config: { options: {
              workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
              attest_message: "I attest that the client system correctly processed the must support elements " \
-                             "contained in the $submit responses received from Inferno."
-           } }
+                             "contained in the $submit responses received from Inferno and did not error."
+           } } do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+      end
     end
   end
 end

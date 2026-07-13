@@ -61,6 +61,8 @@ module DaVinciPASTestKit
         case ig_metadata.ig_version
         when 'v2.0.1'
           'https://hl7.org/fhir/us/davinci-pas/STU2/'
+        when 'v2.2.1'
+          'https://hl7.org/fhir/us/davinci-pas/2.2.1/'
         else
           'https://hl7.org/fhir/us/davinci-pas/history.html'
         end

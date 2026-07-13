@@ -4,11 +4,8 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASClientOperationOutcomeValidationTest < Inferno::Test
       id :pas_client_v221_operation_outcome_validation_test
-      title 'Operation Failure OperationOutcome is valid'
+      title 'Response OperationOutcome has the correct structure and content'
       description %(
-        **USER INPUT VERIFICATION**: This test verifies input provided by the tester instead of the system under test.
-        Errors encountered will be treated as a skip instead of a failure.
-
         This test verifies the validity of the OperationOutcome returned by Inferno during the
         Operation Failure workflow. The OperationOutcome is validated against the base FHIR R4
         OperationOutcome resource definition — no PAS-specific profile is required.

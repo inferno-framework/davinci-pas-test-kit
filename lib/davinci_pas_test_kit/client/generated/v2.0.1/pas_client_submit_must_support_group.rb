@@ -14,7 +14,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientSubmitMustSupportGroup < Inferno::TestGroup
       id :pas_client_v201_submit_must_support
-      title 'Submit Request Must Support'
+      title '$submit Request Must Support Coverage'
       description %(
         Check that the client can demonstrate `$submit` requests that contain
         all PAS-defined profiles and their must support elements.

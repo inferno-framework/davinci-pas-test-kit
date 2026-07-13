@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ServerSubmitResponseMustSupportPasResponseBundleTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v201_submit_response_must_support_pas_response_bundle
-      title 'All must support elements for Profile PAS Response Bundle are observed across all instances returned'
+      title 'All must support elements for profile PAS Response Bundle are observed on $submit responses'
       description %(
         
         PAS server systems are required to be able to populate all

@@ -68,13 +68,13 @@ module DaVinciPASTestKit
 
       def title
         if type == 'response'
-          return 'Submit Response Must Support' if operation == 'submit'
+          return '$submit Response Must Support Coverage' if operation == 'submit'
 
-          'Inquiry Response Must Support'
+          '$inquire Response Must Support Coverage'
         else
-          return 'Submit Request Must Support' if operation == 'submit'
+          return '$submit Request Must Support Coverage' if operation == 'submit'
 
-          'Inquiry Request Must Support'
+          '$inquire Request Must Support Coverage'
         end
       end
 
@@ -172,6 +172,11 @@ module DaVinciPASTestKit
         required_profiles.reject { |profile_metadata| profile_metadata.resource == 'Claim' }
       end
 
+      def other_profiles_title
+        'All must support elements for other profiles referenced by Claim ' \
+          "#{operation == 'submit' ? 'submissions' : 'inquiries'} are observed on $#{operation} requests"
+      end
+
       # Formats a profiles list for an attestation test's config, one hash literal per line.
       def attestation_profiles_block(profile_metadatas)
         profile_metadatas.map do |profile_metadata|
@@ -207,7 +212,7 @@ module DaVinciPASTestKit
 
             For `$#{operation}` responses, this includes the following profiles:
 
-            #{Descriptions.profile_links_list(profiles)}
+            #{Descriptions.profile_links_list(profiles, ig_version)}
           DESCRIPTION
         else
           <<~DESCRIPTION
@@ -216,7 +221,7 @@ module DaVinciPASTestKit
 
             For `$#{operation}` requests, this includes the following profiles:
 
-            #{Descriptions.profile_links_list(required_profiles, request_profiles: operation == 'submit' ? request_profiles : nil)}
+            #{Descriptions.profile_links_list(required_profiles, ig_version, request_profiles: operation == 'submit' ? request_profiles : nil)}
           DESCRIPTION
         end
       end

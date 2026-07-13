@@ -57,7 +57,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         result = run(test, server_endpoint:, pa_request_payload:)
         expect(result.result).to eq('fail')
-        expect(result.result_message).to match(/Unexpected resource type: expected Bundle, but received Claim/)
+        expect(result.result_message).to include('Unexpected resource type: expected Bundle, but received Claim')
       end
 
       it 'skips if the first entry is not a Claim resource' do
@@ -68,10 +68,10 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         result = run(test, server_endpoint:, pa_request_payload:)
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/Check messages for issues found/)
+        expect(result.result_message).to include('Check messages for issues found')
         messages = entity_result_messages(test)
         expect(messages.size).to eq(1)
-        expect(messages[0].message).to match(/The first bundle entry must be a Claim/)
+        expect(messages[0].message).to include('The first bundle entry must be a Claim')
       end
 
       it 'skips when referenced resource is missing from the bundle' do
@@ -82,10 +82,10 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         result = run(test, server_endpoint:, pa_request_payload:)
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/Check messages for issues found/)
+        expect(result.result_message).to include('Check messages for issues found')
         messages = entity_result_messages(test)
         expect(messages.size).to eq(1)
-        expect(messages[0].message).to match(/SHALL appear exactly once in the Bundle, but found 0/)
+        expect(messages[0].message).to include('SHALL appear exactly once in the Bundle, but found 0')
       end
     end
 
@@ -118,7 +118,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         result = run(test, server_endpoint:, pa_request_payload: update_bundle(provider: { reference: missing_urn }))
         expect(result.result).to eq('skip')
         messages = entity_result_messages(test)
-        expect(messages.map(&:message).join).to match(/SHALL appear exactly once in the Bundle, but found 0/)
+        expect(messages.map(&:message).join).to include('SHALL appear exactly once in the Bundle, but found 0')
       end
     end
   end
@@ -141,7 +141,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           validation_error_messages.each do |msg|
             messages << { type: 'error', message: msg }
           end
-          msg = 'Bundle response returned and/or entry resources are not conformant. Check messages for issues found.'
+          msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
           assert validation_error_messages.blank?, msg
         end
       end
@@ -172,10 +172,10 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         result = run(test, server_endpoint:, response_body: pa_response_bundle, request_bundle: pa_request_valid_bundle)
         expect(result.result).to eq('fail')
-        expect(result.result_message).to match(/Check messages for issues found/)
+        expect(result.result_message).to include('Check messages for issues found')
         messages = entity_result_messages(test)
         expect(messages.size).to eq(1)
-        expect(messages[0].message).to match(/The first bundle entry must be a ClaimResponse/)
+        expect(messages[0].message).to include('The first bundle entry must be a ClaimResponse')
       end
 
       it 'fails when referenced resource is missing from the bundle' do
@@ -186,11 +186,11 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         result = run(test, server_endpoint:, response_body: pa_response_bundle, request_bundle: pa_request_valid_bundle)
         expect(result.result).to eq('fail')
-        expect(result.result_message).to match(/Check messages for issues found/)
+        expect(result.result_message).to include('Check messages for issues found')
         messages = entity_result_messages(test)
         expect(messages.size).to eq(2)
-        expect(messages[0].message).to match(/SHALL appear exactly once in the Bundle, but found 0/)
-        expect(messages[1].message).to match(/SHALL appear exactly once in the Bundle, but found 0/)
+        expect(messages[0].message).to include('SHALL appear exactly once in the Bundle, but found 0')
+        expect(messages[1].message).to include('SHALL appear exactly once in the Bundle, but found 0')
       end
     end
   end
@@ -264,7 +264,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         result = run(test, server_endpoint:, response_json: bundle_json)
         expect(result.result).to eq('fail')
-        expect(result.result_message).to match(/not conformant/)
+        expect(result.result_message).to include('not conformant')
       end
 
       it 'passes if Parameters is empty (no return parameters)' do

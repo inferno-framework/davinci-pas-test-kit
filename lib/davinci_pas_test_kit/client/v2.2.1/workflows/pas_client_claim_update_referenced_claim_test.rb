@@ -7,7 +7,7 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_referenced_claim_test
-      title 'Claim Update references and includes the Claim being updated'
+      title 'Request Bundles updating a Claim include the related Claim'
       description %(
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-65)
         that the Claim being updated is referenced in the `Claim.related.claim` element and included in the

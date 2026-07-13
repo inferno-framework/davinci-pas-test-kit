@@ -2,12 +2,13 @@ module DaVinciPASTestKit
   # abstract test, needs to be extended to include a version-specific URLs module
   class AbstractResponseAttest < Inferno::Test
     id :pas_client_response_attest
-    title 'Check that the client reacts appropriately to the response (Attestation)'
+    title 'PAS client reacts appropriately to the response'
     description %(
-        This test provides the tester an opportunity to observe their client following
-        the receipt of response and attest that users are able to see the appropriate
-        updates to the corresponding prior authorization request in their system.
-      )
+      This test provides the tester an opportunity to observe their client following
+      the receipt of response and attest that users are able to see the appropriate
+      updates to the corresponding prior authorization request in their system.
+    )
+    attestation
 
     def workflow_tag
       config.options[:workflow_tag]

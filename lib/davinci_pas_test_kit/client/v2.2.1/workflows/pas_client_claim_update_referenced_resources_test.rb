@@ -9,7 +9,7 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::PasBundleValidation
 
       id :pas_client_v221_claim_update_referenced_resources_test
-      title 'All resources referenced by a Claim Update are included in the Bundle'
+      title 'Request Bundles updating a Claim include all resources referenced by the updated Claim'
       description %(
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-67)
         that all other referenced resources are included in the Bundle. This test checks each Claim Update made

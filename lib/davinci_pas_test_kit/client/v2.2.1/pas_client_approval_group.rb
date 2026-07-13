@@ -24,7 +24,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_response_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
       test from: :pas_client_v221_response_attest,
-           title: 'Check that the client registers the request as approved (Attestation)',
+           title: 'PAS client displays the request as "approved"',
            description: %(
              This test provides the tester an opportunity to observe their client following
              the receipt of the approved response and attest that users are able to determine

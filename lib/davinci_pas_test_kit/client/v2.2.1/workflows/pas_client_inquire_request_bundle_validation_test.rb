@@ -6,12 +6,12 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::PasBundleValidation
 
       id :pas_client_v221_inquire_request_bundle_validation_test
-      title 'Inquire Request Bundle is valid'
+      title '$inquire request Bundles have the correct structure and content'
       description %(
         This test verifies the conformity of the client's request body to the
-        [PAS Inquiry Request Bundle](http://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+        [PAS Inquiry Request Bundle](http://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-request-bundle.html)
         structure. It also checks that other conformance requirements defined in the [PAS Formal
-        Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+        Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
         such as the presence of all referenced instances within the bundle and the
         conformance of those instances to the appropriate profiles, are met.
 
@@ -23,19 +23,7 @@ module DaVinciPASTestKit
 
         Note that because X12 value sets are not public, elements bound to value
         sets containing X12 codes are not validated.
-
-        **Limitations**
-
-        Due to recognized errors in the PAS IG around extension context definitions,
-        this test may not pass due to spurious errors of the form "The extension
-        [extension url] is not allowed at this point". See [this
-        issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-        for additional details.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@75', 'hl7.fhir.us.davinci-pas_2.0.1@121',
-                            'hl7.fhir.us.davinci-pas_2.0.1@122', 'hl7.fhir.us.davinci-pas_2.0.1@123',
-                            'hl7.fhir.us.davinci-pas_2.0.1@125', 'hl7.fhir.us.davinci-pas_2.0.1@126',
-                            'hl7.fhir.us.davinci-pas_2.0.1@127', 'hl7.fhir.us.davinci-pas_2.0.1@128'
 
       def request_type_tag
         INQUIRE_TAG

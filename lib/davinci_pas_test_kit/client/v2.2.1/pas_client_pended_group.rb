@@ -10,6 +10,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASClientPendedGroup < Inferno::TestGroup
       include UserInputResponse
+
       id :pas_client_v221_pended_group
       title 'Pended Workflow'
       description %(
@@ -28,7 +29,7 @@ module DaVinciPASTestKit
                   :session_url_path
 
       group do
-        title 'Perform the pended workflow'
+        title 'Interaction'
         description %(
           All interactions for the pended prior authorization request workflow
           between Inferno and the client under test will be performed during this test
@@ -42,14 +43,14 @@ module DaVinciPASTestKit
       end
 
       group do
-        title 'Verify $submit interaction'
+        title '$submit Conformance and Handling'
 
         test from: :pas_client_v221_request_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v221_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v221_response_attest,
-             title: 'Check that the client registers the request as pended (Attestation)',
+             title: 'PAS client displays the request as "pended"',
              description: %(
               This test provides the tester an opportunity to observe their client following
               the receipt of the pended response and attest that users are able to determine
@@ -64,7 +65,7 @@ module DaVinciPASTestKit
       end
 
       group do
-        title 'Verify notification interaction'
+        title 'Notification Conformance and Handling'
 
         test from: :subscriptions_r4_client_notification_input_verification,
              title: 'Inferno\'s event notification Bundle is conformant',
@@ -95,25 +96,22 @@ module DaVinciPASTestKit
                }
              }
         test from: :pas_notification_pas_conformance_test,
-             title: 'Inferno\'s Notification conforms to PAS-specific requirements',
+             title: 'Inferno\'s notification conforms to PAS-specific requirements',
              simulation_verification: true
         test from: :subscriptions_r4_client_event_notification_verification,
-             title: 'Client accepts the "claim updated" event notification',
+             title: 'PAS client accepts the "claim updated" event notification',
              description: %(
                This test checks that the client responds appropriately to the event notification request.
-             )
-      end
-
-      group do
-        title 'Verify final decision from notification'
-
+             ) do
+               verifies_requirements(*SubscriptionsTestKit::SubscriptionsR5BackportR4Client::EventNotificationVerificationTest.verifies_requirements,
+                                     'hl7.fhir.us.davinci-pas_2.2.1@spec-8')
+             end
         test from: :pas_client_v221_response_attest,
-             title: 'Check that the client processes the full-resource notification ' \
-                    'with the final decision (Attestation)',
+             title: 'PAS client displays the final decision as "approved"',
              description: %(
               This test provides the tester an opportunity to observe their client following
-              the receipt of the full-resource notification containing the final decision and attest
-              that users are able to determine that the request has been approved.
+              the receipt of the full-resource notification containing the approved final decision
+              and attest that users are able to determine that the request has been approved.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,

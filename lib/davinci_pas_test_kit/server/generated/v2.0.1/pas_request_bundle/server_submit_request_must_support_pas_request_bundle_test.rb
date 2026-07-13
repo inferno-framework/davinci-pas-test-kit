@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ServerSubmitRequestMustSupportPasRequestBundleTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v201_submit_request_must_support_pas_request_bundle
-      title 'All must support elements for Profile PAS Request Bundle are observed across all instances submitted'
+      title 'All must support elements for profile PAS Request Bundle are observed on $submit requests'
       description %(
         
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.

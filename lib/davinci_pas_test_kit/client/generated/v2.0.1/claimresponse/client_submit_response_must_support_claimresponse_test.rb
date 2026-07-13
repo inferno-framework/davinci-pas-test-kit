@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientSubmitResponseMustSupportClaimresponseTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v201_submit_response_must_support_claimresponse
-      title 'All must support elements for Profile PAS Claim Response are observed across all instances returned'
+      title 'All must support elements for profile PAS Claim Response are observed on $submit responses'
       description %(
         
         PAS client systems are required to be able to receive all

@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ServerInquireResponseMustSupportClaiminquiryresponseTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v201_inquire_response_must_support_claiminquiryresponse
-      title 'All must support elements for Profile PAS Claim Inquiry Response are observed across all instances returned'
+      title 'All must support elements for profile PAS Claim Inquiry Response are observed on $inquire responses'
       description %(
         
         PAS server systems are required to be able to populate all

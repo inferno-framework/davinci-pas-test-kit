@@ -23,44 +23,31 @@ module DaVinciPASTestKit
     class ClientSuite < Inferno::TestSuite
       id :davinci_pas_client_suite_v221
       title 'Da Vinci PAS Client Suite v2.2.1'
-      description %(
-        The Da Vinci PAS Test Kit Client Suite validates the conformance of client
-        systems to the STU 2 version of the HL7® FHIR®
-        [Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/STU2/).
+      description <<~DESCRIPTION
+        The Da Vinci PAS Client v2.2.1 Test Suite tests the conformance of systems to the
+        capabilities of a PAS client as described in [version 2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1)
+        of the Da Vinci Prior Authorization Support (PAS) Implementation Guide.
 
-        These tests are a **DRAFT** intended to allow PAS client implementers to perform
-        preliminary checks of their clients against PAS IG requirements and [provide
-        feedback](https://github.com/inferno-framework/davinci-pas-test-kit/issues)
-        on the tests. Future versions of these tests may validate other
-        requirements and may change the test validation logic.
+        These tests are a **DRAFT** intended to allow PAS implementers to perform
+        preliminary checks of their implementations against the PAS IG requirements and
+        [provide feedback](https://github.com/inferno-framework/davinci-pas-test-kit/issues) on the tests.
+        Future versions of these tests may validate other requirements and may change how these are tested.
 
-        The best place to get started is the [Client Testing
-        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough),
-        which provides a step-by-step guide for running the tests against a client and provides
-        an example client implemented in Postman.  Visit the [Client Testing
-        Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details)
-        documentation for information about technical implementation and known limitations of these tests.
+        Detailed information about this test suite can be found in the
+        [client section](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details) of the
+        [PAS Test Kit Wiki](https://github.com/inferno-framework/davinci-pas-test-kit/wiki), including:
+        - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
+        - [Minimal](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
+          and [complete](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)
+          instructions for executing against a client system, and
+        - How to [interpret test results](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.2.1#interpreting-results).
+      DESCRIPTION
 
-        In this test suite, Inferno simulates a PAS server for the client under test to
-        interact with. The client will be expected to initiate requests to the server
-        and demonstrate its ability to react to the returned responses. Over the course
-        of these interactions, Inferno will seek to observe conformant handling of PAS
-        requirements, including:
-        - The ability of the client to initiate a prior authorization submission and react to
-            - The approval of the request
-            - The denial of the request
-            - The pending of the request and a subsequent notification that a final decision was made
-        - The ability of the client to provide data covering the full scope of required by PAS, including
-            - The ability to send prior auth requests and inquiries with all PAS
-              profiles and all must support elements on those profiles
-            - The ability to handle responses that contain all PAS profiles and all must support elements on those
-              profiles (not included in the current version of these tests)
-
-        All requests and responses will be checked for conformance to the PAS
-        IG requirements individually and used in aggregate to determine whether
-        required features and functionality are present. HL7® FHIR® resources are
-        validated with the Java validator using `tx.fhir.org` as the terminology server.
-      )
+      suite_summary <<~SUMMARY
+        The Da Vinci PAS Client v2.2.1 Test Suite tests the conformance of client systems
+        to [version 2.2.1 of the Da Vinci Prior Authorization Support (PAS)
+        Implementation Guide](https://hl7.org/fhir/us/davinci-pas/2.2.1).
+      SUMMARY
 
       links [
         {
@@ -77,7 +64,7 @@ module DaVinciPASTestKit
         },
         {
           label: 'Implementation Guide',
-          url: 'https://hl7.org/fhir/us/davinci-pas/STU2/'
+          url: 'https://hl7.org/fhir/us/davinci-pas/2.2.1/'
         }
       ]
 
@@ -155,6 +142,14 @@ module DaVinciPASTestKit
       suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
+      allow_cors UDAPSecurityTestKit::UDAP_DISCOVERY_PATH, SMARTAppLaunch::SMART_DISCOVERY_PATH,
+                 FHIR_METADATA_PATH, SESSION_FHIR_METADATA_PATH,
+                 UDAPSecurityTestKit::REGISTRATION_PATH, UDAPSecurityTestKit::TOKEN_PATH,
+                 SUBMIT_PATH, SESSION_SUBMIT_PATH, INQUIRE_PATH, SESSION_INQUIRE_PATH,
+                 FHIR_SUBSCRIPTION_PATH, SESSION_FHIR_SUBSCRIPTION_PATH,
+                 FHIR_SUBSCRIPTION_INSTANCE_PATH, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH,
+                 FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH,
+                 FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SESSION_FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH
 
       resume_test_route :get, RESUME_PASS_PATH do |request|
         request.query_parameters['token']

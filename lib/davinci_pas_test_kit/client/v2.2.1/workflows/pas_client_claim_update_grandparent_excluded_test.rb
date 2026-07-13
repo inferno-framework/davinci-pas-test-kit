@@ -7,7 +7,7 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_grandparent_excluded_test
-      title 'Claim Update referencing another update omits the grandparent Claim'
+      title 'Request Bundles updating an updated Claim omit the grandparent Claim'
       description %(
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-66)
         that when the Claim being updated is itself a Claim Update, its referenced (grandparent) Claim is not

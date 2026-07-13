@@ -1,6 +1,7 @@
-# Da Vinci PAS Test Kit: Server Testing Walkthrough
+# Da Vinci PAS Test Kit: Server v2.0.1 Testing Instructions
 
-This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **server system (payer)**. In this scenario, Inferno acts as the PAS client.
+This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **server system (payer)**
+against v2.0.1 of the IG. In this scenario, Inferno acts as the PAS client.
 
 ## 1. Quick Start (Using Public Reference Server Example)
 

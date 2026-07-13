@@ -99,7 +99,7 @@ module DaVinciPASTestKit
     # Step 1: the initial prior authorization submission that subsequent updates build on.
     class PASClientClaimUpdateInitialSubmitTest < AbstractClaimUpdateSubmitTest
       id :pas_client_v221_claim_update_initial_submit_test
-      title 'Client submits an initial prior authorization request'
+      title 'PAS client submits an initial prior authorization request'
       description %(
         Inferno waits for an initial prior authorization `$submit` request from the client.
         This establishes the original Claim that the subsequent updates will reference and
@@ -129,7 +129,7 @@ module DaVinciPASTestKit
     # Step 2: an update that adds a new item to the previously submitted Claim.
     class PASClientClaimUpdateAddItemSubmitTest < AbstractClaimUpdateSubmitTest
       id :pas_client_v221_claim_update_add_item_submit_test
-      title 'Client submits an update that adds an item'
+      title 'PAS client submits an update that adds an item'
       description %(
         Inferno waits for an updated prior authorization `$submit` request that adds a new item to
         the previously submitted Claim. The update is expected to reference the original Claim in
@@ -164,7 +164,7 @@ module DaVinciPASTestKit
     # Step 3: an update that modifies one item and cancels another.
     class PASClientClaimUpdateModifyCancelSubmitTest < AbstractClaimUpdateSubmitTest
       id :pas_client_v221_claim_update_modify_cancel_submit_test
-      title 'Client submits an update that modifies an item and cancels an item'
+      title 'PAS client submits an update that modifies an item and cancels an item'
       description %(
         Inferno waits for a second updated prior authorization `$submit` request that modifies one
         existing item and cancels another. Modified entries are expected to carry an `infoChanged`
@@ -203,7 +203,7 @@ module DaVinciPASTestKit
     # Step 4: an update that cancels the entire prior authorization request.
     class PASClientClaimUpdateCancelAllSubmitTest < AbstractClaimUpdateSubmitTest
       id :pas_client_v221_claim_update_cancel_all_submit_test
-      title 'Client submits an update that cancels the entire request'
+      title 'PAS client submits an update that cancels the entire request'
       description %(
         Inferno waits for a third updated prior authorization `$submit` request that cancels the
         entire prior authorization. The update is expected to include a `certificationType` extension

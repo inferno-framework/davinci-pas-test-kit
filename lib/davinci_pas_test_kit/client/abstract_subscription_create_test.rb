@@ -7,9 +7,9 @@ module DaVinciPASTestKit
     include SessionIdentification
 
     id :pas_client_subscription_create_test
-    title 'Client submits a Subscription Creation Request'
+    title 'PAS client submits a Subscription creation request'
     description %(
-      Inferno will wait for a Subscription Creation request
+      Inferno will wait for a Subscription creation request
       and then perform a handshake to activate the Subscription.
     )
 

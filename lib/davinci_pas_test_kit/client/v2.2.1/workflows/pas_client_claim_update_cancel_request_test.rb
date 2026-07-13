@@ -10,7 +10,7 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_cancel_request_test
-      title 'Cancel-entire-request update carries a certificationType extension with code 3'
+      title 'Claims canceling the entire request carry a top-level certificationType extension with code 3'
       description %(
         To [cancel the entire request](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#updating-authorization-requests),
         clients send a [certificationType extension](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-extension-certificationType.html)

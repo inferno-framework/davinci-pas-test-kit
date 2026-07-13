@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v221_operation_failure_submit_test
-      title 'Client submits a claim and handles an operation failure (OperationOutcome) response'
+      title 'PAS client submits a claim and receives an OperationOutcome response'
       description %(
         Inferno will wait for a prior authorization submission request from the client.
         Upon receipt, Inferno will return the provided OperationOutcome with the configured

@@ -13,7 +13,7 @@ module DaVinciPASTestKit
       include PasBundleValidation
 
       id :pas_client_v221_pended_submit_test
-      title 'Client submits a claim and reacts to a pended response'
+      title 'PAS Client submits a claim and receives a final decision via a notification'
       description %(
         Inferno will wait for a prior authorization submission request
         from the client. Upon receipt, Inferno will respond with the
@@ -22,11 +22,6 @@ module DaVinciPASTestKit
         In v2.2.1, no follow-up `$inquire` request is needed as the
         notification includes all details.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
-                            'hl7.fhir.us.davinci-pas_2.0.1@67', 'hl7.fhir.us.davinci-pas_2.0.1@70',
-                            'hl7.fhir.us.davinci-pas_2.0.1@119', 'hl7.fhir.us.davinci-pas_2.0.1@120',
-                            'hl7.fhir.us.davinci-pas_2.0.1@153', 'hl7.fhir.us.davinci-pas_2.0.1@202',
-                            'hl7.fhir.us.davinci-pas_2.0.1@203'
 
       config options: { accepts_multiple_requests: true }
       input :notification_bundle,

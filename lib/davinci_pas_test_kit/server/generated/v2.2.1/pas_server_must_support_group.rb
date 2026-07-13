@@ -73,21 +73,21 @@ module DaVinciPASTestKit
           
           For `$submit` requests, this includes the following profiles:
           
-          - [PAS Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
-          - [PAS Claim Update](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claim-update.html)
-          - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-coverage.html)
-          - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-encounter.html)
-          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-          - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-subscriber.html)
-          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+          - [PAS Request Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-request-bundle.html)
+          - [PAS Claim Update](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claim-update.html)
+          - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-coverage.html)
+          - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-encounter.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+          - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-subscriber.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
           - At least one of the following request profiles
-            - [PAS Device Request](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-devicerequest.html)
-            - [PAS Medication Request](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-medicationrequest.html)
-            - [PAS Nutrition Order](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-nutritionorder.html)
-            - [PAS Service Request](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-servicerequest.html)
+            - [PAS Device Request](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-devicerequest.html)
+            - [PAS Medication Request](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-medicationrequest.html)
+            - [PAS Nutrition Order](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-nutritionorder.html)
+            - [PAS Service Request](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-servicerequest.html)
           
           
           
@@ -95,15 +95,15 @@ module DaVinciPASTestKit
           profiles that may be echoed from `$submit` requests, such as the Claim instance or request instances,
           are not currently checked):
           
-          - [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-response-bundle.html)
-          - [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claimresponse.html)
-          - [PAS CommunicationRequest](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-communicationrequest.html)
-          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
+          - [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
+          - [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claimresponse.html)
+          - [PAS CommunicationRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-communicationrequest.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
+          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-task.html)
           
           
           
@@ -122,11 +122,11 @@ module DaVinciPASTestKit
             
             This test validates the conformity of the
             user input to the
-            [PAS Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
+            [PAS Request Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-request-bundle.html)
             profile, ensuring subsequent tests can accurately simulate content.
             
             It also checks that other conformance requirements defined in the [PAS Formal
-            Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+            Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
             such as the presence of all referenced instances within the bundle and the
             conformance of those instances to the appropriate profiles, are met.
             
@@ -138,14 +138,6 @@ module DaVinciPASTestKit
             
             Note that because X12 value sets are not public, elements bound to value
             sets containing X12 codes are not validated.
-            
-            **Limitations**
-            
-            Due to recognized errors in the PAS IG around extension context definitions,
-            this test may not pass due to spurious errors of the form "The extension
-            [extension url] is not allowed at this point". See [this
-            issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-            for additional details.
             
             )
             simulation_verification
@@ -186,11 +178,11 @@ module DaVinciPASTestKit
             description %(
               This test validates the conformity of the
               server's response to the
-              [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-response-bundle.html)
+              [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
               profile.
               
               It also checks that other conformance requirements defined in the [PAS Formal
-              Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+              Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
               such as the presence of all referenced instances within the bundle and the
               conformance of those instances to the appropriate profiles, are met.
               
@@ -202,14 +194,6 @@ module DaVinciPASTestKit
               
               Note that because X12 value sets are not public, elements bound to value
               sets containing X12 codes are not validated.
-              
-              **Limitations**
-              
-              Due to recognized errors in the PAS IG around extension context definitions,
-              this test may not pass due to spurious errors of the form "The extension
-              [extension url] is not allowed at this point". See [this
-              issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-              for additional details.
               
             )
             config(
@@ -261,15 +245,15 @@ module DaVinciPASTestKit
           
           For `$inquire` requests, this includes the following profiles:
           
-          - [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
-          - [PAS Claim Inquiry](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claim-inquiry.html)
-          - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-coverage.html)
-          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-          - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-subscriber.html)
-          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+          - [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+          - [PAS Claim Inquiry](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claim-inquiry.html)
+          - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-coverage.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+          - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-subscriber.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
           
           
           
@@ -277,14 +261,14 @@ module DaVinciPASTestKit
           profiles that may be echoed from `$inquire` requests, such as the Claim instance or request instances,
           are not currently checked):
           
-          - [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-response-bundle.html)
-          - [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claiminquiryresponse.html)
-          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
+          - [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-response-bundle.html)
+          - [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claiminquiryresponse.html)
+          - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+          - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+          - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+          - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+          - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
+          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-task.html)
           
           
           
@@ -303,11 +287,11 @@ module DaVinciPASTestKit
             
             This test validates the conformity of the
             user input to the
-            [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+            [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-request-bundle.html)
             profile, ensuring subsequent tests can accurately simulate content.
             
             It also checks that other conformance requirements defined in the [PAS Formal
-            Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+            Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
             such as the presence of all referenced instances within the bundle and the
             conformance of those instances to the appropriate profiles, are met.
             
@@ -319,14 +303,6 @@ module DaVinciPASTestKit
             
             Note that because X12 value sets are not public, elements bound to value
             sets containing X12 codes are not validated.
-            
-            **Limitations**
-            
-            Due to recognized errors in the PAS IG around extension context definitions,
-            this test may not pass due to spurious errors of the form "The extension
-            [extension url] is not allowed at this point". See [this
-            issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-            for additional details.
             
             )
             simulation_verification
@@ -367,11 +343,11 @@ module DaVinciPASTestKit
             description %(
               This test validates the conformity of the
               server's response to the
-              [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-response-bundle.html)
+              [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-response-bundle.html)
               profile.
               
               It also checks that other conformance requirements defined in the [PAS Formal
-              Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+              Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
               such as the presence of all referenced instances within the bundle and the
               conformance of those instances to the appropriate profiles, are met.
               
@@ -383,14 +359,6 @@ module DaVinciPASTestKit
               
               Note that because X12 value sets are not public, elements bound to value
               sets containing X12 codes are not validated.
-              
-              **Limitations**
-              
-              Due to recognized errors in the PAS IG around extension context definitions,
-              this test may not pass due to spurious errors of the form "The extension
-              [extension url] is not allowed at this point". See [this
-              issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-              for additional details.
               
             )
             config(

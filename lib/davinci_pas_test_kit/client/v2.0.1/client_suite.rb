@@ -33,7 +33,7 @@ module DaVinciPASTestKit
         requirements and may change the test validation logic.
 
         The best place to get started is the [Client Testing
-        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough),
+        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.0.1),
         which provides a step-by-step guide for running the tests against a client and provides
         an example client implemented in Postman.  Visit the [Client Testing
         Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details)
@@ -144,6 +144,14 @@ module DaVinciPASTestKit
       suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SubscriptionStatusEndpoint
+      allow_cors UDAPSecurityTestKit::UDAP_DISCOVERY_PATH, SMARTAppLaunch::SMART_DISCOVERY_PATH,
+                 FHIR_METADATA_PATH, SESSION_FHIR_METADATA_PATH,
+                 UDAPSecurityTestKit::REGISTRATION_PATH, UDAPSecurityTestKit::TOKEN_PATH,
+                 SUBMIT_PATH, SESSION_SUBMIT_PATH, INQUIRE_PATH, SESSION_INQUIRE_PATH,
+                 FHIR_SUBSCRIPTION_PATH, SESSION_FHIR_SUBSCRIPTION_PATH,
+                 FHIR_SUBSCRIPTION_INSTANCE_PATH, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH,
+                 FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH,
+                 FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH, SESSION_FHIR_SUBSCRIPTION_RESOURCE_STATUS_PATH
 
       resume_test_route :get, RESUME_PASS_PATH do |request|
         request.query_parameters['token']

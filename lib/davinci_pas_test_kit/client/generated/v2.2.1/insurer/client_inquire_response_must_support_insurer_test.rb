@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ClientInquireResponseMustSupportInsurerTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v221_inquire_response_must_support_insurer
-      title 'All must support elements for Profile PAS Insurer Organization are observed across all instances returned'
+      title 'All must support elements for profile PAS Insurer Organization are observed on $inquire responses'
       description %(
         
         PAS client systems are required to be able to receive all

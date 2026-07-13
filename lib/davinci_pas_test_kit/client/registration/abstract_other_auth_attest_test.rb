@@ -1,13 +1,14 @@
 module DaVinciPASTestKit
   class AbstractRegistrationOtherAuthAttest < Inferno::Test
     id :pas_client_reg_other_auth_attest
-    title 'Verify that the client supports an approach for authenticating itself to the server (Attestation)'
+    title 'PAS client supports a non-standard approach for authenticating with the PAS server'
     description %(
       Since a standard auth approach was not chosen for this session, this test provides testers with an
       opportunity to attest to their client's ability to authenticate itself to a server
       using a method that this Inferno test suite does not support, such as mutual authentication
       TLS.
     )
+    attestation
 
     output :attest_true_url
     output :attest_false_url

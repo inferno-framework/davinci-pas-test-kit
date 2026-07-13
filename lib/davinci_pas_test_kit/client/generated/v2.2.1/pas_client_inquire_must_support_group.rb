@@ -5,22 +5,22 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASClientInquireMustSupportGroup < Inferno::TestGroup
       id :pas_client_v221_inquire_must_support
-      title 'Inquiry Request Must Support'
+      title '$inquire Request Must Support Coverage'
       description %(
         Check that the client can demonstrate `$inquire` requests that contain
         all PAS-defined profiles and their must support elements.
         
         For `$inquire` requests, this includes the following profiles:
         
-        - [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
-        - [PAS Claim Inquiry](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claim-inquiry.html)
-        - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-coverage.html)
-        - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-        - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-subscriber.html)
-        - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-        - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
+        - [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-request-bundle.html)
+        - [PAS Claim Inquiry](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claim-inquiry.html)
+        - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-coverage.html)
+        - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+        - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-subscriber.html)
+        - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+        - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
         
         
         
@@ -34,7 +34,7 @@ module DaVinciPASTestKit
       # attested as not collected by the client system.
       test from: :pas_client_v221_must_support_with_attestation_option do
         id :pas_client_v221_inquire_request_other_must_support_with_attestation_option
-        title 'All other inquire request profile must support elements are observed'
+        title 'All must support elements for other profiles referenced by Claim inquiries are observed on $inquire requests'
         config(
           options: {
             require_one_of: false,

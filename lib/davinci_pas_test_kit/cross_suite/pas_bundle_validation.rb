@@ -139,7 +139,7 @@ module DaVinciPASTestKit
       validation_error_messages.each do |msg|
         messages << { type: 'error', message: msg }
       end
-      msg = 'Bundle response returned and/or entry resources are not conformant. Check messages for issues found.'
+      msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
       assert validation_error_messages.blank?, msg
     rescue Inferno::Exceptions::AssertionException => e
       msg = "#{message} #{e.message}".strip

@@ -1,12 +1,14 @@
 module DaVinciPASTestKit
   class AbstractRegistrationConfigurationOtherDisplay < Inferno::Test
     id :pas_client_reg_config_other_display
-    title 'Confirm client configuration'
+    title 'PAS client registers Inferno as a PAS server'
     description %(
       This test provides all the information needed for testers to configure
       the client under test to communicate with Inferno's simulated PAS server
       using dedicated endpoints.
     )
+    attestation
+
     input :session_url_path,
           title: 'Session-specific URL path extension',
           type: 'text',
