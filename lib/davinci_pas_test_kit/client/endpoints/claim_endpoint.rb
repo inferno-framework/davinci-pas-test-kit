@@ -2,6 +2,8 @@ require_relative '../user_input_response'
 require_relative '../response_generator'
 require_relative '../client_urls'
 require_relative '../jobs/send_pas_subscription_notification'
+require_relative '../../cross_suite/fhirpath_utils'
+require_relative '../../cross_suite/response_selection_utils'
 require 'subscriptions_test_kit'
 require 'udap_security_test_kit'
 
@@ -10,6 +12,8 @@ module DaVinciPASTestKit
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
     include ResponseGenerator
     include ClientURLs
+    include FhirpathUtils
+    include ResponseSelectionUtils
 
     # override the one from URLs to make it version specific
     def suite_id
@@ -104,7 +108,7 @@ module DaVinciPASTestKit
         return
       end
 
-      user_inputted_response = resolve_user_response
+      user_inputted_response = resolve_user_response(req_bundle)
       if user_inputted_response.present?
         generated_claim_response_uuid = nil
         response_bundle_json = update_tester_provided_response(user_inputted_response, claim_full_url, operation,
@@ -147,27 +151,52 @@ module DaVinciPASTestKit
 
     private
 
-    # Resolves the user-provided response, using nth-response logic for must support workflows
-    # or the single-response approach for other workflows.
-    def resolve_user_response
+    # Resolves the user-provided response, using criteria-based selection for must support
+    # workflows or the single-response approach for other workflows.
+    def resolve_user_response(req_bundle)
       if must_support_workflow?
-        request_number = count_previous_ms_requests
-        UserInputResponse.nth_user_inputted_response(result, operation, request_number)
+        select_must_support_response(req_bundle)
       else
         UserInputResponse.user_inputted_response(test, operation, result)
       end
     end
 
-    # Count how many previous requests in this test session have the must support workflow tag
-    # and the same operation tag. This gives us the 0-based index for nth-response selection.
-    def count_previous_ms_requests
-      operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
-      requests_repo = Inferno::Repositories::Requests.new
-      previous_requests = requests_repo.find_named_request(test_session_id: test_run.test_session_id,
-                                                           tags: [MUST_SUPPORT_WORKFLOW_TAG, operation_tag])
-      previous_requests.is_a?(Array) ? previous_requests.length : 0
-    rescue StandardError
-      0
+    # Selects the first tester-provided response candidate whose selection criteria all
+    # match the incoming request, extracts its response Bundle (unwrapping it when the
+    # candidate pairs the Bundle with criteria), and replaces {{fhirpath}} tokens with
+    # values from the request. Returns nil, causing Inferno to generate a default
+    # response, if no candidates are provided or none match.
+    def select_must_support_response(req_bundle)
+      candidates = UserInputResponse.response_candidates(result, operation)
+      return if candidates.blank?
+
+      operation_url_suffix = "$#{operation}"
+      request_number = count_previous_successful_requests(operation_url_suffix) + 1
+      selected_index = candidates.index { |candidate| include_entity?(candidate, req_bundle, operation_url_suffix) }
+
+      if selected_index.nil?
+        Inferno::Application['logger'].info(
+          "No tester-provided response bundle matched #{operation_url_suffix} request ##{request_number}. " \
+          'Inferno will generate a default response.'
+        )
+        return
+      end
+
+      Inferno::Application['logger'].info(
+        "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
+        "for #{operation_url_suffix} request ##{request_number}."
+      )
+      replace_tokens(entity_bundle(candidates[selected_index]), req_bundle)
+    end
+
+    # Round-trips the selected bundle through the FHIR model to normalize it after
+    # token replacement. Falls back to the replaced string if it no longer parses,
+    # e.g., when a replaced value breaks the JSON structure.
+    def replace_tokens(bundle_hash, req_bundle)
+      replaced = replace_tokens_in_string(bundle_hash.to_json, req_bundle)
+      FHIR.from_contents(replaced)&.to_json || replaced
+    rescue JSON::ParserError
+      replaced
     end
 
     def handle_missing_required_elements(claim_entry, response)
