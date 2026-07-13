@@ -10,8 +10,8 @@ provides information on how to use and contribute to this test kit.
 
 *   **[Getting Started](../tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
 *   **[Test Kit Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
-*   **[Client Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Walkthrough)**: Step-by-step guide for testing client systems.
-*   **[Server Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough)**: Step-by-step guide for testing server systems.
+*   **[Client Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.0.1)**: Step-by-step guide for testing client systems.
+*   **[Server Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Instructions-v2.0.1)**: Step-by-step guide for testing server systems.
 
 ## Contributing to this Test Kit
 
