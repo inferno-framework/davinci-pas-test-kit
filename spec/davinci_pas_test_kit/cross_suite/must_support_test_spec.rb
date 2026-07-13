@@ -17,7 +17,7 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     preset =
       JSON.parse(
         File.read(
-          File.join(__dir__, '..', '..', '..', 'config', 'presets', 'pas_client_v221_must_support_preset.json')
+          File.join(__dir__, '..', '..', 'fixtures', 'pas_client_v221_must_support_preset.json')
         )
       )
 

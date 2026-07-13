@@ -52,7 +52,7 @@ module DaVinciPASTestKit
         nil
       end.compact
 
-      resources.select { |response| response.is_a?(FHIR::Bundle) }
+      resources.select { |response| response.is_a?(FHIR::Bundle) } # rubocop:disable Style/SelectByKind
     end
 
     run do

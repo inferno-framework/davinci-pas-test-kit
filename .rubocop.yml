@@ -69,7 +69,7 @@ Naming/PredicateMethod:
 RSpec/AnyInstance:
   Enabled: false
 
-RSpec/LeakyLocalVariable:
+RSpec/LeakyConstantDeclaration:
   Enabled: false
 
 RSpec/DescribeClass:

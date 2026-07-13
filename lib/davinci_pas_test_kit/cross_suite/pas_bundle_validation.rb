@@ -629,8 +629,8 @@ module DaVinciPASTestKit
       @metadata[version] ||= YAML.load_file(File.join(__dir__, "generated/#{version}/metadata.yml"),
                                             aliases: true)
       @metadata_map ||= {}
-      @metadata_map[version] ||= @metadata[version][:profiles].each_with_object({}) do |profile_metadata, obj|
-        obj[profile_metadata[:profile_url]] = Generator::ProfileMetadata.new(profile_metadata)
+      @metadata_map[version] ||= @metadata[version][:profiles].to_h do |profile_metadata|
+        [profile_metadata[:profile_url], Generator::ProfileMetadata.new(profile_metadata)]
       end
     end
 
@@ -788,7 +788,7 @@ module DaVinciPASTestKit
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
             check_presence_of_referenced_resources(value, base_url, resources_to_match, skip_claim_related:)
-          elsif value.is_a?(Array) && value.all? { |elmt| elmt.is_a?(FHIR::Model) }
+          elsif value.is_a?(Array) && value.all?(FHIR::Model)
             value.each do |elmt|
               check_presence_of_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:)
             end

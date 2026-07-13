@@ -7,7 +7,8 @@ module DaVinciPASTestKit
     include SessionIdentification
 
     id :pas_client_gather_must_support
-    title 'PAS client submits Claims using the $submit and $inquire operations to demonstrate coverage of must support elements'
+    title 'PAS client submits Claims using the $submit and $inquire operations to demonstrate coverage of must ' \
+          'support elements'
     description %(
       This test allows the client to send both $submit and $inquire requests for Inferno to evaluate
       coverage of must support elements in both requests and responses. Any requests made during

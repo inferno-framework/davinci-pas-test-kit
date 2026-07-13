@@ -104,7 +104,7 @@ module DaVinciPASTestKit
       end
 
       def index_by_sequence(entries)
-        Array(entries).each_with_object({}) { |entry, map| map[entry.sequence] = entry }
+        Array(entries).to_h { |entry| [entry.sequence, entry] }
       end
 
       def entry_kind(entry)

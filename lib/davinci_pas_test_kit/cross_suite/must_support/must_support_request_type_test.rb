@@ -31,12 +31,11 @@ module DaVinciPASTestKit
     end
 
     def metadata_array
-      @metadata_array ||= profile_keys.each_with_object({}) do |profile_key, metadata_array|
-        metadata_array[profile_key.camelize] =
-          Generator::ProfileMetadata.new(
-            YAML.load_file(File.join(__dir__, '..', 'generated', ig_version, profile_key, 'metadata.yml'),
-                           aliases: true)
-          )
+      @metadata_array ||= profile_keys.to_h do |profile_key|
+        [profile_key.camelize, Generator::ProfileMetadata.new(
+          YAML.load_file(File.join(__dir__, '..', 'generated', ig_version, profile_key, 'metadata.yml'),
+                         aliases: true)
+        )]
       end
     end
 

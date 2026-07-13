@@ -8,7 +8,7 @@ module DaVinciPASTestKit
     def extract_bundles_from_pas_inquiry_response_parameters(parameters)
       return [] unless parameters.is_a?(FHIR::Parameters)
 
-      parameters.parameter
+      parameters.parameter # rubocop:disable Style/SelectByKind
         .select { |param| param.name == 'return' }
         .map(&:resource)
         .compact

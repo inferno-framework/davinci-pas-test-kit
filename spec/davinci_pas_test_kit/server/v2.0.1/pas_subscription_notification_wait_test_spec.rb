@@ -7,6 +7,7 @@ RSpec.describe DaVinciPASTestKit::AbstractPASSubscriptionNotificationWaitTest, :
   let(:test) do
     Class.new(described_class) do
       include DaVinciPASTestKit::DaVinciPASV201::ServerURLs
+
       def suite_id
         'davinci_pas_client_suite_v201'
       end

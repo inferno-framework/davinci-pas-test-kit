@@ -45,7 +45,7 @@ module DaVinciPASTestKit
       verify_v221_criteria_format(subscription)
     end
 
-    def verify_v221_profile(subscription)
+    def verify_v221_profile(subscription) # rubocop:disable Naming/PredicateMethod
       resource = FHIR.from_contents(subscription.to_json)
       resource_is_valid?(resource: resource, profile_url: PAS_SUBSCRIPTION_PROFILE)
     end
