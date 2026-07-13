@@ -1,3 +1,6 @@
+# 0.15.0
+* ID-52: Create suites for v2.2.1 of the PAS test kit by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/54
+
 # 0.14.1
 * Fix requirements spreadsheet link by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/50
 * Replace ASTP with ONC by @FlexonyoPizza in https://github.com/inferno-framework/davinci-pas-test-kit/pull/63
