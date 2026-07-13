@@ -41,7 +41,7 @@ module DaVinciPASTestKit
             profile, ensuring subsequent tests can accurately simulate content.
             
             It also checks that other conformance requirements defined in the [PAS Formal
-            Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+            Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
             such as the presence of all referenced instances within the bundle and the
             conformance of those instances to the appropriate profiles, are met.
             
@@ -53,14 +53,6 @@ module DaVinciPASTestKit
             
             Note that because X12 value sets are not public, elements bound to value
             sets containing X12 codes are not validated.
-            
-            **Limitations**
-            
-            Due to recognized errors in the PAS IG around extension context definitions,
-            this test may not pass due to spurious errors of the form "The extension
-            [extension url] is not allowed at this point". See [this
-            issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-            for additional details.
             
           )
           config(
@@ -103,7 +95,7 @@ module DaVinciPASTestKit
             profile.
             
             It also checks that other conformance requirements defined in the [PAS Formal
-            Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+            Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),
             such as the presence of all referenced instances within the bundle and the
             conformance of those instances to the appropriate profiles, are met.
             
@@ -115,14 +107,6 @@ module DaVinciPASTestKit
             
             Note that because X12 value sets are not public, elements bound to value
             sets containing X12 codes are not validated.
-            
-            **Limitations**
-            
-            Due to recognized errors in the PAS IG around extension context definitions,
-            this test may not pass due to spurious errors of the form "The extension
-            [extension url] is not allowed at this point". See [this
-            issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
-            for additional details.
             
           )
           config(

@@ -4,11 +4,8 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PasClientModificationVerificationTest < Inferno::Test
       id :pas_client_v221_modification_verification_test
-      title 'Submit Response represents a payer modification'
+      title '$submit response represents a payer modification'
       description %(
-        **USER INPUT VERIFICATION**: This test verifies the response sent by Inferno (the simulated payer)
-        instead of the system under test.
-
         In PAS v2.2.1, a payer may authorize items that differ from those that were requested. This test
         verifies that the response returned for the $submit request represents such a payer modification by
         checking that:

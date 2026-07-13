@@ -50,16 +50,16 @@ module DaVinciPASTestKit
       claim_update_submit_steps = [
         { key: 'initial', title: 'Initial submission',
           submit: :pas_client_v221_claim_update_initial_submit_test, tag: CLAIM_UPDATE_INITIAL_TAG },
-        { key: 'add_item', title: 'Update: add an item',
+        { key: 'add_item', title: 'Update - add an item',
           submit: :pas_client_v221_claim_update_add_item_submit_test, tag: CLAIM_UPDATE_ADD_ITEM_TAG },
-        { key: 'modify_cancel', title: 'Update: modify an item and cancel an item',
+        { key: 'modify_cancel', title: 'Update - modify an item and cancel an item',
           submit: :pas_client_v221_claim_update_modify_cancel_submit_test, tag: CLAIM_UPDATE_MODIFY_CANCEL_TAG },
-        { key: 'cancel_all', title: 'Update: cancel the entire request',
+        { key: 'cancel_all', title: 'Update - cancel the entire request',
           submit: :pas_client_v221_claim_update_cancel_all_submit_test, tag: CLAIM_UPDATE_CANCEL_ALL_TAG }
       ]
 
       group do
-        title 'Submit the claim update sequence'
+        title 'Interaction'
         description %(
           Inferno waits for each prior authorization submission from the client in turn. Each wait test
           auto-continues when its request is received; no Subscription notifications are triggered.
@@ -69,33 +69,10 @@ module DaVinciPASTestKit
       end
 
       group do
-        title 'Validate the claim update request and response Bundles'
+        title 'Update Details'
         description %(
-          For each submission received above, these tests validate the conformance of the request Bundle
-          the client submitted and of the response Bundle Inferno returned against the PAS Request and
-          Response Bundle profiles.
-        )
-
-        claim_update_submit_steps.each do |step|
-          test from: :pas_client_v221_request_bundle_validation_test do
-            id :"pas_client_v221_claim_update_request_validation_#{step[:key]}"
-            title "#{step[:title]}: submit request Bundle is valid"
-            config options: { workflow_tag: step[:tag] }
-          end
-
-          test from: :pas_client_v221_response_bundle_validation_test do
-            id :"pas_client_v221_claim_update_response_validation_#{step[:key]}"
-            title "#{step[:title]}: submit response Bundle is valid"
-            config options: { workflow_tag: step[:tag] }
-          end
-        end
-      end
-
-      group do
-        title 'Verify the claim update interactions'
-        description %(
-          These tests check each Claim Update made during the submission sequence for conformance of
-          the submitted PAS Claim Update Bundles.
+          These tests check that the sequence of requests made follow the
+          update approach required.
         )
 
         test from: :pas_client_v221_claim_update_referenced_claim_test
@@ -106,6 +83,29 @@ module DaVinciPASTestKit
         test from: :pas_client_v221_claim_update_cancelled_items_certtype_test
         test from: :pas_client_v221_claim_update_changed_entries_test
         test from: :pas_client_v221_claim_update_cancel_request_test
+      end
+
+      group do
+        title '$submit Conformance'
+        description %(
+          For each submission received above, these tests validate the conformance of the request Bundle
+          the client submitted and of the response Bundle Inferno returned against the PAS Request and
+          Response Bundle profiles.
+        )
+
+        claim_update_submit_steps.each do |step|
+          test from: :pas_client_v221_request_bundle_validation_test do
+            id :"pas_client_v221_claim_update_request_validation_#{step[:key]}"
+            title "#{step[:title]}: submit request Bundle has the correct structure and content"
+            config options: { workflow_tag: step[:tag] }
+          end
+
+          test from: :pas_client_v221_response_bundle_validation_test do
+            id :"pas_client_v221_claim_update_response_validation_#{step[:key]}"
+            title "#{step[:title]}: submit response Bundle has the correct structure and content"
+            config options: { workflow_tag: step[:tag] }
+          end
+        end
       end
     end
   end

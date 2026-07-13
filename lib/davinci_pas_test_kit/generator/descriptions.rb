@@ -4,46 +4,59 @@ module DaVinciPASTestKit
   class Generator
     module Descriptions
       class << self
-        def profile_links_list(required_profiles, request_profiles: nil)
+        def profile_links_list(required_profiles, ig_version, request_profiles: nil)
           <<~DESCRIPTION
-            #{profile_links(required_profiles).join("\n")}
-            #{request_profile_links_list(request_profiles) if request_profiles.present?}
+            #{profile_links(required_profiles, ig_version).join("\n")}
+            #{request_profile_links_list(request_profiles, ig_version) if request_profiles.present?}
           DESCRIPTION
         end
 
-        def request_profile_links_list(request_profiles)
+        def request_profile_links_list(request_profiles, ig_version)
           <<~DESCRIPTION
             - At least one of the following request profiles
-            #{profile_links(request_profiles, prefix: '  ').join("\n")}
+            #{profile_links(request_profiles, ig_version, prefix: '  ').join("\n")}
           DESCRIPTION
         end
 
-        def profile_links(profiles, prefix: '')
+        def profile_links(profiles, ig_version, prefix: '')
           profiles.map do |profile_metadata|
-            "#{prefix}- [#{profile_metadata.profile_name}](#{profile_url_to_link(profile_metadata.profile_url)})"
+            "#{prefix}- [#{profile_metadata.profile_name}](#{profile_url_to_link(profile_metadata.profile_url,
+                                                                                 ig_version)})"
           end
         end
 
-        def bundle_profile_link(operation, type)
+        def bundle_profile_link(operation, type, ig_version)
           "[#{PASConstants.bundle_profile_name_for_operation_and_type(operation, type)}]" \
-            "(#{profile_url_to_link(PASConstants.bundle_profile_url_for_operation_and_type(operation, type))})"
+            "(#{profile_url_to_link(PASConstants.bundle_profile_url_for_operation_and_type(operation, type),
+                                    ig_version)})"
         end
 
-        def profile_url_to_link(profile_url)
+        def ig_version_for_link(ig_version)
+          case ig_version
+          when 'v2.0.1'
+            'STU2'
+          when 'v2.2.1'
+            '2.2.1'
+          else
+            raise "Implement link string for ig version #{ig_version}"
+          end
+        end
+
+        def profile_url_to_link(profile_url, ig_version)
           "#{profile_url.gsub('http:', 'https:')
-            .gsub('davinci-pas/', 'davinci-pas/STU2/') # TODO: update to support other ig versions
+            .gsub('davinci-pas/', "davinci-pas/#{ig_version_for_link(ig_version)}/")
             .gsub('StructureDefinition/', 'StructureDefinition-')}.html"
         end
 
-        def bundle_validation_test_description(operation, type)
+        def bundle_validation_test_description(operation, type, ig_version)
           <<~DESCRIPTION
             #{"#{description_user_input_validation}\n" if type == 'request'}This test validates the conformity of the
             #{type == 'request' ? 'user input' : "server's response"} to the
-            #{bundle_profile_link(operation, type)}
+            #{bundle_profile_link(operation, type, ig_version)}
             profile#{type == 'request' ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
 
             It also checks that other conformance requirements defined in the [PAS Formal
-            Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+            Specification](https://hl7.org/fhir/us/davinci-pas/#{ig_version_for_link(ig_version)}/specification.html),
             such as the presence of all referenced instances within the bundle and the
             conformance of those instances to the appropriate profiles, are met.
 
@@ -54,8 +67,12 @@ module DaVinciPASTestKit
             fail if their code/system are not found in the valueset.
 
             Note that because X12 value sets are not public, elements bound to value
-            sets containing X12 codes are not validated.
+            sets containing X12 codes are not validated.#{"\n\n#{description_extension_limitations}" if ig_version == 'v2.0.1'}
+          DESCRIPTION
+        end
 
+        def description_extension_limitations
+          <<~EXTENSION_LIMITATIONS
             **Limitations**
 
             Due to recognized errors in the PAS IG around extension context definitions,
@@ -63,7 +80,7 @@ module DaVinciPASTestKit
             [extension url] is not allowed at this point". See [this
             issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
             for additional details.
-          DESCRIPTION
+          EXTENSION_LIMITATIONS
         end
 
         def description_user_input_validation

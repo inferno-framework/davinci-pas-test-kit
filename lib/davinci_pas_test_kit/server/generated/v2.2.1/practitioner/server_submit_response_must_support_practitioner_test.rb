@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ServerSubmitResponseMustSupportPractitionerTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v221_submit_response_must_support_practitioner
-      title 'All must support elements for Profile PAS Practitioner are observed across all instances returned'
+      title 'All must support elements for profile PAS Practitioner are observed on $submit responses'
       description %(
         
         PAS server systems are required to be able to populate all

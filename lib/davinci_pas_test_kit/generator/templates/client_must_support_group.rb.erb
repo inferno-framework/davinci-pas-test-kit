@@ -53,7 +53,7 @@ module DaVinciPASTestKit
       # attested as not collected by the client system.
       test from: :pas_client_<%= ig_version_for_id %>_must_support_with_attestation_option do
         id :pas_client_<%= ig_version_for_id %>_<%= operation %>_request_other_must_support_with_attestation_option
-        title 'All other <%= operation %> request profile must support elements are observed'
+        title '<%= other_profiles_title %>'
         config(
           options: {
             require_one_of: false,

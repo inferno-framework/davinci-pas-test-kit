@@ -7,7 +7,7 @@ module DaVinciPASTestKit
       include ClaimUpdateValidationUtils
 
       id :pas_client_v221_claim_update_entries_preserved_test
-      title 'Claim Update preserves all prior item and supportingInfo entries'
+      title 'Claims updating a Claim preserve all prior item and supportingInfo entries'
       description %(
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformancedetails.html#ci-c-spec-68)
         that when changing the details of the request, the Claim contains all item and supportingInfo entries

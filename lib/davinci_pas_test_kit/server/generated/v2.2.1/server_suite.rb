@@ -14,8 +14,8 @@ module DaVinciPASTestKit
       title 'Da Vinci PAS Server Suite v2.2.1'
       description %(
         The Da Vinci PAS Server Suite validates the conformance of server systems 
-        to the STU 2 version of the HL7® FHIR® 
-        [Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/STU2/).
+        to the v2.2.1 of the HL7® FHIR® 
+        [Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/2.2.1/).
 
         These tests are a **DRAFT** intended to allow PAS server implementers to perform 
         preliminary checks of their servers against PAS IG requirements and [provide 
@@ -24,7 +24,7 @@ module DaVinciPASTestKit
         requirements and may change the test validation logic.
 
         The best place to get started is the [Server Testing
-        Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Walkthrough),
+        Instructions](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Instructions-v2.2.1),
         which provides a step-by-step guide for running the tests against a client and provides
         an example client implemented in Postman.  Visit the [Server Testing
         Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)
@@ -68,7 +68,7 @@ module DaVinciPASTestKit
         },
         {
           label: 'Implementation Guide',
-          url: 'https://hl7.org/fhir/us/davinci-pas/history.html'
+          url: 'https://hl7.org/fhir/us/davinci-pas/2.2.1/'
         }
       ]
 

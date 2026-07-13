@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientSubmitRequestMustSupportCoverageTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v201_submit_request_must_support_coverage
-      title 'All must support elements for Profile PAS Coverage are observed across all instances submitted'
+      title 'All must support elements for profile PAS Coverage are observed on $submit requests'
       description %(
         
         PAS client systems are required to be able to populate all

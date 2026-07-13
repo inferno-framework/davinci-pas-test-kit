@@ -69,6 +69,17 @@ module DaVinciPASTestKit
         ig_metadata.reformatted_version
       end
 
+      def ig_version_for_link
+        case ig_version
+        when 'v2.0.1'
+          'STU2'
+        when 'v2.2.1'
+          '2.2.1'
+        else
+          raise "Implement link string for ig version #{ig_version}"
+        end
+      end
+
       def generate
         FileUtils.mkdir_p(base_output_dir)
         File.write(output_file_name, output)
@@ -178,7 +189,7 @@ module DaVinciPASTestKit
           profile#{simulation_verification?(type) ? ', ensuring subsequent tests can accurately simulate content.' : '.'}
 
           It also checks that other conformance requirements defined in the [PAS Formal
-          Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),
+          Specification](https://hl7.org/fhir/us/davinci-pas/#{ig_version_for_link}/specification.html),
           such as the presence of all referenced instances within the bundle and the
           conformance of those instances to the appropriate profiles, are met.
 
@@ -189,8 +200,12 @@ module DaVinciPASTestKit
           fail if their code/system are not found in the valueset.
 
           Note that because X12 value sets are not public, elements bound to value
-          sets containing X12 codes are not validated.
+          sets containing X12 codes are not validated.#{"\n\n#{description_extension_limitation}" if ig_version == 'v2.0.1'}
+        DESCRIPTION
+      end
 
+      def description_extension_limitation
+        <<~EXTENSION_LIMITATION
           **Limitations**
 
           Due to recognized errors in the PAS IG around extension context definitions,
@@ -198,7 +213,7 @@ module DaVinciPASTestKit
           [extension url] is not allowed at this point". See [this
           issue](https://github.com/inferno-framework/davinci-pas-test-kit/issues/11)
           for additional details.
-        DESCRIPTION
+        EXTENSION_LIMITATION
       end
 
       def description_user_input_validation

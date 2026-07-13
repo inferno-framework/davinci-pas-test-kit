@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientSubmitRequestMustSupportPasRequestBundleTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v201_submit_request_must_support_pas_request_bundle
-      title 'All must support elements for Profile PAS Request Bundle are observed across all instances submitted'
+      title 'All must support elements for profile PAS Request Bundle are observed on $submit requests'
       description %(
         
         PAS client systems are required to be able to populate all

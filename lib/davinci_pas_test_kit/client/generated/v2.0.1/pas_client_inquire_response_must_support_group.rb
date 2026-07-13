@@ -12,7 +12,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASClientInquireResponseMustSupportGroup < Inferno::TestGroup
       id :pas_client_v201_inquire_response_must_support
-      title 'Inquiry Response Must Support'
+      title '$inquire Response Must Support Coverage'
       description %(
         Check that `$inquire` responses provided to the client contain
         all PAS-defined profiles and their must support elements.
@@ -45,7 +45,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v201_inquire_response_must_support_practitioner_role
       test from: :pas_client_v201_inquire_response_must_support_task
       test from: :pas_client_v201_response_attest,
-           title: 'Confirm that the client handled the $inquire response must support elements (Attestation)',
+           title: 'PAS client handled the $inquire response must support elements',
            description: %(
              This test provides the tester an opportunity to verify that their client
              correctly processed and used the must support elements present in the

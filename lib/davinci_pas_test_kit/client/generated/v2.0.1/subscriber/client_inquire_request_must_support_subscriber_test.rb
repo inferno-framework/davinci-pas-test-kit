@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientInquireRequestMustSupportSubscriberTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v201_inquire_request_must_support_subscriber
-      title 'All must support elements for Profile PAS Subscriber Patient are observed across all instances submitted'
+      title 'All must support elements for profile PAS Subscriber Patient are observed on $inquire requests'
       description %(
         
         PAS client systems are required to be able to populate all

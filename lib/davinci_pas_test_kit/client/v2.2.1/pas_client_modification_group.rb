@@ -35,7 +35,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_modification_verification_test
 
       test from: :pas_client_v221_response_attest,
-           title: 'Check that the client makes the authorized item details available (Attestation)',
+           title: 'PAS client makes the details of the payer-authorized items available',
            description: %(
              This test provides the tester an opportunity to observe their client following
              the receipt of the payer modification response and attest that users are able to

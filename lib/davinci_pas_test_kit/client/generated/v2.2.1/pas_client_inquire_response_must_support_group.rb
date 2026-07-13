@@ -12,7 +12,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASClientInquireResponseMustSupportGroup < Inferno::TestGroup
       id :pas_client_v221_inquire_response_must_support
-      title 'Inquiry Response Must Support'
+      title '$inquire Response Must Support Coverage'
       description %(
         Check that `$inquire` responses provided to the client contain
         all PAS-defined profiles and their must support elements.
@@ -22,14 +22,14 @@ module DaVinciPASTestKit
         
         For `$inquire` responses, this includes the following profiles:
         
-        - [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-response-bundle.html)
-        - [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claiminquiryresponse.html)
-        - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
-        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
-        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
-        - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
-        - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
+        - [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-response-bundle.html)
+        - [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-claiminquiryresponse.html)
+        - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-insurer.html)
+        - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-requestor.html)
+        - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
+        - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
+        - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
+        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-task.html)
         
         
         
@@ -59,7 +59,7 @@ module DaVinciPASTestKit
         optional
       end
       test from: :pas_client_v221_response_attest,
-           title: 'Confirm that the client handled the $inquire response must support elements (Attestation)',
+           title: 'PAS client handled the $inquire response must support elements',
            description: %(
              This test provides the tester an opportunity to verify that their client
              correctly processed and used the must support elements present in the

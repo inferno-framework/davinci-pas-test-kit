@@ -152,13 +152,13 @@ module DaVinciPASTestKit
 
           For `$#{operation}` requests, this includes the following profiles:
 
-          #{Descriptions.profile_links_list(profiles_for(operation, 'request'), request_profiles: operation == 'submit' ? request_profiles : nil)}
+          #{Descriptions.profile_links_list(profiles_for(operation, 'request'), ig_version, request_profiles: operation == 'submit' ? request_profiles : nil)}
 
           For `$#{operation}` responses, this includes the following profiles (NOTE: request-specific
           profiles that may be echoed from `$#{operation}` requests, such as the Claim instance or request instances,
           are not currently checked):
 
-          #{Descriptions.profile_links_list(profiles_for(operation, 'response'))}
+          #{Descriptions.profile_links_list(profiles_for(operation, 'response'), ig_version)}
         DESCRIPTION
       end
     end

@@ -44,7 +44,7 @@ module DaVinciPASTestKit
             id :pas_server_<%= ig_version_for_id %>_<%= operation %>_request_bundle_validation_test_must_support
             title 'Provided $<%= operation %> Request Bundle is conformant'
             description %(
-              <%= Descriptions.bundle_validation_test_description(operation, 'request').gsub("\n", "\n" + " "*12) %>
+              <%= Descriptions.bundle_validation_test_description(operation, 'request', ig_version).gsub("\n", "\n" + " "*12) %>
             )
             simulation_verification
             config(
@@ -82,7 +82,7 @@ module DaVinciPASTestKit
             id :pas_server_<%= ig_version_for_id %>_<%= operation %>_response_bundle_validation_test_must_support
             title 'Server $<%= operation %> Response Bundle is conformant'
             description %(
-              <%= Descriptions.bundle_validation_test_description(operation, 'response').gsub("\n", "\n" + " "*14) %>
+              <%= Descriptions.bundle_validation_test_description(operation, 'response', ig_version).gsub("\n", "\n" + " "*14) %>
             )
             config(
               options: {

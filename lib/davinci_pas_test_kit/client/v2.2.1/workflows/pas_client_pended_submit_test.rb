@@ -13,7 +13,7 @@ module DaVinciPASTestKit
       include PasBundleValidation
 
       id :pas_client_v221_pended_submit_test
-      title 'Client submits a claim and reacts to a pended response'
+      title 'PAS Client submits a claim and receives a final decision via a notification'
       description %(
         Inferno will wait for a prior authorization submission request
         from the client. Upon receipt, Inferno will respond with the

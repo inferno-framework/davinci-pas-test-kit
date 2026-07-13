@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ServerInquireResponseMustSupportTaskTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v221_inquire_response_must_support_task
-      title 'All must support elements for Profile PAS Task are observed across all instances returned'
+      title 'All must support elements for profile PAS Task are observed on $inquire responses'
       description %(
         
         PAS server systems are required to be able to populate all

@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ServerInquireRequestMustSupportBeneficiaryTest < DaVinciPASTestKit::MustSupportTest
       id :pas_server_v221_inquire_request_must_support_beneficiary
-      title 'All must support elements for Profile PAS Beneficiary Patient are observed across all instances submitted'
+      title 'All must support elements for profile PAS Beneficiary Patient are observed on $inquire requests'
       description %(
         
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.

@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v221_processing_error_submit_test
-      title 'Client submits a claim and handles a response containing processing errors'
+      title 'PAS client submits a claim and receives a response containing processing errors'
       description %(
         Inferno will wait for a prior authorization submission request from the client.
         Upon receipt, Inferno will return the provided response bundle containing one or

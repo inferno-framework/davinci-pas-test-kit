@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ClientSubmitResponseMustSupportTaskTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v221_submit_response_must_support_task
-      title 'All must support elements for Profile PAS Task are observed across all instances returned'
+      title 'All must support elements for profile PAS Task are observed on $submit responses'
       description %(
         
         PAS client systems are required to be able to receive all

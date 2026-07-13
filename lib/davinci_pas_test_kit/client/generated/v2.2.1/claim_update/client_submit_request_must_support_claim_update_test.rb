@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ClientSubmitRequestMustSupportClaimUpdateTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v221_submit_request_must_support_claim_update
-      title 'All must support elements for Profile PAS Claim Update are observed across all instances submitted'
+      title 'All must support elements for profile PAS Claim Update are observed on $submit requests'
       description %(
         
         PAS client systems are required to be able to populate all

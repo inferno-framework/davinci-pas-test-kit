@@ -27,7 +27,7 @@ module DaVinciPASTestKit
            config: { options: { workflow_tag: PROCESSING_ERROR_WORKFLOW_TAG } }
       test from: :pas_client_v221_processing_error_response_validation_test
       test from: :pas_client_v221_response_attest,
-           title: 'Check that the client handles the processing errors appropriately (Attestation)',
+           title: 'PAS client handles the processing errors appropriately',
            description: %(
              This test provides the tester an opportunity to observe their client following
              the receipt of the response containing ClaimResponse.error entries and attest

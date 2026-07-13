@@ -9,7 +9,7 @@ module DaVinciPASTestKit
     include UserInputResponse
 
     id :pas_client_denial_submit_test
-    title 'Client submits a claim using the $submit operation'
+    title 'PAS client submits a claim using the $submit operation'
     description %(
       Inferno will wait for a prior authorization submission request
       from the client. Upon receipt, Inferno will respond with the

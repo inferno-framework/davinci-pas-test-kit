@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientSubmitResponseMustSupportCommunicationRequestTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v201_submit_response_must_support_communication_request
-      title 'All must support elements for Profile PAS CommunicationRequest are observed across all instances returned'
+      title 'All must support elements for profile PAS CommunicationRequest are observed on $submit responses'
       description %(
         
         PAS client systems are required to be able to receive all

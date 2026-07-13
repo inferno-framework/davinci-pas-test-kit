@@ -4,7 +4,7 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class ClientInquireRequestMustSupportClaimInquiryTest < DaVinciPASTestKit::MustSupportTest
       id :pas_client_v201_inquire_request_must_support_claim_inquiry
-      title 'All must support elements for Profile PAS Claim Inquiry are observed across all instances submitted'
+      title 'All must support elements for profile PAS Claim Inquiry are observed on $inquire requests'
       description %(
         
         PAS client systems are required to be able to populate all
