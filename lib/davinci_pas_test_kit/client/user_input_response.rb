@@ -19,20 +19,28 @@ module DaVinciPASTestKit
       read_input(result, input_key)
     end
 
-    # Returns the nth response from a list of tester-provided responses for the must support workflow.
-    # The input value should be a JSON array of response bundles, e.g., [bundle_1, bundle_2].
-    # Returns nil if the input is not present, not parseable, or n exceeds the list length.
-    def self.nth_user_inputted_response(result, operation, request_index)
+    # Returns the tester-provided response candidates for the must support workflow
+    # as a list of parsed JSON hashes. The input value may be a single entry or a
+    # JSON array of entries, where each entry is either a bare FHIR Bundle or a
+    # wrapper object holding the response Bundle under "bundle" alongside optional
+    # selection "criteria".
+    # Returns nil if the input is not present, not parseable, or malformed.
+    def self.response_candidates(result, operation)
       input_name = operation == 'submit' ? 'ms_submit_responses' : 'ms_inquire_responses'
       input_value = JSON.parse(result.input_json)&.find { |i| i['name'] == input_name }&.dig('value')
       return unless input_value.present?
 
-      responses = JSON.parse(input_value)
-      return unless responses.is_a?(Array) && request_index < responses.length
-
-      responses[request_index].is_a?(String) ? responses[request_index] : responses[request_index].to_json
+      candidates = JSON.parse(input_value)
+      candidates = [candidates] unless candidates.is_a?(Array)
+      candidates if candidates.all? { |candidate| valid_candidate?(candidate) }
     rescue JSON::ParserError
       nil
+    end
+
+    def self.valid_candidate?(candidate)
+      return false unless candidate.is_a?(Hash)
+
+      candidate['resourceType'] == 'Bundle' || candidate['bundle'].is_a?(Hash)
     end
 
     def user_inputted_response?(input_key)
