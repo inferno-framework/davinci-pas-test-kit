@@ -9,8 +9,8 @@ module DaVinciPASTestKit
       the conformance of both PAS client and server implementations to
       the Da Vinci PAS Implementation Guide. It includes suites covering the
       following versions:
-      - [v2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/)
-      - [v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/)
+      - [Da Vinci Prior Authorization Support (PAS) v2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/)
+      - [Da Vinci Prior Authorization Support (PAS) v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/)
 
       <!-- break -->
 
