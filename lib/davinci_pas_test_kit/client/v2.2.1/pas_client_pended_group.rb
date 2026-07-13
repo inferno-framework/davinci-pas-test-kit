@@ -102,7 +102,10 @@ module DaVinciPASTestKit
              title: 'PAS client accepts the "claim updated" event notification',
              description: %(
                This test checks that the client responds appropriately to the event notification request.
-             )
+             ) do
+               verifies_requirements(*SubscriptionsTestKit::SubscriptionsR5BackportR4Client::EventNotificationVerificationTest.verifies_requirements,
+                                     'hl7.fhir.us.davinci-pas_2.2.1@spec-8')
+             end
         test from: :pas_client_v221_response_attest,
              title: 'PAS client displays the final decision as "approved"',
              description: %(

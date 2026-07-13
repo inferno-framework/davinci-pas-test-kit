@@ -39,7 +39,9 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_inquire_response_must_support_pas_inquiry_response_bundle do
         optional
       end
-      test from: :pas_client_v221_inquire_response_must_support_claiminquiryresponse
+      test from: :pas_client_v221_inquire_response_must_support_claiminquiryresponse do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
       test from: :pas_client_v221_inquire_response_must_support_insurer do
         optional
       end
@@ -68,8 +70,10 @@ module DaVinciPASTestKit
            config: { options: {
              workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
              attest_message: "I attest that the client system correctly processed the must support elements " \
-                             "contained in the $inquire responses received from Inferno."
-           } }
+                             "contained in the $inquire responses received from Inferno and did not error."
+           } } do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+      end
     end
   end
 end

@@ -38,15 +38,33 @@ module DaVinciPASTestKit
       )
       run_as_group
 
-      test from: :pas_client_v201_submit_response_must_support_pas_response_bundle
-      test from: :pas_client_v201_submit_response_must_support_claimresponse
-      test from: :pas_client_v201_submit_response_must_support_communication_request
-      test from: :pas_client_v201_submit_response_must_support_insurer
-      test from: :pas_client_v201_submit_response_must_support_requestor
-      test from: :pas_client_v201_submit_response_must_support_beneficiary
-      test from: :pas_client_v201_submit_response_must_support_practitioner
-      test from: :pas_client_v201_submit_response_must_support_practitioner_role
-      test from: :pas_client_v201_submit_response_must_support_task
+      test from: :pas_client_v201_submit_response_must_support_pas_response_bundle do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_claimresponse do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_communication_request do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_insurer do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_requestor do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_beneficiary do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_practitioner do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_practitioner_role do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
+      test from: :pas_client_v201_submit_response_must_support_task do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+      end
       test from: :pas_client_v201_response_attest,
            title: 'PAS client handled the $submit response must support elements',
            description: %(
@@ -57,8 +75,10 @@ module DaVinciPASTestKit
            config: { options: {
              workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
              attest_message: "I attest that the client system correctly processed the must support elements " \
-                             "contained in the $submit responses received from Inferno."
-           } }
+                             "contained in the $submit responses received from Inferno and did not error."
+           } } do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+      end
     end
   end
 end

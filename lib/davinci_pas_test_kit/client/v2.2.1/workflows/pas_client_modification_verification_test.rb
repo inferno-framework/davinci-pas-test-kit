@@ -19,8 +19,6 @@ module DaVinciPASTestKit
       )
       simulation_verification
 
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-36', 'hl7.fhir.us.davinci-pas_2.2.1@spec-37'
-
       REVIEW_ACTION_URL =
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'.freeze
       REVIEW_ACTION_CODE_URL =
