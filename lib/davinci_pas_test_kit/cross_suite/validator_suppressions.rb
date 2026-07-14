@@ -122,6 +122,10 @@ module DaVinciPASTestKit
       'X12278DiagnosisCodes', # ValueSet includes full ICD-10-CM plus unavailable code systems; validator cannot fully expand
       'X12278RequestedServiceType', # X12 code system included in this PAS-defined value set
       'X12278LocationType', # X12 code system included in this PAS-defined value set
+      # X12 value set definitions are proprietary and unavailable to the validator, so resolution
+      # failures for them are not actionable. Current validator versions quote the URL, which the
+      # exact-string entries from the IG suppression list above no longer match.
+      %r{ValueSet 'https://valueset\.x12\.org/[^']+' not found},
       'ValueSet https://valueset.x12.org/x217/005010/response/2010B/NM1/1/01/00/98 not found',
       "Error from http://tx.fhir.org/r4: Error:A definition for the value Set 'http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|3.1.1' could not be found",
       "A definition for CodeSystem 'https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set' could not be found, so the code cannot be validated",

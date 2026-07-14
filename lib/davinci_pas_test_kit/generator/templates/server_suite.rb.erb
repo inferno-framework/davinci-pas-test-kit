@@ -88,8 +88,7 @@ module DaVinciPASTestKit
         exclude_message do |message|
           # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
           # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching
-          SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, '')) ||
-            message.message.downcase.include?('x12')
+          SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, ''))
         end
 
         validation_context do
