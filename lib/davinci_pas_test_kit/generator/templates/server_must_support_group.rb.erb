@@ -3,6 +3,9 @@ require_relative '../../claim_submit_operation_test'
 require_relative '../../server_response_bundle_validation_test'
 require_relative '../../claim_inquire_operation_test'
 require_relative '../../<%= ig_version %>/must_support/pas_server_must_support_request_profiles_test'
+<%- if claim_inquiry_responses_group? -%>
+require_relative '../../<%= ig_version %>/pas_server_claim_inquiry_responses_group'
+<%- end -%>
 <%- profile_test_files('submit', 'request').each do |file_name| -%>
 require_relative '<%= file_name %>'
 <%- end -%>
@@ -115,6 +118,10 @@ module DaVinciPASTestKit
           test from: :<%= id %>
           <%- end -%>
         end
+        <%- if operation == 'inquire' && claim_inquiry_responses_group? -%>
+
+        group from: :<%= claim_inquiry_responses_group_id %>
+        <%- end -%>
       end<%end%>
     end
   end

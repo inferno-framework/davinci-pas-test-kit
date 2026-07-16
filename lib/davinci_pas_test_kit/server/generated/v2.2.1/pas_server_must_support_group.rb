@@ -3,6 +3,7 @@ require_relative '../../claim_submit_operation_test'
 require_relative '../../server_response_bundle_validation_test'
 require_relative '../../claim_inquire_operation_test'
 require_relative '../../v2.2.1/must_support/pas_server_must_support_request_profiles_test'
+require_relative '../../v2.2.1/pas_server_claim_inquiry_responses_group'
 require_relative 'pas_request_bundle/server_submit_request_must_support_pas_request_bundle_test'
 require_relative 'claim_update/server_submit_request_must_support_claim_update_test'
 require_relative 'coverage/server_submit_request_must_support_coverage_test'
@@ -397,6 +398,8 @@ module DaVinciPASTestKit
           test from: :pas_server_v221_inquire_response_must_support_practitioner_role
           test from: :pas_server_v221_inquire_response_must_support_task
         end
+
+        group from: :pas_server_v221_claim_inquiry_responses
       end
     end
   end
