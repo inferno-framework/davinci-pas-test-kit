@@ -24,7 +24,8 @@ module DaVinciPASTestKit
     # JSON array of entries, where each entry is either a bare FHIR Bundle or a
     # wrapper object holding the response Bundle under "bundle" alongside optional
     # selection "criteria".
-    # Returns nil if the input is not present, not parseable, or malformed.
+    # Returns nil, with a log entry when the value is present but unusable, so that
+    # Inferno falls back to generated default responses.
     def self.response_candidates(result, operation)
       input_name = operation == 'submit' ? 'ms_submit_responses' : 'ms_inquire_responses'
       input_value = JSON.parse(result.input_json)&.find { |i| i['name'] == input_name }&.dig('value')
@@ -32,8 +33,20 @@ module DaVinciPASTestKit
 
       candidates = JSON.parse(input_value)
       candidates = [candidates] unless candidates.is_a?(Array)
-      candidates if candidates.all? { |candidate| valid_candidate?(candidate) }
+      invalid_index = candidates.index { |candidate| !valid_candidate?(candidate) }
+      if invalid_index.present?
+        Inferno::Application['logger'].warn(
+          "Ignoring the '#{input_name}' input: entry #{invalid_index + 1} is neither a FHIR Bundle nor a " \
+          'wrapper object with a "bundle" key. Inferno will generate default responses.'
+        )
+        return
+      end
+
+      candidates
     rescue JSON::ParserError
+      Inferno::Application['logger'].warn(
+        "Ignoring the '#{input_name}' input because it is not valid JSON. Inferno will generate default responses."
+      )
       nil
     end
 

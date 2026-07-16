@@ -14,8 +14,7 @@ module DaVinciPASTestKit
       return fhirpath_result if fhirpath_result.status.to_s.start_with?('2')
 
       raise FhirpathServiceError,
-            "FHIRPath service returned #{fhirpath_result.status} for query '#{query}' " \
-            "on resource #{body}: #{fhirpath_result.body}"
+            "FHIRPath service returned #{fhirpath_result.status} for query '#{query}'"
     end
 
     def interpret_fhirpath_result_as_boolean(fhirpath_result)
@@ -50,6 +49,8 @@ module DaVinciPASTestKit
         .map { |element| element.is_a?(Array) || element.is_a?(Hash) ? nil : element }
         .compact
         .join(',')
+    rescue JSON::ParserError
+      raise FhirpathServiceError, "FHIRPath service returned an unparseable body for query '#{expression}'"
     end
   end
 end
