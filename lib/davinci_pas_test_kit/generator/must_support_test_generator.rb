@@ -144,6 +144,12 @@ module DaVinciPASTestKit
         end
       end
 
+      def tests_conf_6?
+        ig_metadata.ig_version.starts_with?('v2.2') &&
+          system == 'server' &&
+          ['ClaimResponse', 'ClaimInquiryResponse'].include?(resource_type)
+      end
+
       def generate
         FileUtils.mkdir_p(output_file_directory)
         File.write(output_file_name, output)
