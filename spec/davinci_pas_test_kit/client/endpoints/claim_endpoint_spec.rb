@@ -181,6 +181,78 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(returned.entry[0].resource.patient.reference).to eq('Patient/ReferralAuthorizationExample')
     end
 
+    it 'skips an entry with an invalid request range and continues to later entries' do
+      responses = [wrapped_response_bundle(id: 'bad-range', criteria: { 'requestRange' => '3-2' }),
+                   response_bundle(id: 'fallback')]
+      inputs = { session_url_path:, ms_submit_responses: responses.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response.id).to eq('fallback')
+    end
+
+    it 'generates a default response when the FHIRPath service returns an error during criteria evaluation' do
+      responses = [wrapped_response_bundle(id: 'needs-fhirpath', criteria: { 'fhirpath' => 'Bundle.id.exists()' })]
+      inputs = { session_url_path:, ms_submit_responses: responses.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+        .with(query: { 'path' => 'Bundle.id.exists()' })
+        .to_return(status: 500, body: 'internal error')
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+      expect(returned_claim_response.id).to_not eq('needs-fhirpath')
+    end
+
+    it 'generates a default response when the FHIRPath service cannot be reached' do
+      responses = [wrapped_response_bundle(id: 'needs-fhirpath', criteria: { 'fhirpath' => 'Bundle.id.exists()' })]
+      inputs = { session_url_path:, ms_submit_responses: responses.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+        .with(query: { 'path' => 'Bundle.id.exists()' })
+        .to_raise(Faraday::ConnectionFailed.new('connection refused'))
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+    end
+
+    it 'generates a default response when the FHIRPath service fails during token replacement' do
+      bundle = response_bundle(id: 'token-bundle')
+      bundle['entry'][0]['resource']['preAuthRef'] = '{{Bundle.id}}'
+      inputs = { session_url_path:, ms_submit_responses: bundle.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+        .with(query: { 'path' => 'Bundle.id' })
+        .to_return(status: 500, body: 'internal error')
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+      expect(returned_claim_response.id).to_not eq('token-bundle')
+    end
+
+    it 'serves tester-provided bundles when the request URL includes a query string' do
+      inputs = { session_url_path:, ms_submit_responses: response_bundle(id: 'query-string-bundle').to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json("#{submit_url}?foo=bar", submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response.id).to eq('query-string-bundle')
+    end
+
     it 'generates a default response when no provided entry matches' do
       responses = [wrapped_response_bundle(id: 'never-selected', criteria: { 'requestRange' => '5' })]
       inputs = { session_url_path:, ms_submit_responses: responses.to_json }
