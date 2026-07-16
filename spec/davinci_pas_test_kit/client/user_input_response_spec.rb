@@ -40,22 +40,28 @@ RSpec.describe DaVinciPASTestKit::UserInputResponse do
       expect(described_class.response_candidates(result, 'submit')).to be_nil
     end
 
-    it 'returns nil when the input is not valid JSON' do
+    it 'returns nil and logs when the input is not valid JSON' do
       result = result_with_input('ms_submit_responses', 'not json')
+      allow(Inferno::Application['logger']).to receive(:warn)
 
       expect(described_class.response_candidates(result, 'submit')).to be_nil
+      expect(Inferno::Application['logger']).to have_received(:warn).with(/not valid JSON/)
     end
 
-    it 'returns nil when the input contains entries that are not objects' do
+    it 'returns nil and logs the entry number when an entry is not an object' do
       result = result_with_input('ms_submit_responses', [bundle_a, 'not a bundle'].to_json)
+      allow(Inferno::Application['logger']).to receive(:warn)
 
       expect(described_class.response_candidates(result, 'submit')).to be_nil
+      expect(Inferno::Application['logger']).to have_received(:warn).with(/entry 2/)
     end
 
-    it 'returns nil when a wrapper is missing its bundle' do
+    it 'returns nil and logs when a wrapper is missing its bundle' do
       result = result_with_input('ms_submit_responses', [{ 'criteria' => { 'requestRange' => '1' } }].to_json)
+      allow(Inferno::Application['logger']).to receive(:warn)
 
       expect(described_class.response_candidates(result, 'submit')).to be_nil
+      expect(Inferno::Application['logger']).to have_received(:warn).with(/entry 1/)
     end
   end
 end

@@ -165,14 +165,15 @@ module DaVinciPASTestKit
     # match the incoming request, extracts its response Bundle (unwrapping it when the
     # candidate pairs the Bundle with criteria), and replaces {{fhirpath}} tokens with
     # values from the request. Returns nil, causing Inferno to generate a default
-    # response, if no candidates are provided or none match.
+    # response, if no candidates are provided, none match, or the FHIRPath service
+    # cannot evaluate criteria or tokens.
     def select_must_support_response(req_bundle)
       candidates = UserInputResponse.response_candidates(result, operation)
       return if candidates.blank?
 
       operation_url_suffix = "$#{operation}"
       request_number = count_previous_successful_requests(operation_url_suffix) + 1
-      selected_index = candidates.index { |candidate| include_entity?(candidate, req_bundle, operation_url_suffix) }
+      selected_index = candidates.index { |candidate| include_entity?(candidate, req_bundle, request_number) }
 
       if selected_index.nil?
         Inferno::Application['logger'].info(
@@ -187,16 +188,22 @@ module DaVinciPASTestKit
         "for #{operation_url_suffix} request ##{request_number}."
       )
       replace_tokens(entity_bundle(candidates[selected_index]), req_bundle)
+    rescue FhirpathUtils::FhirpathServiceError, Faraday::Error => e
+      Inferno::Application['logger'].warn(
+        "Unable to select a tester-provided response (#{e.message}). Inferno will generate a default response."
+      )
+      nil
     end
 
-    # Round-trips the selected bundle through the FHIR model to normalize it after
-    # token replacement. Falls back to the replaced string if it no longer parses,
-    # e.g., when a replaced value breaks the JSON structure.
+    # Replaces {{fhirpath}} tokens using values from the incoming request, round-tripping
+    # the result through the FHIR model to normalize it. Falls back to the replaced string
+    # if it no longer parses, e.g., when a replaced value breaks the JSON structure.
     def replace_tokens(bundle_hash, req_bundle)
-      replaced = replace_tokens_in_string(bundle_hash.to_json, req_bundle)
+      bundle_json = bundle_hash.to_json
+      replaced = replace_tokens_in_string(bundle_json, req_bundle)
+      return bundle_json if replaced.equal?(bundle_json)
+
       FHIR.from_contents(replaced)&.to_json || replaced
-    rescue JSON::ParserError
-      replaced
     end
 
     def handle_missing_required_elements(claim_entry, response)
@@ -255,7 +262,8 @@ module DaVinciPASTestKit
     end
 
     def operation
-      request.url&.split('$')&.last
+      operation_with_query = request.url&.split('$')&.last
+      operation_with_query&.split('?')&.first
     end
 
     def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid)
