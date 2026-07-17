@@ -26,16 +26,17 @@ module DaVinciPASTestKit
                      modify the Subscription before submission, e.g., to point to Inferno's notification endpoint.
                    )
       end
-      test from: :subscriptions_r4_server_notification_delivery,
-           title: 'Send Subscription and Receive Handshake Notification from Server',
-           description: %(
-               This test sends a request to create the Subscription resource to the Subscriptions Backport FHIR Server.
-               If successful, it then waits for a handshake
-               [notification](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/notifications.html#notifications).
-               Other types of notifications, including heartbeat and event notifications, will be accepted by Inferno
-               but ignored by this test group.
-             ),
-           verifies_requirements: ['hl7.fhir.us.davinci-pas_2.2.1@spec-54']
+      test from: :subscriptions_r4_server_notification_delivery do
+        title 'Send Subscription and Receive Handshake Notification from Server'
+        description %(
+            This test sends a request to create the Subscription resource to the Subscriptions Backport FHIR Server.
+            If successful, it then waits for a handshake
+            [notification](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/notifications.html#notifications).
+            Other types of notifications, including heartbeat and event notifications, will be accepted by Inferno
+            but ignored by this test group.
+          )
+        verifies_requirements(*(verifies_requirements + ['hl7.fhir.us.davinci-pas_2.2.1@spec-54']))
+      end
       test from: :subscriptions_r4_server_creation_response_conformance
       test from: :subscriptions_r4_server_handshake_conformance
     end
