@@ -34,7 +34,8 @@ module DaVinciPASTestKit
                [notification](https://hl7.org/fhir/uv/subscriptions-backport/STU1.1/notifications.html#notifications).
                Other types of notifications, including heartbeat and event notifications, will be accepted by Inferno
                but ignored by this test group.
-             )
+             ),
+           verifies_requirements: ['hl7.fhir.us.davinci-pas_2.2.1@spec-54']
       test from: :subscriptions_r4_server_creation_response_conformance
       test from: :subscriptions_r4_server_handshake_conformance
     end
