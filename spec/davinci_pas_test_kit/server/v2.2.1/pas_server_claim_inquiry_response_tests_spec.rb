@@ -56,6 +56,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ServerClaimInquiryResponseVali
       expect(run(described_class).result).to eq('skip')
     end
 
+    it 'skips when Bundles contain entries but no resources' do
+      seed_inquire_response(parameters_response({ resourceType: 'Bundle', type: 'collection', entry: [{}] }))
+
+      expect(run(described_class).result).to eq('skip')
+    end
+
     it 'passes when the ClaimResponse request references a Claim' do
       bundle = claim_response_bundle(request: { reference: 'Claim/original-claim' })
       seed_inquire_response(parameters_response(bundle))

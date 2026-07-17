@@ -29,7 +29,7 @@ module DaVinciPASTestKit
       end
 
       def claim_inquiry_responses
-        response_bundles.flat_map { |bundle| Array(bundle.entry).map(&:resource) }
+        response_bundles.flat_map { |bundle| Array(bundle.entry).filter_map { |entry| entry&.resource } }
           .grep(FHIR::ClaimResponse)
       end
 

@@ -112,11 +112,11 @@ module DaVinciPASTestKit
 
       # Additional Claim Inquiry Response checks are v2.2.x-specific, so they are only included
       # in the v2.2+ server element support group.
-      def claim_inquiry_responses_group?
+      def additional_claim_inquiry_response_requirements_supported?
         ig_metadata.ig_version.start_with?('v2.2')
       end
 
-      def claim_inquiry_responses_group_id
+      def additional_claim_inquiry_response_requirements_group_id
         "pas_server_#{ig_version_for_id}_claim_inquiry_responses"
       end
 
