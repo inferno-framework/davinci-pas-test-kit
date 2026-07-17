@@ -73,7 +73,8 @@ module DaVinciPASTestKit
             <%= bundle_validation_test_description('submit', 'response').gsub("\n", "\n" + " "*12) %>
           )
 <% if ig_metadata.ig_version.starts_with?('v2.2') -%>
-          verifies_requirements 'hl7.fhir.us.davinci-pas.2.2.1@spec-30'<% end %>
+          verifies_requirements 'hl7.fhir.us.davinci-pas.2.2.1@spec-30',
+                                'hl7.fhir.us.davinci-pas-2.2.1@spec-31<% end %>
           config(
             options: {
               use_case: '<%= use_case %>',
