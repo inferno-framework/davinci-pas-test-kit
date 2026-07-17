@@ -125,7 +125,8 @@ module DaVinciPASTestKit
             for additional details.
             
           )
-          verifies_requirements 'hl7.fhir.us.davinci-pas.2.2.1@spec-30'
+          verifies_requirements 'hl7.fhir.us.davinci-pas.2.2.1@spec-30',
+                                'hl7.fhir.us.davinci-pas-2.2.1@spec-31
           config(
             options: {
               use_case: 'pended',
