@@ -151,7 +151,7 @@ module DaVinciPASTestKit
         
         test from: :pas_server_v221_subscription_notification_wait do
           id :pas_server_v221_subscription_notification_wait_pended
-          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-51'
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-51', 'hl7.fhir.us.davinci-pas_2.2.1@spec-60'
         end
         test from: :subscriptions_r4_server_notification_conformance do
           id :pas_server_v221_subscription_notification_conformance_pended
