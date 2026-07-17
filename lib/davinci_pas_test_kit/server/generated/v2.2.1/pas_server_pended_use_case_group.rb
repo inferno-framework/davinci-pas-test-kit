@@ -162,6 +162,7 @@ module DaVinciPASTestKit
         end
         test from: :pas_notification_pas_conformance_test do
           id :pas_server_v221_notification_pas_conformance_pended
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-61'
         end
       end
     end
