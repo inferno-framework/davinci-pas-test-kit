@@ -117,7 +117,8 @@ module DaVinciPASTestKit
         end
         test from: :pas_notification_pas_conformance_test do
           id :pas_server_<%= ig_version_for_id %>_notification_pas_conformance_<%= use_case %>
-          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-61'
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-61',
+                                'hl7.fhir.us.davinci-pas_2.2.1@spec-62'
         end
 <% else -%>
         test from: :subscriptions_r4_server_id_only_conformance do
