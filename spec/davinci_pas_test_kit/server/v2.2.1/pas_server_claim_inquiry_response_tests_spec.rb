@@ -1,6 +1,3 @@
-# Behavioral specs for the server-side Claim Inquiry Response verification tests (spec-44). Inferno
-# reloads prior $inquire responses by tag and verifies each returned ClaimResponse either references
-# a Claim or explains the missing Claim reference with a Data Absent Reason extension.
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::ServerClaimInquiryResponseValidation, :runnable do
   let(:suite_id) { 'davinci_pas_server_suite_v221' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }

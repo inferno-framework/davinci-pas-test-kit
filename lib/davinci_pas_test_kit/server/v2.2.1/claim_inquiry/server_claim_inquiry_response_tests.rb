@@ -52,7 +52,6 @@ module DaVinciPASTestKit
       end
     end
 
-    # spec-44
     class PASServerClaimInquiryResponseClaimReferenceTest < Inferno::Test
       include ServerClaimInquiryResponseValidation
 
