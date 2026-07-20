@@ -123,6 +123,11 @@ module DaVinciPASTestKit
           ['hl7.fhir.us.davinci-pas_2.0.1@35']
         when 'inquire_request_v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@36']
+        when 'submit_request_v2.2.1', 'inquire_request_v2.2.1'
+          [
+            'hl7.fhir.us.davinci-pas_2.2.1@conf-4',
+            'hl7.fhir.us.davinci-pas_2.2.1@conf-5'
+          ]
         end
       end
 
