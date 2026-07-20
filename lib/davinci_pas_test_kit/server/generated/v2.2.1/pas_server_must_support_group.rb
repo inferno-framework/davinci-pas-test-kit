@@ -225,6 +225,7 @@ module DaVinciPASTestKit
         group do
           title '$submit Request Must Support'
           simulation_verification
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-4', 'hl7.fhir.us.davinci-pas_2.2.1@conf-5'
 
           test from: :pas_server_v221_must_support_request_profiles
           test from: :pas_server_v221_submit_request_must_support_pas_request_bundle
@@ -406,6 +407,7 @@ module DaVinciPASTestKit
         group do
           title '$inquire Request Must Support'
           simulation_verification
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-4', 'hl7.fhir.us.davinci-pas_2.2.1@conf-5'
 
           test from: :pas_server_v221_inquire_request_must_support_pas_inquiry_request_bundle
           test from: :pas_server_v221_inquire_request_must_support_claim_inquiry
