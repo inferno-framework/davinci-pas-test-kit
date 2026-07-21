@@ -57,6 +57,12 @@ module DaVinciPASTestKit
         identifiers.map(&:inspect).join(', ')
       end
 
+      # v2.2+ suites use the targeted suppression list; v2.0.1 keeps the legacy list plus the
+      # targeted entries.
+      def suppressed_messages_constant
+        ig_metadata.ig_version.start_with?('v2.2') ? 'V221_SUPPRESSED_MESSAGES' : 'V201_SUPPRESSED_MESSAGES'
+      end
+
       def ig_link
         case ig_metadata.ig_version
         when 'v2.0.1'
