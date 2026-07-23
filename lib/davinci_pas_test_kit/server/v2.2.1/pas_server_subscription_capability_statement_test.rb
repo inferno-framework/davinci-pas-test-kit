@@ -2,7 +2,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASServerSubscriptionCapabilityStatementTest < Inferno::Test
       id :pas_server_v221_subscription_capability_statement_test
-      title 'Server CapabilityStatement declares Subscription create, update, and delete support'
+      title 'Server Capability Statement declares Subscription create, update, and delete support'
       description %(
           The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#ci-c-spec-55)
           servers that support subscriptions to expose that support in their CapabilityStatement. This test retrieves
@@ -17,7 +17,7 @@ module DaVinciPASTestKit
       run do
         fhir_get_capability_statement
 
-        assert_response_status(200) 
+        assert_response_status(200)
         assert_resource_type(:capability_statement)
 
         server_rest = resource.rest.find { |rest| rest.mode == 'server' }
