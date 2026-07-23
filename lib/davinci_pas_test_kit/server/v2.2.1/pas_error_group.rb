@@ -13,6 +13,8 @@ module DaVinciPASTestKit
       id :pas_v221_error_group
       run_as_group
 
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-39'
+
       test from: :pas_server_v221_prior_auth_submission_error
       test from: :pas_server_v221_prior_auth_inquiry_error
     end
