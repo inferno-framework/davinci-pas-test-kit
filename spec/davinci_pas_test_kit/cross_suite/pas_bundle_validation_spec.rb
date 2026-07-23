@@ -250,6 +250,8 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           request_bundle: request_bundle_with_patient
         )
         expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
       end
 
       it 'fails when an echoed resource has a different identifier' do
@@ -262,6 +264,8 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           request_bundle: request_bundle_with_patient
         )
         expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
       end
 
       it 'fails when an echoed resource has an identifier with a different system' do
@@ -275,6 +279,8 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           request_bundle: request_bundle_with_patient
         )
         expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
       end
     end
 

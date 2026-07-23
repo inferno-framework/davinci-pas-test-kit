@@ -242,12 +242,7 @@ module DaVinciPASTestKit
         end
         next if request_entry.blank?
 
-        # Confirm that echoed responses have matching identifiers with their corresponding request
-        request_resource = request_entry.resource
-        matching_full_url = request_entry.fullUrl == response_entry.fullUrl
-        matching_id = request_resource.id == response_resource.id
-        matching_identifiers = request_resource.identifier == response_resource.identifier
-        next if matching_full_url && matching_id && matching_identifiers
+        next if echoed_resource_identifiers_match?(request_entry, response_entry)
 
         validation_error_messages << resource_present_in_pa_request_and_response_msg(response_resource)
       end
@@ -265,6 +260,15 @@ module DaVinciPASTestKit
       request_entry.fullUrl == response_entry.fullUrl ||
         request_resource.id == response_resource.id ||
         (request_resource.identifier.present? && request_resource.identifier == response_resource.identifier)
+    end
+
+    def echoed_resource_identifiers_match?(request_entry, response_entry)
+      request_resource = request_entry.resource
+      response_resource = response_entry.resource
+
+      request_entry.fullUrl == response_entry.fullUrl &&
+        request_resource.id == response_resource.id &&
+        request_resource.identifier == response_resource.identifier
     end
 
     # Profile conformance of Prior Authorization (PA) resources.
