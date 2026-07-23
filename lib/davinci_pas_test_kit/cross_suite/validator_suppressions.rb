@@ -15,40 +15,37 @@ module DaVinciPASTestKit
     # so resolution failures for them are not actionable by users.
     %r{ValueSet 'https://valueset\.x12\.org/[^']+' not found},
     %r{A definition for CodeSystem 'https://codesystem\.x12\.org/[^']+' could not be found, so the code cannot be validated},
-    # The NUBC revenue code system is proprietary as well, so it can be neither resolved nor
-    # expanded within the PAS-defined value set built on it. Code membership failures against that
-    # value set are false positives -- the IG's own examples fail the check.
-    "A definition for CodeSystem 'https://www.nubc.org/revenue-code' could not be found, so the code cannot be validated",
-    "None of the codings provided are in the value set 'AHA NUBC Revenue Value Set' (http://hl7.org/fhir/us/davinci-pas/ValueSet/AHANUBCRevenueCodes",
-    # Same situation for the PAS-defined X12278RequestedServiceType value set, which draws its
-    # members from unavailable X12 code systems.
-    "None of the codings provided are in the value set 'X12 278 Requested Service Type' (http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278RequestedServiceType",
+    # The NUBC revenue code system is proprietary as well and cannot be resolved. The test kit's
+    # example data references it under both of the URLs the IG has used for it.
+    %r{A definition for CodeSystem 'https://www\.nubc\.org/(revenue-code|CodeSystem/RevenueCodes)' could not be found, so the code cannot be validated},
     # The IG references this draft code system with bindings stronger than example.
     'Reference to draft CodeSystem http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes',
-    # No real content
-    /Details for (.+) matching against profile/,
-    # IG defect: extension context definitions for these extensions don't match where the profiles
-    # place them as must support elements.
-    # extension-authorizationNumber and extension-administrationReferenceNumber context allows
-    # Claim.item only, but profile-claim-base marks them must-support on Claim.extension
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber( v[\d.]+)? is not allowed to be used at this point},
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber( v[\d.]+)? is not allowed to be used at this point},
-    # extension-communicatedDiagnosis context only lists Claim, but profile-claimresponse marks it must-support on ClaimResponse.item
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis( v[\d.]+)? is not allowed to be used at this point},
-    # extension-productOrServiceCodeEnd context only lists Claim.item/ClaimResponse, but profile-servicerequest marks it must-support on ServiceRequest
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd( v[\d.]+)? is not allowed to be used at this point},
-    # extension-infoChanged and modifierextension-infoCancelled context only lists Claim.item,
-    # but profile-claim-base marks them must-support on Claim.supportingInfo as well
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged( v[\d.]+)? is not allowed to be used at this point},
-    %r{The modifier extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/modifierextension-infoCancelled( v[\d.]+)? is not allowed to be used at this point},
-    # extension-itemAuthorizedProvider context allows ExplanationOfBenefit/ClaimResponse.item only,
-    # but profile-claimresponse marks ClaimResponse.extension:authorizedProvider as must-support on ClaimResponse root
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider( v[\d.]+)? is not allowed to be used at this point},
-    # extension-revenueUnitRateLimit, extension-serviceItemRequestType, extension-certificationType
-    # context prohibits ClaimResponse.addItem, but profile-claimresponse marks all three as must-support there
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit( v[\d.]+)? is not allowed to be used at this point},
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType( v[\d.]+)? is not allowed to be used at this point},
-    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType( v[\d.]+)? is not allowed to be used at this point}
+    # IG defect: these extensions are marked must-support at a location that their own context
+    # definition does not permit, so the validator rejects them where the profile requires them.
+    # Each pattern is anchored to the specific element context that the IG forces (reported by the
+    # validator as "(this element is [...])"), so a genuinely misplaced extension is not suppressed.
+    # extension-authorizationNumber/administrationReferenceNumber: context allows Claim.item only,
+    # but profile-claim-base marks them must-support on Claim.extension.
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber( v[\d.]+)? is not allowed to be used at this point \(this element is \[Claim\]},
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber( v[\d.]+)? is not allowed to be used at this point \(this element is \[Claim\]},
+    # extension-infoChanged/modifierextension-infoCancelled: context lists Claim.item only, but
+    # profile-claim-base marks them must-support on Claim.supportingInfo as well.
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?Claim\.supportingInfo\]},
+    %r{The modifier extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/modifierextension-infoCancelled( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?Claim\.supportingInfo\]},
+    # extension-communicatedDiagnosis: context lists Claim only, but profile-claimresponse marks it
+    # must-support on ClaimResponse.item.
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.item\]},
+    # extension-productOrServiceCodeEnd: context lists Claim.item/ClaimResponse, but
+    # profile-servicerequest marks it must-support on ServiceRequest.
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd( v[\d.]+)? is not allowed to be used at this point \(this element is \[ServiceRequest\]},
+    # extension-itemAuthorizedProvider: context allows ExplanationOfBenefit/ClaimResponse.item only,
+    # but profile-claimresponse marks it must-support on the ClaimResponse root.
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider( v[\d.]+)? is not allowed to be used at this point \(this element is \[ClaimResponse\]},
+    # extension-revenueUnitRateLimit/serviceItemRequestType/certificationType: context prohibits
+    # ClaimResponse.addItem, but profile-claimresponse marks all three must-support there.
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]},
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]},
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]}
   ].freeze
 
   # This list captures all validator messages suppressed for the v2.0.1 suites

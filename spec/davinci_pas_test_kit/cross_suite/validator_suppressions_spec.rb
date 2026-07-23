@@ -13,36 +13,67 @@ RSpec.describe DaVinciPASTestKit do
       '[PASRequestor])'
   end
 
+  # NUBC revenue codes are proprietary; the example data references the code system under both URLs.
   let(:nubc_code_system_not_found) do
     'Claim/ReferralAuthorizationExample: Claim.item[0].revenue.coding[0]: ' \
       "A definition for CodeSystem 'https://www.nubc.org/revenue-code' could not be found, " \
       'so the code cannot be validated'
   end
 
-  let(:nubc_value_set_membership_failure) do
-    'Claim/ReferralAuthorizationExample: Claim.item[0].revenue: ' \
-      "None of the codings provided are in the value set 'AHA NUBC Revenue Value Set' " \
-      '(http://hl7.org/fhir/us/davinci-pas/ValueSet/AHANUBCRevenueCodes|2.2.1), and a coding from this value set ' \
-      'is required) (codes = https://www.nubc.org/revenue-code#0105)'
+  let(:nubc_code_system_not_found_alt_url) do
+    'Claim/ReferralAuthorizationExample: Claim.item[0].revenue.coding[0]: ' \
+      "A definition for CodeSystem 'https://www.nubc.org/CodeSystem/RevenueCodes' could not be found, " \
+      'so the code cannot be validated'
   end
 
-  let(:x12278_value_set_membership_failure) do
-    'Claim/HomecareAuthorizationExample: Claim.item[0].productOrService: ' \
-      "None of the codings provided are in the value set 'X12 278 Requested Service Type' " \
-      '(http://hl7.org/fhir/us/davinci-pas/ValueSet/X12278RequestedServiceType|2.2.1), and a coding from this ' \
-      'value set is required)'
+  # Extension-placement errors carry the element context in the message as "(this element is [...])".
+  # Each fixture below uses the exact context the IG defect forces.
+  let(:authorization_number_at_claim) do
+    'Claim/ReferralAuthorizationExample: Claim.extension[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [Claim]; ' \
+      'allowed for this version = e:Claim.item, e:ClaimResponse.item)'
   end
 
-  let(:extension_context_error) do
+  let(:info_changed_at_supporting_info) do
     'Claim/ReferralAuthorizationExample: Claim.supportingInfo[2]: ' \
       'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged v2.2.1 ' \
-      'is not allowed to be used at this point (this element is [Backbone Element: Claim.supportingInfo])'
+      'is not allowed to be used at this point (this element is [BackboneElement, Claim.supportingInfo]; ' \
+      'allowed for this version = e:Claim.item)'
   end
 
-  let(:modifier_extension_context_error) do
+  let(:info_cancelled_at_supporting_info) do
     'Claim/ReferralAuthorizationExample: Claim.supportingInfo[2]: ' \
       'The modifier extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/' \
-      'modifierextension-infoCancelled v2.2.1 is not allowed to be used at this point'
+      'modifierextension-infoCancelled v2.2.1 is not allowed to be used at this point ' \
+      '(this element is [BackboneElement, Claim.supportingInfo]; allowed = e:Claim.item)'
+  end
+
+  let(:certification_type_at_add_item) do
+    'ClaimResponse/ReferralAuthorizationResponseExample: ClaimResponse.addItem[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [BackboneElement, ClaimResponse.addItem]; ' \
+      'allowed for this version = e:Claim, e:Claim.item)'
+  end
+
+  # Same extensions, but at a genuinely wrong location: these must NOT be suppressed.
+  let(:authorization_number_at_wrong_location) do
+    'Patient/SubscriberExample: Patient.extension[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [Patient]; ' \
+      'allowed for this version = e:Claim.item)'
+  end
+
+  let(:info_changed_at_wrong_location) do
+    'Claim/ReferralAuthorizationExample: Claim.extension[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [Claim]; allowed for this version = e:Claim.item)'
+  end
+
+  let(:certification_type_at_wrong_location) do
+    'Claim/ReferralAuthorizationExample: Claim.item[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [BackboneElement, Claim.item]; allowed = e:Claim)'
   end
 
   let(:non_x12_value_set_not_found) do
@@ -55,6 +86,22 @@ RSpec.describe DaVinciPASTestKit do
       'None of the codings provided are in the value set ' \
       "'https://valueset.x12.org/x217/005010/request/2000F/UM/1/03/00/1365', " \
       'and a coding from this value set is required'
+  end
+
+  # Membership failures against the unexpandable NUBC/X12278 value sets are no longer suppressed:
+  # a correctly configured validator reports code-system-not-found instead, so suppressing the
+  # membership error risks hiding real problems.
+  let(:nubc_value_set_membership_failure) do
+    'Claim/ReferralAuthorizationExample: Claim.item[0].revenue: ' \
+      "None of the codings provided are in the value set 'AHA NUBC Revenue Value Set' " \
+      '(http://hl7.org/fhir/us/davinci-pas/ValueSet/AHANUBCRevenueCodes|2.2.1), and a coding from this value set ' \
+      'is required'
+  end
+
+  let(:details_for_matching_profile) do
+    'Bundle/ReferralAuthorizationBundleExample: Bundle.entry[0]: ' \
+      'Details for Claim/ReferralAuthorizationExample matching against profile ' \
+      'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim|2.2.1'
   end
 
   let(:hcpcs_code_system_not_found) do
@@ -94,21 +141,22 @@ RSpec.describe DaVinciPASTestKit do
         expect(exclude_message.call(validator_message(x12_code_system_not_found, 'warning'))).to be true
       end
 
-      it 'excludes unresolvable NUBC revenue code system messages' do
+      it 'excludes unresolvable NUBC revenue code system messages under either code system URL' do
         expect(exclude_message.call(validator_message(nubc_code_system_not_found, 'warning'))).to be true
+        expect(exclude_message.call(validator_message(nubc_code_system_not_found_alt_url, 'warning'))).to be true
       end
 
-      it 'excludes code membership failures against the unexpandable NUBC revenue value set' do
-        expect(exclude_message.call(validator_message(nubc_value_set_membership_failure, 'error'))).to be true
+      it 'excludes IG-defect extension placement errors at the specific forced location' do
+        expect(exclude_message.call(validator_message(authorization_number_at_claim, 'error'))).to be true
+        expect(exclude_message.call(validator_message(info_changed_at_supporting_info, 'error'))).to be true
+        expect(exclude_message.call(validator_message(info_cancelled_at_supporting_info, 'error'))).to be true
+        expect(exclude_message.call(validator_message(certification_type_at_add_item, 'error'))).to be true
       end
 
-      it 'excludes code membership failures against the unexpandable X12278RequestedServiceType value set' do
-        expect(exclude_message.call(validator_message(x12278_value_set_membership_failure, 'error'))).to be true
-      end
-
-      it 'excludes extension context errors caused by IG defects' do
-        expect(exclude_message.call(validator_message(extension_context_error, 'error'))).to be true
-        expect(exclude_message.call(validator_message(modifier_extension_context_error, 'error'))).to be true
+      it 'does not exclude the same extensions when used at a genuinely wrong location' do
+        expect(exclude_message.call(validator_message(authorization_number_at_wrong_location, 'error'))).to be false
+        expect(exclude_message.call(validator_message(info_changed_at_wrong_location, 'error'))).to be false
+        expect(exclude_message.call(validator_message(certification_type_at_wrong_location, 'error'))).to be false
       end
 
       it 'does not exclude resolution failures for non-X12 value sets' do
@@ -117,6 +165,14 @@ RSpec.describe DaVinciPASTestKit do
 
       it 'does not exclude code membership failures against X12 value sets' do
         expect(exclude_message.call(validator_message(x12_value_set_membership_failure, 'error'))).to be false
+      end
+
+      it 'does not exclude code membership failures against unexpandable value sets' do
+        expect(exclude_message.call(validator_message(nubc_value_set_membership_failure, 'error'))).to be false
+      end
+
+      it 'does not exclude informational profile-slice-matching messages' do
+        expect(exclude_message.call(validator_message(details_for_matching_profile, 'info'))).to be false
       end
 
       it 'does not exclude legacy-only patterns dropped from the targeted list' do
@@ -145,6 +201,14 @@ RSpec.describe DaVinciPASTestKit do
         expect(exclude_message.call(validator_message(hcpcs_code_system_not_found, 'warning'))).to be true
         expect(exclude_message.call(validator_message(profile_match_error, 'error'))).to be true
         expect(exclude_message.call(validator_message(all_ok_message, 'info'))).to be true
+      end
+
+      # The v2.0.1 list keeps the original location-blind extension suppressions, so it still
+      # excludes these placement errors regardless of where the extension was seen. The location
+      # anchoring only applies to the v2.2.1 list.
+      it 'excludes extension placement errors regardless of location' do
+        expect(exclude_message.call(validator_message(authorization_number_at_claim, 'error'))).to be true
+        expect(exclude_message.call(validator_message(authorization_number_at_wrong_location, 'error'))).to be true
       end
 
       it 'does not exclude resolution failures for non-X12 value sets' do
