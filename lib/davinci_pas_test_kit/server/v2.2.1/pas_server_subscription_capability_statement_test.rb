@@ -31,7 +31,7 @@ module DaVinciPASTestKit
 
         missing_interactions = REQUIRED_INTERACTIONS - supported_interactions
 
-        assert missing_interactions.empty?, "Missing: #{missing_interactions.join(', ')}"
+        assert missing_interactions.empty?, "Missing interactions in the subscription: #{missing_interactions.join(', ')}"
       end
     end
   end
