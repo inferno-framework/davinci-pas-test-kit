@@ -56,6 +56,20 @@ RSpec.describe DaVinciPASTestKit do
       'allowed for this version = e:Claim, e:Claim.item)'
   end
 
+  let(:product_or_service_code_end_at_service_request) do
+    'ServiceRequest/ReferralRequestExample: ServiceRequest.extension[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [ServiceRequest]; ' \
+      'allowed for this version = e:Claim.item, e:ClaimResponse)'
+  end
+
+  let(:product_or_service_code_end_at_add_item) do
+    'ClaimResponse/ReferralAuthorizationResponseExample: ClaimResponse.addItem[0]: ' \
+      'The extension http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd v2.2.1 ' \
+      'is not allowed to be used at this point (this element is [BackboneElement, ClaimResponse.addItem]; ' \
+      'allowed for this version = e:Claim.item, e:ClaimResponse)'
+  end
+
   # Same extensions, but at a genuinely wrong location: these must NOT be suppressed.
   let(:authorization_number_at_wrong_location) do
     'Patient/SubscriberExample: Patient.extension[0]: ' \
@@ -88,9 +102,9 @@ RSpec.describe DaVinciPASTestKit do
       'and a coding from this value set is required'
   end
 
-  # Membership failures against the unexpandable NUBC/X12278 value sets are no longer suppressed:
-  # a correctly configured validator reports code-system-not-found instead, so suppressing the
-  # membership error risks hiding real problems.
+  # NUBC revenue codes are must-support (not required), so the element is empty in the IG examples
+  # but populated by the must support tests; the value set cannot be expanded, so the membership
+  # check is unactionable and is suppressed.
   let(:nubc_value_set_membership_failure) do
     'Claim/ReferralAuthorizationExample: Claim.item[0].revenue: ' \
       "None of the codings provided are in the value set 'AHA NUBC Revenue Value Set' " \
@@ -153,6 +167,16 @@ RSpec.describe DaVinciPASTestKit do
         expect(exclude_message.call(validator_message(certification_type_at_add_item, 'error'))).to be true
       end
 
+      it 'excludes productOrServiceCodeEnd at both forced locations (ServiceRequest and addItem)' do
+        expect(exclude_message.call(validator_message(product_or_service_code_end_at_service_request, 'error')))
+          .to be true
+        expect(exclude_message.call(validator_message(product_or_service_code_end_at_add_item, 'error'))).to be true
+      end
+
+      it 'excludes code membership failures against the unexpandable NUBC revenue value set' do
+        expect(exclude_message.call(validator_message(nubc_value_set_membership_failure, 'error'))).to be true
+      end
+
       it 'does not exclude the same extensions when used at a genuinely wrong location' do
         expect(exclude_message.call(validator_message(authorization_number_at_wrong_location, 'error'))).to be false
         expect(exclude_message.call(validator_message(info_changed_at_wrong_location, 'error'))).to be false
@@ -165,10 +189,6 @@ RSpec.describe DaVinciPASTestKit do
 
       it 'does not exclude code membership failures against X12 value sets' do
         expect(exclude_message.call(validator_message(x12_value_set_membership_failure, 'error'))).to be false
-      end
-
-      it 'does not exclude code membership failures against unexpandable value sets' do
-        expect(exclude_message.call(validator_message(nubc_value_set_membership_failure, 'error'))).to be false
       end
 
       it 'does not exclude informational profile-slice-matching messages' do

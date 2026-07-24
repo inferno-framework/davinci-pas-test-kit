@@ -18,6 +18,11 @@ module DaVinciPASTestKit
     # The NUBC revenue code system is proprietary as well and cannot be resolved. The test kit's
     # example data references it under both of the URLs the IG has used for it.
     %r{A definition for CodeSystem 'https://www\.nubc\.org/(revenue-code|CodeSystem/RevenueCodes)' could not be found, so the code cannot be validated},
+    # Because that code system is unavailable, membership in the PAS-defined value set built on it
+    # cannot be checked either. Claim.item.revenue is must-support (not required), so the IG examples
+    # leave it empty and the IG QA never hits this, but the must support tests populate it, so the
+    # code cannot be checked against the value set and the error is unactionable.
+    "None of the codings provided are in the value set 'AHA NUBC Revenue Value Set' (http://hl7.org/fhir/us/davinci-pas/ValueSet/AHANUBCRevenueCodes",
     # The IG references this draft code system with bindings stronger than example.
     'Reference to draft CodeSystem http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes',
     # IG defect: these extensions are marked must-support at a location that their own context
@@ -36,8 +41,10 @@ module DaVinciPASTestKit
     # must-support on ClaimResponse.item.
     %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.item\]},
     # extension-productOrServiceCodeEnd: context lists Claim.item/ClaimResponse, but
-    # profile-servicerequest marks it must-support on ServiceRequest.
+    # profile-servicerequest marks it must-support on ServiceRequest and profile-claimresponse marks
+    # it must-support on ClaimResponse.addItem.
     %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd( v[\d.]+)? is not allowed to be used at this point \(this element is \[ServiceRequest\]},
+    %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]},
     # extension-itemAuthorizedProvider: context allows ExplanationOfBenefit/ClaimResponse.item only,
     # but profile-claimresponse marks it must-support on the ClaimResponse root.
     %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider( v[\d.]+)? is not allowed to be used at this point \(this element is \[ClaimResponse\]},
