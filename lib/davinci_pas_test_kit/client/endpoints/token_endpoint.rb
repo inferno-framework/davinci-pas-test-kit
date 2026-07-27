@@ -14,6 +14,20 @@ module DaVinciPASTestKit
         UDAPSecurityTestKit::MockUDAPServer.client_id_from_client_assertion(request.params[:client_assertion])
       end
 
+      def test_run_identifier_location_description
+        "the client assertion's 'iss' claim representing the client's id"
+      end
+
+      def no_session_response
+        response.status = 401
+        response.format = :json
+        response.body = {
+          error: 'invalid_client',
+          error_description: no_session_message
+
+        }.to_json
+      end
+
       def make_response
         if request.params[:udap].present?
           make_udap_client_credential_token_response
