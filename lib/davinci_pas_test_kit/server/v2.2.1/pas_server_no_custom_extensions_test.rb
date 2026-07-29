@@ -112,8 +112,7 @@ module DaVinciPASTestKit
         not defined by FHIR, US Core, PAS, CRD, DTR, or HRex it passes.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-11',
-                            'hl7.fhir.us.davinci-pas_2.2.1@conf-12'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-11'
 
       run do
         requests = load_tagged_requests(SUBMIT_TAG)
