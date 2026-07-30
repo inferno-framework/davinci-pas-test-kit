@@ -40,9 +40,15 @@ module DaVinciPASTestKit
 
       DTR_EXTENSION_URLS = [
         'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/activeRole',
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/alternativeExpression',
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/containedReference',
         'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/information-origin',
         'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/intendedUse',
-        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/qr-context'
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/qr-context',
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/estimated-completion-time',
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/questionnaireAudience',
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/qr-coverage',
+        'http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/request-specific'
       ].freeze
 
       PAS_EXTENSION_URLS = [
@@ -67,8 +73,6 @@ module DaVinciPASTestKit
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-homeHealthCareInformation',
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction',
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierSubDepartment',
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-jurisdiction',
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-subDepartmen',
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-infoChanged',
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedDetail',
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider',
@@ -97,7 +101,14 @@ module DaVinciPASTestKit
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-timingdeliverypattern',
         'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/modifierextension-infoCancelled',
         'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter',
-        'http://hl7.org/fhir/StructureDefinition/data-absent-reason'
+        'http://hl7.org/fhir/StructureDefinition/data-absent-reason',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-timeout',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-max-count',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-channel-type',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content',
+        'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical'
       ].freeze
 
       VALID_EXTENSION_URLS = (US_CORE_EXTENSION_URLS + CRD_EXTENSION_URLS + HREX_EXTENSION_URLS \
