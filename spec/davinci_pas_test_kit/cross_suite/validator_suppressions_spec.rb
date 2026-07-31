@@ -13,6 +13,14 @@ RSpec.describe DaVinciPASTestKit do
       '[PASRequestor])'
   end
 
+  # Some X12 codes are referenced with a valueset.x12.org URL as their code system.
+  let(:x12_code_system_not_found_valueset_url) do
+    'ClaimResponse/ReferralAuthorizationResponseExample: ' \
+      'ClaimResponse.addItem[0].extension[6].value.ofType(CodeableConcept).coding[0].system: ' \
+      "A definition for CodeSystem 'https://valueset.x12.org/x217/005010/response/2000F/NX1/1/01/00/1345' " \
+      'could not be found, so the code cannot be validated'
+  end
+
   # NUBC revenue codes are proprietary; the example data references the code system under both URLs.
   let(:nubc_code_system_not_found) do
     'Claim/ReferralAuthorizationExample: Claim.item[0].revenue.coding[0]: ' \
@@ -151,8 +159,9 @@ RSpec.describe DaVinciPASTestKit do
         end
       end
 
-      it 'excludes unresolvable X12 code system messages' do
+      it 'excludes unresolvable X12 code system messages under either x12.org subdomain' do
         expect(exclude_message.call(validator_message(x12_code_system_not_found, 'warning'))).to be true
+        expect(exclude_message.call(validator_message(x12_code_system_not_found_valueset_url, 'warning'))).to be true
       end
 
       it 'excludes unresolvable NUBC revenue code system messages under either code system URL' do
@@ -215,6 +224,7 @@ RSpec.describe DaVinciPASTestKit do
           expect(exclude_message.call(validator_message(x12_value_set_not_found, type))).to be true
         end
         expect(exclude_message.call(validator_message(x12_code_system_not_found, 'warning'))).to be true
+        expect(exclude_message.call(validator_message(x12_code_system_not_found_valueset_url, 'warning'))).to be true
       end
 
       it 'still excludes legacy suppression patterns' do

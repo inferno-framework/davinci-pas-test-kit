@@ -12,9 +12,11 @@ module DaVinciPASTestKit
   # rubocop:disable Layout/LineLength
   V221_SUPPRESSIONS = [
     # X12 value set and code system definitions are proprietary and not available to the validator,
-    # so resolution failures for them are not actionable by users.
-    %r{ValueSet 'https://valueset\.x12\.org/[^']+' not found},
-    %r{A definition for CodeSystem 'https://codesystem\.x12\.org/[^']+' could not be found, so the code cannot be validated},
+    # so resolution failures for them are not actionable by users. The IG references X12 URLs under
+    # both x12.org subdomains, and uses valueset.x12.org URLs as code system URLs in some places, so
+    # both patterns accept either subdomain.
+    %r{ValueSet 'https://(?:valueset|codesystem)\.x12\.org/[^']+' not found},
+    %r{A definition for CodeSystem 'https://(?:codesystem|valueset)\.x12\.org/[^']+' could not be found, so the code cannot be validated},
     # The NUBC revenue code system is proprietary as well and cannot be resolved. The test kit's
     # example data references it under both of the URLs the IG has used for it.
     %r{A definition for CodeSystem 'https://www\.nubc\.org/(revenue-code|CodeSystem/RevenueCodes)' could not be found, so the code cannot be validated},
