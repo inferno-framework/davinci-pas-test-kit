@@ -126,6 +126,10 @@ module DaVinciPASTestKit
         end
       end
 
+      def replaced_pa_inquire_reference_test?
+        ig_version == 'v2.2.1'
+      end
+
       def description
         <<~DESCRIPTION
           Demonstrate the ability of the server to support all PAS-defined profiles
