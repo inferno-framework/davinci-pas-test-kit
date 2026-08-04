@@ -110,6 +110,16 @@ module DaVinciPASTestKit
         ig_metadata.profiles.select { |profile_metadata| MustSupportTargetProfiles.request_profile?(profile_metadata) }
       end
 
+      # Additional Claim Inquiry Response checks are v2.2.x-specific, so they are only included
+      # in the v2.2+ server element support group.
+      def additional_claim_inquiry_response_requirements_supported?
+        ig_metadata.ig_version.start_with?('v2.2')
+      end
+
+      def additional_claim_inquiry_response_requirements_group_id
+        "pas_server_#{ig_version_for_id}_claim_inquiry_responses"
+      end
+
       def verifies_requirements
         case ig_metadata.ig_version
         when 'v2.0.1'
