@@ -100,6 +100,8 @@ module DaVinciPASTestKit
             sets containing X12 codes are not validated.
             
           )
+          verifies_requirements 'hl7.fhir.us.davinci-pas.2.2.1@spec-30',
+                                'hl7.fhir.us.davinci-pas_2.2.1@spec-31'
           config(
             options: {
               use_case: 'denial',

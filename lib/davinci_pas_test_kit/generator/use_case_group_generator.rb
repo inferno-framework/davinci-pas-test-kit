@@ -100,6 +100,8 @@ module DaVinciPASTestKit
         case ig_version
         when 'v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@141']
+        when 'v2.2.1'
+          ['hl7.fhir.us.davinci-pas_2.2.1@spec-51', 'hl7.fhir.us.davinci-pas_2.2.1@spec-60']
         end
       end
 

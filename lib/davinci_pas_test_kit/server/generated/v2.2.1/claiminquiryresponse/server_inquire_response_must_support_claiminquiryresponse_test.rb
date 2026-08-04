@@ -87,6 +87,8 @@ module DaVinciPASTestKit
         * ClaimResponse.status
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-6'
+
       config(
         options: {
           resource_type: 'ClaimResponse',
