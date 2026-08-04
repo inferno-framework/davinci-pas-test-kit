@@ -38,8 +38,9 @@ module DaVinciPASTestKit
       )
       <%- if verifies_requirements -%>
       verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
-      <%- end -%>
-
+      <%- end -%><%- if tests_conf_6?  %>
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-6'
+      <%- end %>
       config(
         options: {
           resource_type: '<%= resource_type %>',
