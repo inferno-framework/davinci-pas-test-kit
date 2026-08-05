@@ -25,6 +25,10 @@ module DaVinciPASTestKit
     # leave it empty and the IG QA never hits this, but the must support tests populate it, so the
     # code cannot be checked against the value set and the error is unactionable.
     "None of the codings provided are in the value set 'AHA NUBC Revenue Value Set' (http://hl7.org/fhir/us/davinci-pas/ValueSet/AHANUBCRevenueCodes",
+    # These PAS-defined value sets draw all their members from X12 code systems, so membership
+    # cannot be checked and the failure is unactionable. Anchored on each value set's canonical URL.
+    %r{None of the codings provided are in the value set .*http://hl7\.org/fhir/us/davinci-pas/ValueSet/pas-pwk01-attachment-report-type-code},
+    %r{None of the codings provided are in the value set .*http://hl7\.org/fhir/us/davinci-pas/ValueSet/PASCommunicationRequestMedium},
     # The IG references this draft code system with bindings stronger than example.
     'Reference to draft CodeSystem http://hl7.org/fhir/us/davinci-pas/CodeSystem/PASTempCodes',
     # IG defect: these extensions are marked must-support at a location that their own context

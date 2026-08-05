@@ -120,6 +120,21 @@ RSpec.describe DaVinciPASTestKit do
       'is required'
   end
 
+  # Other PAS-defined value sets whose members are entirely X12 codes; membership is unactionable.
+  let(:pwk01_value_set_membership_failure) do
+    'DocumentReference/DocumentReferenceExample: DocumentReference.type: ' \
+      "None of the codings provided are in the value set 'PAS PWK01 Attachment Report Type Code Value Set' " \
+      '(http://hl7.org/fhir/us/davinci-pas/ValueSet/pas-pwk01-attachment-report-type-code|2.2.1), and a coding ' \
+      'should come from this value set'
+  end
+
+  let(:communication_medium_value_set_membership_failure) do
+    'CommunicationRequest/CommunicationRequestExample: CommunicationRequest.medium[0]: ' \
+      "None of the codings provided are in the value set 'PAS Communication Medium Value Set' " \
+      '(http://hl7.org/fhir/us/davinci-pas/ValueSet/PASCommunicationRequestMedium|2.2.1), and a coding from this ' \
+      'value set is required'
+  end
+
   let(:details_for_matching_profile) do
     'Bundle/ReferralAuthorizationBundleExample: Bundle.entry[0]: ' \
       'Details for Claim/ReferralAuthorizationExample matching against profile ' \
@@ -184,6 +199,12 @@ RSpec.describe DaVinciPASTestKit do
 
       it 'excludes code membership failures against the unexpandable NUBC revenue value set' do
         expect(exclude_message.call(validator_message(nubc_value_set_membership_failure, 'error'))).to be true
+      end
+
+      it 'excludes code membership failures against all-X12 PAS-defined value sets' do
+        expect(exclude_message.call(validator_message(pwk01_value_set_membership_failure, 'warning'))).to be true
+        expect(exclude_message.call(validator_message(communication_medium_value_set_membership_failure, 'error')))
+          .to be true
       end
 
       it 'does not exclude the same extensions when used at a genuinely wrong location' do
