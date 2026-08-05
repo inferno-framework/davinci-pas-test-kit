@@ -3,10 +3,12 @@
 require_relative '../parameters_helper'
 require_relative 'validation_test'
 require_relative 'pas_constants'
+require_relative 'pas_datatype_constraints'
 
 module DaVinciPASTestKit
   module PasBundleValidation
     include DaVinciPASTestKit::ValidationTest
+    include DaVinciPASTestKit::PasDatatypeConstraints
     include ParametersHelper
 
     US_CORE_VERSION = '6.1.0'
@@ -299,27 +301,36 @@ module DaVinciPASTestKit
     end
 
     # Validates bundle resource and each entry in the bundle against its target profiles.
-    # It logs a message for each conformant entry
-    # and collects error messages for non-conformant entries. Asserts that there are no validation errors.
+    # Validation messages are collected per profile rather than logged directly, so a
+    # resource with multiple candidate profiles only reports errors when it fails all of
+    # them. When a profile passes, only that profile's (non-error) messages are logged.
     # @param version [String] The version of the IG.
     def validate_bundle_entries_against_profiles(version)
       bundle_resources_target_profile_map.each do |key, item|
         resource = item[:resource]
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
+        messages_by_profile = {}
 
         success_profile = item[:profile_urls].find do |url|
-          if key == 'bundle'
-            profile_to_validate = profile_url_for_validation(url, base_profile, version)
-            bundle_profile_valid?(resource, profile_to_validate)
-          elsif url == BASE_R4_PROFILE
-            resource_is_valid?(resource:)
-          else
-            profile_to_validate = profile_url_for_validation(url, base_profile, version)
-            resource_is_valid?(resource:, profile_url: profile_to_validate)
-          end
+          profile_messages =
+            if key == 'bundle'
+              collect_bundle_profile_messages(resource, profile_url_for_validation(url, base_profile, version))
+            elsif url == BASE_R4_PROFILE
+              collect_resource_profile_messages(resource)
+            else
+              collect_resource_profile_messages(resource, profile_url_for_validation(url, base_profile, version)) +
+                datatype_constraint_messages(resource, profile_url_without_version(url), version)
+            end
+          messages_by_profile[url] = profile_messages
+          profile_messages.none? { |message| message[:type] == 'error' }
         end
 
-        validation_error_messages << generate_non_conformance_message(item) unless success_profile
+        if success_profile
+          messages.concat(messages_by_profile[success_profile])
+        else
+          messages_by_profile.each_value { |profile_messages| messages.concat(profile_messages) }
+          validation_error_messages << generate_non_conformance_message(item)
+        end
       end
     end
 
@@ -446,19 +457,36 @@ module DaVinciPASTestKit
       end
     end
 
-    # Validates a Bundle resource against a profile, filtering out entry-resource-level issues
-    # that are covered by individual resource validation to avoid duplicate messages.
+    # Validates a resource against a profile without logging, returning the unfiltered
+    # issues as message hashes for the caller to log once profile selection is resolved.
+    # @param resource [FHIR::Model] The resource to validate.
+    # @param profile_url [String, nil] The profile URL (with version) to validate against,
+    #   or nil to validate against the base resource definition.
+    # @return [Array<Hash>] Message hashes for the issues found.
+    def collect_resource_profile_messages(resource, profile_url = nil)
+      response_details = []
+      resource_is_valid?(resource:, profile_url:,
+                         add_messages_to_runnable: false,
+                         validator_response_details: response_details)
+      validator_issues_to_messages(response_details.reject(&:filtered))
+    end
+
+    # Same as collect_resource_profile_messages for a Bundle, additionally dropping
+    # entry-resource-level issues that are covered by individual resource validation
+    # to avoid duplicate messages.
     # @param bundle [FHIR::Bundle] The Bundle resource to validate.
     # @param profile_url [String] The profile URL (with version) to validate against.
-    # @return [Boolean] true if no unfiltered errors remain after removing entry-resource issues.
-    def bundle_profile_valid?(bundle, profile_url)
+    # @return [Array<Hash>] Message hashes for the Bundle-structural issues found.
+    def collect_bundle_profile_messages(bundle, profile_url)
       response_details = []
       resource_is_valid?(resource: bundle, profile_url:,
                          add_messages_to_runnable: false,
                          validator_response_details: response_details)
-      bundle_level_issues = reject_entry_resource_issues(response_details)
-      bundle_level_issues.each { |issue| messages << { type: issue.severity, message: issue.message } }
-      bundle_level_issues.none? { |issue| issue.severity == 'error' }
+      validator_issues_to_messages(reject_entry_resource_issues(response_details))
+    end
+
+    def validator_issues_to_messages(issues)
+      issues.map { |issue| { type: issue.severity, message: issue.message } }
     end
 
     # Rejects validator issues that are already filtered or are located at/below
