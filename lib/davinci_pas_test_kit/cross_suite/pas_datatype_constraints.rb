@@ -6,7 +6,7 @@ module DaVinciPASTestKit
   # See https://hl7.org/fhir/us/davinci-pas/STU2.2/StructureDefinition-profile-datatype-timing.html
   # and https://hl7.org/fhir/us/davinci-pas/STU2.2/StructureDefinition-profile-quantity.html
   module PasDatatypeConstraints
-    PAS_STRUCTURE_DEFINITION_BASE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition'
+    PAS_STRUCTURE_DEFINITION_BASE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition'.freeze
 
     TIMING_CALENDAR_PATTERN_EXTENSION_URL = "#{PAS_STRUCTURE_DEFINITION_BASE}/extension-timingcalendarpattern".freeze
     TIMING_DELIVERY_PATTERN_EXTENSION_URL = "#{PAS_STRUCTURE_DEFINITION_BASE}/extension-timingdeliverypattern".freeze
@@ -15,7 +15,7 @@ module DaVinciPASTestKit
     # Quantity.code is bound (required) to the X12 673 "quantity qualifier" value set,
     # which the terminology validator cannot expand. Requiring this system when a code
     # is present is the machine-checkable part of prof-3.
-    X12_QUANTITY_UNITS_SYSTEM = 'https://codesystem.x12.org/005010/673'
+    X12_QUANTITY_UNITS_SYSTEM = 'https://codesystem.x12.org/005010/673'.freeze
 
     # Profiles that apply profile-datatype-timing to elements of their resource.
     TIMING_CONSTRAINED_PROFILE_URLS = [
