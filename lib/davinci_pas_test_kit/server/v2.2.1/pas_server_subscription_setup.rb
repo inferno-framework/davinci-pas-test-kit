@@ -1,4 +1,5 @@
 require 'subscriptions_test_kit'
+require_relative 'pas_server_subscription_capability_statement_test'
 require_relative 'pas_server_subscription_input_conformance'
 
 module DaVinciPASTestKit
@@ -14,6 +15,8 @@ module DaVinciPASTestKit
       config inputs: { url: { name: :server_endpoint } }
       input_order :server_endpoint, :smart_credentials, :access_token, :subscription_resource
       run_as_group
+
+      test from: :pas_server_v221_subscription_capability_statement_test
 
       test from: :pas_server_v221_subscription_input_conformance do
         input :subscription_resource,
