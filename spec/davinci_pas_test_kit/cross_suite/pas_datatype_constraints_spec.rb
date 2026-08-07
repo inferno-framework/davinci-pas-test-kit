@@ -173,7 +173,7 @@ RSpec.describe DaVinciPASTestKit::PasDatatypeConstraints do
 
       expect(messages).to contain_exactly(
         { type: 'error',
-          message: include('ClaimResponse.item[0].extension:authorizedItemDetail.extension:quantity.value') }
+          message: include('ClaimResponse.item[0].extension:authorizedItemDetail.extension:quantity.valueQuantity') }
       )
     end
 

@@ -1,3 +1,5 @@
+require_relative 'pas_constants'
+
 module DaVinciPASTestKit
   # Checks for the narrative-only constraints on the PAS Timing and Quantity data type
   # profiles introduced in v2.2 (prof-1, prof-2, prof-3). These constraints have no
@@ -29,11 +31,11 @@ module DaVinciPASTestKit
     # profile-claimresponse-base (ClaimResponse.addItem.quantity and the
     # itemAuthorizedDetail quantity sub-extension).
     QUANTITY_CONSTRAINED_PROFILE_URLS = [
-      "#{PAS_STRUCTURE_DEFINITION_BASE}/profile-claim",
-      "#{PAS_STRUCTURE_DEFINITION_BASE}/profile-claim-update",
-      "#{PAS_STRUCTURE_DEFINITION_BASE}/profile-claim-inquiry",
-      "#{PAS_STRUCTURE_DEFINITION_BASE}/profile-claimresponse",
-      "#{PAS_STRUCTURE_DEFINITION_BASE}/profile-claiminquiryresponse",
+      PASConstants::CLAIM_PROFILE_FIRST_SUBMIT,
+      PASConstants::CLAIM_PROFILE,
+      PASConstants::CLAIM_INQUIRY_PROFILE,
+      PASConstants::CLAIM_RESPONSE_PROFILE,
+      PASConstants::CLAIM_INQUIRY_RESPONSE_PROFILE,
       "#{PAS_STRUCTURE_DEFINITION_BASE}/profile-servicerequest"
     ].freeze
 
@@ -110,7 +112,7 @@ module DaVinciPASTestKit
           .filter_map do |extension|
             quantity = Array(extension.extension).find { |sub| sub.url == 'quantity' }&.valueQuantity
             if quantity.present?
-              [quantity, "ClaimResponse.item[#{index}].extension:authorizedItemDetail.extension:quantity.value"]
+              [quantity, "ClaimResponse.item[#{index}].extension:authorizedItemDetail.extension:quantity.valueQuantity"]
             end
           end
       end
