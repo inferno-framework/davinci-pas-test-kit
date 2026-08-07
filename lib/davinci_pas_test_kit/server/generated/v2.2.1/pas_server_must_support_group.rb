@@ -4,6 +4,7 @@ require_relative '../../server_response_bundle_validation_test'
 require_relative '../../claim_inquire_operation_test'
 require_relative '../../v2.2.1/must_support/pas_server_must_support_request_profiles_test'
 require_relative '../../v2.2.1/pas_server_claim_inquiry_responses_group'
+require_relative '../../v2.2.1/server_replaced_pa_inquire_reference_input_test'
 require_relative '../../v2.2.1/server_replaced_pa_inquire_reference_test'
 require_relative 'pas_request_bundle/server_submit_request_must_support_pas_request_bundle_test'
 require_relative 'claim_update/server_submit_request_must_support_claim_update_test'
@@ -372,19 +373,27 @@ module DaVinciPASTestKit
               }
             )
           end
-          test from: :pas_server_v221_replaced_pa_inquire_reference_test do
-            id :pas_server_v221_replaced_pa_inquire_reference_test
+          test from: :pas_server_v221_replaced_pa_inquire_reference_input_test do
+            id :pas_server_v221_replaced_pa_inquire_reference_input_test
             config(
               inputs: {
-                replaced_pa_inquire_request_body: {
+                pa_inquire_request_body: {
                   name: :must_support_pa_inquire_request_payload,
                   title: 'Additional $inquire Request Payloads',
                   description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
                 }
-              },
-              options: {
-                use_case: 'must_support',
-                ig_version: 'v2.2.1'
+              }
+            )
+          end
+          test from: :pas_server_v221_replaced_pa_inquire_reference_test do
+            id :pas_server_v221_replaced_pa_inquire_reference_test
+            config(
+              inputs: {
+                pa_inquire_request_body: {
+                  name: :must_support_pa_inquire_request_payload,
+                  title: 'Additional $inquire Request Payloads',
+                  description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
+                }
               }
             )
           end

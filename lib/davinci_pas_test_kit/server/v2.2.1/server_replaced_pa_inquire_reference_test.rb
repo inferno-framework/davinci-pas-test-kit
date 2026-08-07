@@ -25,68 +25,62 @@ module DaVinciPASTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-47'
 
-      makes_request :replaced_pa_inquire_request
+      makes_request :pa_inquire_request
 
-      input :replaced_pa_inquire_request_body,
-            title: 'Inquiry request body for a replaced prior authorization',
-            type: 'textarea',
-            description: %(
-              Provide a PAS Inquiry Request Bundle containing an authorization
-              number or administration reference number that is no longer current.
-              The server must be configured to return the current authorization
-              response with a different corresponding reference number.
-            )
+      input :pa_inquire_request_body
 
       run do
-        request_payload = JSON.parse(replaced_pa_inquire_request_body)
-        request_payload = request_payload.first if request_payload.is_a?(Array)
-        request_resource = FHIR.from_contents(request_payload.to_json)
-
-        assert request_resource.is_a?(FHIR::Bundle),
-               'The inquiry request body was not a FHIR Bundle.'
-
-        submitted_references = extract_references(request_resource)
-
-        assert submitted_references.values.flatten.present?,
-               'The inquiry request did not contain an authorization number or ' \
-               'administration reference number.'
-
-        fhir_operation(
-          '/Claim/$inquire',
-          body: request_resource,
-          name: :replaced_pa_inquire_request
+        assert_valid_json(
+          pa_inquire_request_body,
+          'Provide a valid JSON PAS Inquiry Request Bundle.'
         )
+        parsed_payload = JSON.parse(pa_inquire_request_body)
+        request_payloads = [parsed_payload].flatten.compact.uniq
 
-        assert_response_status(200)
+        reference_comparisons = request_payloads.map do |request_payload|
+          request_resource = FHIR.from_contents(request_payload.to_json)
 
-        assert resource.is_a?(FHIR::Parameters),
-               'The $inquire response was not a FHIR Parameters resource.'
+          submitted_references = extract_references([request_resource])
 
-        response_bundles =
-          extract_bundles_from_pas_inquiry_response_parameters(resource)
+          fhir_operation(
+            '/Claim/$inquire',
+            body: request_resource,
+            name: :pa_inquire_request
+          )
 
-        assert response_bundles.any?,
-               'The $inquire response did not contain a response Bundle.'
+          assert_response_status(200)
 
-        returned_references = extract_references(response_bundles)
+          assert resource.is_a?(FHIR::Parameters),
+                 'The $inquire response was not a FHIR Parameters resource.'
 
-        assert different_reference?(submitted_references, returned_references),
-               'Expected the inquiry response to contain a different authorization number or ' \
+          response_bundles =
+            extract_bundles_from_pas_inquiry_response_parameters(resource)
+
+          assert response_bundles.any?,
+                 'The $inquire response did not contain a response Bundle.'
+
+          returned_references = extract_references(response_bundles)
+
+          different_reference?(submitted_references, returned_references)
+        end
+
+        assert reference_comparisons.any?,
+               'Expected an inquiry response to contain a different authorization number or ' \
                'administration reference number, but it did not.'
       end
 
       def extract_references(bundles)
-        references = Hash.new { |hash, url| hash[url] = [] }
-
-        Array(bundles).each do |bundle|
+        bundles.each_with_object(
+          Hash.new { |hash, url| hash[url] = [] }
+        ) do |bundle, references|
           next unless bundle.is_a?(FHIR::Bundle)
 
-          Array(bundle.entry).each do |entry|
+          bundle.entry.each do |entry|
             resource = entry.resource
             next unless resource.respond_to?(:item)
 
-            Array(resource.item).each do |item|
-              Array(item.extension).each do |extension|
+            resource.item.each do |item|
+              item.extension.each do |extension|
                 next unless REFERENCE_EXTENSION_URLS.include?(extension.url)
                 next if extension.valueString.blank?
 
@@ -95,8 +89,6 @@ module DaVinciPASTestKit
             end
           end
         end
-
-        references
       end
 
       def different_reference?(submitted, returned)

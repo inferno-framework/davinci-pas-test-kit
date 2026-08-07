@@ -1,6 +1,9 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireReferenceTest, :runnable do
   let(:suite_id) { 'davinci_pas_server_suite_v221' }
   let(:server_endpoint) { 'http://example.com/fhir' }
+  let(:input_test) do
+    DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireReferenceInputTest
+  end
 
   let(:test) do
     Class.new(described_class) do
@@ -76,13 +79,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     bundle = request_bundle('')
 
     result = run(
-      test,
-      server_endpoint:,
-      replaced_pa_inquire_request_body: bundle.to_json
+      input_test,
+      pa_inquire_request_body: bundle.to_json
     )
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to include('inquiry request did not contain an authorization number')
+    expect(result.result_message).to include('inquiry requests did not contain an authorization number')
   end
 
   it 'passes with a JSON Bundle when the response contains a different reference number' do
@@ -92,20 +94,20 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     result = run(
       test,
       server_endpoint:,
-      replaced_pa_inquire_request_body: bundle.to_json
+      pa_inquire_request_body: bundle.to_json
     )
 
     expect(result.result).to eq('pass')
   end
 
-  it 'passes with an array wrapped Bundle when the response contains a different reference number' do
+  it 'submits every Bundle when provided a list of Bundles' do
     bundle = request_bundle('AUTH-0001')
     stub_inquire(response_parameters('AUTH-0002'))
 
     result = run(
       test,
       server_endpoint:,
-      replaced_pa_inquire_request_body: [bundle].to_json
+      pa_inquire_request_body: [bundle].to_json
     )
 
     expect(result.result).to eq('pass')
@@ -118,7 +120,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     result = run(
       test,
       server_endpoint:,
-      replaced_pa_inquire_request_body: bundle.to_json
+      pa_inquire_request_body: bundle.to_json
     )
 
     expect(result.result).to eq('fail')
