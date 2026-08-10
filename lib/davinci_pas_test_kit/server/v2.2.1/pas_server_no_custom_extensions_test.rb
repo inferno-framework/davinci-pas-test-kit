@@ -111,8 +111,64 @@ module DaVinciPASTestKit
         'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/capabilitystatement-subscriptiontopic-canonical'
       ].freeze
 
+      SDC_EXTENSION_URLS = [
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerOptionsToggleExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-assemble-expectation',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-assembleContext',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-assembleDefinitionRoot',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-assembledFrom',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-collapsible',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-columnCount',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-contextExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-endpoint',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-isSubject',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemAnswerMedia',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-keyboard',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-lookupQuestionnaire',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observation-extract-category',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtractEntry',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationLinkPeriod',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-openLabel',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-optionalDisplay',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-performerType',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-preferredTerminologyServer',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-questionnaireAdaptive',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-shortText',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceQueries',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-sourceStructureMap',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-subQuestionnaire',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtract',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtractBundle',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtractContext',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtractValue',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-unitOpen',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-unitSupplementalSystem',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-width',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaireresponse-isSubject',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-rendering-criticalExtension',
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-servicerequest-questionnaire'
+      ].freeze
+
       VALID_EXTENSION_URLS = (US_CORE_EXTENSION_URLS + CRD_EXTENSION_URLS + HREX_EXTENSION_URLS \
-        + DTR_EXTENSION_URLS + PAS_EXTENSION_URLS).freeze
+        + SDC_EXTENSION_URLS + DTR_EXTENSION_URLS + PAS_EXTENSION_URLS).freeze
 
       id :pas_server_v221_no_custom_extensions_test
       title 'Server processes $submit without custom extensions'
