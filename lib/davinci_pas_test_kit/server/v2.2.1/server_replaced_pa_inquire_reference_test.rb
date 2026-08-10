@@ -1,18 +1,11 @@
 require_relative '../../parameters_helper'
+require_relative '../../cross_suite/pas_constants'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
     class PASServerReplacedPAInquireReferenceTest < Inferno::Test
       include ParametersHelper
-
-      AUTHORIZATION_NUMBER_EXTENSION =
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber'.freeze
-      ADMINISTRATION_REFERENCE_NUMBER_EXTENSION =
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber'.freeze
-      REFERENCE_EXTENSION_URLS = [
-        AUTHORIZATION_NUMBER_EXTENSION,
-        ADMINISTRATION_REFERENCE_NUMBER_EXTENSION
-      ].freeze
+      include PASConstants
 
       id :pas_server_v221_replaced_pa_inquire_reference_test
       title 'Server returns a different reference number for a replaced prior authorization'
@@ -81,7 +74,7 @@ module DaVinciPASTestKit
 
             resource.item.each do |item|
               item.extension.each do |extension|
-                next unless REFERENCE_EXTENSION_URLS.include?(extension.url)
+                next unless REFERENCE_NUMBER_EXTENSIONS.value?(extension.url)
                 next if extension.valueString.blank?
 
                 references[extension.url] << extension.valueString
@@ -92,7 +85,7 @@ module DaVinciPASTestKit
       end
 
       def different_reference?(submitted, returned)
-        REFERENCE_EXTENSION_URLS.any? do |extension_url|
+        REFERENCE_NUMBER_EXTENSIONS.each_value.any? do |extension_url|
           submitted_values = submitted[extension_url]
           returned_values = returned[extension_url]
 

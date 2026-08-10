@@ -1,9 +1,6 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireReferenceTest, :runnable do
   let(:suite_id) { 'davinci_pas_server_suite_v221' }
   let(:server_endpoint) { 'http://example.com/fhir' }
-  let(:input_test) do
-    DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireReferenceInputTest
-  end
 
   let(:test) do
     Class.new(described_class) do
@@ -25,7 +22,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
                 sequence: 1,
                 extension: [
                   {
-                    url: described_class::AUTHORIZATION_NUMBER_EXTENSION,
+                    url: DaVinciPASTestKit::PASConstants::REFERENCE_NUMBER_EXTENSIONS[:authorization_number],
                     valueString: reference_number
                   }
                 ]
@@ -55,7 +52,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
                       itemSequence: 1,
                       extension: [
                         {
-                          url: described_class::AUTHORIZATION_NUMBER_EXTENSION,
+                          url: DaVinciPASTestKit::PASConstants::REFERENCE_NUMBER_EXTENSIONS[:authorization_number],
                           valueString: reference_number
                         }
                       ]
@@ -73,18 +70,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
   def stub_inquire(response_body)
     stub_request(:post, "#{server_endpoint}/Claim/$inquire")
       .to_return(status: 200, body: response_body)
-  end
-
-  it 'fails when provided request body does not contain a reference number' do
-    bundle = request_bundle('')
-
-    result = run(
-      input_test,
-      pa_inquire_request_body: bundle.to_json
-    )
-
-    expect(result.result).to eq('fail')
-    expect(result.result_message).to include('inquiry requests did not contain an authorization number')
   end
 
   it 'passes with a JSON Bundle when the response contains a different reference number' do

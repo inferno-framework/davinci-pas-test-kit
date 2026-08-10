@@ -1,14 +1,9 @@
+require_relative '../../cross_suite/pas_constants'
+
 module DaVinciPASTestKit
   module DaVinciPASV221
     class PASServerReplacedPAInquireReferenceInputTest < Inferno::Test
-      AUTHORIZATION_NUMBER_EXTENSION =
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber'.freeze
-      ADMINISTRATION_REFERENCE_NUMBER_EXTENSION =
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber'.freeze
-      REFERENCE_EXTENSION_URLS = [
-        AUTHORIZATION_NUMBER_EXTENSION,
-        ADMINISTRATION_REFERENCE_NUMBER_EXTENSION
-      ].freeze
+      include PASConstants
 
       id :pas_server_v221_replaced_pa_inquire_reference_input_test
       title 'Provided $inquire Request contains a replaced prior authorization reference'
@@ -54,7 +49,7 @@ module DaVinciPASTestKit
 
           resource.item.flat_map do |item|
             item.extension.filter_map do |extension|
-              extension.valueString if REFERENCE_EXTENSION_URLS.include?(extension.url) &&
+              extension.valueString if REFERENCE_NUMBER_EXTENSIONS.value?(extension.url) &&
                                        extension.valueString.present?
             end
           end
