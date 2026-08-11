@@ -373,30 +373,8 @@ module DaVinciPASTestKit
               }
             )
           end
-          test from: :pas_server_v221_replaced_pa_inquire_reference_input_test do
-            id :pas_server_v221_replaced_pa_inquire_reference_input_test
-            config(
-              inputs: {
-                pa_inquire_request_body: {
-                  name: :must_support_pa_inquire_request_payload,
-                  title: 'Additional $inquire Request Payloads',
-                  description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
-                }
-              }
-            )
-          end
-          test from: :pas_server_v221_replaced_pa_inquire_reference_test do
-            id :pas_server_v221_replaced_pa_inquire_reference_test
-            config(
-              inputs: {
-                pa_inquire_request_body: {
-                  name: :must_support_pa_inquire_request_payload,
-                  title: 'Additional $inquire Request Payloads',
-                  description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
-                }
-              }
-            )
-          end
+          test from: :pas_server_v221_replaced_pa_inquire_reference_input_test
+          test from: :pas_server_v221_replaced_pa_inquire_reference_test
         end
 
         group do
