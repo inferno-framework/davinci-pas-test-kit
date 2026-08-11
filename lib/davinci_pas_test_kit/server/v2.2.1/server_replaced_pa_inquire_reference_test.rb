@@ -20,15 +20,17 @@ module DaVinciPASTestKit
 
       makes_request :pa_inquire_request
 
-      input :pa_inquire_request_body
+      input :must_support_pa_inquire_request_payload,
+            title: 'Additional $inquire Request Payloads',
+            description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
 
       run do
         assert_valid_json(
-          pa_inquire_request_body,
+          must_support_pa_inquire_request_payload,
           'Provide a valid JSON PAS Inquiry Request Bundle.'
         )
-        parsed_payload = JSON.parse(pa_inquire_request_body)
-        request_payloads = [parsed_payload].flatten.compact.uniq
+        parsed_payload = JSON.parse(must_support_pa_inquire_request_payload)
+        request_payloads = Array.wrap(parsed_payload)
 
         reference_comparisons = request_payloads.map do |request_payload|
           request_resource = FHIR.from_contents(request_payload.to_json)
@@ -43,11 +45,14 @@ module DaVinciPASTestKit
 
           assert_response_status(200)
 
-          assert resource.is_a?(FHIR::Parameters),
-                 'The $inquire response was not a FHIR Parameters resource.'
-
           response_bundles =
-            extract_bundles_from_pas_inquiry_response_parameters(resource)
+            if resource.is_a?(FHIR::Parameters)
+              extract_bundles_from_pas_inquiry_response_parameters(resource)
+            elsif resource.is_a?(FHIR::Bundle)
+              [resource]
+            else
+              assert false, '$inquire response is neither Parameters or Bundle'
+            end
 
           assert response_bundles.any?,
                  'The $inquire response did not contain a response Bundle.'
