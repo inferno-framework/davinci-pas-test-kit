@@ -757,11 +757,16 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         described_class::BASE_R4_PROFILE
       )
 
-      allow(test_instance).to receive(:resource_is_valid?).with(resource: nutrition_order).and_return(true)
+      allow(test_instance).to receive(:resource_is_valid?)
+        .with(resource: nutrition_order, profile_url: nil, add_messages_to_runnable: false,
+              validator_response_details: anything)
+        .and_return(true)
 
       test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
-      expect(test_instance).to have_received(:resource_is_valid?).with(resource: nutrition_order)
+      expect(test_instance).to have_received(:resource_is_valid?)
+        .with(resource: nutrition_order, profile_url: nil, add_messages_to_runnable: false,
+              validator_response_details: anything)
       expect(test_instance.validation_error_messages).to be_empty
     end
 
@@ -936,6 +941,142 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       it 'returns profile-claim-update when Claim.related is present' do
         claim = FHIR::Claim.new(related: [{ relationship: { coding: [{ code: 'prior' }] } }])
         expect(test_instance.send(:determine_claim_submit_profile_url, '2.2.1', claim)).to eq(claim_update_url)
+      end
+    end
+  end
+
+  describe '#validate_bundle_entries_against_profiles with multiple profiles' do
+    let(:validator_issue_class) { Inferno::DSL::FHIRResourceValidation::ValidatorIssue }
+    let(:test_instance) do
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def messages
+          @messages ||= []
+        end
+
+        def resource_is_valid?(**)
+          true
+        end
+      end.new
+    end
+
+    # Versioned URLs pass through profile_url_for_validation unchanged, keeping stub keys predictable
+    let(:profile_a) { 'http://example.com/StructureDefinition/profile-a|1.0.0' }
+    let(:profile_b) { 'http://example.com/StructureDefinition/profile-b|1.0.0' }
+    let(:observation) { FHIR::Observation.new(id: 'obs-1') }
+
+    def make_issue(resource, level:, message:, location: 'Observation.code')
+      validator_issue_class.new(
+        raw_issue: { 'location' => location, 'level' => level, 'message' => message },
+        target: resource
+      )
+    end
+
+    def stub_validator(issues_by_profile)
+      allow(test_instance).to receive(:resource_is_valid?) do |profile_url: nil, validator_response_details: nil, **|
+        issues = issues_by_profile.fetch(profile_url, [])
+        validator_response_details&.concat(issues)
+        issues.reject(&:filtered).none? { |issue| issue.severity == 'error' }
+      end
+    end
+
+    it 'suppresses error messages from failing profiles when another profile passes' do
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_a)
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_b)
+      stub_validator(
+        profile_a => [make_issue(observation, level: 'ERROR', message: 'missing required element')],
+        profile_b => []
+      )
+
+      test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+      expect(test_instance.messages).to be_empty
+      expect(test_instance.validation_error_messages).to be_empty
+    end
+
+    it 'logs non-error messages from the passing profile' do
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_a)
+      stub_validator(
+        profile_a => [make_issue(observation, level: 'WARNING', message: 'unresolvable value set')]
+      )
+
+      test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+      expect(test_instance.messages).to contain_exactly(
+        { type: 'warning', message: include('unresolvable value set') }
+      )
+      expect(test_instance.validation_error_messages).to be_empty
+    end
+
+    it 'logs messages for every candidate profile when all profiles fail' do
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_a)
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_b)
+      stub_validator(
+        profile_a => [make_issue(observation, level: 'ERROR', message: 'profile a failure')],
+        profile_b => [make_issue(observation, level: 'ERROR', message: 'profile b failure')]
+      )
+
+      test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+      expect(test_instance.messages.map { |message| message[:message] })
+        .to contain_exactly(include('profile a failure'), include('profile b failure'))
+      expect(test_instance.validation_error_messages.join)
+        .to include('not conformant to any of the target profiles')
+    end
+
+    it 'stops validating once a profile passes' do
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_a)
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_b)
+      stub_validator(profile_a => [], profile_b => [])
+
+      test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+      expect(test_instance).to have_received(:resource_is_valid?).once
+    end
+
+    it 'excludes filtered validator issues from the logged messages' do
+      test_instance.add_resource_target_profile_to_map('urn:uuid:obs-1', observation, profile_a)
+      filtered_issue = make_issue(observation, level: 'ERROR', message: 'suppressed x12 message')
+      filtered_issue.filtered = true
+      stub_validator(profile_a => [filtered_issue])
+
+      test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+      expect(test_instance.messages).to be_empty
+      expect(test_instance.validation_error_messages).to be_empty
+    end
+
+    context 'with PAS datatype constraints' do
+      let(:device_request_profile) { 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-devicerequest' }
+      let(:device_request) do
+        FHIR::DeviceRequest.new(
+          id: 'dr-1',
+          occurrenceTiming: FHIR::Timing.new(repeat: FHIR::Timing::Repeat.new(duration: 1, durationUnit: 'h'))
+        )
+      end
+
+      it 'reports a resource that passes validator checks but violates a datatype constraint' do
+        test_instance.add_resource_target_profile_to_map('urn:uuid:dr-1', device_request, device_request_profile)
+        stub_validator("#{device_request_profile}|2.2.1" => [])
+
+        test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+        expect(test_instance.messages).to contain_exactly(
+          { type: 'error', message: include('prof-1') }
+        )
+        expect(test_instance.validation_error_messages.join)
+          .to include('not conformant to any of the target profiles')
+      end
+
+      it 'does not apply datatype constraints for v2.0.1' do
+        test_instance.add_resource_target_profile_to_map('urn:uuid:dr-1', device_request, device_request_profile)
+        stub_validator("#{device_request_profile}|2.0.1" => [])
+
+        test_instance.validate_bundle_entries_against_profiles('2.0.1')
+
+        expect(test_instance.messages).to be_empty
+        expect(test_instance.validation_error_messages).to be_empty
       end
     end
   end
