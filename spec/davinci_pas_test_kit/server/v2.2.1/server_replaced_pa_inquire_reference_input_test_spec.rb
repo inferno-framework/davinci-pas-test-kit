@@ -38,12 +38,40 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
 
     result = run(
       test,
-      pa_inquire_request_body: bundle.to_json
+      must_support_pa_inquire_request_payload: bundle.to_json
     )
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to include(
       'inquiry requests did not contain an authorization number'
+    )
+  end
+
+  it 'fails when the request body is not valid JSON' do
+    result = run(
+      test,
+      must_support_pa_inquire_request_payload: '{test}'
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include(
+      'Provide a valid JSON PAS Inquiry Request Bundle.'
+    )
+  end
+
+  it 'fails when the request body does not contain a request Bundle' do
+    operation_outcome = {
+      resourceType: 'OperationOutcome'
+    }
+
+    result = run(
+      test,
+      must_support_pa_inquire_request_payload: operation_outcome.to_json
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include(
+      'Each inquiry request body must be a FHIR Bundle.'
     )
   end
 
@@ -58,7 +86,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
 
     result = run(
       test,
-      pa_inquire_request_body: bundle.to_json
+      must_support_pa_inquire_request_payload: bundle.to_json
     )
 
     expect(result.result).to eq('pass')

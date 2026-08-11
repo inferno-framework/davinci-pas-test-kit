@@ -67,9 +67,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     }.to_json
   end
 
-  def stub_inquire(response_body)
+  def stub_inquire(response_body, status: 200)
     stub_request(:post, "#{server_endpoint}/Claim/$inquire")
-      .to_return(status: 200, body: response_body)
+      .to_return(status:, body: response_body)
   end
 
   it 'passes with a JSON Bundle when the response contains a different reference number' do
@@ -79,23 +79,30 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     result = run(
       test,
       server_endpoint:,
-      pa_inquire_request_body: bundle.to_json
+      must_support_pa_inquire_request_payload: bundle.to_json
     )
 
     expect(result.result).to eq('pass')
   end
 
   it 'submits every Bundle when provided a list of Bundles' do
-    bundle = request_bundle('AUTH-0001')
-    stub_inquire(response_parameters('AUTH-0002'))
+    first_bundle = request_bundle('AUTH-0001')
+    second_bundle = request_bundle('AUTH-0002')
+    stub_inquire(response_parameters('AUTH-0003'))
 
     result = run(
       test,
       server_endpoint:,
-      pa_inquire_request_body: [bundle].to_json
+      must_support_pa_inquire_request_payload: [
+        first_bundle,
+        second_bundle
+      ].to_json
     )
 
     expect(result.result).to eq('pass')
+    expect(
+      a_request(:post, "#{server_endpoint}/Claim/$inquire")
+    ).to have_been_requested.twice
   end
 
   it 'fails when the response contains the same reference number' do
@@ -105,10 +112,84 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     result = run(
       test,
       server_endpoint:,
-      pa_inquire_request_body: bundle.to_json
+      must_support_pa_inquire_request_payload: bundle.to_json
     )
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to include('different authorization number')
+  end
+
+  it 'fails when the request body is not valid JSON' do
+    result = run(
+      test,
+      server_endpoint:,
+      must_support_pa_inquire_request_payload: '{test}'
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include(
+      'Provide a valid JSON PAS Inquiry Request Bundle.'
+    )
+  end
+
+  it 'fails when $inquire response is not 200' do
+    bundle = request_bundle('AUTH-0001')
+    stub_inquire(
+      {
+        resourceType: 'OperationOutcome',
+        issue: []
+      }.to_json,
+      status: 400
+    )
+
+    result = run(
+      test,
+      server_endpoint:,
+      must_support_pa_inquire_request_payload: bundle.to_json
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('400')
+  end
+
+  it 'fails when $inquire response did not contain response Bundle' do
+    bundle = request_bundle('AUTH-0001')
+    stub_inquire(
+      {
+        resourceType: 'Parameters',
+        parameter: []
+      }.to_json
+    )
+
+    result = run(
+      test,
+      server_endpoint:,
+      must_support_pa_inquire_request_payload: bundle.to_json
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include(
+      'The $inquire response did not contain a response Bundle.'
+    )
+  end
+
+  it 'fails when $inquire response did not contain response Bundle or Paramter' do
+    bundle = request_bundle('AUTH-0001')
+    stub_inquire(
+      {
+        resourceType: 'OperationOutcome'
+      }.to_json
+    )
+
+    result = run(
+      test,
+      server_endpoint:,
+      must_support_pa_inquire_request_payload: bundle.to_json
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include(
+      '$inquire response is neither Parameters or Bundle'
+    )
   end
 end
