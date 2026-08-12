@@ -5,6 +5,8 @@ require_relative '../../claim_inquire_operation_test'
 require_relative '../../<%= ig_version %>/must_support/pas_server_must_support_request_profiles_test'
 <%- if additional_claim_inquiry_response_requirements_supported? -%>
 require_relative '../../<%= ig_version %>/pas_server_claim_inquiry_responses_group'
+<%- if additional_submit_request_requirements_supported? -%>
+require_relative '../../<%= ig_version %>/pas_server_no_custom_extensions_test'
 <%- end -%>
 <%- profile_test_files('submit', 'request').each do |file_name| -%>
 require_relative '<%= file_name %>'
@@ -95,6 +97,10 @@ module DaVinciPASTestKit
               }
             )
           end
+          <%- if operation == 'submit' && additional_submit_request_requirements_supported? -%>
+
+          test from: :pas_server_<%= ig_version_for_id %>_no_custom_extensions_test
+          <%- end -%>
         end
 
         group do
