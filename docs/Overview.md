@@ -80,3 +80,4 @@ For specific testing prerequisites and detailed test descriptions, refer to:
 * [Client v2.0.1 Instructions](Client-Instructions-v2.0.1.md)
 * [Client v2.2.1 Instructions](Client-Instructions-v2.2.1.md)
 * [Server v2.0.1 Instructions](Server-Instructions-v2.0.1.md)
+* [Server v2.2.1 Instructions](Server-Instructions-v2.2.1.md)
