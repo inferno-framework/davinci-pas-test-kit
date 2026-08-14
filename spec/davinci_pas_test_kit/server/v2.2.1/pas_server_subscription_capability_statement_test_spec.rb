@@ -5,12 +5,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerSubscriptionCapabilit
   let(:test) do
     Class.new(described_class) do
       fhir_client { url :server_endpoint }
+
       input :server_endpoint
     end
   end
 
+  before do
+    allow_any_instance_of(test).to receive(:assert_valid_resource).and_return(true)
+  end
+
   def capability_statement(
-    interactions: %w[create update delete],
+    interactions: ['create', 'update', 'delete'],
     subscription_resource: true,
     server_rest: true
   )
@@ -36,6 +41,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerSubscriptionCapabilit
       resourceType: 'CapabilityStatement',
       status: 'active',
       kind: 'instance',
+      date: '2026-01-01',
+      implementation: {
+        description: 'Example PAS server'
+      },
       fhirVersion: '4.0.1',
       format: ['json'],
       rest:
@@ -67,22 +76,23 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerSubscriptionCapabilit
     result = run(test, server_endpoint:)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message)
-      .to eq(
-        'CapabilityStatement is missing a `Subscription` resource entry ' \
-        'in its server-mode `rest` section.'
-      )
+    expect(result.result_message).to eq(
+      'CapabilityStatement is missing a `Subscription` resource entry ' \
+      'in its server-mode `rest` section.'
+    )
   end
 
   it 'fails when the Subscription resource is missing a required interaction' do
     stub_capability_statement(
-      capability_statement(interactions: %w[create update])
+      capability_statement(interactions: ['create', 'update'])
     )
 
     result = run(test, server_endpoint:)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('Missing: delete')
+    expect(result.result_message).to eq(
+      'Missing interactions in the subscription: delete'
+    )
   end
 
   it 'fails when the CapabilityStatement has no server-mode rest entry' do
@@ -93,9 +103,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerSubscriptionCapabilit
     result = run(test, server_endpoint:)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message)
-      .to eq(
-        'CapabilityStatement is missing a `rest` entry with `mode` set to `server`.'
-      )
+    expect(result.result_message).to eq(
+      'CapabilityStatement is missing a `rest` entry with `mode` set to `server`.'
+    )
   end
 end

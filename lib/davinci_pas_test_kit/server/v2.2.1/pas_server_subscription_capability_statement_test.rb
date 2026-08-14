@@ -19,6 +19,7 @@ module DaVinciPASTestKit
 
         assert_response_status(200)
         assert_resource_type(:capability_statement)
+        assert_valid_resource
 
         server_rest = resource.rest.find { |rest| rest.mode == 'server' }
         assert server_rest.present?, 'CapabilityStatement is missing a `rest` entry with `mode` set to `server`.'
@@ -31,7 +32,8 @@ module DaVinciPASTestKit
 
         missing_interactions = REQUIRED_INTERACTIONS - supported_interactions
 
-        assert missing_interactions.empty?, "Missing interactions in the subscription: #{missing_interactions.join(', ')}"
+        assert missing_interactions.empty?,
+               "Missing interactions in the subscription: #{missing_interactions.join(', ')}"
       end
     end
   end
