@@ -44,7 +44,7 @@ This test kit is a **DRAFT**. While it covers core aspects of the PAS IG, there 
 
 The test kit currently focuses on validating core end-to-end prior authorization
 workflows, including the submission and handling of responses for prior
-authorization requests (approval, denial, pended). It also covers FHIR profile
+authorization requests (approval, denial, pended) and claim updates. It also covers FHIR profile
 conformance, validation of must-support elements as defined in PAS IG profiles,
 basic subscription mechanics for pended request notifications, and core
 authentication flows like SMART Backend Services and UDAP B2B.

@@ -1,10 +1,9 @@
 # Server Suite Implementation Details
 
 The Da Vinci PAS Server Suite validates the conformance of server systems 
-to the STU 2 version of the HL7® FHIR® 
-[Da Vinci Prior Authorization Support Implementation Guide](https://hl7.org/fhir/us/davinci-pas/STU2/).
-There is also an in-progress suite for the [2.2.1 version of the IG](https://hl7.org/fhir/us/davinci-pas/2.2.1/).
-The documentation on this wiki currently covers only the 2.0.1 version of the server suite.
+to versions [2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/) and
+[2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/) of the HL7® FHIR® Da Vinci Prior Authorization Support Implementation Guide.
+This documentation covers both versions of the server suite.
 
 These tests are a **DRAFT** intended to allow PAS server implementers to perform 
 preliminary checks of their servers against PAS IG requirements and [provide 
@@ -21,6 +20,7 @@ conformant handling of PAS requirements, including
     - Approval of a prior authorization request
     - Denial of a prior authorization request
     - Pending of a prior authorization request and a subsequent final decision
+    - Claim Updates (v2.2.1 only)
     - Inability to process a prior authorization request
 - The ability of the server to handle the full scope of data required by PAS, including
     - Ability to process prior auth requests and inquiries with all PAS profiles and all must support elements on those profiles
@@ -35,6 +35,8 @@ IG requirements individually and used in aggregate to determine whether
 required features and functionality are present. HL7® FHIR® resources are 
 validated with the Java validator using `tx.fhir.org` as the terminology server.
 
+The v2.2.1 suite validates resources against the PAS 2.2.1 and US Core 6.1.0 implementation guides.
+
 These tests do not currently test the full scope of the IG. See the *Testing Limitations* section below 
 for more details about the current scope of the tests and the reasons that some details have been left out.
 
@@ -44,6 +46,9 @@ for more details about the current scope of the tests and the reasons that some 
 
 Execution of these tests require a significant amount of tester input in the
 form of requests that Inferno will make against the server under test.
+
+For v2.2.1, see the [v2.2.1 server instructions](Server-Instructions-v2.2.1) for version-specific
+setup and execution steps. The public reference server example below applies to v2.0.1.
 
 If you would like to try out the tests using examples from the IG against the
 [public reference server endpoint](https://prior-auth.davinci.hl7.org/fhir) ([code on github](https://github.com/HL7-DaVinci/prior-auth)), you can do so by 
@@ -65,7 +70,7 @@ that appears when initiating a test run.
 
 ### Server identification
 
-Requests will be made to the `/Claim/$submit` and `/Claim/$inquire` endpoints under the url provided in the "FHIR Server Endpoint URL" field.
+Requests will be made to the `/Claim/$submit`, `/Claim/$inquire`, and `/Subscription` endpoints under the url provided in the "FHIR Server Endpoint URL" field.
 
 ### Authentication
 
@@ -73,11 +78,11 @@ The PAS IG states that
 
 > "PAS Servers **SHOULD** support server-server OAuth… In a future release of this guide, direction will limit the option to [require] server-server OAuth."
 
-The PAS test kit currently assumes that the handshake has already occurred and requires
-that a bearer token be provided in the “OAuth Credentials / Access Token” configuration
-field. Inferno will submit this token on all requests it makes to the server as a part of 
-executing the tests. A complete backend server authentication handshake may be supported
-in future versions of the test kit.
+The **OAuth Credentials** input is optional for test environments that do not require authentication.
+When authentication is required, it must authorize Inferno to invoke the PAS operations and create the
+Subscription. The v2.2.1 suite accepts an access-token or backend-service configuration and uses it to
+obtain or apply credentials to its outbound requests. The server suite does not separately evaluate an
+OAuth interaction as a server-test result.
 
 ### Payload
 
@@ -88,6 +93,21 @@ and instead relies on the tester to provide the requests that Inferno will make.
 For single-request fields (e.g., “PAS Submit Request Payload for Approval Response”), the input must be a json-encoded FHIR bundle.
 
 For multiple-request fields (e.g., “Additional PAS Submit Request Payloads”), the input must be a json array of json-encoded FHIR bundles (e.g., [fhir-bundle-1, fhir-bundle-2, …] where each fhir-bundle-n is a full bundle).
+
+### Claim Updates (v2.2.1)
+
+The v2.2.1 **Claim Updates** group sends four tester-provided `$submit` requests in order: an initial Claim
+submission, an update that adds an item, an update that modifies one item and cancels another, and an update that
+cancels the entire request. The Bundles must form a stateful sequence for the server under test.
+
+Inferno validates each response against the corresponding request: each response must echo submitted item sequences
+and include current results for all submitted items. It does not compare item sequences between different update steps.
+
+### Error handling (v2.2.1)
+
+The **Demonstrate Error Handling** group requires no tester-provided error payload. Inferno submits an intentionally
+nonconformant, empty Bundle to both `$submit` and `$inquire`. The server is expected to return a non-2xx response
+containing an `OperationOutcome`.
 
 ### Subscription
 
@@ -109,6 +129,9 @@ the `Claim/$submit` operation and that it uses the same authentication. Testers 
 
 During the pended workflow test, testers will demonstrate that an update to the submitted and pended prior authorization
 request causes the Subscription to trigger and send a notification to Inferno.
+
+The v2.0.1 and v2.2.1 pended workflows differ in that Inferno expects `id-only` notification content in v2.0.1 and
+`full-resource` notification content in v2.2.1.
 
 ## Testing Limitations
 
@@ -138,9 +161,7 @@ The implications of this reliance on proprietary information that is not publicl
 kit:
 
 - Cannot verify the correct usage of X12-based terminology: terminology requirements for all elements bound to X12
-    value sets will not be validated.
-- Cannot verify the meaning of codes: validation that a given response conveys something specific, e.g., approval
-    or pending, is not performed.
+    value sets will not be validated beyond the expected codes indicating approval, denial, and pended decisions.
 - Cannot verify matching semantics on inquiries: no checking of the identity of the ClaimResponse returned for an
     inquiry, e.g., that it matches the input or the original request.
 
@@ -152,7 +173,7 @@ if these requirements are not met.
 
 The PAS IG places additional requirements on servers that are not currently tested by this test kit, including
 
-- Prior Authorization update workflows
+- Prior Authorization update workflows (v2.0.1)
 - Requests for additional information handled through the CDex framework
 - PDF, CDA, and JPG attachments
 - US Core profile support for supporting information
