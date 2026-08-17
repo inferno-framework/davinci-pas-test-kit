@@ -81,7 +81,7 @@ The PAS IG states that
 The **OAuth Credentials** input is optional for test environments that do not require authentication.
 When authentication is required, it must authorize Inferno to invoke the PAS operations and create the
 Subscription. The v2.2.1 suite accepts an access-token or backend-service configuration and uses it to
-obtain or apply credentials to its outbound requests. The server suite does not separately evaluate an
+apply credentials to its outbound requests. The server suite does not separately evaluate an
 OAuth interaction as a server-test result.
 
 ### Payload
