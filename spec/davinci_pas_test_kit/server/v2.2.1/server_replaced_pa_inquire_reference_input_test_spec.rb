@@ -75,12 +75,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     )
   end
 
-  it 'skips when no inquiry request body is provided' do
-    result = run(test)
-
-    expect(result.result).to eq('skip')
-  end
-
   it 'passes when provided request body does contain a reference number' do
     bundle = request_bundle('AUTH-0001')
 
@@ -90,5 +84,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASServerReplacedPAInquireRefe
     )
 
     expect(result.result).to eq('pass')
+  end
+
+  it 'fails when no inquiry Request Bundles are provided' do
+    result = run(
+      test,
+      must_support_pa_inquire_request_payload: [].to_json
+    )
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include(
+      'No inquiry Request Bundles were provided.'
+    )
   end
 end
