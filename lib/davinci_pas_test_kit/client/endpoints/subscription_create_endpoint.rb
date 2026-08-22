@@ -6,6 +6,12 @@ module DaVinciPASTestKit
   class SubscriptionCreateEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
 
+    error_response_format :operation_outcome
+
+    def test_run_identifier_location_description
+      'the path or embedded within the bearer token in the Authorization header'
+    end
+
     def test_run_identifier
       return request.params[:session_path] if request.params[:session_path].present?
 
