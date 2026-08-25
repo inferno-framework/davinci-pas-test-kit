@@ -100,6 +100,8 @@ module DaVinciPASTestKit
         case ig_version
         when 'v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@141']
+        when 'v2.2.1'
+          ['hl7.fhir.us.davinci-pas_2.2.1@spec-51', 'hl7.fhir.us.davinci-pas_2.2.1@spec-60']
         end
       end
 
@@ -111,14 +113,15 @@ module DaVinciPASTestKit
       end
 
       def bundle_response_conformance_requirements_verified(operation)
-        case "#{operation}_#{ig_version}"
-        when 'submit_v2.0.1'
-          ['hl7.fhir.us.davinci-pas_2.0.1@64', 'hl7.fhir.us.davinci-pas_2.0.1@100',
-           'hl7.fhir.us.davinci-pas_2.0.1@101', 'hl7.fhir.us.davinci-pas_2.0.1@102',
-           'hl7.fhir.us.davinci-pas_2.0.1@103', 'hl7.fhir.us.davinci-pas_2.0.1@107']
-        when 'inquire_v2.0.1'
-          ['hl7.fhir.us.davinci-pas_2.0.1@131']
-        end
+        {
+          ['submit', 'v2.0.1'] => [
+            'hl7.fhir.us.davinci-pas_2.0.1@64', 'hl7.fhir.us.davinci-pas_2.0.1@100',
+            'hl7.fhir.us.davinci-pas_2.0.1@101', 'hl7.fhir.us.davinci-pas_2.0.1@102',
+            'hl7.fhir.us.davinci-pas_2.0.1@103', 'hl7.fhir.us.davinci-pas_2.0.1@107'
+          ],
+          ['submit', 'v2.2.1'] => ['hl7.fhir.us.davinci-pas_2.2.1@spec-33'],
+          ['inquire', 'v2.0.1'] => ['hl7.fhir.us.davinci-pas_2.0.1@131']
+        }[[operation, ig_version]]
       end
 
       def description

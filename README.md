@@ -1,7 +1,7 @@
 # Da Vinci Prior Authorization Support (PAS) Test Kit
 
 The **Da Vinci Prior Authorization Support (PAS) Test Kit** validates the 
-conformance of systems to versions 2.0.1 and 2.1.1 of the PAS FHIR IG. The test kit includes
+conformance of systems to versions 2.0.1 and 2.2.1 of the PAS FHIR IG. The test kit includes
 suites targeting each of the actors from the specification:
 
 - Servers (payers): Inferno will act as a client and make a series of
@@ -66,6 +66,7 @@ Detailed step-by-step instructions for running the tests can be found in our wal
 - [Client v2.0.1 Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.0.1)
 - [Client v2.2.1 Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Instructions-v2.2.1)
 - [Server v2.0.1 Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Instructions-v2.0.1)
+- [Server v2.2.1 Testing Walkthrough](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Instructions-v2.2.1)
 
 Additional information is provided in the [Da Vinci PAS Test Kit documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).
 

@@ -32,7 +32,15 @@ module DaVinciPASTestKit
       requests = load_tagged_requests(DaVinciPASTestKit.operation_tag(operation),
                                       workflow_tag)
       bundles = []
-      requests.map(&:response_body).compact.uniq.each do |response_body|
+      seen_response_bodies = []
+      requests.each do |request|
+        response_body = request.response_body
+        next if response_body.blank?
+        next if seen_response_bodies.include?(response_body)
+
+        seen_response_bodies << response_body
+
+        request_bundle = FHIR.from_contents(request.request_body) if request.request_body.present?
         resource = FHIR.from_contents(response_body)
         next unless resource.present?
 
@@ -40,10 +48,10 @@ module DaVinciPASTestKit
         if resource.resourceType == 'Parameters'
           # Extract all Bundles from Parameters.parameter entries
           parameter_bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
-          bundles.concat(parameter_bundles)
+          bundles.concat(parameter_bundles.map { |bundle| [bundle, request_bundle] })
         elsif resource.is_a?(FHIR::Bundle)
           # Handle Bundle resource (v2.0.1 or v2.2.1 non-inquire)
-          bundles << resource
+          bundles << [resource, request_bundle]
         end
       rescue StandardError
         next
@@ -57,12 +65,13 @@ module DaVinciPASTestKit
       assert bundles_to_verify.present?,
              "No successful $#{operation} requests made during the #{use_case.titleize} workflow tests."
 
-      bundles_to_verify.each do |bundle|
+      bundles_to_verify.each do |bundle, request_bundle|
         perform_bundle_validation(
           bundle,
           operation,
           'response',
-          ig_version
+          ig_version,
+          request_bundle
         )
       end
 
