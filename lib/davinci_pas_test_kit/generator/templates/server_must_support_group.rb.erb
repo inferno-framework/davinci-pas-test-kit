@@ -6,6 +6,10 @@ require_relative '../../<%= ig_version %>/must_support/pas_server_must_support_r
 <%- if additional_claim_inquiry_response_requirements_supported? -%>
 require_relative '../../<%= ig_version %>/pas_server_claim_inquiry_responses_group'
 <%- end -%>
+<% if replaced_pa_inquire_reference_test? -%>
+require_relative '../../<%= ig_version %>/server_replaced_pa_inquire_reference_input_test'
+require_relative '../../<%= ig_version %>/server_replaced_pa_inquire_reference_test'
+<% end -%>
 <%- profile_test_files('submit', 'request').each do |file_name| -%>
 require_relative '<%= file_name %>'
 <%- end -%>
@@ -95,6 +99,10 @@ module DaVinciPASTestKit
               }
             )
           end
+          <%- if operation == 'inquire' && replaced_pa_inquire_reference_test? -%>
+          test from: :pas_server_<%= ig_version_for_id %>_replaced_pa_inquire_reference_input_test
+          test from: :pas_server_<%= ig_version_for_id %>_replaced_pa_inquire_reference_test
+          <%- end -%>
         end
 
         group do
