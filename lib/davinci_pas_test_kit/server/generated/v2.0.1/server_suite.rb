@@ -24,8 +24,7 @@ module DaVinciPASTestKit
 
         The best place to get started is the [Server Testing
         Instructions](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Instructions-v2.0.1),
-        which provides a step-by-step guide for running the tests against a client and provides
-        an example client implemented in Postman.  Visit the [Server Testing
+        which provides a step-by-step guide for running the tests. Visit the [Server Testing
         Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)
         documentation for information about technical implementation and known limitations of these tests.
 
@@ -36,6 +35,7 @@ module DaVinciPASTestKit
             - Approval of a prior authorization request
             - Denial of a prior authorization request
             - Pending of a prior authorization request and a subsequent final decision
+            - Claim updates (except in v2.0.1)
             - Inability to process a prior authorization request
         - The ability of the server to handle the full scope of data required by PAS, including
             - Ability to process prior auth requests and inquiries with all PAS profiles and all must support elements on those profiles
@@ -50,7 +50,7 @@ module DaVinciPASTestKit
         required features and functionality are present. HL7® FHIR® resources are 
         validated with the Java validator using `tx.fhir.org` as the terminology server.
       
-      %)
+      )
 
       links [
         {

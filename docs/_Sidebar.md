@@ -12,6 +12,7 @@
 **Server Suite**
 *   [Server Testing Details](Server-Details)
 *   [Server v2.0.1 Testing Instructions](Server-Instructions-v2.0.1)
+*   [Server v2.2.1 Testing Instructions](Server-Instructions-v2.2.1)
 
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)
