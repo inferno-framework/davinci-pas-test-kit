@@ -3,6 +3,7 @@ require_relative '../../claim_submit_operation_test'
 require_relative '../../server_response_bundle_validation_test'
 require_relative '../../claim_inquire_operation_test'
 require_relative '../../v2.2.1/must_support/pas_server_must_support_request_profiles_test'
+require_relative '../../v2.2.1/pas_server_no_custom_extensions_test'
 require_relative '../../v2.2.1/pas_server_claim_inquiry_responses_group'
 require_relative '../../v2.2.1/server_replaced_pa_inquire_reference_input_test'
 require_relative '../../v2.2.1/server_replaced_pa_inquire_reference_test'
@@ -207,6 +208,8 @@ module DaVinciPASTestKit
               }
             )
           end
+
+          test from: :pas_server_v221_no_custom_extensions_test
         end
 
         group do
