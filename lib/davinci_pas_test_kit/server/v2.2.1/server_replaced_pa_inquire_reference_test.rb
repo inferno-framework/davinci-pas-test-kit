@@ -25,6 +25,9 @@ module DaVinciPASTestKit
             description: 'Insert an additional request bundle or a list of bundles (e.g. [bundle_1, bundle_2])'
 
       run do
+        skip_if must_support_pa_inquire_request_payload.blank?,
+                'No inquiry request body was provided.'
+
         assert_valid_json(
           must_support_pa_inquire_request_payload,
           'Provide a valid JSON PAS Inquiry Request Bundle.'
