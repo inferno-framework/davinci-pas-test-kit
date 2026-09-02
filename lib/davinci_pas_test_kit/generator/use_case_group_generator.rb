@@ -119,7 +119,10 @@ module DaVinciPASTestKit
             'hl7.fhir.us.davinci-pas_2.0.1@101', 'hl7.fhir.us.davinci-pas_2.0.1@102',
             'hl7.fhir.us.davinci-pas_2.0.1@103', 'hl7.fhir.us.davinci-pas_2.0.1@107'
           ],
-          ['submit', 'v2.2.1'] => ['hl7.fhir.us.davinci-pas_2.2.1@spec-33'],
+          ['submit', 'v2.2.1'] => [
+            'hl7.fhir.us.davinci-pas_2.2.1@spec-30', 'hl7.fhir.us.davinci-pas_2.2.1@spec-31',
+            'hl7.fhir.us.davinci-pas_2.2.1@spec-33'
+          ],
           ['inquire', 'v2.0.1'] => ['hl7.fhir.us.davinci-pas_2.0.1@131']
         }[[operation, ig_version]]
       end

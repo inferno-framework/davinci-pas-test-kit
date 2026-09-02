@@ -98,7 +98,7 @@ module DaVinciPASTestKit
     end
 
     def perform_response_validation(response_bundle, profile_url, version, request_type, request_bundle = nil)
-      validate_pa_response_body_structure(response_bundle, request_bundle) if request_type == 'submit'
+      validate_pa_response_body_structure(response_bundle, request_bundle) if request_type.start_with?('submit')
       validate_resources_conformance_against_profile(response_bundle, profile_url, version, request_type)
     end
 
@@ -258,9 +258,10 @@ module DaVinciPASTestKit
       return false if request_resource.blank? || response_resource.blank?
       return false unless request_resource.resourceType == response_resource.resourceType
 
-      # True if any identifier matches, so we can later report if any do not have all matching identifiers
-      request_entry.fullUrl == response_entry.fullUrl ||
-        request_resource.id == response_resource.id ||
+      # True if any identifying field is present on both sides and matches, so we can later report if any
+      # do not have all matching identifiers. Blank fields do not identify echoed resources.
+      (request_entry.fullUrl.present? && request_entry.fullUrl == response_entry.fullUrl) ||
+        (request_resource.id.present? && request_resource.id == response_resource.id) ||
         (request_resource.identifier.present? && request_resource.identifier == response_resource.identifier)
     end
 

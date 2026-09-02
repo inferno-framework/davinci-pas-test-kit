@@ -282,6 +282,31 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(entity_result_messages(test).map(&:message).join)
           .to include('do not have the same fullUrl or identifiers')
       end
+
+      it 'does not flag unrelated resources that only share a resource type and blank ids' do
+        request_bundle = {
+          resourceType: 'Bundle', type: 'collection',
+          entry: [
+            { fullUrl: 'urn:uuid:claim', resource: {
+              resourceType: 'Claim', id: 'claim', status: 'active', use: 'preauthorization'
+            } },
+            { fullUrl: 'urn:uuid:practitioner-request', resource: { resourceType: 'Practitioner' } }
+          ]
+        }.to_json
+        response_bundle = {
+          resourceType: 'Bundle', type: 'collection',
+          entry: [
+            { fullUrl: 'urn:uuid:claim-response', resource: {
+              resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+              use: 'preauthorization', outcome: 'complete'
+            } },
+            { fullUrl: 'urn:uuid:practitioner-response', resource: { resourceType: 'Practitioner' } }
+          ]
+        }.to_json
+
+        result = run(test, server_endpoint:, response_body: response_bundle, request_bundle:)
+        expect(result.result).to eq('pass')
+      end
     end
 
     context 'when an invalid PA response bundle is provided' do
@@ -313,6 +338,59 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(messages[0].message).to include('SHALL appear exactly once in the Bundle, but found 0')
         expect(messages[1].message).to include('SHALL appear exactly once in the Bundle, but found 0')
       end
+    end
+  end
+
+  describe '#perform_bundle_validation for a server $submit response' do
+    let(:test_instance) do
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def messages
+          @messages ||= []
+        end
+      end.new
+    end
+
+    let(:request_bundle) do
+      FHIR.from_contents({
+        resourceType: 'Bundle', type: 'collection',
+        entry: [
+          { fullUrl: 'urn:uuid:claim', resource: {
+            resourceType: 'Claim', id: 'claim', status: 'active', use: 'preauthorization'
+          } },
+          { fullUrl: 'urn:uuid:patient', resource: {
+            resourceType: 'Patient', id: 'patient-1',
+            identifier: [{ system: 'http://example.com/mrn', value: '12345' }]
+          } }
+        ]
+      }.to_json)
+    end
+
+    let(:response_bundle) do
+      FHIR.from_contents({
+        resourceType: 'Bundle', type: 'collection',
+        entry: [
+          { fullUrl: 'urn:uuid:claim-response', resource: {
+            resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+            use: 'preauthorization', outcome: 'complete'
+          } },
+          { fullUrl: 'urn:uuid:different-patient', resource: {
+            resourceType: 'Patient', id: 'patient-1',
+            identifier: [{ system: 'http://example.com/mrn', value: '12345' }]
+          } }
+        ]
+      }.to_json)
+    end
+
+    before do
+      allow(test_instance).to receive(:validate_resources_conformance_against_profile)
+    end
+
+    it 'flags an echoed request resource with a different fullUrl' do
+      test_instance.perform_bundle_validation(response_bundle, 'submit', 'response', 'v2.2.1', request_bundle)
+
+      expect(test_instance.validation_error_messages.join).to include('do not have the same fullUrl or identifiers')
     end
   end
 
