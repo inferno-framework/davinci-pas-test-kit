@@ -143,7 +143,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a series of PAS request to the client suite session. Wait for the server tests to complete.
-    *   Once the server suite tests have completed, return to the client suite sessio and confirm that they have completed as well.
+    *   Once the server suite tests have completed, return to the client suite session and confirm that they have completed as well.
 9.  **Must Support Elements Execution**:
     *   In the client session, select the "**12** Must Support Elements" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -151,11 +151,11 @@ in progress, so some tests do not fully align yet.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
     *   Return to the server suite test session.
     *   In the server suite session, select the "**3** Demonstrate Element Support" group from the sidebar (typically found on the left side).
-    *   Click the "Run Tests" button (typically found in the top-right).
+    *   Click the "Run All Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a series of PAS request to the client suite session and then verify that the requests and responses demonstrate all must support elements. Wait for the server tests to complete.
     *   Once the server suite tests have completed, return to the client suite session. Click the link to indicate that all requests have been sent. A new "User Action Required" dialog will appear asking for an attestation that the client system handled the $submit response must support elements appropriately. Click the statement indicating that it was and then do the same in the next dialog asking about the $inquire response must support elements to complete the tests.
-10.  **Operation Failure Execution**:
+10. **Operation Failure Execution**:
     *   In the client session, select the "**13.1** Operation Failure" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.

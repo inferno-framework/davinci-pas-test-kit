@@ -109,6 +109,7 @@ module DaVinciPASTestKit
             sets containing X12 codes are not validated.
             
           )
+
           config(
             options: {
               use_case: 'pended',
@@ -116,6 +117,7 @@ module DaVinciPASTestKit
               ig_version: 'v2.2.1'
             }
           )
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-30', 'hl7.fhir.us.davinci-pas_2.2.1@spec-31', 'hl7.fhir.us.davinci-pas_2.2.1@spec-33'
         end
         test from: :prior_auth_claim_response_decision_validation do
           id :pas_server_v221_decision_validation_test_pended
@@ -133,6 +135,7 @@ module DaVinciPASTestKit
         
         test from: :pas_server_v221_subscription_notification_wait do
           id :pas_server_v221_subscription_notification_wait_pended
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-51', 'hl7.fhir.us.davinci-pas_2.2.1@spec-60'
         end
         test from: :subscriptions_r4_server_notification_conformance do
           id :pas_server_v221_subscription_notification_conformance_pended
@@ -143,6 +146,8 @@ module DaVinciPASTestKit
         end
         test from: :pas_notification_pas_conformance_test do
           id :pas_server_v221_notification_pas_conformance_pended
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-61',
+                                'hl7.fhir.us.davinci-pas_2.2.1@spec-62'
         end
       end
     end

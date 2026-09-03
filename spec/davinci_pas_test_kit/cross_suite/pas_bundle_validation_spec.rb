@@ -163,6 +163,152 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
     end
 
+    context 'when a response echoes a resource from the request' do
+      let(:patient_full_url) { 'urn:uuid:patient' }
+      let(:patient_id) { 'patient-1' }
+      let(:patient_identifier_system) { 'http://example.com/mrn' }
+      let(:patient_identifier) { '12345' }
+      let(:request_bundle_with_patient) do
+        {
+          resourceType: 'Bundle',
+          type: 'collection',
+          entry: [
+            {
+              fullUrl: 'urn:uuid:claim',
+              resource: {
+                resourceType: 'Claim', id: 'claim', status: 'active', use: 'preauthorization'
+              }
+            },
+            {
+              fullUrl: patient_full_url,
+              resource: {
+                resourceType: 'Patient', id: patient_id,
+                identifier: [{ system: patient_identifier_system, value: patient_identifier }]
+              }
+            }
+          ]
+        }.to_json
+      end
+
+      def response_bundle_with_echoed_patient(patient_full_url:, patient_id:, patient_identifier_system:,
+                                              patient_identifier:)
+        {
+          resourceType: 'Bundle',
+          type: 'collection',
+          entry: [
+            {
+              fullUrl: 'urn:uuid:claim-response',
+              resource: {
+                resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+                use: 'preauthorization', outcome: 'complete'
+              }
+            },
+            {
+              fullUrl: patient_full_url,
+              resource: {
+                resourceType: 'Patient', id: patient_id,
+                identifier: [{ system: patient_identifier_system, value: patient_identifier }]
+              }
+            }
+          ]
+        }.to_json
+      end
+
+      it 'validates an echoed resource with the same fullUrl, id, and identifiers' do
+        result = run(
+          test,
+          server_endpoint:,
+          response_body: response_bundle_with_echoed_patient(
+            patient_full_url:, patient_id:, patient_identifier_system:, patient_identifier:
+          ),
+          request_bundle: request_bundle_with_patient
+        )
+        expect(result.result).to eq('pass')
+      end
+
+      it 'fails when an echoed resource has a different fullUrl' do
+        result = run(
+          test,
+          server_endpoint:,
+          response_body: response_bundle_with_echoed_patient(
+            patient_full_url: 'urn:uuid:different-patient', patient_id:, patient_identifier_system:, patient_identifier:
+          ),
+          request_bundle: request_bundle_with_patient
+        )
+        expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
+      end
+
+      it 'fails when an echoed resource has a different id' do
+        result = run(
+          test,
+          server_endpoint:,
+          response_body: response_bundle_with_echoed_patient(
+            patient_full_url:, patient_id: 'different-patient', patient_identifier_system:, patient_identifier:
+          ),
+          request_bundle: request_bundle_with_patient
+        )
+        expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
+      end
+
+      it 'fails when an echoed resource has a different identifier' do
+        result = run(
+          test,
+          server_endpoint:,
+          response_body: response_bundle_with_echoed_patient(
+            patient_full_url:, patient_id:, patient_identifier_system:, patient_identifier: 'different'
+          ),
+          request_bundle: request_bundle_with_patient
+        )
+        expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
+      end
+
+      it 'fails when an echoed resource has an identifier with a different system' do
+        result = run(
+          test,
+          server_endpoint:,
+          response_body: response_bundle_with_echoed_patient(
+            patient_full_url:, patient_id:, patient_identifier_system: 'http://example.com/other-mrn',
+            patient_identifier:
+          ),
+          request_bundle: request_bundle_with_patient
+        )
+        expect(result.result).to eq('fail')
+        expect(entity_result_messages(test).map(&:message).join)
+          .to include('do not have the same fullUrl or identifiers')
+      end
+
+      it 'does not flag unrelated resources that only share a resource type and blank ids' do
+        request_bundle = {
+          resourceType: 'Bundle', type: 'collection',
+          entry: [
+            { fullUrl: 'urn:uuid:claim', resource: {
+              resourceType: 'Claim', id: 'claim', status: 'active', use: 'preauthorization'
+            } },
+            { fullUrl: 'urn:uuid:practitioner-request', resource: { resourceType: 'Practitioner' } }
+          ]
+        }.to_json
+        response_bundle = {
+          resourceType: 'Bundle', type: 'collection',
+          entry: [
+            { fullUrl: 'urn:uuid:claim-response', resource: {
+              resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+              use: 'preauthorization', outcome: 'complete'
+            } },
+            { fullUrl: 'urn:uuid:practitioner-response', resource: { resourceType: 'Practitioner' } }
+          ]
+        }.to_json
+
+        result = run(test, server_endpoint:, response_body: response_bundle, request_bundle:)
+        expect(result.result).to eq('pass')
+      end
+    end
+
     context 'when an invalid PA response bundle is provided' do
       it 'fails if the first entry is not a ClaimResponse' do
         pa_response_bundle =
@@ -192,6 +338,59 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(messages[0].message).to include('SHALL appear exactly once in the Bundle, but found 0')
         expect(messages[1].message).to include('SHALL appear exactly once in the Bundle, but found 0')
       end
+    end
+  end
+
+  describe '#perform_bundle_validation for a server $submit response' do
+    let(:test_instance) do
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def messages
+          @messages ||= []
+        end
+      end.new
+    end
+
+    let(:request_bundle) do
+      FHIR.from_contents({
+        resourceType: 'Bundle', type: 'collection',
+        entry: [
+          { fullUrl: 'urn:uuid:claim', resource: {
+            resourceType: 'Claim', id: 'claim', status: 'active', use: 'preauthorization'
+          } },
+          { fullUrl: 'urn:uuid:patient', resource: {
+            resourceType: 'Patient', id: 'patient-1',
+            identifier: [{ system: 'http://example.com/mrn', value: '12345' }]
+          } }
+        ]
+      }.to_json)
+    end
+
+    let(:response_bundle) do
+      FHIR.from_contents({
+        resourceType: 'Bundle', type: 'collection',
+        entry: [
+          { fullUrl: 'urn:uuid:claim-response', resource: {
+            resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+            use: 'preauthorization', outcome: 'complete'
+          } },
+          { fullUrl: 'urn:uuid:different-patient', resource: {
+            resourceType: 'Patient', id: 'patient-1',
+            identifier: [{ system: 'http://example.com/mrn', value: '12345' }]
+          } }
+        ]
+      }.to_json)
+    end
+
+    before do
+      allow(test_instance).to receive(:validate_resources_conformance_against_profile)
+    end
+
+    it 'flags an echoed request resource with a different fullUrl' do
+      test_instance.perform_bundle_validation(response_bundle, 'submit', 'response', 'v2.2.1', request_bundle)
+
+      expect(test_instance.validation_error_messages.join).to include('do not have the same fullUrl or identifiers')
     end
   end
 

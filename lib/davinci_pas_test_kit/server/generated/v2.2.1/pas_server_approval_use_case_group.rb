@@ -100,6 +100,7 @@ module DaVinciPASTestKit
             sets containing X12 codes are not validated.
             
           )
+
           config(
             options: {
               use_case: 'approval',
@@ -107,6 +108,7 @@ module DaVinciPASTestKit
               ig_version: 'v2.2.1'
             }
           )
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-30', 'hl7.fhir.us.davinci-pas_2.2.1@spec-31', 'hl7.fhir.us.davinci-pas_2.2.1@spec-33'
         end
         test from: :prior_auth_claim_response_decision_validation do
           id :pas_server_v221_decision_validation_test_approval

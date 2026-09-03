@@ -39,7 +39,7 @@ jobs:
       - name: Verify test generation is up to date
         run: |
           bundle exec rake pas:generate
-          if [[ -n "$(git status --porcelain lib/davinci_pas_test_kit/generated)" ]]; then
+          if [[ -n "$(git status --porcelain lib/davinci_pas_test_kit/{cross_suite,server,client}/generated)" ]]; then
             echo "Generated tests are outdated. Run 'bundle exec rake pas:generate' and commit the changes."
             git diff
             exit 1

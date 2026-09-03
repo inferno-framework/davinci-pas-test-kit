@@ -82,13 +82,13 @@ module DaVinciPASTestKit
       @validation_error_messages ||= []
     end
 
-    def perform_bundle_validation(bundle, operation, type, ig_version)
+    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
       target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
       request_type = "#{operation}_#{type}"
       if type == 'request'
         perform_request_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type)
       else
-        perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type)
+        perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type, request_bundle)
       end
     end
 
@@ -98,7 +98,7 @@ module DaVinciPASTestKit
     end
 
     def perform_response_validation(response_bundle, profile_url, version, request_type, request_bundle = nil)
-      validate_pa_response_body_structure(response_bundle, request_bundle) if request_type == 'submit'
+      validate_pa_response_body_structure(response_bundle, request_bundle) if request_type.start_with?('submit')
       validate_resources_conformance_against_profile(response_bundle, profile_url, version, request_type)
     end
 
@@ -205,7 +205,7 @@ module DaVinciPASTestKit
     # Validates the response body structure of a Prior Authorization (PA) response.
     #
     # @param pa_response_bundle [FHIR::Bundle] The FHIR bundle representing the PA response.
-    # @param pa_request_bundle [String] The JSON payload of the PA request bundle.
+    # @param pa_request_bundle [FHIR::Bundle, String, nil] The submitted PA request Bundle, either parsed or JSON.
     #
     # This method performs validation of the PA response bundle structure.
     # It follows the PAS IG requirement that the FHIR Bundle generated
@@ -216,7 +216,7 @@ module DaVinciPASTestKit
     # a given combination of content. Resources echoed back from the request are validated
     # to ensure the same fullUrl and resource identifiers as in the
     # request are used.
-    def validate_pa_response_body_structure(pa_response_bundle, _pa_request_bundle)
+    def validate_pa_response_body_structure(pa_response_bundle, pa_request_bundle)
       first_entry = pa_response_bundle.entry.first.resource
       unless first_entry.is_a?(FHIR::ClaimResponse)
         validation_error_messages <<
@@ -226,22 +226,52 @@ module DaVinciPASTestKit
       base_url = extract_base_url(pa_response_bundle.entry.last&.fullUrl)
       check_presence_of_referenced_resources(first_entry, base_url, pa_response_bundle.entry)
 
-      # Testing: When echoing back resources that are the same as were present in the prior authorization request,
-      # the system SHALL ensure that the same fullUrl and resource identifiers are used in the response as appeared
-      # in the request
-      # pa_request_bundle = FHIR.from_contents(pa_request_bundle)
-      # pa_response_bundle.entry.each do |entry|
-      #   res = entry.resource
-      #   request_entry = pa_request_bundle.entry.find do |ent|
-      #     ent.resource.resourceType == res.resourceType && ent.resource.id == res.id
-      #   end
-      #   next unless request_entry.present?
+      validate_echoed_response_resources(pa_response_bundle, pa_request_bundle)
+    end
 
-      #   assert(
-      #     request_entry.fullUrl == entry.fullUrl && request_entry.resource.identifier == res.identifier,
-      #     resource_present_in_pa_request_and_response_msg(res)
-      #   )
-      # end
+    def validate_echoed_response_resources(pa_response_bundle, pa_request_bundle)
+      return if pa_request_bundle.blank?
+
+      request_bundle = pa_request_bundle.is_a?(FHIR::Bundle) ? pa_request_bundle : FHIR.from_contents(pa_request_bundle)
+      return unless request_bundle.is_a?(FHIR::Bundle)
+
+      pa_response_bundle.entry.each do |response_entry|
+        response_resource = response_entry.resource
+        next if response_resource.blank?
+
+        request_entry = request_bundle.entry.find do |entry|
+          echoed_resource?(entry, response_entry)
+        end
+        next if request_entry.blank?
+
+        next if echoed_resource_identifiers_match?(request_entry, response_entry)
+
+        validation_error_messages << resource_present_in_pa_request_and_response_msg(response_resource)
+      end
+    rescue StandardError
+      validation_error_messages << 'Unable to compare PAS request and response Bundle resources for echoed identifiers.'
+    end
+
+    def echoed_resource?(request_entry, response_entry)
+      request_resource = request_entry.resource
+      response_resource = response_entry.resource
+      return false if request_resource.blank? || response_resource.blank?
+      return false unless request_resource.resourceType == response_resource.resourceType
+
+      # True if any identifying field is present on both sides and matches, so we can later report if any
+      # do not have all matching identifiers. Blank fields do not identify echoed resources.
+      (request_entry.fullUrl.present? && request_entry.fullUrl == response_entry.fullUrl) ||
+        (request_resource.id.present? && request_resource.id == response_resource.id) ||
+        (request_resource.identifier.present? && request_resource.identifier == response_resource.identifier)
+    end
+
+    def echoed_resource_identifiers_match?(request_entry, response_entry)
+      request_resource = request_entry.resource
+      response_resource = response_entry.resource
+
+      request_entry.fullUrl == response_entry.fullUrl &&
+        request_resource.id == response_resource.id &&
+        request_resource.identifier == response_resource.identifier
     end
 
     # Profile conformance of Prior Authorization (PA) resources.
