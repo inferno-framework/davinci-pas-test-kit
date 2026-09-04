@@ -17,10 +17,12 @@
 :must_supports:
   :extensions:
   - :id: ServiceRequest.extension:serviceCodeEnd
+    :slice_name: serviceCodeEnd
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-productOrServiceCodeEnd
     :modifier_extension: false
   - :id: ServiceRequest.extension:coverage
+    :slice_name: coverage
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
     :modifier_extension: false
@@ -36,6 +38,7 @@
     :target_profiles:
     - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-beneficiary|2.2.1
   - :path: occurrence[x]
+  :recursive_elements: []
 :mandatory_elements:
 - ServiceRequest.status
 - ServiceRequest.intent

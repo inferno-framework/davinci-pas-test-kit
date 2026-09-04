@@ -17,14 +17,17 @@
 :must_supports:
   :extensions:
   - :id: CommunicationRequest.payload.extension:serviceLineNumber
+    :slice_name: serviceLineNumber
     :path: payload.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
     :modifier_extension: false
   - :id: CommunicationRequest.payload.extension:communicatedDiagnosis
+    :slice_name: communicatedDiagnosis
     :path: payload.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis
     :modifier_extension: false
   - :id: CommunicationRequest.payload.extension:contentModifier
+    :slice_name: contentModifier
     :path: payload.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier
     :modifier_extension: false
@@ -48,6 +51,7 @@
     - Reference
     :target_profiles:
     - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor
+  :recursive_elements: []
 :mandatory_elements:
 - CommunicationRequest.status
 - CommunicationRequest.payload.content[x]

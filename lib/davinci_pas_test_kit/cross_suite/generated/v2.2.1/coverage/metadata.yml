@@ -75,6 +75,7 @@
   - :path: class:group.name
   - :path: class:plan.value
   - :path: class:plan.name
+  :recursive_elements: []
 :mandatory_elements:
 - Coverage.identifier
 - Coverage.identifier.type

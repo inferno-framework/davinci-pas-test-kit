@@ -33,66 +33,82 @@
 :must_supports:
   :extensions:
   - :id: Claim.extension:levelOfServiceType
+    :slice_name: levelOfServiceType
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-levelOfServiceCode
     :modifier_extension: false
   - :id: Claim.extension:encounter
+    :slice_name: encounter
     :path: extension
     :url: http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter
     :modifier_extension: false
   - :id: Claim.careTeam.extension:careTeamClaimScope
+    :slice_name: careTeamClaimScope
     :path: careTeam.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
     :modifier_extension: false
   - :id: Claim.careTeam:OverallClaimMember.extension:careTeamClaimScope
+    :slice_name: careTeamClaimScope
     :path: careTeam.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
     :modifier_extension: false
   - :id: Claim.careTeam:ItemClaimMember.extension:careTeamClaimScope
+    :slice_name: careTeamClaimScope
     :path: careTeam.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope
     :modifier_extension: false
   - :id: Claim.diagnosis.extension:recordedDate
+    :slice_name: recordedDate
     :path: diagnosis.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-diagnosisRecordedDate
     :modifier_extension: false
   - :id: Claim.item.extension:itemTraceNumber
+    :slice_name: itemTraceNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber
     :modifier_extension: false
   - :id: Claim.item.extension:authorizationNumber
+    :slice_name: authorizationNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber
     :modifier_extension: false
   - :id: Claim.item.extension:administrationReferenceNumber
+    :slice_name: administrationReferenceNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber
     :modifier_extension: false
   - :id: Claim.item.extension:requestType
+    :slice_name: requestType
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType
     :modifier_extension: false
   - :id: Claim.item.extension:certificationType
+    :slice_name: certificationType
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType
     :modifier_extension: false
   - :id: Claim.item.extension:epsdtIndicator
+    :slice_name: epsdtIndicator
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator
     :modifier_extension: false
   - :id: Claim.item.extension:nursingHomeResidentialStatus
+    :slice_name: nursingHomeResidentialStatus
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus
     :modifier_extension: false
   - :id: Claim.item.extension:nursingHomeLevelOfCare
+    :slice_name: nursingHomeLevelOfCare
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare
     :modifier_extension: false
   - :id: Claim.item.extension:revenueUnitRateLimit
+    :slice_name: revenueUnitRateLimit
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit
     :modifier_extension: false
   - :id: Claim.item.extension:requestedService
+    :slice_name: requestedService
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService
     :modifier_extension: false
@@ -211,6 +227,7 @@
   - :path: item.location[x]
   - :path: item.quantity
   - :path: item.unitPrice
+  :recursive_elements: []
 :mandatory_elements:
 - Claim.extension.url
 - Claim.extension.value[x]

@@ -16,6 +16,7 @@
 :must_supports:
   :extensions:
   - :id: MedicationRequest.extension:coverage
+    :slice_name: coverage
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
     :modifier_extension: false
@@ -47,6 +48,7 @@
   - :path: dosageInstruction.timing
   - :path: dispenseRequest
   - :path: dispenseRequest.quantity
+  :recursive_elements: []
 :mandatory_elements:
 - MedicationRequest.status
 - MedicationRequest.intent

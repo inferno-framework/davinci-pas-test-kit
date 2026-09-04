@@ -17,54 +17,67 @@
 :must_supports:
   :extensions:
   - :id: ClaimResponse.item.extension:itemTraceNumber
+    :slice_name: itemTraceNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:preAuthIssueDate
+    :slice_name: preAuthIssueDate
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthIssueDate
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:preAuthPeriod
+    :slice_name: preAuthPeriod
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthPeriod
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:previousAuthorizationNumber
+    :slice_name: previousAuthorizationNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:administrationReferenceNumber
+    :slice_name: administrationReferenceNumber
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:requestedServiceDate
+    :slice_name: requestedServiceDate
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemRequestedServiceDate
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:authorizedItemDetail
+    :slice_name: authorizedItemDetail
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedDetail
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:authorizedProvider
+    :slice_name: authorizedProvider
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedProvider
     :modifier_extension: false
   - :id: ClaimResponse.item.extension:communicatedDiagnosis
+    :slice_name: communicatedDiagnosis
     :path: item.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-communicatedDiagnosis
     :modifier_extension: false
   - :id: ClaimResponse.item.adjudication.extension:reviewAction
+    :slice_name: reviewAction
     :path: item.adjudication.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction
     :modifier_extension: false
   - :id: ClaimResponse.error.extension:followupAction
+    :slice_name: followupAction
     :path: error.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorFollowupAction
     :modifier_extension: false
   - :id: ClaimResponse.error.extension:errorElement
+    :slice_name: errorElement
     :path: error.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorElement
     :modifier_extension: false
   - :id: ClaimResponse.error.extension:errorPath
+    :slice_name: errorPath
     :path: error.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-errorPath
     :modifier_extension: false
@@ -103,6 +116,8 @@
     - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-communicationrequest
   - :path: error
   - :path: error.code
+  :recursive_elements:
+  - adjudication
 :mandatory_elements:
 - ClaimResponse.status
 - ClaimResponse.type

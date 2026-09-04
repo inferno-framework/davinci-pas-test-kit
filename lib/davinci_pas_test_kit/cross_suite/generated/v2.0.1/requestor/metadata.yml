@@ -46,6 +46,7 @@
   - :path: contact
   - :path: contact.name
   - :path: contact.telecom
+  :recursive_elements: []
 :mandatory_elements:
 - Organization.identifier.system
 - Organization.active
