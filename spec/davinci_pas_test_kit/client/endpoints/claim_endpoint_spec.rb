@@ -45,6 +45,13 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       FHIR.from_contents(last_response.body).entry[0].resource
     end
 
+    # Warnings recorded on the waiting test's result, which is where the tester sees them
+    def result_warnings(result)
+      Inferno::Repositories::Messages.new.messages_for_result(result.id)
+        .select { |message| message.type == 'warning' }
+        .map(&:message)
+    end
+
     it 'returns a tester-provided response given as a single bare bundle' do
       inputs = { session_url_path:, ms_submit_responses: response_bundle(id: 'single-bundle').to_json }
       result = run(test, inputs)
@@ -192,6 +199,23 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
 
       expect(last_response.status).to be(200)
       expect(returned_claim_response.id).to eq('fallback')
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(/requestRange criteria "3-2" because it is not a valid range/)
+      )
+    end
+
+    it 'records a warning about the same invalid input only once across requests' do
+      responses = [wrapped_response_bundle(id: 'bad-range', criteria: { 'requestRange' => '3-2' }),
+                   response_bundle(id: 'fallback')]
+      inputs = { session_url_path:, ms_submit_responses: responses.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(submit_url, submit_request_json)
+      post_json(submit_url, submit_request_json)
+
+      expect(returned_claim_response.id).to eq('fallback')
+      expect(result_warnings(result).length).to eq(1)
     end
 
     it 'generates a default response when the FHIRPath service returns an error during criteria evaluation' do
@@ -208,6 +232,11 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(last_response.status).to be(200)
       expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
       expect(returned_claim_response.id).to_not eq('needs-fhirpath')
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(
+          /Inferno will generate a default response.*HTTP 500 for query 'Bundle.id.exists\(\)': internal error/
+        )
+      )
     end
 
     it 'generates a default response when the FHIRPath service cannot be reached' do
@@ -223,6 +252,9 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
 
       expect(last_response.status).to be(200)
       expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(/FHIRPath service request for query 'Bundle.id.exists\(\)' failed: connection refused/)
+      )
     end
 
     it 'generates a default response when the FHIRPath service fails during token replacement' do
@@ -240,6 +272,27 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(last_response.status).to be(200)
       expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
       expect(returned_claim_response.id).to_not eq('token-bundle')
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(/HTTP 500 for query 'Bundle.id': internal error/)
+      )
+    end
+
+    it 'generates a default response with a warning when token replacement breaks the JSON structure' do
+      bundle = response_bundle(id: 'token-bundle')
+      bundle['entry'][0]['resource']['preAuthRef'] = '{{Bundle.id}}'
+      inputs = { session_url_path:, ms_submit_responses: bundle.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      stub_fhirpath_service('Bundle.id', [{ type: 'string', element: 'value with "quotes"' }])
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+      expect(returned_claim_response.id).to_not eq('token-bundle')
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(/not valid JSON after \{\{fhirpath\}\} token replacement/)
+      )
     end
 
     it 'serves tester-provided bundles when the request URL includes a query string' do
@@ -266,7 +319,7 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(returned_claim_response.id).to_not eq('never-selected')
     end
 
-    it 'generates a default response when the input is not parseable' do
+    it 'generates a default response with a warning when the input is not parseable' do
       inputs = { session_url_path:, ms_submit_responses: 'not json' }
       result = run(test, inputs)
       expect(result.result).to eq('wait')
@@ -275,6 +328,11 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
 
       expect(last_response.status).to be(200)
       expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(
+          /Inferno will generate a default response\. The 'ms_submit_responses' input is not valid JSON\./
+        )
+      )
     end
 
     it 'serves tester-provided bundles for inquire requests' do

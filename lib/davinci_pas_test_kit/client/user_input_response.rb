@@ -1,5 +1,9 @@
 module DaVinciPASTestKit
   module UserInputResponse
+    # Raised when a tester-provided response input is present but cannot be used. The
+    # message explains why in terms the tester can act on.
+    class InvalidInputError < StandardError; end
+
     def self.included(klass)
       klass.extend ClassMethods
     end
@@ -24,30 +28,25 @@ module DaVinciPASTestKit
     # JSON array of entries, where each entry is either a bare FHIR Bundle or a
     # wrapper object holding the response Bundle under "bundle" alongside optional
     # selection "criteria".
-    # Returns nil, with a log entry when the value is present but unusable, so that
-    # Inferno falls back to generated default responses.
+    # Returns nil if the input has no value and raises InvalidInputError if the value
+    # is present but unusable.
     def self.response_candidates(result, operation)
       input_name = operation == 'submit' ? 'ms_submit_responses' : 'ms_inquire_responses'
-      input_value = JSON.parse(result.input_json)&.find { |i| i['name'] == input_name }&.dig('value')
+      input_value = read_input(result, input_name)
       return unless input_value.present?
 
       candidates = JSON.parse(input_value)
       candidates = [candidates] unless candidates.is_a?(Array)
       invalid_index = candidates.index { |candidate| !valid_candidate?(candidate) }
       if invalid_index.present?
-        Inferno::Application['logger'].warn(
-          "Ignoring the '#{input_name}' input: entry #{invalid_index + 1} is neither a FHIR Bundle nor a " \
-          'wrapper object with a "bundle" key. Inferno will generate default responses.'
-        )
-        return
+        raise InvalidInputError,
+              "Entry #{invalid_index + 1} of the '#{input_name}' input is neither a FHIR Bundle nor a " \
+              'wrapper object with a "bundle" key.'
       end
 
       candidates
     rescue JSON::ParserError
-      Inferno::Application['logger'].warn(
-        "Ignoring the '#{input_name}' input because it is not valid JSON. Inferno will generate default responses."
-      )
-      nil
+      raise InvalidInputError, "The '#{input_name}' input is not valid JSON."
     end
 
     def self.valid_candidate?(candidate)

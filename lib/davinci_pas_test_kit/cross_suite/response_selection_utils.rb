@@ -61,18 +61,17 @@ module DaVinciPASTestKit
       previous_requests.count { |req| req.url.include?(operation) && req.status == 200 }
     end
 
-    # An invalid range comes from tester input, so it is logged and treated as unmet
-    # rather than raised, leaving the candidate unselected.
+    # An invalid range comes from tester input, so it is reported as a warning on the
+    # test and treated as unmet rather than raised, leaving the candidate unselected.
     def ranges_cover_value?(value, ranges_string)
       unless /\A(\d+(-\d+)?,)*\d+(-\d+)?\z/.match?(ranges_string)
-        raise ArgumentError,
-              "Invalid range string: #{ranges_string.inspect}"
+        raise ArgumentError, 'expected comma-separated numbers or ranges such as "1-2,4"'
       end
 
       ranges_string.split(',').any? do |part|
         if part.include?('-')
           low, high = part.split('-').map(&:to_i)
-          raise ArgumentError, "Inverted range in: #{part.inspect}" if low > high
+          raise ArgumentError, "#{part.inspect} is inverted" if low > high
 
           (low..high).cover?(value)
         else
@@ -80,8 +79,26 @@ module DaVinciPASTestKit
         end
       end
     rescue ArgumentError => e
-      Inferno::Application['logger'].warn("Ignoring unmatchable requestRange criteria: #{e.message}")
+      add_result_warning(
+        "Ignoring the requestRange criteria #{ranges_string.inspect} because it is not a valid range " \
+        "(#{e.message})."
+      )
       false
+    end
+
+    # ***********************************************************************
+    # Tester-facing warnings
+    # ***********************************************************************
+
+    # Records a warning on the result of the waiting test, where the tester will see it,
+    # since problems with response selection stem from tester-provided input. The same
+    # input is evaluated for every incoming request, so a warning identical to one the
+    # result already has is not recorded again.
+    def add_result_warning(message)
+      messages_repo = Inferno::Repositories::Messages.new
+      return if messages_repo.messages_for_result(result.id).any? { |existing| existing.message == message }
+
+      messages_repo.create(result_id: result.id, type: 'warning', message:)
     end
   end
 end

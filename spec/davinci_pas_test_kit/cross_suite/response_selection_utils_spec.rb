@@ -31,6 +31,13 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
     instance_double(Inferno::Entities::Request, url:, status:)
   end
 
+  def stub_result_messages(*existing_messages)
+    existing = existing_messages.map { |message| instance_double(Inferno::Entities::Message, message:) }
+    messages_repo = instance_double(Inferno::Repositories::Messages, messages_for_result: existing, create: nil)
+    allow(Inferno::Repositories::Messages).to receive(:new).and_return(messages_repo)
+    messages_repo
+  end
+
   def stub_fhirpath_service(expression, results)
     stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
       .with(query: { 'path' => expression })
@@ -65,6 +72,7 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
     end
 
     it 'excludes a wrapper with an invalid request range instead of raising' do
+      stub_result_messages
       entity = wrapper({ 'requestRange' => '1-2,a' })
 
       expect(utils.include_entity?(entity, request_bundle, 1)).to be(false)
@@ -154,18 +162,45 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
       expect(utils.ranges_cover_value?(4, '1-2,4')).to be(true)
     end
 
-    it 'logs and returns false for an invalid range string' do
-      allow(Inferno::Application['logger']).to receive(:warn)
+    it 'warns on the test and returns false for an invalid range string' do
+      messages_repo = stub_result_messages
 
       expect(utils.ranges_cover_value?(1, 'one')).to be(false)
-      expect(Inferno::Application['logger']).to have_received(:warn).with(/Invalid range string/)
+      expect(messages_repo).to have_received(:create).with(
+        result_id: 'test-result-id',
+        type: 'warning',
+        message: a_string_matching(/requestRange criteria "one" because it is not a valid range/)
+      )
     end
 
-    it 'logs and returns false for an inverted range' do
-      allow(Inferno::Application['logger']).to receive(:warn)
+    it 'warns on the test and returns false for an inverted range' do
+      messages_repo = stub_result_messages
 
       expect(utils.ranges_cover_value?(1, '3-2')).to be(false)
-      expect(Inferno::Application['logger']).to have_received(:warn).with(/Inverted range/)
+      expect(messages_repo).to have_received(:create).with(
+        result_id: 'test-result-id',
+        type: 'warning',
+        message: a_string_matching(/requestRange criteria "3-2" .*"3-2" is inverted/)
+      )
+    end
+  end
+
+  describe '#add_result_warning' do
+    it 'records a warning on the result' do
+      messages_repo = stub_result_messages
+
+      utils.add_result_warning('something went wrong')
+
+      expect(messages_repo).to have_received(:create)
+        .with(result_id: 'test-result-id', type: 'warning', message: 'something went wrong')
+    end
+
+    it 'does not record a warning that the result already has' do
+      messages_repo = stub_result_messages('something went wrong')
+
+      utils.add_result_warning('something went wrong')
+
+      expect(messages_repo).to_not have_received(:create)
     end
   end
 end
