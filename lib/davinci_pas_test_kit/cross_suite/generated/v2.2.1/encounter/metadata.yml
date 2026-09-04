@@ -19,10 +19,12 @@
 :must_supports:
   :extensions:
   - :id: Encounter.extension:patientStatus
+    :slice_name: patientStatus
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-patientStatus
     :modifier_extension: false
   - :id: Encounter.extension:nursingHomeResidentialStatus
+    :slice_name: nursingHomeResidentialStatus
     :path: extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus
     :modifier_extension: false
@@ -73,6 +75,7 @@
     - Reference
     :target_profiles:
     - http://hl7.org/fhir/us/core/StructureDefinition/us-core-organization|7.0.0
+  :recursive_elements: []
 :mandatory_elements:
 - Encounter.extension.url
 - Encounter.identifier.system

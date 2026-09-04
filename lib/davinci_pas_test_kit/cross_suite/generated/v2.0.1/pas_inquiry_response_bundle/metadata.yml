@@ -28,6 +28,8 @@
   - :path: entry
   - :path: entry.fullUrl
   - :path: entry.resource
+  :recursive_elements:
+  - link
 :mandatory_elements:
 - Bundle.type
 - Bundle.timestamp

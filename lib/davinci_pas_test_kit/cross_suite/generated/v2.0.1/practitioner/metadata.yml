@@ -29,6 +29,7 @@
   - :path: name.family
   - :path: telecom
   - :path: address
+  :recursive_elements: []
 :mandatory_elements:
 - Practitioner.identifier
 - Practitioner.name

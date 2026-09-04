@@ -39,7 +39,7 @@ module DaVinciPASTestKit
       target_element
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable-next Metrics/CyclomaticComplexity
     def take_discriminator_step(current_element, path)
       if path.start_with?('extension(')
         ext_url, remaining_path = path.delete_prefix("extension('").split("')", 2)
@@ -74,7 +74,6 @@ module DaVinciPASTestKit
 
       [next_element, remaining_path&.delete_prefix('.')]
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
 
     def value_slices
       must_support_value_slice_elements.map do |current_element|
