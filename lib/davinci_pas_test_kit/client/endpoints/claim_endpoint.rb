@@ -169,7 +169,7 @@ module DaVinciPASTestKit
     # tester-provided input or the FHIRPath service also result in nil, with a warning
     # on the waiting test so that the tester can see what went wrong.
     def select_must_support_response(req_bundle)
-      candidates = UserInputResponse.response_candidates(result, operation)
+      candidates = UserInputResponse.response_candidates(test, operation, result)
       return if candidates.blank?
 
       operation_url_suffix = "$#{operation}"

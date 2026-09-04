@@ -29,8 +29,9 @@ module DaVinciPASTestKit
     # wrapper object holding the response Bundle under "bundle" alongside optional
     # selection "criteria".
     # Returns nil if the input has no value and raises InvalidInputError if the value
-    # is present but unusable.
-    def self.response_candidates(result, operation)
+    # is present but unusable. The configurable (the waiting test) supplies the input
+    # title so that the error names the input as the tester sees it.
+    def self.response_candidates(configurable, operation, result)
       input_name = operation == 'submit' ? 'ms_submit_responses' : 'ms_inquire_responses'
       input_value = read_input(result, input_name)
       return unless input_value.present?
@@ -40,13 +41,19 @@ module DaVinciPASTestKit
       invalid_index = candidates.index { |candidate| !valid_candidate?(candidate) }
       if invalid_index.present?
         raise InvalidInputError,
-              "Entry #{invalid_index + 1} of the '#{input_name}' input is neither a FHIR Bundle nor a " \
-              'wrapper object with a "bundle" key.'
+              "Entry #{invalid_index + 1} of the '#{input_title(configurable, input_name)}' input is neither " \
+              'a FHIR Bundle nor a wrapper object with a FHIR Bundle in the "bundle" key.'
       end
 
       candidates
     rescue JSON::ParserError
-      raise InvalidInputError, "The '#{input_name}' input is not valid JSON."
+      raise InvalidInputError, "The '#{input_title(configurable, input_name)}' input is not valid JSON."
+    end
+
+    # Title of an input as shown to the tester in the Inferno UI, falling back to its name
+    def self.input_title(configurable, input_key)
+      input = configurable.config.inputs[input_key.to_sym]
+      (input&.title || input&.name || input_key).to_s
     end
 
     def self.valid_candidate?(candidate)
@@ -60,7 +67,7 @@ module DaVinciPASTestKit
     end
 
     def input_title(input_key)
-      config.inputs[input_key]&.title || config.inputs[input_key]&.name
+      UserInputResponse.input_title(self, input_key)
     end
 
     module ClassMethods

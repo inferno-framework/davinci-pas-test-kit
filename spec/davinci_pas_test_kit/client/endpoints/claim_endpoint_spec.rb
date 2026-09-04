@@ -200,7 +200,7 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(last_response.status).to be(200)
       expect(returned_claim_response.id).to eq('fallback')
       expect(result_warnings(result)).to contain_exactly(
-        a_string_matching(/requestRange criteria "3-2" because it is not a valid range/)
+        a_string_matching(/Invalid requestRange criteria "3-2"\. The corresponding Bundle was not selected/)
       )
     end
 
@@ -330,7 +330,7 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
       expect(result_warnings(result)).to contain_exactly(
         a_string_matching(
-          /Inferno will generate a default response\. The 'ms_submit_responses' input is not valid JSON\./
+          /default response\. The 'Must Support \$submit Response Bundles' input is not valid JSON\./
         )
       )
     end

@@ -80,7 +80,7 @@ module DaVinciPASTestKit
       end
     rescue ArgumentError => e
       add_result_warning(
-        "Ignoring the requestRange criteria #{ranges_string.inspect} because it is not a valid range " \
+        "Invalid requestRange criteria #{ranges_string.inspect}. The corresponding Bundle was not selected " \
         "(#{e.message})."
       )
       false

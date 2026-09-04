@@ -169,7 +169,7 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
       expect(messages_repo).to have_received(:create).with(
         result_id: 'test-result-id',
         type: 'warning',
-        message: a_string_matching(/requestRange criteria "one" because it is not a valid range/)
+        message: a_string_matching(/Invalid requestRange criteria "one"\. The corresponding Bundle was not selected/)
       )
     end
 
@@ -180,7 +180,7 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
       expect(messages_repo).to have_received(:create).with(
         result_id: 'test-result-id',
         type: 'warning',
-        message: a_string_matching(/requestRange criteria "3-2" .*"3-2" is inverted/)
+        message: a_string_matching(/Invalid requestRange criteria "3-2".*\("3-2" is inverted\)/)
       )
     end
   end
