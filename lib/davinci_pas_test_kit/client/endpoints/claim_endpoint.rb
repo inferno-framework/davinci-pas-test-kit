@@ -165,14 +165,16 @@ module DaVinciPASTestKit
     # match the incoming request, extracts its response Bundle (unwrapping it when the
     # candidate pairs the Bundle with criteria), and replaces {{fhirpath}} tokens with
     # values from the request. Returns nil, causing Inferno to generate a default
-    # response, if no candidates are provided or none match.
+    # response, if no candidates are provided or none match. Problems with the
+    # tester-provided input or the FHIRPath service also result in nil, with a warning
+    # on the waiting test so that the tester can see what went wrong.
     def select_must_support_response(req_bundle)
-      candidates = UserInputResponse.response_candidates(result, operation)
+      candidates = UserInputResponse.response_candidates(test, operation, result)
       return if candidates.blank?
 
       operation_url_suffix = "$#{operation}"
       request_number = count_previous_successful_requests(operation_url_suffix) + 1
-      selected_index = candidates.index { |candidate| include_entity?(candidate, req_bundle, operation_url_suffix) }
+      selected_index = candidates.index { |candidate| include_entity?(candidate, req_bundle, request_number) }
 
       if selected_index.nil?
         Inferno::Application['logger'].info(
@@ -187,16 +189,30 @@ module DaVinciPASTestKit
         "for #{operation_url_suffix} request ##{request_number}."
       )
       replace_tokens(entity_bundle(candidates[selected_index]), req_bundle)
+    rescue UserInputResponse::InvalidInputError, FhirpathUtils::FhirpathServiceError => e
+      add_result_warning(
+        "Unable to select a tester-provided response, so Inferno will generate a default response. #{e.message}"
+      )
+      nil
     end
 
-    # Round-trips the selected bundle through the FHIR model to normalize it after
-    # token replacement. Falls back to the replaced string if it no longer parses,
-    # e.g., when a replaced value breaks the JSON structure.
+    # Replaces {{fhirpath}} tokens using values from the incoming request, round-tripping
+    # the result through the FHIR model to normalize it. If a replaced value breaks the
+    # JSON structure, the result cannot be returned as a FHIR response, so nil is returned
+    # with a warning on the waiting test and Inferno generates a default response.
     def replace_tokens(bundle_hash, req_bundle)
-      replaced = replace_tokens_in_string(bundle_hash.to_json, req_bundle)
+      bundle_json = bundle_hash.to_json
+      replaced = replace_tokens_in_string(bundle_json, req_bundle)
+      return bundle_json if replaced.equal?(bundle_json)
+
       FHIR.from_contents(replaced)&.to_json || replaced
     rescue JSON::ParserError
-      replaced
+      add_result_warning(
+        'Unable to use the selected tester-provided response, so Inferno will generate a default response. ' \
+        'The response is not valid JSON after {{fhirpath}} token replacement, for example because a token ' \
+        'value contains a double quote.'
+      )
+      nil
     end
 
     def handle_missing_required_elements(claim_entry, response)
@@ -255,7 +271,7 @@ module DaVinciPASTestKit
     end
 
     def operation
-      request.url&.split('$')&.last
+      request.path.split('$').last
     end
 
     def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid)
