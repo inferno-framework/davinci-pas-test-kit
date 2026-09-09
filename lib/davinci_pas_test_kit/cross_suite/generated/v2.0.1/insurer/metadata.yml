@@ -43,6 +43,7 @@
   - :path: address.state
   - :path: address.postalCode
   - :path: address.country
+  :recursive_elements: []
 :mandatory_elements:
 - Organization.identifier.system
 - Organization.active

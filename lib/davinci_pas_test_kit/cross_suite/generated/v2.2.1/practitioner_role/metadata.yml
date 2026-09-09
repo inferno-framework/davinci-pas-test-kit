@@ -40,6 +40,7 @@
   - :path: endpoint
     :types:
     - Reference
+  :recursive_elements: []
 :mandatory_elements:
 - PractitionerRole.practitioner
 - PractitionerRole.telecom.system

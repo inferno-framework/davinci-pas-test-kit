@@ -38,6 +38,7 @@
   - :path: address.postalCode
   - :path: address.country
   - :path: communication.language
+  :recursive_elements: []
 :mandatory_elements:
 - Patient.identifier
 - Patient.identifier.system

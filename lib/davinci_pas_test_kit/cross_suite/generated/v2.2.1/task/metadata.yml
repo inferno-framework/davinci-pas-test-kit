@@ -18,14 +18,17 @@
 :must_supports:
   :extensions:
   - :id: Task.input:AttachmentsNeeded.extension:paLineNumber
+    :slice_name: paLineNumber
     :path: input.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
     :modifier_extension: false
   - :id: Task.input:AttachmentsNeeded.extension:contentModifier
+    :slice_name: contentModifier
     :path: input.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-contentModifier
     :modifier_extension: false
   - :id: Task.input:QuestionnaireContext.extension:paLineNumber
+    :slice_name: paLineNumber
     :path: input.extension
     :url: http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceLineNumber
     :modifier_extension: false
@@ -86,6 +89,7 @@
   - :path: input:AttachmentsNeeded.value[x]
   - :path: input:QuestionnaireContext.type
   - :path: input:QuestionnaireContext.value[x]
+  :recursive_elements: []
 :mandatory_elements:
 - Task.identifier
 - Task.status

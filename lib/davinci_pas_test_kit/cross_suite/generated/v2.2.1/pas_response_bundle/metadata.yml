@@ -31,6 +31,8 @@
   - :path: entry.resource
   - :path: entry:ClaimResponse.fullUrl
   - :path: entry:ClaimResponse.resource
+  :recursive_elements:
+  - link
 :mandatory_elements:
 - Bundle.identifier
 - Bundle.type

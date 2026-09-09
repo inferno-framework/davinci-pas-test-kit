@@ -1,3 +1,9 @@
+# 0.15.2
+* ID-88: Narrow the x12 validator message filter and apply it to both Client and Server suites by @abhinandan2012 in https://github.com/inferno-framework/davinci-pas-test-kit/pull/83
+* ID-151: Add PAS v2.2 Timing and Quantity data type constraint validation by @abhinandan2012 in https://github.com/inferno-framework/davinci-pas-test-kit/pull/94
+* Server 2.2 support by @Jammjammjamm in https://github.com/inferno-framework/davinci-pas-test-kit/pull/99
+* ID-165: Error handling and cleanup for must support response selection by @abhinandan2012 in https://github.com/inferno-framework/davinci-pas-test-kit/pull/84
+
 # 0.15.1
 * Fix last update date typo
 

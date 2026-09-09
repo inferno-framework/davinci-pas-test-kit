@@ -46,6 +46,7 @@
     - http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim
   - :path: restriction.period
   - :path: input
+  :recursive_elements: []
 :mandatory_elements:
 - Task.identifier
 - Task.status
