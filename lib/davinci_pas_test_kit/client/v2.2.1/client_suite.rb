@@ -16,6 +16,7 @@ require_relative 'pas_client_registration_group'
 require_relative 'pas_client_auth_smart_group'
 require_relative 'pas_client_auth_udap_group'
 require_relative 'pas_client_error_handling_group'
+require_relative 'pas_client_attestations_group'
 require_relative '../client_input_descriptions'
 
 module DaVinciPASTestKit
@@ -235,6 +236,8 @@ module DaVinciPASTestKit
             required_suite_options: {
               client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
             }
+
+      group from: :pas_client_v221_attestations
     end
   end
 end
