@@ -123,7 +123,8 @@ against a real client system using SMART Backend Services for authentication.
 1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "SMART Backend Services"
    option for the Client Security Type suite option.
 1. Apply present "Da Vinci BR Provider reference implementation" using
-   the dropdown in the upper right.
+   the dropdown in the upper right. This fills in `https://BR Provider.davinci.hl7.org/api/security/jwks`
+   for the value of the "SMART Confidential Asymmetric JSON Web Key Set (JWKS)" input.
 1. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
    click the "Submit" button to start the tests.
 1. When the "User Action Required" dialog appears asking for confirmation that the client is setup
