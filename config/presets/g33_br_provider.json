@@ -1,0 +1,13 @@
+{
+  "title": "Da Vinci BR Provider Reference Implementation",
+  "id": "pas_client_v221_run_against_br_provider",
+  "test_suite_id": "davinci_pas_client_suite_v221",
+  "inputs": [
+    {
+      "name": "smart_jwk_set",
+      "title": "SMART Confidential Asymmetric JSON Web Key Set (JWKS)",
+      "type": "textarea",
+      "value": "https://br-provider.davinci.hl7.org/api/security/jwks"
+    }
+  ]
+}

@@ -110,9 +110,67 @@ in the suite.
 
 With those caveats, a passing execution of this suite would include passing all groups.
 
-## Demonstration Execution
+## Demonstration Executions
+
+### BR Provider
 
 If you would like to try out the order-sign hook invocation tests against
+[the Da Vinci BR Provider reference implementation](https://br-provider.davinci.hl7.org/),
+use the following steps. While these tests are not expected to fully
+pass, they can give you a sense for how to execute the Inferno tests
+against a real client system using SMART Backend Services for authentication.
+
+1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "SMART Backend Services"
+   option for the Client Security Type suite option.
+1. Apply present "Da Vinci BR Provider reference implementation" using
+   the dropdown in the upper right. This fills in `https://BR Provider.davinci.hl7.org/api/security/jwks`
+   for the value of the "SMART Confidential Asymmetric JSON Web Key Set (JWKS)" input.
+1. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
+   click the "Submit" button to start the tests.
+1. When the "User Action Required" dialog appears asking for confirmation that the client is setup
+   to hit Inferno's PAS FHIR server, navigate to https://br-provider.davinci.hl7.org/ in a
+   separate tab and login (no password needed) as a practitioner (any).
+1. Configure the reference implementation's connection to Inferno's simulated PAS server by:
+  1. Clicking the gear icon in the upper right to open the settings dialog.
+  1. Select the "Payer" tab
+  1. Use the "Server" dropdown to select the "Custom" option.
+  1. In the "CDS Services URL" input, put `https://br-payer.davinci.hl7.org/cds-services`.
+  1. In the "FHIR" input, put Inferno's FHIR url displayed in the "User Action Required"
+     dialog on the Inferno tab (e.g., `https://inferno.healthit.gov/suites/custom/g33_certification/pas_v221/fhir`).
+  1. From the "Authentication" dropdown, select `SMART Backend Services`
+  1. In the "Client ID" input, copy the client id displayed in the "User Action Required"
+     dialog on the Inferno tab (11 character alpha-numeric value).
+  1. Click the "Bypass payor-handled check" box.
+  1. Click the "Save" button and close the dialog to complete the setup.
+1. Back in the Inferno session tab, click the link to confirm the configuration and continue the tests.
+1. Select and run group "3.1 Approval Workflow" without any changes to the inputs so that the default
+   mocked response response will be used. When the dialog appears indicating Inferno is ready to
+   receive requests, return to the tab with the reference implementation.
+1. In the reference implementation tab, select patient "Roosevelt, Theodor Alan Roosevelt"
+   to open their chart.
+1. Start an encounter by clicking the "Start Encounter" button in the far upper
+   right of the chart window.
+1. Select the "EO424 - Stationary compressed gas 02" order (which will require
+   prior authorization for this patient) from the "Add Order" dropdown and click
+   the "+ Add" button to the right of the dropdown.  
+1. Click the "Sign all Orders" button at the bottom of the chart frame (scroll down).
+   On the next screen, click the "Confirm & Sign" button. This will trigger hook
+   requests and within a few seconds you should see authorization details for the
+   order, including an option to "Submit PA".
+1. Click the option to "Submit PA" and then click the "Submit Prior Authorization"
+   button on the next screen. The response should come back and be displayed
+   as "Approved".
+1. Return to the Inferno tab, which will have begun to evaluate the prior authorization
+   interaction. A "User Action Required" dialog will appear asking for comfirmation
+   that the order displayed has having prior authorization "approved". Click the
+   appropriate answer based on what you saw in the reference implementation. This
+   will complete the tests.
+1. Run group "6 Review Authentication Interactions" to have Inferno verify the authentication
+   requests received during this session.
+
+## CRD Request Generator (old)
+
+If you would like to try out the PAS Approval Workflow tests against
 [a public PAS reference client](https://crd-request-generator.davinci.hl7.org/),
 you can do so using the following steps. Note that this reference implementation has
 not been updated for the 2.2.1 version of the PAS IG so many failures are expected during this
