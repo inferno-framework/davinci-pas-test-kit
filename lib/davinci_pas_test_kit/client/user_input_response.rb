@@ -72,17 +72,19 @@ module DaVinciPASTestKit
 
     def response_description_for_wait(user_input, user_input_title)
       if user_input
-        "Inferno will respond with the content provided in the '**#{user_input_title}**' input, " \
-          'with `{{...}}` fhirpath expressions replaced with their value when evaluated against ' \
-          'the request and timestamps and resources references updated to be current and consistent. ' \
-          'See the ["Response Instantiation" section]' \
-          '(https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation) ' \
-          'of the Da Vinci PAS Test Kit wiki for details on these updates.'
+        <<~DESCRIPTION.strip
+          Inferno will respond with the content provided in the '**#{user_input_title}**' input,
+          with `{{...}}` fhirpath expressions replaced with their value when evaluated against
+          the request and timestamps and resources references updated to be current and consistent.
+          See the ["Response Instantiation" section](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
+          of the Da Vinci PAS Test Kit wiki for details on these updates.
+        DESCRIPTION
       else
-        'Inferno will response with a mocked response based on the request. ' \
-          'See the ["Mocked Responses" section]' \
-          '(https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses) ' \
-          'of the Da Vinci PAS Test Kit wiki for details on the mocked response.'
+        <<~DESCRIPTION.strip
+          Inferno will respond with a mocked response based on the request.
+          See the ["Mocked Responses" section](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+          of the Da Vinci PAS Test Kit wiki for details on the mocked response.
+        DESCRIPTION
       end
     end
 
