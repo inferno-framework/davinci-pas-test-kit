@@ -267,22 +267,38 @@ module DaVinciPASTestKit
     end
 
     def make_processing_error_response
-      user_provided_bundle = UserInputResponse.user_inputted_response(test, operation, result)
-      unless user_provided_bundle.present?
-        response.status = 400
-        response.body = FHIR::OperationOutcome.new(
-          issue: FHIR::OperationOutcome::Issue.new(
-            severity: 'fatal', code: 'required',
-            details: FHIR::CodeableConcept.new(
-              text: 'The processing_error_response input is required for this test and was not provided.'
-            )
-          )
-        ).to_json
+      unless UserInputResponse.user_inputted_response(test, operation, result).present?
+        error_outcome_response('The processing_error_response input is required for this test and was not provided.')
         return
       end
 
+      req_bundle = FHIR.from_contents(request.body.string)
+      if req_bundle.blank?
+        handle_missing_required_elements(nil, response)
+        return
+      end
+
+      # Unlike other workflows, there is no mocked response to fall back to when instantiation fails.
+      instantiated_response = resolve_user_response(req_bundle)
+      if instantiated_response.blank?
+        error_outcome_response('The processing_error_response input could not be instantiated. ' \
+                               'See the warnings on the waiting test for details.')
+        return
+      end
+
+      claim_entry = req_bundle.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
       response.status = 200
-      response.body = user_provided_bundle
+      response.body = update_tester_provided_response(instantiated_response, claim_entry&.fullUrl, operation,
+                                                      ig_version)
+    end
+
+    def error_outcome_response(text)
+      response.status = 400
+      response.body = FHIR::OperationOutcome.new(
+        issue: FHIR::OperationOutcome::Issue.new(
+          severity: 'fatal', code: 'required', details: FHIR::CodeableConcept.new(text:)
+        )
+      ).to_json
     end
 
     def operation
