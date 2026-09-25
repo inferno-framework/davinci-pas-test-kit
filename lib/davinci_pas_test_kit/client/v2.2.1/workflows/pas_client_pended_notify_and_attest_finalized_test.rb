@@ -6,14 +6,14 @@ require_relative '../../session_identification'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
-    class PASClientPendedSubmitTest < Inferno::Test
+    class PASClientPendedNotifyAndAttestFinalizedTest < Inferno::Test
       include URLs
       include SessionIdentification
       include UserInputResponse
       include PasBundleValidation
 
-      id :pas_client_v221_pended_submit_test
-      title 'PAS client submits a claim using the $submit operation'
+      id :pas_client_v221_pended_notify_and_attest_finalized_test
+      title 'Inferno'
       description %(
         During this test, Inferno will wait for a prior authorization submission request
         from the client. Upon receipt, Inferno will generate and send a

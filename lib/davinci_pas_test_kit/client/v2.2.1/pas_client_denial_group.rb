@@ -34,6 +34,7 @@ module DaVinciPASTestKit
            ),
            config: { options: {
              workflow_tag: DENIAL_WORKFLOW_TAG,
+             operation_tag: SUBMIT_TAG,
              attest_message: "I attest that the client system displays the submitted claim as 'denied', meaning " \
                              'that the user cannot proceed with ordering or providing the requested service without ' \
                              'making adjustments and submitting for further approval.'

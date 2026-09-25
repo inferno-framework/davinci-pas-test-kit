@@ -11,7 +11,7 @@ module DaVinciPASTestKit
     id :pas_client_approval_submit_test
     title 'PAS client submits a claim using the $submit operation'
     description %(
-      Inferno will wait for a prior authorization submission request
+      During this test, Inferno will wait for a prior authorization submission request
       from the client. Upon receipt, Inferno will generate and send a
       response with an approved status.
     )
@@ -35,6 +35,7 @@ module DaVinciPASTestKit
           description: INPUT_SESSION_URL_PATH_LOCKED
 
     submit_respond_with :approval_json_response
+    config options: { submit_enabled: true }
 
     run do
       if user_inputted_response?(:approval_json_response)

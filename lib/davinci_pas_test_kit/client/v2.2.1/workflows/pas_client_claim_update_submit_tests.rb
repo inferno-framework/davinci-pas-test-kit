@@ -26,7 +26,7 @@ module DaVinciPASTestKit
 
       id :pas_client_v221_claim_update_submit_base
 
-      config options: { suppress_notifications: true }
+      config options: { suppress_notifications: true, submit_enabled: true }
 
       input :client_id,
             title: 'Client Id',

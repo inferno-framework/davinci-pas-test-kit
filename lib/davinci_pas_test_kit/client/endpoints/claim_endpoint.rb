@@ -29,8 +29,9 @@ module DaVinciPASTestKit
     end
 
     def tags
-      # Requests rejected for an expired token are not treated as submissions of any workflow.
-      return [] if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+      # Requests rejected for an expired token or a rejected $inquire are not treated as
+      # submissions of any workflow.
+      return [] if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request) || !operation_enabled?
 
       operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
       workflow_tag = WORKFLOW_TAG_MAP[workflow]
@@ -53,6 +54,13 @@ module DaVinciPASTestKit
     # response indicates the request was pended.
     def suppress_notifications?
       test.config.options[:suppress_notifications] == true
+    end
+
+    # Tests must opt in to each operation with the submit_enabled and inquire_enabled options. Inferno responds
+    # to every request for an operation that is not enabled with an OperationOutcome, without tagging the
+    # request or continuing the test.
+    def operation_enabled?
+      %w[inquire submit].include?(operation) && test.config.options[:"#{operation}_enabled"] == true
     end
 
     def workflow
@@ -89,6 +97,11 @@ module DaVinciPASTestKit
       return if response.status == 401 # set in update_result (expired token handling there)
 
       response.format = :json
+
+      unless operation_enabled?
+        make_rejected_operation_response
+        return
+      end
 
       # Handle the operation failure and processing error workflows, which require a user-provided response.
       if workflow == :operation_failure
@@ -143,6 +156,7 @@ module DaVinciPASTestKit
         UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response, 'Bearer token')
         return
       end
+      return unless operation_enabled? # keep waiting for the request that the test is looking for
 
       results_repo.update_result(result.id, 'pass') unless test.config.options[:accepts_multiple_requests]
     end
@@ -290,6 +304,18 @@ module DaVinciPASTestKit
       response.status = 200
       response.body = update_tester_provided_response(instantiated_response, claim_entry&.fullUrl, operation,
                                                       ig_version)
+    end
+
+    def make_rejected_operation_response
+      response.status = 501
+      response.body = FHIR::OperationOutcome.new(
+        issue: FHIR::OperationOutcome::Issue.new(
+          severity: 'error', code: 'not-supported',
+          details: FHIR::CodeableConcept.new(
+            text: "Inferno does not support the $#{operation} operation during this test."
+          )
+        )
+      ).to_json
     end
 
     def error_outcome_response(text)

@@ -19,7 +19,7 @@ module DaVinciPASTestKit
       these tests testers will need to provide response bundles for Inferno to return when
       responding to $submit and $inquire requests. Each response input takes a JSON list of entries,
       where each entry specifies a Bundle with selection criteria ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format)).
-      For each request, Inferno will [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
+      For each request received during this test, Inferno will [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
       and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
       a response to return from this list. If no entries match or instantiation fails, Inferno will
       [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
@@ -51,7 +51,7 @@ module DaVinciPASTestKit
           type: 'textarea',
           optional: true,
           description: DaVinciPASTestKit.ms_responses_input_description('$inquire')
-    config options: { accepts_multiple_requests: true }
+    config options: { accepts_multiple_requests: true, submit_enabled: true, inquire_enabled: true }
     output :confirmation_url
 
     run do

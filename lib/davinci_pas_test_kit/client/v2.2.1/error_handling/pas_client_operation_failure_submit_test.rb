@@ -51,6 +51,7 @@ module DaVinciPASTestKit
             description: INPUT_SESSION_URL_PATH_LOCKED
 
       submit_respond_with :operation_failure_operation_outcome
+      config options: { submit_enabled: true }
 
       run do
         assert_valid_json operation_failure_operation_outcome,

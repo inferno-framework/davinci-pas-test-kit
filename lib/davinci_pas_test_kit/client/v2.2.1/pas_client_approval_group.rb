@@ -27,6 +27,7 @@ module DaVinciPASTestKit
            ),
            config: { options: {
              workflow_tag: APPROVAL_WORKFLOW_TAG,
+             operation_tag: SUBMIT_TAG,
              attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning " \
                              'that the user can proceed with ordering or providing the requested service.'
            } }

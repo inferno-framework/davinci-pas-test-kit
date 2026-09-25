@@ -31,7 +31,7 @@ module DaVinciPASTestKit
                   :session_url_path
 
       group do
-        title 'Interaction'
+        title 'Interaction and Response Handling'
         description %(
           All interactions for the pended prior authorization request workflow
           between Inferno and the client under test will be performed during this test
@@ -39,14 +39,13 @@ module DaVinciPASTestKit
           - A `$submit` request from the client to Inferno where Inferno returns a pended response.
           - A full-resource notification that the prior authorization decision has been finalized
             from Inferno to the client under test.
+
+          In between these requests, testers will confirm that the system registers
+          the request as pended and that it is updated with the final response
+          after the notification is received.
         )
 
         test from: :pas_client_v221_pended_submit_test
-      end
-
-      group do
-        title 'Response Handling'
-
         test from: :pas_client_v221_response_attest,
              id: :pas_client_v221_pended_response_attest,
              title: 'PAS client displays the request as "pended"',
@@ -57,10 +56,15 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
-                               'claim, the client system indicates to users that a final decision on request ' \
-                               'has not yet been made.'
+               opeation_tag: SUBMIT_TAG,
+               attest_message: "I attest that the client system displays the submitted claim as 'pended' meaning " \
+                               'that a final decision on prior authorization of the service has not been made.'
              } }
+      end
+
+      group do
+        title 'Response Handling'
+
         test from: :pas_client_v221_response_attest,
              id: :pas_client_v221_pended_finalized_response_attest,
              title: 'PAS client displays the final decision as "approved"',

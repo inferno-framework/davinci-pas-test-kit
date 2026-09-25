@@ -27,7 +27,7 @@ module DaVinciPASTestKit
                             'hl7.fhir.us.davinci-pas_2.0.1@153', 'hl7.fhir.us.davinci-pas_2.0.1@202',
                             'hl7.fhir.us.davinci-pas_2.0.1@203'
 
-      config options: { accepts_multiple_requests: true }
+      config options: { accepts_multiple_requests: true, submit_enabled: true, inquire_enabled: true }
       input :notification_bundle,
             title: 'Claim updated notification JSON',
             type: 'textarea',

@@ -42,6 +42,7 @@ module DaVinciPASTestKit
             description: INPUT_SESSION_URL_PATH_LOCKED
 
       submit_respond_with :processing_error_response
+      config options: { submit_enabled: true }
 
       run do
         assert_valid_json processing_error_response,
