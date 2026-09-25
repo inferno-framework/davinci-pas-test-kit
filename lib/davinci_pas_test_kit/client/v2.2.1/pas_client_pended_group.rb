@@ -1,4 +1,5 @@
 require_relative 'workflows/pas_client_pended_submit_test'
+require_relative 'workflows/pas_client_pended_send_notification_test'
 require_relative 'workflows/pas_client_response_attest'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative 'workflows/pas_client_request_bundle_validation_test'
@@ -60,11 +61,7 @@ module DaVinciPASTestKit
                attest_message: "I attest that the client system displays the submitted claim as 'pended' meaning " \
                                'that a final decision on prior authorization of the service has not been made.'
              } }
-      end
-
-      group do
-        title 'Response Handling'
-
+        test from: :pas_client_v221_pended_notify_and_attest_finalized_test
         test from: :pas_client_v221_response_attest,
              id: :pas_client_v221_pended_finalized_response_attest,
              title: 'PAS client displays the final decision as "approved"',

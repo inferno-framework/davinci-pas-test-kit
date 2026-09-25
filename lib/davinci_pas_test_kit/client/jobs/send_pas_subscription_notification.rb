@@ -20,8 +20,13 @@ module DaVinciPASTestKit
 
       sidekiq_options retry: false
 
+      # test_run_id and result_id may be nil when the job is started by an Inferno test, which does not know
+      # them until it is waiting. They are then looked up from the test session once the test waits.
+      # When resume_test_after_notification is true, the job ends the wait with the resume_token after
+      # sending the notification (or fails it if the job errors).
+      # Sidekiq job arguments are positional, so the boolean cannot be a keyword argument
       def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token,
-                  notification_suite_id, ig_version = 'v2.0.1')
+                  notification_suite_id, ig_version = 'v2.0.1', resume_test_after_notification = false) # rubocop:disable Style/OptionalBooleanParameter
         @test_run_id = test_run_id
         @test_session_id = test_session_id
         @result_id = result_id
@@ -30,8 +35,10 @@ module DaVinciPASTestKit
         @resume_token = resume_token
         @notification_suite_id = notification_suite_id
         @ig_version = ig_version
+        @resume_test_after_notification = resume_test_after_notification
 
         await_subscription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
+        await_test_waiting if @result_id.nil?
         sleep 1
         return unless test_still_waiting?
 
@@ -39,6 +46,12 @@ module DaVinciPASTestKit
         return unless test_still_waiting?
 
         send_event_notification
+        resume_test(RESUME_PASS_PATH) if @resume_test_after_notification
+      rescue StandardError => e
+        raise unless @resume_test_after_notification
+
+        Inferno::Application['logger'].error("Sending the subscription notification failed: #{e.message}")
+        resume_test(RESUME_FAIL_PATH)
       end
 
       def requests_repo
@@ -94,8 +107,37 @@ module DaVinciPASTestKit
         @subscription_full_url ||= "#{fhir_subscription_url}/#{subscription.id}"
       end
 
+      def test_runs_repo
+        @test_runs_repo ||= Inferno::Repositories::TestRuns.new
+      end
+
+      def test_run_id
+        @test_run_id ||= test_runs_repo.last_test_run(@test_session_id)&.id
+      end
+
+      def waiting_result
+        results_repo.find_waiting_result(test_run_id:)
+      end
+
+      def result_id
+        @result_id ||= waiting_result&.id
+      end
+
       def test_still_waiting?
-        results_repo.find_waiting_result(test_run_id: @test_run_id)
+        waiting_result.present?
+      end
+
+      # Inferno tests start the job before they begin waiting
+      def await_test_waiting
+        40.times do
+          break if test_still_waiting?
+
+          sleep 0.5
+        end
+      end
+
+      def resume_test(path)
+        test_suite_connection.get(path.delete_prefix('/'), { token: @resume_token })
       end
 
       def await_subscription_creation
@@ -130,7 +172,7 @@ module DaVinciPASTestKit
           request_body: response.env.request_body,
           response_body: response.env.response_body,
           test_session_id: @test_session_id,
-          result_id: @result_id,
+          result_id:,
           request_headers: inferno_request_headers,
           response_headers: inferno_response_headers,
           tags:

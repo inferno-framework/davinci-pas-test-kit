@@ -1,7 +1,7 @@
 require_relative '../user_input_response'
 require_relative '../response_generator'
+require_relative '../subscription_notification_trigger'
 require_relative '../client_urls'
-require_relative '../jobs/send_pas_subscription_notification'
 require_relative '../../cross_suite/fhirpath_utils'
 require_relative '../../cross_suite/response_selection_utils'
 require 'subscriptions_test_kit'
@@ -11,6 +11,7 @@ module DaVinciPASTestKit
   class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
     include ResponseGenerator
+    include SubscriptionNotificationTrigger
     include ClientURLs
     include FhirpathUtils
     include ResponseSelectionUtils
@@ -331,46 +332,30 @@ module DaVinciPASTestKit
       request.path.split('$').last
     end
 
-    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid)
-      notification_bearer_token = client_access_token_input(result)
-      notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
+    # Helper methods for SubscriptionNotificationTrigger
 
-      Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, test_run.id, test_run.test_session_id, result.id,
-                            notification_bearer_token, notification_contents, test_run_identifier, suite_id,
-                            ig_version)
+    def notification_test_run_id
+      test_run.id
     end
 
-    def notification_json(response_bundle_json, decision, generated_claim_response_uuid)
-      user_inputted_notification_json =
-        JSON.parse(result.input_json).find { |i| i['name'] == 'notification_bundle' }['value']
-
-      if user_inputted_notification_json.present?
-        update_tester_provided_notification(user_inputted_notification_json, generated_claim_response_uuid)
-      else
-        generate_notification(response_bundle_json, decision)
-      end
+    def notification_test_session_id
+      test_run.test_session_id
     end
 
-    def generate_notification(response_bundle_json, decision)
-      subscription = find_subscription(test_run.test_session_id, as_json: true)
-      subscription_reference = "#{fhir_subscription_url}/#{subscription['id']}"
-      subscription_topic = subscription['criteria']
-
-      if find_subscription_content_type(subscription) == 'full-resource'
-        mock_full_resource_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
-                                               decision, ig_version)
-      else # assume id-only since empty not allowed - if asked for empty, other failures will occur
-        mock_id_only_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
-                                         ig_version)
-      end
+    def notification_result_id
+      result.id
     end
 
-    def find_subscription_content_type(subscription)
-      content_ext = subscription.dig('channel', '_payload', 'extension')
-        &.find do |ext|
-          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
-        end
-      content_ext&.dig('valueCode')
+    def notification_bearer_token
+      client_access_token_input(result)
+    end
+
+    def tester_notification_bundle
+      notification_bundle_input(result)
+    end
+
+    def client_subscription_json
+      find_subscription(test_run.test_session_id, as_json: true)
     end
   end
 end
