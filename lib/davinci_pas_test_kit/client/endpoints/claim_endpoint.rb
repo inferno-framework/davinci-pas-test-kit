@@ -29,6 +29,9 @@ module DaVinciPASTestKit
     end
 
     def tags
+      # Requests rejected for an expired token are not treated as submissions of any workflow.
+      return [] if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+
       operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
       workflow_tag = WORKFLOW_TAG_MAP[workflow]
 

@@ -134,6 +134,43 @@ RSpec.describe DaVinciPASTestKit::AbstractSubscriptionCreateTest, :request do
       expect(continue_pass_request).to have_been_made.once
     end
 
+    describe 'requests authenticated with an access token' do
+      let(:client_id) { 'subscription-create-client' }
+      let(:token_subscription_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
+
+      def create_with_token(minutes_from_now)
+        token = UDAPSecurityTestKit::MockUDAPServer.client_id_to_token(client_id, minutes_from_now)
+        header('Authorization', "Bearer #{token}")
+        post_json(token_subscription_url, subscription_create_response_full_resource)
+      end
+
+      it 'tags the request when the token is valid' do
+        allow_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake) # skip handshake
+          .to receive(:perform).and_return(nil)
+        result = run(test, client_id:)
+        expect(result.result).to eq('wait')
+
+        create_with_token(5)
+
+        expect(last_response.status).to be(201)
+        requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG])
+        expect(requests.length).to be(1)
+      end
+
+      it 'returns 401 and assigns no tags when the token has expired' do
+        expect_any_instance_of(DaVinciPASTestKit::Jobs::SendSubscriptionHandshake).to_not receive(:perform)
+        result = run(test, client_id:)
+        expect(result.result).to eq('wait')
+
+        create_with_token(-5)
+
+        expect(last_response.status).to be(401)
+        requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG])
+        expect(requests).to be_empty
+        expect(results_repo.find(result.id).result).to eq('wait')
+      end
+    end
+
     describe 'triggering a handshake' do
       def create_subscription_request
         repo_create(

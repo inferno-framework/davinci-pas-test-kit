@@ -23,8 +23,8 @@ module DaVinciPASTestKit
             title: 'Operation Failure OperationOutcome JSON',
             type: 'textarea',
             description: %(
-              Inferno will return this OperationOutcome JSON in response to the $submit request
-              during this test.
+              Inferno will return exactly this OperationOutcome JSON in response
+              to the $submit request during the *Operation Failure* group.
             )
       input :operation_failure_http_status,
             title: 'Operation Failure HTTP Status Code',
@@ -32,8 +32,10 @@ module DaVinciPASTestKit
             optional: true,
             default: '400',
             description: %(
-              The HTTP status code Inferno will use when returning the OperationOutcome to the client.
-              Must be a 4XX or 5XX value. Defaults to 400 if not provided or outside that range.
+              The HTTP status code Inferno will use when returning the Operation Failure
+              OperationOutcome to the client. If provided, the value ust be in the 4XX or
+              5XX range. Inferno will return 400 if this input is not provided or the
+              provided value is outside that range.
             )
       input :client_id,
             title: 'Client Id',
@@ -59,16 +61,23 @@ module DaVinciPASTestKit
 
         wait(
           identifier: wait_identifier,
-          message: %(
+          message: <<~MESSAGE
             **Operation Failure Workflow Test**:
+
+            Inferno will wait while the tester uses the system to submit a PAS request to
+            Inferno. Inferno will respond with exactly the provided OperationOutcome and HTTP status.
+            The tests will automatically continue once a request has been received.
+
+            ### Endpoints
 
             Submit a PAS request to
 
             `#{submit_endpoint}`
 
-            Inferno will respond with the provided OperationOutcome and HTTP status
-            **#{operation_failure_http_status.present? ? operation_failure_http_status : '400'}**.
-          )
+            ### Authentication and Identification
+
+            #{auth_description_for_wait(client_id)}
+          MESSAGE
         )
       end
     end

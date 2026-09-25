@@ -112,4 +112,43 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateInitialSub
       expect(result.result).to eq('wait')
     end
   end
+
+  describe 'requests authenticated with an access token' do
+    let(:client_id) { 'claim-update-client' }
+    let(:token_submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
+
+    def token_for(minutes_from_now)
+      UDAPSecurityTestKit::MockUDAPServer.client_id_to_token(client_id, minutes_from_now)
+    end
+
+    def submit_with_token(token)
+      header('Authorization', "Bearer #{token}")
+      post_json(token_submit_url, JSON.parse(submit_bundle))
+    end
+
+    it 'tags the request and continues when the token is valid' do
+      result = run(described_class, client_id:)
+      expect(result.result).to eq('wait')
+
+      submit_with_token(token_for(5))
+
+      expect(last_response.status).to eq(200)
+      expect(results_repo.find(result.id).result).to eq('pass')
+      tagged = requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBMIT_TAG])
+      expect(tagged.length).to eq(1)
+    end
+
+    it 'returns 401, assigns no tags, and keeps waiting when the token has expired' do
+      result = run(described_class, client_id:)
+      expect(result.result).to eq('wait')
+
+      submit_with_token(token_for(-5))
+
+      expect(last_response.status).to eq(401)
+      expect(results_repo.find(result.id).result).to eq('wait')
+      expect(requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBMIT_TAG])).to be_empty
+      expect(requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::CLAIM_UPDATE_INITIAL_TAG]))
+        .to be_empty
+    end
+  end
 end

@@ -14,8 +14,16 @@ module DaVinciPASTestKit
       config.options[:workflow_tag]
     end
 
+    def operation_tag
+      config.options[:operation_tag]
+    end
+
     def attest_message
       config.options[:attest_message]
+    end
+
+    def tags_to_load
+      [workflow_tag, operation_tag].compact
     end
 
     def workflow_name
@@ -34,6 +42,9 @@ module DaVinciPASTestKit
         'Operation Failure'
       when PROCESSING_ERROR_WORKFLOW_TAG
         'Processing Error'
+      else
+        raise Inferno::Exceptions::TestSuiteImplementationException.new('PAS Display Attestation',
+                                                                        "No name for workflow tag #{workflow_tag}.")
       end
     end
 
@@ -41,6 +52,32 @@ module DaVinciPASTestKit
     output :attest_false_url
 
     run do
+      # check that there are actually requests
+      # - skip if none unless there is a config
+      # - raise an implementation error if there are more than 1 unless config set (shouldn't ever)
+      # - skip if one that is a failure HTTP status unless config set
+
+      requests = load_tagged_requests(*tags_to_load)
+      if requests.empty?
+        if config.options[:no_requests_ok]
+          pass 'Attestation not needed: no requests received or required for this group.'
+        else
+          skip "Skipping attestation: No requests made demonstrating the #{workflow_name} workflow."
+        end
+      elsif requests.one?
+        is_success_response = requests.first.status.to_s.start_with?('2')
+        if is_success_response && config.options[:error_status_expected]
+          skip 'Skipping attestation: Inferno expected to return a HTTP error response, but did not.'
+        elsif !is_success_response && !config.options[:error_status_expected]
+          skip 'Skipping attestation: Inferno expected to return a succesful response, but did not.'
+        end
+      elsif !config.options[:multiple_requests_ok]
+        raise Inferno::Exceptions::TestSuiteImplementationException.new(
+          'PAS request tagging',
+          "multiple requests tagged with workflow tag #{workflow_tag}."
+        )
+      end
+
       identifier = test_session_id
       attest_true_url = "#{resume_pass_url}?token=#{identifier}"
       output(attest_true_url:)

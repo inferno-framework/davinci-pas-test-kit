@@ -32,6 +32,7 @@ module DaVinciPASTestKit
            ),
            config: { options: {
              workflow_tag: PROCESSING_ERROR_WORKFLOW_TAG,
+             operation_tag: SUBMIT_TAG,
              attest_message: 'I attest that the client system handles the processing error response ' \
                              'appropriately: the ClaimResponse error details are surfaced to the ' \
                              'appropriate users so that corrective action can be taken.'
