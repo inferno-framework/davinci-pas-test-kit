@@ -27,13 +27,6 @@ module DaVinciPASTestKit
       input :modification_json_response, optional: true
 
       test from: :pas_client_v221_modification_submit_test
-      test from: :pas_client_v221_request_bundle_validation_test,
-           config: { options: { workflow_tag: MODIFICATION_WORKFLOW_TAG } }
-
-      test from: :pas_client_v221_response_bundle_validation_test,
-           config: { options: { workflow_tag: MODIFICATION_WORKFLOW_TAG } }
-      test from: :pas_client_v221_modification_verification_test
-
       test from: :pas_client_v221_response_attest,
            title: 'PAS client makes the details of the payer-authorized items available',
            description: %(
@@ -47,6 +40,11 @@ module DaVinciPASTestKit
                              'modifications made to the requested items, were made available to users in the ' \
                              'client system.'
            } }
+      test from: :pas_client_v221_request_bundle_validation_test,
+           config: { options: { workflow_tag: MODIFICATION_WORKFLOW_TAG } }
+      test from: :pas_client_v221_response_bundle_validation_test,
+           config: { options: { workflow_tag: MODIFICATION_WORKFLOW_TAG } }
+      test from: :pas_client_v221_modification_verification_test
     end
   end
 end

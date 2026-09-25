@@ -24,7 +24,6 @@ module DaVinciPASTestKit
                   :session_url_path
 
       test from: :pas_client_v221_operation_failure_submit_test
-      test from: :pas_client_v221_operation_outcome_validation_test
       test from: :pas_client_v221_response_attest,
            title: 'PAS client handles the operation failure appropriately',
            description: %(
@@ -40,6 +39,7 @@ module DaVinciPASTestKit
                              'for review and the clinical end user is informed that the submission could ' \
                              'not be processed.'
            } }
+      test from: :pas_client_v221_operation_outcome_validation_test
     end
   end
 end

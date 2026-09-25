@@ -25,6 +25,8 @@ module DaVinciPASTestKit
       input :pended_json_response, optional: true
 
       input_order :pended_json_response,
+                  :notification_bundle,
+                  :client_endpoint_access_token,
                   :client_id,
                   :session_url_path
 
@@ -43,13 +45,10 @@ module DaVinciPASTestKit
       end
 
       group do
-        title '$submit Conformance and Handling'
+        title 'Response Handling'
 
-        test from: :pas_client_v221_request_bundle_validation_test,
-             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v221_response_bundle_validation_test,
-             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_pended_response_attest,
              title: 'PAS client displays the request as "pended"',
              description: %(
               This test provides the tester an opportunity to observe their client following
@@ -62,10 +61,33 @@ module DaVinciPASTestKit
                                'claim, the client system indicates to users that a final decision on request ' \
                                'has not yet been made.'
              } }
+        test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_pended_finalized_response_attest,
+             title: 'PAS client displays the final decision as "approved"',
+             description: %(
+              This test provides the tester an opportunity to observe their client following
+              the receipt of the full-resource notification containing the approved final decision
+              and attest that users are able to determine that the request has been approved.
+             ),
+             config: { options: {
+               workflow_tag: PENDED_WORKFLOW_TAG,
+               attest_message: "I attest that the client system displays the submitted claim as 'approved' based " \
+                               'on the full-resource notification, meaning that the user can proceed with ' \
+                               'ordering or providing the requested service.'
+             } }
       end
 
       group do
-        title 'Notification Conformance and Handling'
+        title '$submit Conformance'
+
+        test from: :pas_client_v221_request_bundle_validation_test,
+             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
+        test from: :pas_client_v221_response_bundle_validation_test,
+             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
+      end
+
+      group do
+        title 'Notification Conformance'
 
         test from: :subscriptions_r4_client_notification_input_verification,
              title: 'Inferno\'s event notification Bundle is conformant',
@@ -106,19 +128,6 @@ module DaVinciPASTestKit
                verifies_requirements(*SubscriptionsTestKit::SubscriptionsR5BackportR4Client::EventNotificationVerificationTest.verifies_requirements,
                                      'hl7.fhir.us.davinci-pas_2.2.1@spec-8')
              end
-        test from: :pas_client_v221_response_attest,
-             title: 'PAS client displays the final decision as "approved"',
-             description: %(
-              This test provides the tester an opportunity to observe their client following
-              the receipt of the full-resource notification containing the approved final decision
-              and attest that users are able to determine that the request has been approved.
-             ),
-             config: { options: {
-               workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that the client system displays the submitted claim as 'approved' based " \
-                               'on the full-resource notification, meaning that the user can proceed with ' \
-                               'ordering or providing the requested service.'
-             } }
       end
     end
   end

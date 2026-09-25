@@ -25,10 +25,6 @@ module DaVinciPASTestKit
                   :session_url_path
 
       test from: :pas_client_v221_denial_submit_test
-      test from: :pas_client_v221_request_bundle_validation_test,
-           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
-      test from: :pas_client_v221_response_bundle_validation_test,
-           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
       test from: :pas_client_v221_response_attest,
            title: 'PAS client displays the request as "denied"',
            description: %(
@@ -42,6 +38,10 @@ module DaVinciPASTestKit
                              'that the user cannot proceed with ordering or providing the requested service without ' \
                              'making adjustments and submitting for further approval.'
            } }
+      test from: :pas_client_v221_request_bundle_validation_test,
+           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
+      test from: :pas_client_v221_response_bundle_validation_test,
+           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
     end
   end
 end

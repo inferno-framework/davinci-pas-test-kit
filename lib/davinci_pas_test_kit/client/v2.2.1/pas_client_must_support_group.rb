@@ -34,6 +34,11 @@ module DaVinciPASTestKit
         as a part of these.
       )
 
+      input_order :ms_submit_responses,
+                  :ms_inquire_responses,
+                  :client_id,
+                  :session_url_path
+
       # Combined receive group - single wait test for both submit and inquire
       group do
         id :pas_client_v221_must_support_receive
@@ -47,6 +52,18 @@ module DaVinciPASTestKit
 
         test from: :pas_client_v221_gather_must_support
       end
+
+      # $submit Request Must Support (fail when errors detected)
+      group from: :pas_client_v221_submit_must_support
+
+      # $submit Response Must Support (skip when errors detected)
+      group from: :pas_client_v221_submit_response_must_support
+
+      # $inquire Request Must Support (fail when errors detected)
+      group from: :pas_client_v221_inquire_must_support
+
+      # $inquire Response Must Support (skip when errors detected)
+      group from: :pas_client_v221_inquire_response_must_support
 
       # $submit Bundle Conformance Validation
       group do
@@ -64,12 +81,6 @@ module DaVinciPASTestKit
              config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
       end
 
-      # $submit Request Must Support (fail when errors detected)
-      group from: :pas_client_v221_submit_must_support
-
-      # $submit Response Must Support (skip when errors detected)
-      group from: :pas_client_v221_submit_response_must_support
-
       # $inquire Bundle Conformance Validation
       group do
         title '$inquire Bundle Conformance'
@@ -85,12 +96,6 @@ module DaVinciPASTestKit
         test from: :pas_client_v221_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
       end
-
-      # $inquire Request Must Support (fail when errors detected)
-      group from: :pas_client_v221_inquire_must_support
-
-      # $inquire Response Must Support (skip when errors detected)
-      group from: :pas_client_v221_inquire_response_must_support
     end
   end
 end

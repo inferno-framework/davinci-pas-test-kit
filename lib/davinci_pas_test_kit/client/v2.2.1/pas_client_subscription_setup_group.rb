@@ -14,6 +14,8 @@ module DaVinciPASTestKit
       )
       run_as_group
 
+      input_order :client_endpoint_access_token
+
       test from: :pas_client_v221_subscription_create_test
       test from: :pas_client_subscription_pas_conformance_test,
            description: %(

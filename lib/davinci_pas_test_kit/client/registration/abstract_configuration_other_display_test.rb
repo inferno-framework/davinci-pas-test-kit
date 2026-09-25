@@ -37,7 +37,7 @@ module DaVinciPASTestKit
           FHIR Base URL: `#{session_fhir_base_url(wait_identifier)}`
 
           [Click here](#{confirmation_url}) once you have configured
-          the client to connect to Inferno at the above endpoints.
+          the client to send PAS requests to Inferno at the above endpoint.
         )
       )
     end

@@ -64,30 +64,32 @@ module DaVinciPASTestKit
       end
 
       def claim_update_wait_message(submit_endpoint)
-        %(
-          **Claim Update Workflow**
+        <<~MESSAGE
+          **Claim Update Workflow**:
 
-          #{interaction_instructions}
+          Inferno will wait while the tester uses the system to #{interaction_instructions}.
+          The tests will automatically continue once a request has been received.
 
-          Submit the request to
+          ### Endpoints
+
+          Submit a PAS request to
 
           `#{submit_endpoint}`
 
-          #{response_note}
+          ### Authentication and Identification
 
-          Inferno will automatically continue once it receives the request, so no further
-          action is required after submitting.
-        )
+          #{auth_description_for_wait(client_id)}
+
+          ### Responses
+
+          #{response_note}
+        MESSAGE
       end
 
       def response_note
         response_input = config.options[:submit_respond_with]
-        if response_input.present? && send(response_input).present?
-          "The response provided in the '**#{input_title(response_input)}**' input will be returned, " \
-            'updated with current timestamps.'
-        else
-          'Inferno will generate an approved response from the submitted Claim and return it.'
-        end
+        response_description_for_wait(user_inputted_response?(response_input),
+                                      input_title(response_input))
       end
 
       # Overridden by subclasses to describe the specific submission the tester should make.
@@ -121,8 +123,8 @@ module DaVinciPASTestKit
       config options: { claim_update_tag: CLAIM_UPDATE_INITIAL_TAG }
 
       def interaction_instructions
-        'Submit an **initial** prior authorization request (a `$submit` containing a Claim with one ' \
-          'or more items and no `Claim.related.claim`).'
+        'submit an **initial** prior authorization request (a `$submit` containing a Claim with one ' \
+          'or more items and no `Claim.related.claim`)'
       end
     end
 
@@ -154,10 +156,10 @@ module DaVinciPASTestKit
       config options: { claim_update_tag: CLAIM_UPDATE_ADD_ITEM_TAG }
 
       def interaction_instructions
-        'Submit an **update that adds a new item** to the prior authorization. Reference the ' \
+        'submit an **update that adds a new item** to the prior authorization. Reference the ' \
           'previously submitted Claim in `Claim.related.claim` and include that Claim in the Bundle, ' \
           'retain all previously submitted items and supportingInfo (preserving their `sequence` ' \
-          'values), and mark the newly added item with an `infoChanged` extension.'
+          'values), and mark the newly added item with an `infoChanged` extension'
       end
     end
 
@@ -191,12 +193,12 @@ module DaVinciPASTestKit
       config options: { claim_update_tag: CLAIM_UPDATE_MODIFY_CANCEL_TAG }
 
       def interaction_instructions
-        'Submit an **update that modifies one item and cancels another**. Mark the modified item ' \
+        'submit an **update that modifies one item and cancels another**. Mark the modified item ' \
           'with an `infoChanged` extension. Mark the canceled item with the `infoCancelled` modifier ' \
           'extension (valueBoolean `true`), a `certificationType` extension with code `3` (Cancel) in ' \
           '`Claim.item.extension`, and an `infoChanged` extension. Retain all prior items and ' \
           'supportingInfo (preserving their `sequence` values) and reference the immediately prior ' \
-          'Claim update in `Claim.related.claim`.'
+          'Claim update in `Claim.related.claim`'
       end
     end
 
@@ -228,10 +230,10 @@ module DaVinciPASTestKit
       config options: { claim_update_tag: CLAIM_UPDATE_CANCEL_ALL_TAG }
 
       def interaction_instructions
-        'Submit an **update that cancels the entire prior authorization**. Include a ' \
+        'submit an **update that cancels the entire prior authorization**. Include a ' \
           '`certificationType` extension with code `3` (Cancel) in `Claim.extension`; no items are ' \
           'required to cancel the entire authorization. Reference the immediately prior Claim update ' \
-          'in `Claim.related.claim`.'
+          'in `Claim.related.claim`'
       end
     end
   end

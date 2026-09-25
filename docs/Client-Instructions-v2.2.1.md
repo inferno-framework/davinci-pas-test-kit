@@ -123,7 +123,7 @@ against a real client system using SMART Backend Services for authentication.
 1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "SMART Backend Services"
    option for the Client Security Type suite option.
 1. Apply present "Da Vinci BR Provider reference implementation" using
-   the dropdown in the upper right. This fills in `https://BR Provider.davinci.hl7.org/api/security/jwks`
+   the dropdown in the upper right. This fills in `https://br-provider.davinci.hl7.org/api/security/jwks`
    for the value of the "SMART Confidential Asymmetric JSON Web Key Set (JWKS)" input.
 1. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
    click the "Submit" button to start the tests.
@@ -131,17 +131,17 @@ against a real client system using SMART Backend Services for authentication.
    to hit Inferno's PAS FHIR server, navigate to https://br-provider.davinci.hl7.org/ in a
    separate tab and login (no password needed) as a practitioner (any).
 1. Configure the reference implementation's connection to Inferno's simulated PAS server by:
-  1. Clicking the gear icon in the upper right to open the settings dialog.
-  1. Select the "Payer" tab
-  1. Use the "Server" dropdown to select the "Custom" option.
-  1. In the "CDS Services URL" input, put `https://br-payer.davinci.hl7.org/cds-services`.
-  1. In the "FHIR" input, put Inferno's FHIR url displayed in the "User Action Required"
-     dialog on the Inferno tab (e.g., `https://inferno.healthit.gov/suites/custom/g33_certification/pas_v221/fhir`).
-  1. From the "Authentication" dropdown, select `SMART Backend Services`
-  1. In the "Client ID" input, copy the client id displayed in the "User Action Required"
-     dialog on the Inferno tab (11 character alpha-numeric value).
-  1. Click the "Bypass payor-handled check" box.
-  1. Click the "Save" button and close the dialog to complete the setup.
+   1. Clicking the gear icon in the upper right to open the settings dialog.
+   1. Select the "Payer" tab
+   1. Use the "Server" dropdown to select the "Custom" option.
+   1. In the "CDS Services URL" input, put `https://br-payer.davinci.hl7.org/cds-services`.
+   1. In the "FHIR" input, put Inferno's FHIR url displayed in the "User Action Required"
+      dialog on the Inferno tab (e.g., `https://inferno.healthit.gov/suites/custom/g33_certification/pas_v221/fhir`).
+   1. From the "Authentication" dropdown, select `SMART Backend Services`
+   1. In the "Client ID" input, copy the client id displayed in the "User Action Required"
+      dialog on the Inferno tab (11 character alpha-numeric value).
+   1. Click the "Bypass payor-handled check" box.
+   1. Click the "Save" button and close the dialog to complete the setup.
 1. Back in the Inferno session tab, click the link to confirm the configuration and continue the tests.
 1. Select and run group "3.1 Approval Workflow" without any changes to the inputs so that the default
    mocked response response will be used. When the dialog appears indicating Inferno is ready to

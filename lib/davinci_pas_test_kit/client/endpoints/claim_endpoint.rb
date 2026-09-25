@@ -70,7 +70,7 @@ module DaVinciPASTestKit
     end
 
     def must_support_workflow?
-      test.id =~ /.*must_support.*/ || test.id =~ /.*gather_must_support.*/
+      test.id =~ /.*must_support.*/
     end
 
     WORKFLOW_TAG_MAP = {
@@ -152,19 +152,29 @@ module DaVinciPASTestKit
     private
 
     # Resolves the user-provided response, using criteria-based selection for must support
-    # workflows or the single-response approach for other workflows.
+    # workflows or the single-response approach for other workflows
+    # and replaces {{fhirpath}} tokens with values from the request.
     def resolve_user_response(req_bundle)
-      if must_support_workflow?
-        select_must_support_response(req_bundle)
-      else
-        UserInputResponse.user_inputted_response(test, operation, result)
-      end
+      user_response = if must_support_workflow?
+                        select_must_support_response(req_bundle)
+                      else
+                        UserInputResponse.user_inputted_response(test, operation, result)
+                      end
+
+      return nil unless user_response.present?
+
+      replace_tokens(user_response, req_bundle)
+    rescue FhirpathUtils::FhirpathServiceError => e
+      add_result_warning(
+        'Unable to instantiate a tester-provided response, so Inferno will generate a default response: ' \
+        "#{e.message}"
+      )
+      nil
     end
 
     # Selects the first tester-provided response candidate whose selection criteria all
     # match the incoming request, extracts its response Bundle (unwrapping it when the
-    # candidate pairs the Bundle with criteria), and replaces {{fhirpath}} tokens with
-    # values from the request. Returns nil, causing Inferno to generate a default
+    # candidate pairs the Bundle with criteria). Returns nil, causing Inferno to generate a default
     # response, if no candidates are provided or none match. Problems with the
     # tester-provided input or the FHIRPath service also result in nil, with a warning
     # on the waiting test so that the tester can see what went wrong.
@@ -188,20 +198,22 @@ module DaVinciPASTestKit
         "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
         "for #{operation_url_suffix} request ##{request_number}."
       )
-      replace_tokens(entity_bundle(candidates[selected_index]), req_bundle)
+      entity_bundle(candidates[selected_index])
     rescue UserInputResponse::InvalidInputError, FhirpathUtils::FhirpathServiceError => e
       add_result_warning(
-        "Unable to select a tester-provided response, so Inferno will generate a default response. #{e.message}"
+        'Unable to select a tester-provided response, so Inferno will generate a default response: ' \
+        "#{e.message}"
       )
       nil
     end
 
     # Replaces {{fhirpath}} tokens using values from the incoming request, round-tripping
-    # the result through the FHIR model to normalize it. If a replaced value breaks the
-    # JSON structure, the result cannot be returned as a FHIR response, so nil is returned
-    # with a warning on the waiting test and Inferno generates a default response.
+    # the result through the FHIR model to normalize it. The response may be a parsed hash
+    # (must support workflow) or the raw JSON string of a single input. If a replaced value
+    # breaks the JSON structure, the result cannot be returned as a FHIR response, so nil is
+    # returned with a warning on the waiting test and Inferno generates a default response.
     def replace_tokens(bundle_hash, req_bundle)
-      bundle_json = bundle_hash.to_json
+      bundle_json = bundle_hash.is_a?(String) ? bundle_hash : bundle_hash.to_json
       replaced = replace_tokens_in_string(bundle_json, req_bundle)
       return bundle_json if replaced.equal?(bundle_json)
 

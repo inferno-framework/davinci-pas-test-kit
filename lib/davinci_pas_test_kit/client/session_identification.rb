@@ -1,4 +1,5 @@
 require 'udap_security_test_kit'
+require_relative 'pas_client_options'
 
 module DaVinciPASTestKit
   module SessionIdentification
@@ -39,6 +40,28 @@ module DaVinciPASTestKit
       return client_id if client_id.present?
 
       token
+    end
+
+    def auth_description_for_wait(client_id)
+      case suite_options[:client_type]
+      when PASClientOptions::OTHER_AUTH
+        'No authentication with Inferno is required. Requests will be associated ' \
+        'with this session based on the endpoint alone.'
+      when PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+        authenticated_auth_description_for_wait(client_id, 'SMART Backend Services')
+      when PASClientOptions::UDAP_CLIENT_CREDENTIALS
+        authenticated_auth_description_for_wait(client_id, 'UDAP B2B Client Credentials')
+      end
+    end
+
+    def authenticated_auth_description_for_wait(client_id, type)
+      "Requests must be authenticated by first obtaining a #{type} " \
+        'access token using' \
+        "\n\n- Token endpoint: `#{token_url}`" \
+        "\n- Client Id: `#{client_id}`\n\n" \
+        'Only requests that include an obtained access token as a bearer token ' \
+        'in the Authorization header of the HTTP request will be recognized as ' \
+        'associated with this session and return successful responses.'
     end
   end
 end

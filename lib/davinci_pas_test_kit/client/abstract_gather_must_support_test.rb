@@ -5,6 +5,7 @@ module DaVinciPASTestKit
   # abstract test, needs to be extended to include a version-specific URLs module
   class AbstractGatherMustSupportTest < Inferno::Test
     include SessionIdentification
+    include UserInputResponse
 
     id :pas_client_gather_must_support
     title 'PAS client submits Claims using the $submit and $inquire operations to demonstrate coverage of must ' \
@@ -16,12 +17,13 @@ module DaVinciPASTestKit
 
       Because Inferno's mocked responses do not cover all must support elements, in order to pass
       these tests testers will need to provide response bundles for Inferno to return when
-      responding to $submit and $inquire requests. Each response input takes a single entry or a
-      JSON list of entries, where each entry is either a FHIR Bundle or a wrapper object pairing
-      a Bundle with selection criteria. For each request, Inferno will respond with the Bundle of
-      the first entry whose criteria are all met, generating a default response if none match.
-      See the input descriptions for details on the wrapper format, the supported criteria, and
-      on substituting values from the request into the returned response.
+      responding to $submit and $inquire requests. Each response input takes a JSON list of entries,
+      where each entry specifies a Bundle with selection criteria ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format)).
+      For each request, Inferno will [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
+      and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
+      a response to return from this list. If no entries match or instantiation fails, Inferno will
+      [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+      a response.
 
       This enables testers to verify that their client can handle responses containing all required
       must support elements.
@@ -61,11 +63,17 @@ module DaVinciPASTestKit
 
       wait(
         identifier: wait_identifier,
-        message: %(
-          The client system may now make multiple $submit and $inquire requests before continuing.
-          These requests should cumulatively demonstrate coverage of all required profiles and all
-          must support elements within those profiles, as specified by the DaVinci Prior Authorization
-          Support implementation guide.
+        message: <<~MESSAGE
+          **Additional Must Support Demonstration**:
+
+          Inferno will wait while the tester uses the system to make additional $submit and $inquire requests.
+          Along with the requests submitted during previous tests, these requests and their responses must
+          cumulatively demonstrate coverage of all required profiles and all must support elements within
+          those profiles, as specified by the DaVinci Prior Authorization Support implementation guide.
+
+          [Click here](#{confirmation_url}) when all requests have been submitted.
+
+          ### Required Profiles
 
           For the $submit operation the required profiles include:
           - PAS Request Bundle
@@ -95,19 +103,28 @@ module DaVinciPASTestKit
           - PAS Practitioner
           - PAS PractitionerRole
 
-          If you would like Inferno to respond with specific response bundles (to demonstrate
-          must support coverage on responses), provide them in the input fields above.
+          ### Endpoints
 
-          Submit PAS $submit requests to
+          Submit a PAS requests to
 
-          `#{submit_endpoint}`
+          - $submit: `#{submit_endpoint}`
+          - $inquire: `#{inquire_endpoint}`
 
-          Submit PAS $inquire requests to
+          ### Authentication and Identification
 
-          `#{inquire_endpoint}`
+          #{auth_description_for_wait(client_id)}
 
-          and [click here](#{confirmation_url}) when done.
-        )
+          ### Submit Responses
+
+          #{response_description_for_wait(user_inputted_response?(:ms_submit_responses),
+                                          input_title(:ms_submit_responses))}
+
+          ### Inquire Resposnes
+
+          #{response_description_for_wait(user_inputted_response?(:ms_inquire_responses),
+                                          input_title(:ms_inquire_responses))}
+
+        MESSAGE
       )
     end
   end

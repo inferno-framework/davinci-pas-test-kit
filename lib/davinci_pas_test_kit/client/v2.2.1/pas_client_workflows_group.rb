@@ -15,6 +15,19 @@ module DaVinciPASTestKit
         responses returned.
       )
 
+      input_order :approval_json_response,
+                  :denial_json_response,
+                  :pended_json_response,
+                  :notification_bundle,
+                  :client_endpoint_access_token,
+                  :claim_update_initial_response,
+                  :claim_update_add_item_response,
+                  :claim_update_modify_cancel_response,
+                  :claim_update_cancel_all_response,
+                  :modification_json_response,
+                  :client_id,
+                  :session_url_path
+
       group from: :pas_client_v221_approval_group
       group from: :pas_client_v221_denial_group
       group from: :pas_client_v221_pended_group

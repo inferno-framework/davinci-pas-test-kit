@@ -18,11 +18,6 @@ module DaVinciPASTestKit
       input :approval_json_response, optional: true
 
       test from: :pas_client_v221_approval_submit_test
-      test from: :pas_client_v221_request_bundle_validation_test,
-           config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
-
-      test from: :pas_client_v221_response_bundle_validation_test,
-           config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
       test from: :pas_client_v221_response_attest,
            title: 'PAS client displays the request as "approved"',
            description: %(
@@ -35,6 +30,10 @@ module DaVinciPASTestKit
              attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning " \
                              'that the user can proceed with ordering or providing the requested service.'
            } }
+      test from: :pas_client_v221_request_bundle_validation_test,
+           config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
+      test from: :pas_client_v221_response_bundle_validation_test,
+           config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }
     end
   end
 end

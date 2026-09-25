@@ -29,7 +29,8 @@ module DaVinciPASTestKit
           - Token endpoint: `#{token_url}`
 
           [Click here](#{confirmation_url}) once you have configured
-          the client to connect to Inferno at the above endpoints.
+          the client to authenticate with Inferno and send PAS requests
+          to Inferno at the above endpoint.
         )
       )
     end

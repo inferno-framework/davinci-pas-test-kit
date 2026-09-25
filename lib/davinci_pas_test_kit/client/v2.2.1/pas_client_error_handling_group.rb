@@ -13,6 +13,12 @@ module DaVinciPASTestKit
         business-level processing errors conveyed within a response bundle.
       )
 
+      input_order :operation_failure_operation_outcome,
+                  :operation_failure_http_status,
+                  :processing_error_response,
+                  :client_id,
+                  :session_url_path
+
       group from: :pas_client_v221_operation_failure_group
       group from: :pas_client_v221_processing_error_group
     end

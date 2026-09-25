@@ -23,9 +23,6 @@ module DaVinciPASTestKit
                   :session_url_path
 
       test from: :pas_client_v221_processing_error_submit_test
-      test from: :pas_client_v221_request_bundle_validation_test,
-           config: { options: { workflow_tag: PROCESSING_ERROR_WORKFLOW_TAG } }
-      test from: :pas_client_v221_processing_error_response_validation_test
       test from: :pas_client_v221_response_attest,
            title: 'PAS client handles the processing errors appropriately',
            description: %(
@@ -39,6 +36,9 @@ module DaVinciPASTestKit
                              'appropriately: the ClaimResponse error details are surfaced to the ' \
                              'appropriate users so that corrective action can be taken.'
            } }
+      test from: :pas_client_v221_request_bundle_validation_test,
+           config: { options: { workflow_tag: PROCESSING_ERROR_WORKFLOW_TAG } }
+      test from: :pas_client_v221_processing_error_response_validation_test
     end
   end
 end
