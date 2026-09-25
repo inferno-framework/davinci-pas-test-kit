@@ -217,7 +217,7 @@ module DaVinciPASTestKit
     # to ensure the same fullUrl and resource identifiers as in the
     # request are used.
     def validate_pa_response_body_structure(pa_response_bundle, pa_request_bundle)
-      first_entry = pa_response_bundle.entry.first.resource
+      first_entry = pa_response_bundle.entry.first&.resource
       unless first_entry.is_a?(FHIR::ClaimResponse)
         validation_error_messages <<
           "[Bundle/#{pa_response_bundle.id}]: The first bundle entry must be a ClaimResponse"
