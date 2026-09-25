@@ -69,4 +69,47 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateInitialSub
     expect(Inferno::Jobs).to_not have_received(:perform)
       .with(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification, any_args)
   end
+
+  describe 'prior_submission_failed tracking' do
+    let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+    let(:add_item_test) { DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateAddItemSubmitTest }
+
+    def prior_submission_failed_output
+      session_data_repo.load(test_session_id: test_session.id, name: :prior_submission_failed)
+    end
+
+    it 'sets prior_submission_failed to true and fails when the configured response is not valid JSON' do
+      result = run(described_class, session_url_path:, claim_update_initial_response: 'not json')
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('must be valid JSON')
+      expect(prior_submission_failed_output).to eq('true')
+    end
+
+    it 'sets prior_submission_failed to false when the configured response is valid JSON' do
+      result = run(described_class, session_url_path:, claim_update_initial_response: pended_response)
+
+      expect(result.result).to eq('wait')
+      expect(prior_submission_failed_output).to eq('false')
+    end
+
+    it 'skips a later update test when the prior step failed' do
+      result = run(add_item_test, session_url_path:, prior_submission_failed: 'true')
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('Prior step of the update workflow not completed.')
+    end
+
+    it 'runs a later update test when the prior step did not fail' do
+      result = run(add_item_test, session_url_path:, prior_submission_failed: 'false')
+
+      expect(result.result).to eq('wait')
+    end
+
+    it 'never skips the first update test based on prior_submission_failed' do
+      result = run(described_class, session_url_path:)
+
+      expect(result.result).to eq('wait')
+    end
+  end
 end

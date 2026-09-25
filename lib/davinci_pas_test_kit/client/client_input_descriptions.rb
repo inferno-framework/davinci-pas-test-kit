@@ -22,12 +22,21 @@ module DaVinciPASTestKit
   end
 
   def self.user_response_input_description(operation, workflow, group_name)
+    timing_description = "during the *#{group_name}* group to indicate that the request has been #{workflow}"
+    user_response_input_description_base(operation, workflow, timing_description)
+  end
+
+  def self.user_response_input_description_for_update_tests(operation, default_decision, test_name)
+    timing_description = "during the *#{test_name}* test in the *Claim Updates* group"
+    user_response_input_description_base(operation, default_decision, timing_description)
+  end
+
+  def self.user_response_input_description_base(operation, workflow, timing_description)
     <<~DESCRIPTION
       If provided, this JSON will be [instantiated](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
-      and sent in response to a #{operation} request received during the *#{group_name}* group to indicate
-      that the request has been #{workflow}. If not provided or if instantiation fails,
-      Inferno will [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-      a response based on the submitted Claim and indicate it has been #{workflow}. In either
+      and sent in response to the #{operation} request received #{timing_description}.
+      If not provided or if instantiation fails, Inferno will [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+      the response based on the submitted Claim and indicate it has been #{workflow}. In either
       case, the response will be validated against the PAS Response Bundle profile.
     DESCRIPTION
   end
