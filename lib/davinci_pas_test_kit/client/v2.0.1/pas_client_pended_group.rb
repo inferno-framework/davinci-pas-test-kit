@@ -15,7 +15,7 @@ module DaVinciPASTestKit
       id :pas_client_v201_pended_group
       title 'Pended Workflow'
       description %(
-        During these tests, the client will initiate a prior authorization
+        During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to a 'pended' decision, including
         waiting for a notification that an update has been made
         and making an inquiry request to retrieve the final result.
@@ -34,11 +34,11 @@ module DaVinciPASTestKit
         title 'Perform the pended workflow'
         description %(
           All interactions for the pended prior authorization request workflow
-          between Inferno and the client under test will be performed during this test
+          between Inferno and the client system will be performed during this group
           including
           - A `$submit` request from the client to Inferno where Inferno returns a pended response.
           - A notification that the prior authorization decision has been finalized from Inferno
-            to the client under test.
+            to the client system.
           - An `$inquire` request from the client to Inferno where Inferno returns an approved response.
         )
 
@@ -53,9 +53,9 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
-             title: 'Check that the client registers the request as pended (Attestation)',
+             title: 'Check that the client registers the request as pended',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the pended response and attest that users are able to determine
               that the response has been pended and a decision will be forthcoming.
              ),
@@ -118,9 +118,9 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
-             title: 'Check that the client registers the request as approved (Attestation)',
+             title: 'Check that the client registers the request as approved',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the inquiry response with a final decision and attest that users
               are able to determine that the response has been approved in full.
              ),

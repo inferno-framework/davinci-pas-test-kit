@@ -29,7 +29,7 @@ module DaVinciPASTestKit
           optional: true,
           title: 'Client Notification Access Token',
           description: %(
-            The bearer token that Inferno will send on requests to the client under test's rest-hook notification
+            The bearer token that Inferno will send on requests to the client system's rest-hook notification
             endpoint, including handshake notifications sent after Subscription creation. Not needed if the client
             under test will create a Subscription with an appropriate header value in the `channel.header` element.
             If a value for the `authorization` header is provided in `channel.header`, this value will override it.

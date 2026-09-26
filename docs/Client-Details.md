@@ -14,7 +14,7 @@ requirements and may change the test validation logic.
 
 ## Technical Implementation
 
-In these test suites, Inferno simulates a PAS server for the client under test to
+In these test suites, Inferno simulates a PAS server for the client system to
 interact with. The client will be expected to initiate requests to the server
 and demonstrate its ability to react to the returned responses. Over the course
 of these interactions, Inferno will seek to observe conformant handling of PAS
@@ -68,12 +68,12 @@ Inferno's simulated payer server includes a simulation of two standard authentic
 - SMART Backend Services
 - UDAP B2B client credentials flow, including dynamic registration
 
-Clients under test can register with the authorization server and request tokens for use
+Client systems can register with the authorization server and request tokens for use
 when making PAS requests. In this case, Inferno will verify that the client's interactions with
 the simulated authorization server are conformant and that the provided tokens are used.
 
-If the client under test does not support either of these standards-based methods of authentication, the tester
-may instead attest to other authentication capabilities. In this case, the client will not
+If the client system does not support either of these standards-based methods of authentication, the tester
+may instead attest to other authentication capabilities. In this case, the client system will not
 authenticate and will identify itself to Inferno by by sending requests to dedicated PAS endpoints
 created by Inferno for use during the testing session. To reduce configuration burden, the dedicated
 endpoints can be reused in subsequent sessions.
@@ -94,7 +94,7 @@ what details the tester needs to provide during the Client Registration tests:
 - **UDAP B2B Client Credentials**: the system under test will dynamically register
   with Inferno and request access tokens used to access FHIR endpoints
   as per the UDAP specification. It requires the **UDAP Client URI** input
-  to be populated with the URI that the client will use when dynamically
+  to be populated with the URI that the client system will use when dynamically
   registering with Inferno. This will be used to generate a client id (each
   unique UDAP Client URI will always get the same client id).
 - **Other Authentication**: Inferno will create a dedicated set of FHIR endpoints for this session

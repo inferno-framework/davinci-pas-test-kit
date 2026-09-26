@@ -4,8 +4,8 @@ module DaVinciPASTestKit
     id :pas_client_response_attest
     title 'PAS client reacts appropriately to the response'
     description %(
-      This test provides the tester an opportunity to observe their client following
-      the receipt of response and attest that users are able to see the appropriate
+      During this test, the tester will observe the client system following
+      the receipt of a response and attest that users are able to see the appropriate
       updates to the corresponding prior authorization request in their system.
     )
     attestation

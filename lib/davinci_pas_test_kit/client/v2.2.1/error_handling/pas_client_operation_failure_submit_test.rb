@@ -14,7 +14,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_operation_failure_submit_test
       title 'PAS client submits a claim and receives an OperationOutcome response'
       description %(
-        Inferno will wait for a prior authorization submission request from the client.
+        During this test, Inferno will wait for a prior authorization submission request from the client.
         Upon receipt, Inferno will return the provided OperationOutcome with the configured
         HTTP status code (default 400).
       )
@@ -65,7 +65,7 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Operation Failure Workflow Test**:
 
-            Inferno will wait while the tester uses the system to submit a PAS request to
+            Inferno will wait while the tester uses the client system to submit a PAS request to
             Inferno. Inferno will respond with exactly the provided OperationOutcome and HTTP status.
             The tests will automatically continue once a request has been received.
 

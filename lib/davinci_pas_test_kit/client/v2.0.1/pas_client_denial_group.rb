@@ -13,7 +13,7 @@ module DaVinciPASTestKit
       id :pas_client_v201_denial_group
       title 'Denial Workflow'
       description %(
-        During these tests, the client will initiate a prior authorization
+        During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to a 'denied' decision.
       )
       run_as_group
@@ -30,9 +30,9 @@ module DaVinciPASTestKit
       test from: :pas_client_v201_response_bundle_validation_test,
            config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
       test from: :pas_client_v201_response_attest,
-           title: 'Check that the client registers the request as denied (Attestation)',
+           title: 'Check that the client registers the request as denied',
            description: %(
-             This test provides the tester an opportunity to observe their client following
+             During this test, the tester will observe the client system following
              the receipt of the denied response and attest that users are able to determine
              that the response has been denied.
            ),
@@ -40,7 +40,7 @@ module DaVinciPASTestKit
              workflow_tag: DENIAL_WORKFLOW_TAG,
              attest_message: "I attest that the client system displays the submitted claim as 'denied', meaning " \
                              'that the user cannot proceed with ordering or providing the requested service without ' \
-                             'making adjustments and submitting for further approval.'
+                             'making adjustments and submitting for further review.'
            } }
     end
   end

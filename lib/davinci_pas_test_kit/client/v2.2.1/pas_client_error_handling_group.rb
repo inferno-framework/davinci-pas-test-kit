@@ -7,7 +7,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_error_handling_group
       title 'Error Handling'
       description %(
-        The error handling tests verify that the client can appropriately handle
+        The error handling tests in this group verify that the client can appropriately handle
         [prior authorization error responses](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
         from the server, including both HTTP-level operation failures and
         business-level processing errors conveyed within a response bundle.

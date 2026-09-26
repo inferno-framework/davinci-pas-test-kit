@@ -1,7 +1,7 @@
 require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
 
 RSpec.describe DaVinciPASTestKit::AbstractSubscriptionCreateTest, :request do
-  describe 'when responding to requests from the client under tests' do
+  describe 'when responding to requests from the client systems' do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:session_url_path) { '1234' }
     let(:notification_access_token) { '1234' }

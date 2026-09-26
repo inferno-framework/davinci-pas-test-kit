@@ -10,7 +10,8 @@ module DaVinciPASTestKit
         Operation Failure workflow. The OperationOutcome is validated against the base FHIR R4
         OperationOutcome resource definition — no PAS-specific profile is required.
 
-        Per IG §7.2.5, when a 4XX response is returned, an OperationOutcome SHALL be included
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
+        that when a 4XX response is returned, an OperationOutcome **SHALL** be included
         that details why the bundle could not be processed.
       )
       simulation_verification

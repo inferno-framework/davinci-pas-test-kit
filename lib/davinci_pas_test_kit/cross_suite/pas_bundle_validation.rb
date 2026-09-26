@@ -751,7 +751,7 @@ module DaVinciPASTestKit
 
     # Determines the target profile URL for a Claim resource in a submit request bundle.
     #
-    # In v2.2.1, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
+    # In PAS v2.2.1, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
     # The structural discriminator is Claim.related: profile-claim-update requires it (must-support)
     # while profile-claim disallows it (max: 0). For all other versions, profile-claim-update is
     # used unconditionally.

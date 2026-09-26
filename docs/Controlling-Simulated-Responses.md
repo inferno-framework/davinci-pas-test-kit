@@ -83,7 +83,7 @@ All PAS tests include the option for Inferno to return tester-provide responses.
 
 ### Response Selection
 
-In most cases, Inferno waits for a single $submit request and automatically continues the tests
+In most cases, Inferno will wait for a single $submit request and automatically continue the tests
 after it has been received and responded to. In those cases, testers have the option to specify
 a single response which will always be used.
 

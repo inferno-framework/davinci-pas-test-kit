@@ -33,7 +33,7 @@ module DaVinciPASTestKit
               tester through the *Claim pended response JSON* input.
               If not provided, a notification will be generated from the returned ClaimResponse.
               In either case the response will be validated to ensure that the notification
-              is conformant. For v2.2.1, the notification will be a full-resource notification
+              is conformant. For PAS v2.2.1, the notification must be a full-resource notification
               containing the complete ClaimResponse.
             )
       input :pended_json_response,
@@ -45,8 +45,8 @@ module DaVinciPASTestKit
             optional: true,
             title: 'Client Notification Access Token',
             description: %(
-              The bearer token that Inferno will send on requests to the client under test's rest-hook notification
-              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value
+              The bearer token that Inferno will send on requests to the client system's rest-hook notification
+              endpoint. Not needed if the client system will create a Subscription with an appropriate header value
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
@@ -85,9 +85,9 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Pended Workflow Test**:
 
-            Inferno will shortly send a full-resource notification to the client's Subscription endpoint to
-            tell it that a final decision has been made on the pended prior authorization request. The
-            tests will continue automatically once the notification has been sent.
+            Inferno will shortly send a full-resource notification to the endpoint specified in the client's
+            Subscription to tell it that a final decision has been made on the pended prior authorization
+            request. The tests will continue automatically once the notification has been sent.
           MESSAGE
         )
       end

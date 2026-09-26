@@ -151,8 +151,8 @@ module DaVinciPASTestKit
       title 'PAS client submits an update that adds an item'
       description %(
         During this test, Inferno will wait for an updated prior authorization `$submit` request that adds a new item to
-        the previously submitted Claim. The update is expected to reference the original Claim in
-        `Claim.related.claim` (and include it in the Bundle), retain all previously submitted item
+        the previously submitted Claim. The update is expected to reference (and include in the Bundle)
+        the original Claim in `Claim.related.claim`, retain all previously submitted item
         and supportingInfo entries with their `sequence` values, and mark the newly added item with
         an `infoChanged` extension. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
         or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)

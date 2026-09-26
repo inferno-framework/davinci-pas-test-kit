@@ -15,10 +15,10 @@ module DaVinciPASTestKit
       id :pas_client_v221_pended_group
       title 'Pended Workflow'
       description %(
-        During these tests, the client will initiate a prior authorization
+        During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to a 'pended' decision, including
         waiting for a full-resource notification that contains the final decision.
-        In v2.2.1, the notification includes all details so no follow-up `$inquire`
+        In PAS v2.2.1, the notification includes all details so no follow-up `$inquire`
         request is needed.
       )
       run_as_group
@@ -35,11 +35,11 @@ module DaVinciPASTestKit
         title 'Interaction and Response Handling'
         description %(
           All interactions for the pended prior authorization request workflow
-          between Inferno and the client under test will be performed during this test
+          between Inferno and the client system will be performed during this group
           including
-          - A `$submit` request from the client to Inferno where Inferno returns a pended response.
+          - A `$submit` request from the client system to Inferno where Inferno returns a pended response.
           - A full-resource notification that the prior authorization decision has been finalized
-            from Inferno to the client under test.
+            from Inferno to the client system.
 
           In between these requests, testers will confirm that the system registers
           the request as pended and that it is updated with the final response
@@ -51,7 +51,7 @@ module DaVinciPASTestKit
              id: :pas_client_v221_pended_response_attest,
              title: 'PAS client displays the request as "pended"',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the pended response and attest that users are able to determine
               that the response has been pended and a decision will be forthcoming.
              ),
@@ -66,7 +66,7 @@ module DaVinciPASTestKit
              id: :pas_client_v221_pended_finalized_response_attest,
              title: 'PAS client displays the final decision as "approved"',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the full-resource notification containing the approved final decision
               and attest that users are able to determine that the request has been approved.
              ),

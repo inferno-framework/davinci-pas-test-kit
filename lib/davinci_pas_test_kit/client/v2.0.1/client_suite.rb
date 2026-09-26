@@ -39,7 +39,7 @@ module DaVinciPASTestKit
         Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details)
         documentation for information about technical implementation and known limitations of these tests.
 
-        In this test suite, Inferno simulates a PAS server for the client under test to
+        In this test suite, Inferno simulates a PAS server for the client system to
         interact with. The client will be expected to initiate requests to the server
         and demonstrate its ability to react to the returned responses. Over the course
         of these interactions, Inferno will seek to observe conformant handling of PAS

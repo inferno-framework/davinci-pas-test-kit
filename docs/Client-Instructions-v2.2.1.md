@@ -77,7 +77,7 @@ generate a [mocked pended response and a notification with the rendered decision
 
 ### Testing Must Support Elements
 
-During the "Must Support Elements" group, the client will submit multiple $submit and $inquire requests
+During the "Must Support Elements" group, the client system will submit multiple $submit and $inquire requests
 to demonstrate all required must support elements, including on both the requests and response.
 These tests can be run without providing custom responses, but because Inferno's mocked responses
 will not populate all ClaimResponse must support elements, [custom responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#response-and-notification-content)

@@ -74,7 +74,7 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Pended Workflow Test**:
 
-            Inferno will wait while the tester uses the system to submit a PAS request to
+            Inferno will wait while the tester uses the client system to submit a PAS request to
             Inferno. The tests will automatically continue once a request has been received.
 
             ### Endpoints

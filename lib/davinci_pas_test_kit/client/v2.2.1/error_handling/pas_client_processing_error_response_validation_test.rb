@@ -20,7 +20,8 @@ module DaVinciPASTestKit
         profile. Additionally, it checks that the ClaimResponse contains at least one error entry,
         as required by the processing error scenario.
 
-        Per IG §7.2.5, business errors that are a part of processing the 278 payload are
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
+        that business errors that are a part of processing the 278 payload are
         represented in the mapping to the response bundle via the ClaimResponse error capability.
       )
       simulation_verification

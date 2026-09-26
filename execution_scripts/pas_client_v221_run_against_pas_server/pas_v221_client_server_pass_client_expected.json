@@ -2603,7 +2603,7 @@
       {
         "name": "client_endpoint_access_token",
         "label": "Client Notification Access Token",
-        "description": "\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ",
+        "description": "\n              The bearer token that Inferno will send on requests to the client under test's rest-hook notification\n              endpoint. Not needed if the client system will create a Subscription with an appropriate header value\n              in the `channel.header` element. If a value for the `authorization` header is provided in\n              `channel.header`, this value will override it.\n            ",
         "value": "passing_execution",
         "type": "text"
       }

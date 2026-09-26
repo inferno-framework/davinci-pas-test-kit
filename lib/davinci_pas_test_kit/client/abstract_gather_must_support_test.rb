@@ -11,9 +11,9 @@ module DaVinciPASTestKit
     title 'PAS client submits Claims using the `$submit` and `$inquire` operations to demonstrate coverage of must ' \
           'support elements'
     description %(
-      This test allows the client to send both `$submit` and `$inquire` requests for Inferno to evaluate
-      coverage of must support elements in both requests and responses. Any requests made during
-      previous workflow tests will also be considered.
+      During this test, Inferno will wait while the tester uses the client system to make `$submit`
+      and `$inquire` operation requests against Inferno demonstrating any request and response
+      must support elements not yet demonstrated.
 
       Because Inferno's mocked responses do not cover all must support elements, in order to pass
       these tests testers will need to provide response bundles for Inferno to return when
@@ -24,9 +24,6 @@ module DaVinciPASTestKit
       a response to return from this list. If no entries match or instantiation fails, Inferno will
       [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
       a response.
-
-      This enables testers to verify that their client can handle responses containing all required
-      must support elements.
     )
 
     input :client_id,
@@ -69,7 +66,7 @@ module DaVinciPASTestKit
           Inferno will wait while the tester uses the system to make additional $submit and $inquire requests.
           Along with the requests submitted during previous tests, these requests and their responses must
           cumulatively demonstrate coverage of all required profiles and all must support elements within
-          those profiles, as specified by the DaVinci Prior Authorization Support implementation guide.
+          those profiles, as specified by the PAS IG.
 
           [Click here](#{confirmation_url}) when all requests have been submitted.
 
