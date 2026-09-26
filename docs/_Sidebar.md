@@ -8,6 +8,7 @@
 *   [Client Testing Details](Client-Details)
 *   [Client v2.0.1 Testing Walkthrough](Client-Instructions-v2.0.1)
 *   [Client v2.2.1 Testing Instructions](Client-Instructions-v2.2.1)
+*   [Controlling Inferno's Simulated Responses](Controlling-Simulated-Responses)
 
 **Server Suite**
 *   [Server Testing Details](Server-Details)
