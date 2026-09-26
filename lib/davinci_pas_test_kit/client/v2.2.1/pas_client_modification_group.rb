@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       title 'Payer Modifications'
       description %(
         During these tests, the client will initiate a prior authorization request and show it can
-        respond appropriately to a response in which the payer authorizes items that differ from those
+        react appropriately to a response in which the payer authorizes items that differ from those
         that were requested.
 
         In PAS v2.2.1, payers are permitted to

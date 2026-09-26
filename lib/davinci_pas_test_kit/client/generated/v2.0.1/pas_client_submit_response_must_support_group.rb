@@ -74,6 +74,9 @@ module DaVinciPASTestKit
            ),
            config: { options: {
              workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+             operation_tag: SUBMIT_TAG,
+             no_requests_ok: true,
+             multiple_requests_ok: true,
              attest_message: "I attest that the client system correctly processed the must support elements " \
                              "contained in the $submit responses received from Inferno and did not error."
            } } do

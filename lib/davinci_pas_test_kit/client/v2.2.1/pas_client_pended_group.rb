@@ -16,7 +16,7 @@ module DaVinciPASTestKit
       title 'Pended Workflow'
       description %(
         During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a 'pended' decision, including
+        request and show it can react appropriately to a 'pended' decision, including
         waiting for a full-resource notification that contains the final decision.
         In v2.2.1, the notification includes all details so no follow-up `$inquire`
         request is needed.

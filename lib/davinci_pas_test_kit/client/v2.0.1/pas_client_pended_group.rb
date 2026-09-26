@@ -16,7 +16,7 @@ module DaVinciPASTestKit
       title 'Pended Workflow'
       description %(
         During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a 'pended' decision, including
+        request and show it can react appropriately to a 'pended' decision, including
         waiting for a notification that an update has been made
         and making an inquiry request to retrieve the final result.
       )
@@ -61,6 +61,8 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
+               operation_tag: SUBMIT_TAG,
+               multiple_requests_ok: true,
                attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
                                'claim, the client system indicates to users that a final decision on request ' \
                                'has not yet been made.'
@@ -124,6 +126,8 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
+               operation_tag: INQUIRE_TAG,
+               multiple_requests_ok: true,
                attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
              } }
       end

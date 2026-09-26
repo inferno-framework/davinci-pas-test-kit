@@ -11,7 +11,7 @@ module DaVinciPASTestKit
       title 'Processing Errors'
       description %(
         During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a response containing
+        request and show it can react appropriately to a response containing
         one or more ClaimResponse.error entries.
       )
       run_as_group

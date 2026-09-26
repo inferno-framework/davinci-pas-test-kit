@@ -158,4 +158,23 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
       expect(result.result_message).to include('No name for workflow tag')
     end
   end
+
+  describe 'pended workflow with both a $submit and an $inquire request' do
+    let(:pended_tag) { DaVinciPASTestKit::PENDED_WORKFLOW_TAG }
+
+    before do
+      shared_result = repo_create(:result, test_session_id: test_session.id)
+      create_tagged_request(tags: [pended_tag, DaVinciPASTestKit::SUBMIT_TAG], result: shared_result)
+      create_tagged_request(tags: [pended_tag, DaVinciPASTestKit::INQUIRE_TAG], result: shared_result)
+    end
+
+    [DaVinciPASTestKit::SUBMIT_TAG, DaVinciPASTestKit::INQUIRE_TAG].each do |operation_tag|
+      it "waits for the attestation for the #{operation_tag} interaction" do
+        result = run(attest_test_with(workflow_tag: pended_tag, operation_tag:, multiple_requests_ok: true,
+                                      attest_message: 'blah blah'))
+
+        expect(result.result).to eq('wait')
+      end
+    end
+  end
 end

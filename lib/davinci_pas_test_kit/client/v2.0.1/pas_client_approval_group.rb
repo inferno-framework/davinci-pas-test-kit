@@ -11,7 +11,7 @@ module DaVinciPASTestKit
       title 'Approval Workflow'
       description %(
         During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to an 'approved' decision.
+        request and show it can react appropriately to an 'approved' decision.
       )
       run_as_group
 

@@ -14,7 +14,7 @@ module DaVinciPASTestKit
       title 'Denial Workflow'
       description %(
         During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a 'denied' decision.
+        request and show it can react appropriately to a 'denied' decision.
       )
       run_as_group
 

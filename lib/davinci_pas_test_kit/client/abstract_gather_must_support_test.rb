@@ -8,16 +8,16 @@ module DaVinciPASTestKit
     include UserInputResponse
 
     id :pas_client_gather_must_support
-    title 'PAS client submits Claims using the $submit and $inquire operations to demonstrate coverage of must ' \
+    title 'PAS client submits Claims using the `$submit` and `$inquire` operations to demonstrate coverage of must ' \
           'support elements'
     description %(
-      This test allows the client to send both $submit and $inquire requests for Inferno to evaluate
+      This test allows the client to send both `$submit` and `$inquire` requests for Inferno to evaluate
       coverage of must support elements in both requests and responses. Any requests made during
       previous workflow tests will also be considered.
 
       Because Inferno's mocked responses do not cover all must support elements, in order to pass
       these tests testers will need to provide response bundles for Inferno to return when
-      responding to $submit and $inquire requests. Each response input takes a JSON list of entries,
+      responding to `$submit` and `$inquire` requests. Each response input takes a JSON list of entries,
       where each entry specifies a Bundle with selection criteria ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format)).
       For each request received during this test, Inferno will [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
       and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
@@ -117,12 +117,14 @@ module DaVinciPASTestKit
           ### Submit Responses
 
           #{response_description_for_wait(user_inputted_response?(:ms_submit_responses),
-                                          input_title(:ms_submit_responses))}
+                                          input_title(:ms_submit_responses),
+                                          '$submit')}
 
           ### Inquire Resposnes
 
           #{response_description_for_wait(user_inputted_response?(:ms_inquire_responses),
-                                          input_title(:ms_inquire_responses))}
+                                          input_title(:ms_inquire_responses),
+                                          '$inquire')}
 
         MESSAGE
       )

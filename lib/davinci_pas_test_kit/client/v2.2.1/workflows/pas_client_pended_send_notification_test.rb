@@ -15,7 +15,7 @@ module DaVinciPASTestKit
       title 'Inferno sends a notification that the pended request has been finalized'
       description %(
         During this test, Inferno will send a full-resource notification to the client's Subscription
-        to tell it that a final decision has been made on the pended prior authorization request
+        endpoint to tell it that a final decision has been made on the pended prior authorization request
         that the client submitted earlier. The notification is generated from the pended `$submit` response
         that Inferno returned to the client, unless one is provided.
       )
@@ -85,9 +85,9 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Pended Workflow Test**:
 
-            Inferno is sending a full-resource notification to the client's Subscription to tell it that a
-            final decision has been made on the pended prior authorization request. The tests will continue
-            automatically once the notification has been sent.
+            Inferno will shortly send a full-resource notification to the client's Subscription endpoint to
+            tell it that a final decision has been made on the pended prior authorization request. The
+            tests will continue automatically once the notification has been sent.
           MESSAGE
         )
       end

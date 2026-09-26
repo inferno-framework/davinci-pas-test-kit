@@ -12,8 +12,11 @@ module DaVinciPASTestKit
     title 'PAS client submits a claim using the $submit operation'
     description %(
       During this test, Inferno will wait for a prior authorization submission request
-      from the client. Upon receipt, Inferno will generate and send a
-      response with an approved status.
+      from the client using the `$submit` operation. Upon receipt, Inferno will respond
+      with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+      or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+      approval response. Inferno will not respond to `$inquire` operation requests during
+      this test.
     )
 
     input :approval_json_response,
@@ -72,7 +75,10 @@ module DaVinciPASTestKit
           ### Responses
 
           #{response_description_for_wait(user_inputted_response?(:approval_json_response),
-                                          input_title(:approval_json_response))}
+                                          input_title(:approval_json_response),
+                                          '$submit')}
+
+          Inferno will not respond to `$inquire` requests during this test.
         MESSAGE
       )
     end

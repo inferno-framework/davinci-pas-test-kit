@@ -10,7 +10,7 @@ module DaVinciPASTestKit
       title 'Operation Failure'
       description %(
         During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to an operation failure response —
+        request and show it can react appropriately to an operation failure response —
         a non-2XX HTTP status code accompanied by an OperationOutcome resource.
       )
       run_as_group

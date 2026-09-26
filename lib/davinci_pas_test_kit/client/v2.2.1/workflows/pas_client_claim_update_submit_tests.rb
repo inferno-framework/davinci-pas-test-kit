@@ -94,13 +94,16 @@ module DaVinciPASTestKit
           ### Responses
 
           #{response_note}
+
+          Inferno will not respond to `$inquire` requests during this test.
         MESSAGE
       end
 
       def response_note
         response_input = config.options[:submit_respond_with]
         response_description_for_wait(user_inputted_response?(response_input),
-                                      input_title(response_input))
+                                      input_title(response_input),
+                                      '$submit')
       end
 
       # Overridden by subclasses to describe the specific submission the tester should make.
@@ -116,8 +119,10 @@ module DaVinciPASTestKit
       description %(
         During this test, Inferno will wait for an initial prior authorization `$submit` request from the client.
         This establishes the original Claim that the subsequent updates will reference and
-        modify. Upon receipt, Inferno will return the configured response (or generates an
-        approved response from the submitted Claim) and continue automatically.
+        modify. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
 
       input :claim_update_initial_response,
@@ -149,8 +154,10 @@ module DaVinciPASTestKit
         the previously submitted Claim. The update is expected to reference the original Claim in
         `Claim.related.claim` (and include it in the Bundle), retain all previously submitted item
         and supportingInfo entries with their `sequence` values, and mark the newly added item with
-        an `infoChanged` extension. Upon receipt, Inferno will return the configured response and
-        continue automatically.
+        an `infoChanged` extension. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-63'
 
@@ -186,8 +193,10 @@ module DaVinciPASTestKit
         (valueBoolean `true`), a `certificationType` extension with code `3` (Cancel) in
         `Claim.item.extension`, and an `infoChanged` extension. All prior item and supportingInfo
         entries are expected to be retained with preserved `sequence` values, referencing the
-        immediately prior Claim update. Upon receipt, Inferno will return the configured response and
-        continue automatically.
+        immediately prior Claim update. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-63'
 
@@ -223,8 +232,10 @@ module DaVinciPASTestKit
         entire prior authorization. The update is expected to include a `certificationType` extension
         with code `3` (Cancel) in `Claim.extension`; no items are required to cancel the entire
         authorization. The update is expected to reference the immediately prior Claim update in
-        `Claim.related.claim`. Upon receipt, Inferno will return the configured response and continue
-        automatically.
+        `Claim.related.claim`. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-63'
 
