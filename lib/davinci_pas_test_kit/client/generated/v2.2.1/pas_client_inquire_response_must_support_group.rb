@@ -70,8 +70,8 @@ module DaVinciPASTestKit
            config: { options: {
              workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
              operation_tag: INQUIRE_TAG,
-             multiple_requests_ok: true,
              no_requests_ok: true,
+             multiple_requests_ok: true,
              attest_message: "I attest that the client system correctly processed the must support elements " \
                              "contained in the $inquire responses received from Inferno and did not error."
            } } do
