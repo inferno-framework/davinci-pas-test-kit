@@ -1,12 +1,12 @@
 require_relative 'pas_client_claim_update_validation_utils'
-require_relative '../../../cross_suite/pas_bundle_validation'
+require_relative '../../../cross_suite/referenced_resource_presence_validation'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
-    # spec-67 - reuses the existing PasBundleValidation reference-presence logic.
+    # spec-67 - reuses the existing reference-presence validation logic.
     class PASClientClaimUpdateReferencedResourcesTest < Inferno::Test
       include ClaimUpdateValidationUtils
-      include DaVinciPASTestKit::PasBundleValidation
+      include DaVinciPASTestKit::ReferencedResourcePresenceValidation
 
       id :pas_client_v221_claim_update_referenced_resources_test
       title 'Request Bundles updating a Claim include all resources referenced by the updated Claim'
@@ -28,9 +28,8 @@ module DaVinciPASTestKit
           # The reused reference-presence check verifies the primary Update Claim's parent reference and the
           # parent's own referenced resources, while skipping a non-primary Claim's `related` so the
           # deliberately-omitted grandparent (spec-65/66) is not flagged as missing.
-          validation_error_messages.clear
-          check_presence_of_referenced_resources(step[:claim], base_url, bundle.entry)
-          validation_error_messages.each do |message|
+          errors = check_presence_of_referenced_resources(step[:claim], base_url, bundle.entry)
+          errors.each do |message|
             add_message('error', "In the #{step[:label]} request: #{message}")
           end
         end

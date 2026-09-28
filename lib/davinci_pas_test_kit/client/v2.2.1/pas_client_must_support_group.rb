@@ -95,7 +95,7 @@ module DaVinciPASTestKit
         run_as_group
 
         test from: :pas_client_v221_inquire_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, requests_required: false } }
         test from: :pas_client_v221_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
       end

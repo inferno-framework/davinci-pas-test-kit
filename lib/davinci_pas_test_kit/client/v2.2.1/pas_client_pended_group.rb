@@ -19,7 +19,7 @@ module DaVinciPASTestKit
         request and show it can react appropriately to a 'pended' decision, including
         waiting for a full-resource notification that contains the final decision.
         In PAS v2.2.1, the notification includes all details so no follow-up `$inquire`
-        request is needed.
+        request is needed and Inferno does not currently accept them during this group.
       )
       run_as_group
 

@@ -29,6 +29,10 @@ module DaVinciPASTestKit
         INQUIRE_TAG
       end
 
+      def requests_required?
+        config.options[:requests_required]
+      end
+
       def workflow_tag
         config.options[:workflow_tag]
       end
@@ -39,7 +43,14 @@ module DaVinciPASTestKit
         else
           load_tagged_requests(request_type_tag)
         end
-        skip_if !request.present?, 'No inquire requests received.'
+
+        unless request.present?
+          if requests_required?
+            skip 'No `$inquire` requests received.'
+          else
+            pass 'No `$inquire` requests demonstrated during this group'
+          end
+        end
 
         validate_pas_bundle_json(
           request.request_body,

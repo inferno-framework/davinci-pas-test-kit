@@ -41,15 +41,15 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 1. Optionally provide a value for the **Session-specific URL path extension** input to
    specify the extra path for the dedicated session endpoint or leave blank to let
    Inferno generate a value for you. Then click the "SUBMIT" button at the bottom right.
-1. Attest to an alternate authentication approach in the wait dialog that appears and
+1. Attest to an alternate authentication approach in the "User Action Required" dialog that appears and
    then configure your client to connect to the Inferno FHIR server subsequently displayed
    and click the link continue.
 1. Select the "Approval Workflow" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
-1. Submit a PAS prior authorization request to the endpoint shown in the wait
+1. Submit a PAS prior authorization request to the endpoint shown in the "User Action Required"
    dialog that appears.
-1. When another wait dialog appears, check your system to see whether Inferno's response
+1. When another "User Action Required" dialog appears, check your system to see whether Inferno's response
    was interpreted as an approval or not and click the appropriate link in the dialog.
 1. Review the results including any errors or warnings found when checking the conformance
    of the request or the generated response.
@@ -72,7 +72,7 @@ To run the "Pended Workflow" group, first run the "Subscription Setup" group, du
 client system will submit a Subscription so that Inferno knows how and where to send a
 notification that a decision has been rendered on a pended prior authorization request.
 Once that group has been run, proceed to execute the "Pended Workflow" group and follow the
-instructions in the dialogs that appear. Inferno can
+instructions in the "User Action Required" dialogs that appear. Inferno can
 generate a [mocked pended response and a notification with the rendered decision](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic).
 
 ### Testing Must Support Elements

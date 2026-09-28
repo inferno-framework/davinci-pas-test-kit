@@ -4,12 +4,91 @@ require_relative '../parameters_helper'
 require_relative 'validation_test'
 require_relative 'pas_constants'
 require_relative 'pas_datatype_constraints'
+require_relative 'referenced_resource_presence_validation'
 
 module DaVinciPASTestKit
   module PasBundleValidation
     include DaVinciPASTestKit::ValidationTest
     include DaVinciPASTestKit::PasDatatypeConstraints
+    include DaVinciPASTestKit::ReferencedResourcePresenceValidation
     include ParametersHelper
+
+    ###########################################################################
+    # Public API
+    ###########################################################################
+
+    # collected errors
+    def validation_error_messages
+      @validation_error_messages ||= []
+    end
+
+    # entry-point used by the server tests
+    # @return [Array<String>] The validation error messages found for this bundle.
+    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
+      @validation_error_messages = []
+      target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
+      request_type = "#{operation}_#{type}"
+      if type == 'request'
+        perform_request_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type)
+      else
+        perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type, request_bundle)
+      end
+      validation_error_messages
+    end
+
+    # entry-point used by the client tests
+    def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false, message: '')
+      @validation_error_messages = []
+      assert_valid_json(json)
+      resource = FHIR.from_contents(json)
+      assert resource.present?, 'Not a FHIR resource'
+
+      # For v2.2.1 inquire responses, expect Parameters resource
+      if version == '2.2.1' && request_type == 'inquire' && bundle_type == 'response_bundle'
+        if resource.resourceType == 'Parameters'
+          # Extract and validate each Bundle in the Parameters
+          bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
+
+          bundles.each do |bundle|
+            perform_response_validation(bundle, profile_url, version, request_type)
+          end
+        elsif resource.is_a?(FHIR::Bundle)
+          # Bundle received instead of Parameters - validate it but log an error
+          validation_error_messages << 'Expected Parameters resource for v2.2.1 inquire response, but received ' \
+                                       'Bundle. The response Bundle should be wrapped in a ' \
+                                       'Parameters resource with a return parameter.'
+          perform_response_validation(resource, profile_url, version, request_type)
+        else
+          assert false,
+                 "Expected Parameters resource for v2.2.1 inquire response, but received #{resource.resourceType}"
+        end
+      else
+        # For v2.0.1 or non-inquire operations, expect Bundle resource
+        assert_resource_type(:bundle, resource: resource)
+        bundle = resource
+
+        if bundle_type == 'request_bundle'
+          perform_request_validation(bundle, profile_url, version, request_type)
+        else
+          perform_response_validation(bundle, profile_url, version, request_type)
+        end
+      end
+
+      validation_error_messages.each do |msg|
+        messages << { type: 'error', message: msg }
+      end
+      msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
+      assert validation_error_messages.blank?, msg
+    rescue Inferno::Exceptions::AssertionException => e
+      msg = "#{message} #{e.message}".strip
+      raise e.class, msg unless skips
+
+      skip msg
+    end
+
+    ###########################################################################
+    # US Core Version Constants
+    ###########################################################################
 
     US_CORE_VERSION = '6.1.0'
     US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
@@ -78,19 +157,9 @@ module DaVinciPASTestKit
       '72166-2' => 'us-core-smokingstatus'
     }.freeze
 
-    def validation_error_messages
-      @validation_error_messages ||= []
-    end
-
-    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
-      target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
-      request_type = "#{operation}_#{type}"
-      if type == 'request'
-        perform_request_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type)
-      else
-        perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type, request_bundle)
-      end
-    end
+    ###########################################################################
+    # Internal Validation Methods
+    ###########################################################################
 
     def perform_request_validation(bundle, profile_url, version, request_type)
       validate_pa_request_payload_structure(bundle, request_type)
@@ -102,53 +171,9 @@ module DaVinciPASTestKit
       validate_resources_conformance_against_profile(response_bundle, profile_url, version, request_type)
     end
 
-    def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false, message: '')
-      assert_valid_json(json)
-      resource = FHIR.from_contents(json)
-      assert resource.present?, 'Not a FHIR resource'
-
-      # For v2.2.1 inquire responses, expect Parameters resource
-      if version == '2.2.1' && request_type == 'inquire' && bundle_type == 'response_bundle'
-        if resource.resourceType == 'Parameters'
-          # Extract and validate each Bundle in the Parameters
-          bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
-
-          bundles.each do |bundle|
-            perform_response_validation(bundle, profile_url, version, request_type)
-          end
-        elsif resource.is_a?(FHIR::Bundle)
-          # Bundle received instead of Parameters - validate it but log an error
-          validation_error_messages << 'Expected Parameters resource for v2.2.1 inquire response, but received ' \
-                                       'Bundle. The response Bundle should be wrapped in a ' \
-                                       'Parameters resource with a return parameter.'
-          perform_response_validation(resource, profile_url, version, request_type)
-        else
-          assert false,
-                 "Expected Parameters resource for v2.2.1 inquire response, but received #{resource.resourceType}"
-        end
-      else
-        # For v2.0.1 or non-inquire operations, expect Bundle resource
-        assert_resource_type(:bundle, resource: resource)
-        bundle = resource
-
-        if bundle_type == 'request_bundle'
-          perform_request_validation(bundle, profile_url, version, request_type)
-        else
-          perform_response_validation(bundle, profile_url, version, request_type)
-        end
-      end
-
-      validation_error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
-      msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
-      assert validation_error_messages.blank?, msg
-    rescue Inferno::Exceptions::AssertionException => e
-      msg = "#{message} #{e.message}".strip
-      raise e.class, msg unless skips
-
-      skip msg
-    end
+    ###########################################################################
+    # Structure Validation
+    ###########################################################################
 
     # Validates the structure of a Prior Authorization (PA) request Bundle.
     #
@@ -166,7 +191,7 @@ module DaVinciPASTestKit
       first_entry = bundle_entry_resources.first
       base_url = extract_base_url(bundle.entry.first&.fullUrl)
 
-      check_presence_of_referenced_resources(first_entry, base_url, bundle.entry)
+      validation_error_messages.concat(check_presence_of_referenced_resources(first_entry, base_url, bundle.entry))
 
       if request_type == 'submit'
         unless first_entry.is_a?(FHIR::Claim)
@@ -224,7 +249,9 @@ module DaVinciPASTestKit
       end
 
       base_url = extract_base_url(pa_response_bundle.entry.last&.fullUrl)
-      check_presence_of_referenced_resources(first_entry, base_url, pa_response_bundle.entry)
+      validation_error_messages.concat(
+        check_presence_of_referenced_resources(first_entry, base_url, pa_response_bundle.entry)
+      )
 
       validate_echoed_response_resources(pa_response_bundle, pa_request_bundle)
     end
@@ -273,6 +300,10 @@ module DaVinciPASTestKit
         request_resource.id == response_resource.id &&
         request_resource.identifier == response_resource.identifier
     end
+
+    ###########################################################################
+    # Bundle entry profile validation
+    ###########################################################################
 
     # Profile conformance of Prior Authorization (PA) resources.
     #
@@ -710,29 +741,6 @@ module DaVinciPASTestKit
       bundle_map[key]
     end
 
-    def absolute_url(reference, base_url)
-      return if reference.blank?
-      return reference if base_url.blank? || reference.starts_with?('urn:uuid:') || URI(reference).absolute?
-
-      "#{base_url}/#{reference}"
-    end
-
-    # Extracts the base URL from an absolute URL by removing the resource type and ID.
-    # @param absolute_url [String] The absolute URL.
-    # @return [String] The base URL, or an empty string if the URL format is not as expected.
-    def extract_base_url(absolute_url)
-      return '' if absolute_url.blank?
-
-      uri = URI(absolute_url)
-      return '' unless uri.scheme && uri.host
-
-      # Split the path segments and remove the last two segments (resource type and id)
-      path_segments = uri.path.split('/')
-      base_path = path_segments[0...-2].join('/')
-
-      "#{uri.scheme}://#{uri.host}#{base_path}"
-    end
-
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
       {
@@ -807,75 +815,6 @@ module DaVinciPASTestKit
       string&.match?(url_regex) || string&.match?(urn_uuid_regex)
     end
 
-    # This method traverses references within a FHIR resource, ensuring that referenced resources
-    # are populated in the bundle. It also enforces that a referenced resource appears only once in the bundle,
-    # as required by the PAS IG.
-    # @param target_resource [FHIR::Model] The FHIR resource to traverse and validate.
-    # @param base_url [String] The server base url.
-    # @param resources_to_match [Array<FHIR:Bundle:Entry] The list of FHIR bundle entries to match references against.
-    # @param skip_claim_related [Boolean] When true, a Claim's `related` element is not traversed. This is set
-    #   for any Claim reached by following a reference (i.e. a non-primary Claim in a Claim Update chain), whose
-    #   own Claim.related.claim (the grandparent) is deliberately omitted from the Bundle per spec-65/66. The
-    #   primary Claim passed in by the caller keeps `skip_claim_related: false`, so its parent reference - and the
-    #   parent's own referenced resources - are still checked.
-    def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match,
-                                               skip_claim_related: false)
-      return if target_resource.blank?
-
-      if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
-        ref = target_resource.reference
-        absolute_ref = absolute_url(ref, base_url)
-        matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
-
-        if matching_resources.length != 1
-          validation_error_messages << resource_shall_appear_once_message(absolute_ref,
-                                                                          matching_resources.length)
-        end
-
-        if matching_resources.length.positive?
-          # A resource reached by following a reference is an included resource, not the primary Claim
-          # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
-          check_presence_of_referenced_resources(matching_resources.first.resource, base_url, resources_to_match,
-                                                 skip_claim_related: true)
-        end
-      else
-        target_resource.source_hash.each_key do |attr|
-          next if claim_response_request_attr?(target_resource, attr)
-          next if skip_claim_related && claim_related_attr?(target_resource, attr)
-
-          value = target_resource.send(attr.to_sym)
-          if value.is_a?(FHIR::Model)
-            check_presence_of_referenced_resources(value, base_url, resources_to_match, skip_claim_related:)
-          elsif value.is_a?(Array) && value.all?(FHIR::Model)
-            value.each do |elmt|
-              check_presence_of_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:)
-            end
-          end
-        end
-      end
-    end
-
-    # ClaimResponse.request is a back-reference to the submitted Claim. The PAS IG response bundle
-    # profile (profile-pas-response-bundle) has no required Claim entry slice, so the Claim need
-    # not be present in the response bundle. Skipping here matches the identical guard in
-    # ResponseGenerator#referenced_entities, which also skips ClaimResponse.request when
-    # building mock response bundles.
-    def claim_response_request_attr?(resource, attr)
-      attr.to_s == 'request' &&
-        resource.respond_to?(:resourceType) &&
-        resource.resourceType == 'ClaimResponse'
-    end
-
-    # Claim.related.claim points to the Claim being updated. For a non-primary Claim in a Claim Update
-    # chain (one reached by following a reference), that prior Claim is the grandparent, which spec-65/66
-    # require to be omitted from the Bundle. Used with the `skip_claim_related` flag so the generic
-    # reference-presence check does not flag the deliberately-omitted grandparent as missing.
-    def claim_related_attr?(resource, attr)
-      attr.to_s == 'related' &&
-        resource.respond_to?(:resourceType) &&
-        resource.resourceType == 'Claim'
-    end
-
     # Extracts resources from a bundle while following "next" links.
     #
     # @param bundle [FHIR::Bundle] The initial FHIR bundle to extract resources from.
@@ -906,18 +845,6 @@ module DaVinciPASTestKit
       end
 
       resources
-    end
-
-    # Generates a message for a resource that appears more than once in a bundle.
-    #
-    # @param reference_resource_type [String] The resource type being referenced.
-    # @param reference_resource_id [String] The resource ID being referenced.
-    # @param total_matches [Integer] The total number of matches found in the bundle.
-    #
-    # This method generates an error message when a referenced resource appears more than once
-    # in a FHIR bundle, which is not allowed.
-    def resource_shall_appear_once_message(absolute_ref, total_matches)
-      " The referenced #{absolute_ref} resource SHALL appear exactly once in the Bundle, but found #{total_matches}."
     end
 
     # Generates a message for a resource present in both the PA request and response bundles.
