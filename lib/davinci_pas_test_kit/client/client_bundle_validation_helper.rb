@@ -107,42 +107,58 @@ module DaVinciPASTestKit
     # Validation logic
     ###########################################################################
 
-    # find Bundles in the requests and determine which ones are non-conformant
+    # Finds Bundles in the requests and determines which ones are non-conformant.
+    #
+    # Assumes this is the only thing logging to `messages` during this run and that it's
+    # called at most once, so every message present afterward is one it logged itself.
     def non_conformant_bundles
       requests = fetch_requests
-
       check_request_count(requests, "$#{operation_name} #{message_direction_name}s")
+      requests.each_with_index { |request, index| validate_request(request, index) }
 
-      requests.flat_map.with_index do |request, index|
-        message_label = "#{message_direction_name.capitalize} #{index + 1}"
-        contents = message_contents(request)
-        message_resource = resource_from_message_contents(contents, message_label)
-        next [message_label] unless message_resource.present?
+      messages
+        .select { |message| message[:type] == 'error' }
+        .map { |message| message[:message].split(':', 2).first }
+        .uniq
+    end
 
-        # extraction varies - provided by test class if not using the default
-        bundles = bundles_from_message_resource(message_resource, message_label)
+    # Validates one request/response, extracting and checking the Bundle(s) it contains and
+    # logging any problem found along the way - this only logs, callers determine what failed
+    # from `messages` afterward (see non_conformant_bundles).
+    def validate_request(request, index)
+      message_label = entity_label("#{message_direction_name.capitalize} #{index + 1}")
+      contents = message_contents(request)
+      message_resource = resource_from_message_contents(contents, message_label)
+      return if message_resource.blank?
 
-        if bundles.length == 1
-          # use message_label
-          bundle_has_errors?(bundles.first, message_label) ? [message_label] : []
-        else
-          # use message_label with an entry added
-          bundles.flat_map.with_index do |bundle, bundle_index|
-            bundle_label = "#{message_label} Bundle #{bundle_index + 1}"
-            bundle_has_errors?(bundle, bundle_label) ? bundle_label : nil
-          end.compact
+      # extraction varies - provided by test class if not using the default
+      bundles = bundles_from_message_resource(message_resource, message_label)
+
+      if bundles.length > 1
+        bundles.each_with_index do |bundle, bundle_index|
+          bundle_label = entity_label("#{message_label.delete_suffix(':')} Bundle #{bundle_index + 1}")
+          bundle_has_errors?(bundle, bundle_label)
         end
+      else
+        bundles.each { |bundle| bundle_has_errors?(bundle, message_label) }
       end
+    end
+
+    # A label identifying one request/response, or a Bundle within one, for use as a message
+    # prefix. Always ends in ':' so a logged message's entity can be recovered by splitting on
+    # its first ':' - see non_conformant_bundles.
+    def entity_label(description)
+      "#{description}:"
     end
 
     def resource_from_message_contents(contents, label)
       unless valid_json?(contents)
-        messages << { type: 'error', message: "#{label}Invalid JSON." }
+        messages << { type: 'error', message: "#{label} Invalid JSON." }
         return nil
       end
 
       resource = FHIR.from_contents(contents)
-      messages << { type: 'error', message: "#{label}Not a FHIR resource." } unless resource.present?
+      messages << { type: 'error', message: "#{label} Not a FHIR resource." } unless resource.present?
       resource
     end
 
@@ -186,7 +202,7 @@ module DaVinciPASTestKit
 
     def bundle_has_errors?(bundle, label)
       validation_errors = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version)
-      validation_errors.each { |msg| messages << { type: 'error', message: "#{label}: #{msg}" } }
+      validation_errors.each { |msg| messages << { type: 'error', message: "#{label} #{msg}" } }
       validation_errors.present?
     end
   end
