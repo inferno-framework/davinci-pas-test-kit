@@ -1,6 +1,7 @@
 require_relative '../../../cross_suite/pas_bundle_validation'
 require_relative '../../user_input_response'
 require_relative '../../response_generator'
+require_relative '../../client_bundle_validation_helper'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -8,6 +9,7 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::PasBundleValidation
       include UserInputResponse
       include ResponseGenerator
+      include DaVinciPASTestKit::ClientBundleValidationHelper
 
       id :pas_client_v221_inquire_response_bundle_validation_test
       title '$inquire response Bundles have the correct structure and content'
@@ -35,12 +37,16 @@ module DaVinciPASTestKit
       )
       simulation_verification
 
-      def request_type
+      def operation_name
         'inquire'
       end
 
-      def workflow_tag
-        config.options[:workflow_tag]
+      def message_direction_name
+        'response'
+      end
+
+      def ig_version
+        '2.2.1'
       end
 
       def target_user_input
@@ -52,26 +58,50 @@ module DaVinciPASTestKit
         end
       end
 
-      run do
-        load_tagged_requests(workflow_tag, INQUIRE_TAG)
-        skip_if requests.empty?, 'No responses to verify because no inquire requests were made.'
-        message = if workflow_tag == MUST_SUPPORT_WORKFLOW_TAG
-                    'Invalid must support response bundle provided:'
-                  elsif user_inputted_response? target_user_input
-                    "Invalid response generated from provided input '#{input_title(target_user_input)}':"
-                  else
-                    'Invalid response generated from the submitted claim:'
-                  end
+      # v2.2.1 inquire response is a Parameters with one or more Bundles
+      def bundles_from_message_resource(message_resource, message_label)
+        case message_resource
+        when FHIR::Bundle
+          messages << { type: 'error',
+                        message: "#{message_label} expected a Parameters resource, got Bundle." }
+          [message_resource]
 
-        validate_pas_bundle_json(
-          request.response_body,
-          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle',
-          '2.2.1',
-          request_type,
-          'response_bundle',
-          skips: true,
-          message:
-        )
+        when FHIR::Parameters
+          target_parameter_name = 'return'
+          message_resource.parameter.select { |parameter| parameter.name == target_parameter_name }
+            .map.with_index do |parameter, parameter_index|
+              case parameter.resource
+              when FHIR::Bundle
+                parameter.resource
+              else
+                messages << { type: 'error',
+                              message: "#{message_label} Parameters resource '#{target_parameter_name}' " \
+                                       "entry #{parameter_index + 1} expected to " \
+                                       "contain a Bundle, got #{parameter.resource&.resourceType}" }
+                nil
+              end
+            end.compact
+        else
+          messages << { type: 'error',
+                        message: "#{message_label} expected a Parameters resource, " \
+                                 "got #{message_resource.resourceType}." }
+          []
+        end
+      end
+
+      def failed_entities_description
+        if user_inputted_response? target_user_input
+          "built from tester-provided response in '#{input_title(target_user_input)}'"
+        else
+          'generated from the submitted claim'
+        end
+      end
+
+      run do
+        failed = non_conformant_bundles
+        skip_if failed.present?,
+                "Non-conformant response Bundles #{failed_entities_description}: #{failed.join(', ')}. " \
+                'Check messages for issues found.'
       end
     end
   end

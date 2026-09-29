@@ -17,12 +17,6 @@ module DaVinciPASTestKit
     # Public API
     ###########################################################################
 
-    # collected errors
-    def validation_error_messages
-      @validation_error_messages ||= []
-    end
-
-    # entry-point used by the server tests
     # @return [Array<String>] The validation error messages found for this bundle.
     def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
       @validation_error_messages = []
@@ -36,130 +30,14 @@ module DaVinciPASTestKit
       validation_error_messages
     end
 
-    # entry-point used by the client tests
-    def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false, message: '')
-      @validation_error_messages = []
-      assert_valid_json(json)
-      resource = FHIR.from_contents(json)
-      assert resource.present?, 'Not a FHIR resource'
-
-      # For v2.2.1 inquire responses, expect Parameters resource
-      if version == '2.2.1' && request_type == 'inquire' && bundle_type == 'response_bundle'
-        if resource.resourceType == 'Parameters'
-          # Extract and validate each Bundle in the Parameters
-          bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
-
-          bundles.each do |bundle|
-            perform_response_validation(bundle, profile_url, version, request_type)
-          end
-        elsif resource.is_a?(FHIR::Bundle)
-          # Bundle received instead of Parameters - validate it but log an error
-          validation_error_messages << 'Expected Parameters resource for v2.2.1 inquire response, but received ' \
-                                       'Bundle. The response Bundle should be wrapped in a ' \
-                                       'Parameters resource with a return parameter.'
-          perform_response_validation(resource, profile_url, version, request_type)
-        else
-          assert false,
-                 "Expected Parameters resource for v2.2.1 inquire response, but received #{resource.resourceType}"
-        end
-      else
-        # For v2.0.1 or non-inquire operations, expect Bundle resource
-        assert_resource_type(:bundle, resource: resource)
-        bundle = resource
-
-        if bundle_type == 'request_bundle'
-          perform_request_validation(bundle, profile_url, version, request_type)
-        else
-          perform_response_validation(bundle, profile_url, version, request_type)
-        end
-      end
-
-      validation_error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
-      msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
-      assert validation_error_messages.blank?, msg
-    rescue Inferno::Exceptions::AssertionException => e
-      msg = "#{message} #{e.message}".strip
-      raise e.class, msg unless skips
-
-      skip msg
-    end
-
-    ###########################################################################
-    # US Core Version Constants
-    ###########################################################################
-
-    US_CORE_VERSION = '6.1.0'
-    US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
-    BASE_R4_PROFILE = :base_r4
-    CLAIM_ENCOUNTER_EXTENSION_URL = 'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter'
-    LOINC_SYSTEM = 'http://loinc.org'
-    TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
-    OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
-    DIAGNOSTIC_REPORT_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v2-0074'
-
-    US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE = {
-      'AllergyIntolerance' => 'us-core-allergyintolerance',
-      'CarePlan' => 'us-core-careplan',
-      'CareTeam' => 'us-core-careteam',
-      'Coverage' => 'us-core-coverage',
-      'Device' => 'us-core-implantable-device',
-      'DocumentReference' => 'us-core-documentreference',
-      'Encounter' => 'us-core-encounter',
-      'Goal' => 'us-core-goal',
-      'Immunization' => 'us-core-immunization',
-      'Location' => 'us-core-location',
-      'Medication' => 'us-core-medication',
-      'MedicationDispense' => 'us-core-medicationdispense',
-      'MedicationRequest' => 'us-core-medicationrequest',
-      'Organization' => 'us-core-organization',
-      'Patient' => 'us-core-patient',
-      'Practitioner' => 'us-core-practitioner',
-      'PractitionerRole' => 'us-core-practitionerrole',
-      'Procedure' => 'us-core-procedure',
-      'Provenance' => 'us-core-provenance',
-      'QuestionnaireResponse' => 'us-core-questionnaireresponse',
-      'RelatedPerson' => 'us-core-relatedperson',
-      'ServiceRequest' => 'us-core-servicerequest',
-      'Specimen' => 'us-core-specimen'
-    }.freeze
-
-    US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID = 'us-core-condition-encounter-diagnosis'
-    US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID = 'us-core-condition-problems-health-concerns'
-    US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID = 'us-core-diagnosticreport-lab'
-    US_CORE_DIAGNOSTIC_REPORT_NOTE_PROFILE_ID = 'us-core-diagnosticreport-note'
-    US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID = 'us-core-observation-clinical-result'
-    US_CORE_OBSERVATION_LAB_PROFILE_ID = 'us-core-observation-lab'
-    US_CORE_OBSERVATION_SCREENING_ASSESSMENT_PROFILE_ID = 'us-core-observation-screening-assessment'
-    US_CORE_SIMPLE_OBSERVATION_PROFILE_ID = 'us-core-simple-observation'
-    US_CORE_SMOKING_STATUS_PROFILE_ID = 'us-core-smokingstatus'
-    US_CORE_VITAL_SIGNS_PROFILE_ID = 'us-core-vital-signs'
-
-    US_CORE_OBSERVATION_CODE_PROFILE_IDS = {
-      '11341-5' => 'us-core-observation-occupation',
-      '86645-9' => 'us-core-observation-pregnancyintent',
-      '82810-3' => 'us-core-observation-pregnancystatus',
-      '76690-7' => 'us-core-observation-sexual-orientation',
-      '8289-1' => 'head-occipital-frontal-circumference-percentile',
-      '59576-9' => 'pediatric-bmi-for-age',
-      '77606-2' => 'pediatric-weight-for-height',
-      '85354-9' => 'us-core-blood-pressure',
-      '39156-5' => 'us-core-bmi',
-      '8302-2' => 'us-core-body-height',
-      '8310-5' => 'us-core-body-temperature',
-      '29463-7' => 'us-core-body-weight',
-      '9843-4' => 'us-core-head-circumference',
-      '8867-4' => 'us-core-heart-rate',
-      '59408-5' => 'us-core-pulse-oximetry',
-      '2708-6' => 'us-core-pulse-oximetry',
-      '9279-1' => 'us-core-respiratory-rate',
-      '72166-2' => 'us-core-smokingstatus'
-    }.freeze
-
     ###########################################################################
     # Internal Validation Methods
     ###########################################################################
+
+    # collected errors
+    def validation_error_messages
+      @validation_error_messages ||= []
+    end
 
     def perform_request_validation(bundle, profile_url, version, request_type)
       validate_pa_request_payload_structure(bundle, request_type)
@@ -193,7 +71,10 @@ module DaVinciPASTestKit
 
       validation_error_messages.concat(check_presence_of_referenced_resources(first_entry, base_url, bundle.entry))
 
-      if request_type == 'submit'
+      # request_type is 'submit' from client tests, or the compound 'submit_request' from
+      # perform_bundle_validation (server tests) - start_with? matches both, consistent with
+      # find_profile_url and validate_resources_conformance_against_profile below.
+      if request_type.start_with?('submit')
         unless first_entry.is_a?(FHIR::Claim)
           validation_error_messages << "[Bundle/#{bundle.id}]: The first bundle entry must be a Claim"
         end
@@ -857,5 +738,76 @@ module DaVinciPASTestKit
       "Resource #{resource.resourceType}/#{resource.id} is an entry in both the PA Request Bundle and the Response " \
         'Bundle, but they do not have the same fullUrl or identifiers'
     end
+
+    ###########################################################################
+    # US Core Version Constants
+    ###########################################################################
+
+    US_CORE_VERSION = '6.1.0'
+    US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
+    BASE_R4_PROFILE = :base_r4
+    CLAIM_ENCOUNTER_EXTENSION_URL = 'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter'
+    LOINC_SYSTEM = 'http://loinc.org'
+    TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
+    OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
+    DIAGNOSTIC_REPORT_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v2-0074'
+
+    US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE = {
+      'AllergyIntolerance' => 'us-core-allergyintolerance',
+      'CarePlan' => 'us-core-careplan',
+      'CareTeam' => 'us-core-careteam',
+      'Coverage' => 'us-core-coverage',
+      'Device' => 'us-core-implantable-device',
+      'DocumentReference' => 'us-core-documentreference',
+      'Encounter' => 'us-core-encounter',
+      'Goal' => 'us-core-goal',
+      'Immunization' => 'us-core-immunization',
+      'Location' => 'us-core-location',
+      'Medication' => 'us-core-medication',
+      'MedicationDispense' => 'us-core-medicationdispense',
+      'MedicationRequest' => 'us-core-medicationrequest',
+      'Organization' => 'us-core-organization',
+      'Patient' => 'us-core-patient',
+      'Practitioner' => 'us-core-practitioner',
+      'PractitionerRole' => 'us-core-practitionerrole',
+      'Procedure' => 'us-core-procedure',
+      'Provenance' => 'us-core-provenance',
+      'QuestionnaireResponse' => 'us-core-questionnaireresponse',
+      'RelatedPerson' => 'us-core-relatedperson',
+      'ServiceRequest' => 'us-core-servicerequest',
+      'Specimen' => 'us-core-specimen'
+    }.freeze
+
+    US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID = 'us-core-condition-encounter-diagnosis'
+    US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID = 'us-core-condition-problems-health-concerns'
+    US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID = 'us-core-diagnosticreport-lab'
+    US_CORE_DIAGNOSTIC_REPORT_NOTE_PROFILE_ID = 'us-core-diagnosticreport-note'
+    US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID = 'us-core-observation-clinical-result'
+    US_CORE_OBSERVATION_LAB_PROFILE_ID = 'us-core-observation-lab'
+    US_CORE_OBSERVATION_SCREENING_ASSESSMENT_PROFILE_ID = 'us-core-observation-screening-assessment'
+    US_CORE_SIMPLE_OBSERVATION_PROFILE_ID = 'us-core-simple-observation'
+    US_CORE_SMOKING_STATUS_PROFILE_ID = 'us-core-smokingstatus'
+    US_CORE_VITAL_SIGNS_PROFILE_ID = 'us-core-vital-signs'
+
+    US_CORE_OBSERVATION_CODE_PROFILE_IDS = {
+      '11341-5' => 'us-core-observation-occupation',
+      '86645-9' => 'us-core-observation-pregnancyintent',
+      '82810-3' => 'us-core-observation-pregnancystatus',
+      '76690-7' => 'us-core-observation-sexual-orientation',
+      '8289-1' => 'head-occipital-frontal-circumference-percentile',
+      '59576-9' => 'pediatric-bmi-for-age',
+      '77606-2' => 'pediatric-weight-for-height',
+      '85354-9' => 'us-core-blood-pressure',
+      '39156-5' => 'us-core-bmi',
+      '8302-2' => 'us-core-body-height',
+      '8310-5' => 'us-core-body-temperature',
+      '29463-7' => 'us-core-body-weight',
+      '9843-4' => 'us-core-head-circumference',
+      '8867-4' => 'us-core-heart-rate',
+      '59408-5' => 'us-core-pulse-oximetry',
+      '2708-6' => 'us-core-pulse-oximetry',
+      '9279-1' => 'us-core-respiratory-rate',
+      '72166-2' => 'us-core-smokingstatus'
+    }.freeze
   end
 end
