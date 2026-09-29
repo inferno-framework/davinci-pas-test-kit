@@ -17,9 +17,12 @@ module DaVinciPASTestKit
     # Public API
     ###########################################################################
 
-    # @return [Array<String>] The validation error messages found for this bundle.
+    # @return [Array<Hash>] The messages (of every severity) found while validating this
+    #   bundle, each a { type:, message: } hash. Callers that only care about failure should
+    #   check for a message with type: 'error' rather than just whether this is present -
+    #   see validation_messages.
     def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
-      @validation_error_messages = []
+      @validation_messages = []
       target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
       request_type = "#{operation}_#{type}"
       if type == 'request'
@@ -27,16 +30,28 @@ module DaVinciPASTestKit
       else
         perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type, request_bundle)
       end
-      validation_error_messages
+      validation_messages
     end
 
     ###########################################################################
     # Internal Validation Methods
     ###########################################################################
 
-    # collected errors
-    def validation_error_messages
-      @validation_error_messages ||= []
+    # Every message (of every severity, not just errors) collected while validating the
+    # current bundle. Passing-profile messages and per-issue profile-conformance messages
+    # (see validate_bundle_entries_against_profiles) may be warnings or info, not just
+    # errors, which is why this isn't error-only despite most entries being added via
+    # add_validation_error.
+    def validation_messages
+      @validation_messages ||= []
+    end
+
+    # Appends a plain error string to validation_messages as a { type:, message: } hash,
+    # for the many checks in this file that only ever produce errors (as opposed to
+    # validate_bundle_entries_against_profiles, which already has typed messages from the
+    # validator and concats them directly).
+    def add_validation_error(message)
+      validation_messages << { type: 'error', message: }
     end
 
     def perform_request_validation(bundle, profile_url, version, request_type)
@@ -69,14 +84,15 @@ module DaVinciPASTestKit
       first_entry = bundle_entry_resources.first
       base_url = extract_base_url(bundle.entry.first&.fullUrl)
 
-      validation_error_messages.concat(check_presence_of_referenced_resources(first_entry, base_url, bundle.entry))
+      check_presence_of_referenced_resources(first_entry, base_url, bundle.entry)
+        .each { |msg| add_validation_error(msg) }
 
       # request_type is 'submit' from client tests, or the compound 'submit_request' from
       # perform_bundle_validation (server tests) - start_with? matches both, consistent with
       # find_profile_url and validate_resources_conformance_against_profile below.
       if request_type.start_with?('submit')
         unless first_entry.is_a?(FHIR::Claim)
-          validation_error_messages << "[Bundle/#{bundle.id}]: The first bundle entry must be a Claim"
+          add_validation_error("[Bundle/#{bundle.id}]: The first bundle entry must be a Claim")
         end
 
         validate_uniqueness_of_supporting_info_sequences(first_entry)
@@ -84,7 +100,7 @@ module DaVinciPASTestKit
       else
         claim_resource = bundle_entry_resources.find { |resource| resource.resourceType == 'Claim' }
         if claim_resource.blank?
-          validation_error_messages << "[Bundle/#{bundle.id}]: Claim must be present for inquiry request"
+          add_validation_error("[Bundle/#{bundle.id}]: Claim must be present for inquiry request")
         end
 
         # The inquiry operation must contain a requesting provider organization,
@@ -94,16 +110,15 @@ module DaVinciPASTestKit
         payer_reference = claim_resource&.insurer&.reference
 
         if patient_reference.blank?
-          validation_error_messages <<
-            "[Bundle/#{bundle.id}]: The Claim for inquiry operation must reference a patient."
+          add_validation_error("[Bundle/#{bundle.id}]: The Claim for inquiry operation must reference a patient.")
         end
         if provider_reference.blank?
-          validation_error_messages << "[Bundle/#{bundle.id}]: The claim for inquiry operation must reference " \
-                                       'a requesting provider organization.'
+          add_validation_error("[Bundle/#{bundle.id}]: The claim for inquiry operation must reference " \
+                               'a requesting provider organization.')
         end
         if payer_reference.blank?
-          validation_error_messages << "[Bundle/#{bundle.id}]: The Claim for inquiry operation must contain " \
-                                       'a payer organization.'
+          add_validation_error("[Bundle/#{bundle.id}]: The Claim for inquiry operation must contain " \
+                               'a payer organization.')
         end
       end
     end
@@ -125,14 +140,12 @@ module DaVinciPASTestKit
     def validate_pa_response_body_structure(pa_response_bundle, pa_request_bundle)
       first_entry = pa_response_bundle.entry.first&.resource
       unless first_entry.is_a?(FHIR::ClaimResponse)
-        validation_error_messages <<
-          "[Bundle/#{pa_response_bundle.id}]: The first bundle entry must be a ClaimResponse"
+        add_validation_error("[Bundle/#{pa_response_bundle.id}]: The first bundle entry must be a ClaimResponse")
       end
 
       base_url = extract_base_url(pa_response_bundle.entry.last&.fullUrl)
-      validation_error_messages.concat(
-        check_presence_of_referenced_resources(first_entry, base_url, pa_response_bundle.entry)
-      )
+      check_presence_of_referenced_resources(first_entry, base_url, pa_response_bundle.entry)
+        .each { |msg| add_validation_error(msg) }
 
       validate_echoed_response_resources(pa_response_bundle, pa_request_bundle)
     end
@@ -154,10 +167,10 @@ module DaVinciPASTestKit
 
         next if echoed_resource_identifiers_match?(request_entry, response_entry)
 
-        validation_error_messages << resource_present_in_pa_request_and_response_msg(response_resource)
+        add_validation_error(resource_present_in_pa_request_and_response_msg(response_resource))
       end
     rescue StandardError
-      validation_error_messages << 'Unable to compare PAS request and response Bundle resources for echoed identifiers.'
+      add_validation_error('Unable to compare PAS request and response Bundle resources for echoed identifiers.')
     end
 
     def echoed_resource?(request_entry, response_entry)
@@ -245,7 +258,10 @@ module DaVinciPASTestKit
     # Validates bundle resource and each entry in the bundle against its target profiles.
     # Validation messages are collected per profile rather than logged directly, so a
     # resource with multiple candidate profiles only reports errors when it fails all of
-    # them. When a profile passes, only that profile's (non-error) messages are logged.
+    # them. When a profile passes, only that profile's (non-error) messages are kept. Either
+    # way, messages go into validation_messages rather than straight to the runnable's
+    # `messages` - see perform_bundle_validation - so callers see every message this method
+    # finds, not just the summary line for a resource that conformed to nothing.
     # @param version [String] The version of the IG.
     def validate_bundle_entries_against_profiles(version)
       bundle_resources_target_profile_map.each do |key, item|
@@ -268,10 +284,10 @@ module DaVinciPASTestKit
         end
 
         if success_profile
-          messages.concat(messages_by_profile[success_profile])
+          validation_messages.concat(messages_by_profile[success_profile])
         else
-          messages_by_profile.each_value { |profile_messages| messages.concat(profile_messages) }
-          validation_error_messages << generate_non_conformance_message(item)
+          messages_by_profile.each_value { |profile_messages| validation_messages.concat(profile_messages) }
+          add_validation_error(generate_non_conformance_message(item))
         end
       end
     end
@@ -674,15 +690,15 @@ module DaVinciPASTestKit
       is_unique = sequences.uniq.length == sequences.length
       return if is_unique
 
-      validation_error_messages << "[Claim/#{claim.id}]: The sequence element for each supportingInfo entry SHALL be " \
-                                   'unique within the Claim.'
+      add_validation_error("[Claim/#{claim.id}]: The sequence element for each supportingInfo entry SHALL be " \
+                           'unique within the Claim.')
     end
 
     def validate_bundle_entries_full_url(bundle)
       msg = "[Bundle/#{bundle.id}]: Bundle.entry.fullUrl values SHALL be a valid url or in the form " \
             "'urn:uuid:[some guid]'."
       bundle.entry.each do |entry|
-        validation_error_messages << msg unless valid_url_or_urn_uuid?(entry.fullUrl)
+        add_validation_error(msg) unless valid_url_or_urn_uuid?(entry.fullUrl)
       end
     end
 

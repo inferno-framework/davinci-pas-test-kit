@@ -28,11 +28,9 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
           bundle = FHIR.from_contents(pa_request_payload)
           assert_resource_type(:bundle, resource: bundle)
           validate_pa_request_payload_structure(bundle, 'submit')
-          validation_error_messages.each do |msg|
-            messages << { type: 'error', message: msg }
-          end
+          messages.concat(validation_messages)
           msg = 'Bundle(s) provided and/or entry resources are not conformant. Check messages for issues found.'
-          skip_if validation_error_messages.present?, msg
+          skip_if validation_messages.present?, msg
         end
       end
     end
@@ -138,11 +136,9 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         run do
           fhir_response = FHIR.from_contents(response_body)
           validate_pa_response_body_structure(fhir_response, request_bundle)
-          validation_error_messages.each do |msg|
-            messages << { type: 'error', message: msg }
-          end
+          messages.concat(validation_messages)
           msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
-          assert validation_error_messages.blank?, msg
+          assert validation_messages.blank?, msg
         end
       end
     end
@@ -390,7 +386,8 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     it 'flags an echoed request resource with a different fullUrl' do
       test_instance.perform_bundle_validation(response_bundle, 'submit', 'response', 'v2.2.1', request_bundle)
 
-      expect(test_instance.validation_error_messages.join).to include('do not have the same fullUrl or identifiers')
+      expect(test_instance.validation_messages.map { |m| m[:message] }.join)
+        .to include('do not have the same fullUrl or identifiers')
     end
   end
 
@@ -884,7 +881,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       expect(test_instance).to have_received(:resource_is_valid?)
         .with(resource: nutrition_order, profile_url: nil, add_messages_to_runnable: false,
               validator_response_details: anything)
-      expect(test_instance.validation_error_messages).to be_empty
+      expect(test_instance.validation_messages).to be_empty
     end
 
     it 'applies IG-specific versions only when needed for validation' do
@@ -1109,7 +1106,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
       expect(test_instance.messages).to be_empty
-      expect(test_instance.validation_error_messages).to be_empty
+      expect(test_instance.validation_messages).to be_empty
     end
 
     it 'logs non-error messages from the passing profile' do
@@ -1120,10 +1117,12 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
-      expect(test_instance.messages).to contain_exactly(
+      # Messages go into validation_messages, not straight to the runnable's `messages` - see
+      # perform_bundle_validation - so callers get every message, not just a summary line.
+      expect(test_instance.messages).to be_empty
+      expect(test_instance.validation_messages).to contain_exactly(
         { type: 'warning', message: include('unresolvable value set') }
       )
-      expect(test_instance.validation_error_messages).to be_empty
     end
 
     it 'logs messages for every candidate profile when all profiles fail' do
@@ -1136,10 +1135,11 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
-      expect(test_instance.messages.map { |message| message[:message] })
-        .to contain_exactly(include('profile a failure'), include('profile b failure'))
-      expect(test_instance.validation_error_messages.join)
-        .to include('not conformant to any of the target profiles')
+      expect(test_instance.messages).to be_empty
+      expect(test_instance.validation_messages.map { |message| message[:message] }).to contain_exactly(
+        include('profile a failure'), include('profile b failure'),
+        include('not conformant to any of the target profiles')
+      )
     end
 
     it 'stops validating once a profile passes' do
@@ -1161,7 +1161,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
       expect(test_instance.messages).to be_empty
-      expect(test_instance.validation_error_messages).to be_empty
+      expect(test_instance.validation_messages).to be_empty
     end
 
     context 'with PAS datatype constraints' do
@@ -1179,11 +1179,10 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
-        expect(test_instance.messages).to contain_exactly(
-          { type: 'error', message: include('prof-1') }
+        expect(test_instance.messages).to be_empty
+        expect(test_instance.validation_messages.map { |message| message[:message] }).to contain_exactly(
+          include('prof-1'), include('not conformant to any of the target profiles')
         )
-        expect(test_instance.validation_error_messages.join)
-          .to include('not conformant to any of the target profiles')
       end
 
       it 'does not apply datatype constraints for v2.0.1' do
@@ -1193,7 +1192,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         test_instance.validate_bundle_entries_against_profiles('2.0.1')
 
         expect(test_instance.messages).to be_empty
-        expect(test_instance.validation_error_messages).to be_empty
+        expect(test_instance.validation_messages).to be_empty
       end
     end
   end

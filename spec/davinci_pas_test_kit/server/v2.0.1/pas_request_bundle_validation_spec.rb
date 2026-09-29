@@ -67,7 +67,7 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
 
   it 'skips if validation errors found' do
     allow_any_instance_of(test).to receive(:perform_bundle_validation)
-      .and_return(['this is an error', 'this is another error'])
+      .and_return([{ type: 'error', message: 'this is an error' }, { type: 'error', message: 'this is another error' }])
 
     result = run(test, bundle_payload: pa_request_valid_bundle)
     expect(result.result).to eq('skip')

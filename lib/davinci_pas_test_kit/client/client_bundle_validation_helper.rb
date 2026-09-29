@@ -201,9 +201,9 @@ module DaVinciPASTestKit
     end
 
     def bundle_has_errors?(bundle, label)
-      validation_errors = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version)
-      validation_errors.each { |msg| messages << { type: 'error', message: "#{label} #{msg}" } }
-      validation_errors.present?
+      bundle_messages = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version)
+      bundle_messages.each { |m| messages << { type: m[:type], message: "#{label} #{m[:message]}" } }
+      bundle_messages.any? { |m| m[:type] == 'error' }
     end
   end
 end

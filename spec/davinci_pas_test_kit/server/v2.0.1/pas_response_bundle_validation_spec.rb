@@ -88,7 +88,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
 
   it 'fails if validation errors found' do
     allow_any_instance_of(test).to receive(:perform_bundle_validation)
-      .and_return(['this is an error', 'this is another error'])
+      .and_return([{ type: 'error', message: 'this is an error' }, { type: 'error', message: 'this is another error' }])
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
 

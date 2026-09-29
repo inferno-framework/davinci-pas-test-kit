@@ -65,7 +65,7 @@ module DaVinciPASTestKit
       assert bundles_to_verify.present?,
              "No successful $#{operation} requests made during the #{use_case.titleize} workflow tests."
 
-      errors = bundles_to_verify.flat_map do |bundle, request_bundle|
+      bundle_messages = bundles_to_verify.flat_map do |bundle, request_bundle|
         perform_bundle_validation(
           bundle,
           operation,
@@ -75,10 +75,8 @@ module DaVinciPASTestKit
         )
       end
 
-      errors.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
-      assert errors.blank?,
+      messages.concat(bundle_messages)
+      assert bundle_messages.none? { |message| message[:type] == 'error' },
              'Bundle response(s) returned are not conformant. Check messages for issues found.'
     end
   end

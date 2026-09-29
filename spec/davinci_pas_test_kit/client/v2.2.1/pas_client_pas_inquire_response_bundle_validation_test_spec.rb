@@ -29,7 +29,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientInquireResponseBundle
     # on, so a stubbed Bundle can still fail in a way perform_bundle_validation reports.
     allow_any_instance_of(test).to receive(:validate_resources_conformance_against_profile) do |instance, bundle, *|
       first_type = bundle.entry&.first&.resource.try(:resourceType)
-      instance.validation_error_messages << 'Stubbed non-conformance error' unless first_type == 'ClaimResponse'
+      unless first_type == 'ClaimResponse'
+        instance.validation_messages << { type: 'error', message: 'Stubbed non-conformance error' }
+      end
     end
   end
 

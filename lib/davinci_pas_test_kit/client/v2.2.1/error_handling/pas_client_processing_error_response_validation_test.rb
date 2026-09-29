@@ -34,17 +34,21 @@ module DaVinciPASTestKit
         response_body = request.response_body
         skip_if response_body.blank?, 'The Processing Error response body is empty.'
 
-        validate_pas_bundle_json(
-          response_body,
-          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle',
-          '2.2.1',
-          'submit',
-          'response_bundle',
-          skips: true,
-          message: "Invalid processing error response bundle provided in 'Processing Error Response Bundle JSON' input:"
-        )
+        message = "Invalid processing error response bundle provided in 'Processing Error Response Bundle JSON' input:"
+        begin
+          JSON.parse(response_body)
+        rescue JSON::ParserError, TypeError
+          skip "#{message} Invalid JSON.".strip
+        end
 
         bundle = FHIR.from_contents(response_body)
+        skip_if !bundle.is_a?(FHIR::Bundle),
+                "#{message} Unexpected resource type: expected Bundle, but received #{bundle&.resourceType}.".strip
+
+        messages.concat(perform_bundle_validation(bundle, 'submit', 'response', '2.2.1'))
+        skip_if error_messages?,
+                "#{message} Bundle and/or entry resources are not conformant. Check messages for issues found.".strip
+
         claim_response = bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }&.resource
         skip_if claim_response&.error.blank?,
                 'The ClaimResponse in the Processing Error response bundle contains no error entries. ' \

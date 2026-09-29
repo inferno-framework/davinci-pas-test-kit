@@ -44,7 +44,7 @@ module DaVinciPASTestKit
 
       assert bundles_to_verify.present?, 'Provided input is not a Bundle or list of Bundles.'
 
-      errors = bundles_to_verify.flat_map do |bundle|
+      bundle_messages = bundles_to_verify.flat_map do |bundle|
         perform_bundle_validation(
           bundle,
           operation,
@@ -53,11 +53,9 @@ module DaVinciPASTestKit
         )
       end
 
-      errors.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
+      messages.concat(bundle_messages)
 
-      skip_if errors.present?,
+      skip_if bundle_messages.any? { |message| message[:type] == 'error' },
               'Bundle(s) provided are not conformant. Check messages for issues found.'
     end
   end

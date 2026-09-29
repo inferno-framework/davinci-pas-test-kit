@@ -1,6 +1,5 @@
 require_relative '../../../cross_suite/pas_bundle_validation'
 require_relative '../../user_input_response'
-require_relative '../../response_generator'
 require_relative '../../client_bundle_validation_helper'
 
 module DaVinciPASTestKit
@@ -8,7 +7,6 @@ module DaVinciPASTestKit
     class PasClientResponseBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
       include UserInputResponse
-      include ResponseGenerator
       include DaVinciPASTestKit::ClientBundleValidationHelper
 
       id :pas_client_v201_response_bundle_validation_test
