@@ -66,8 +66,12 @@ module DaVinciPASTestKit
           "#{requests.length} #{description} were tagged for validation by this test, which does not expect " \
           'more than one.'
         )
-      elsif requests.empty? && !no_requests_ok?
-        skip "No #{description} received."
+      elsif requests.empty?
+        if no_requests_ok?
+          pass "No #{description} analyzed."
+        else
+          skip "No #{description} received."
+        end
       end
     end
 
