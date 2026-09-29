@@ -103,10 +103,44 @@ module DaVinciPASTestKit
           During this group, Inferno will wait while the tester uses the client system to
           make `$submit` and `$inquire` operation requests to Inferno demonstrating coverage
           of must support elements not yet demonstrated.
+
+          Inferno then asks for confirmation that all responses were handled
+          without error and verifies the conformance of all requests and responses.
         )
         run_as_group
 
         test from: :pas_client_v221_gather_must_support
+        test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_response_attest_ms_submit_inquire,
+             title: 'PAS client handled the $submit and $inquire responses without erroring',
+             description: %(
+               During this test, the tester will verify that the client handled
+               the `$submit` and `$inquire` operation responses, making the result available to
+               the user without failing or erroring.
+             ),
+             config: { options: {
+               workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+               no_requests_ok: true,
+               multiple_requests_ok: true,
+               attest_message: 'I attest that the client system correctly handled the `$submit` and `$inquire` ' \
+                               'operation responses received from Inferno during this test, making the details ' \
+                               'available to users without errors.'
+             } } do
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+        end
+
+        test from: :pas_client_v221_request_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v221_response_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v221_inquire_request_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v221_inquire_response_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
       end
 
       # $submit Request Must Support (fail when errors detected)
@@ -120,42 +154,6 @@ module DaVinciPASTestKit
 
       # $inquire Response Must Support (skip when errors detected)
       group from: :pas_client_v221_inquire_response_must_support
-
-      # $submit Bundle Conformance Validation
-      group do
-        title '$submit Bundle Conformance'
-        description %(
-          During this group, Inferno will verify that the `$submit` request bundles sent by
-          the client are conformant and that the $submit response bundles provided for Inferno
-          to send back are conformant.
-        )
-        run_as_group
-
-        test from: :pas_client_v221_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
-                                  multiple_requests_ok: true } }
-        test from: :pas_client_v221_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
-                                  multiple_requests_ok: true } }
-      end
-
-      # $inquire Bundle Conformance Validation
-      group do
-        title '$inquire Bundle Conformance'
-        description %(
-          During this group, Inferno will verify that the `$inquire` request bundles sent by
-          the client are conformant and that the $inquire response bundles provided for Inferno
-          to send back are conformant.
-        )
-        run_as_group
-
-        test from: :pas_client_v221_inquire_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
-                                  multiple_requests_ok: true } }
-        test from: :pas_client_v221_inquire_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
-                                  multiple_requests_ok: true } }
-      end
     end
   end
 end

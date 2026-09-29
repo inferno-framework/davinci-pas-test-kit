@@ -73,23 +73,6 @@ module DaVinciPASTestKit
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
         simulation_verification
       end
-      test from: :pas_client_v201_response_attest,
-           title: 'PAS client handled the $submit response must support elements',
-           description: %(
-             This test provides the tester an opportunity to verify that their client
-             correctly processed and used the must support elements present in the
-             $submit responses received from Inferno during these tests.
-           ),
-           config: { options: {
-             workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
-             operation_tag: SUBMIT_TAG,
-             no_requests_ok: true,
-             multiple_requests_ok: true,
-             attest_message: "I attest that the client system correctly processed the must support elements " \
-                             "contained in the $submit responses received from Inferno and did not error."
-           } } do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
-      end
     end
   end
 end

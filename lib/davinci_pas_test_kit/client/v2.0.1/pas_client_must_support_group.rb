@@ -58,6 +58,22 @@ module DaVinciPASTestKit
         run_as_group
 
         test from: :pas_client_v201_gather_must_support
+        test from: :pas_client_v201_response_attest,
+             id: :pas_client_v201_response_attest_ms_submit_inquire,
+             title: 'PAS client handled the $submit and $inquire responses without erroring',
+             description: %(
+               During this test, the tester will verify that the client handled
+               the `$submit` and `$inquire` operation responses, making the result available to
+               the user without failing or erroring.
+             ),
+             config: { options: {
+               workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+               no_requests_ok: true,
+               multiple_requests_ok: true,
+               attest_message: 'I attest that the client system correctly handled the `$submit` and `$inquire` ' \
+                               'operation responses received from Inferno during this test, making the details ' \
+                               'available to users without errors.'
+             } }
       end
 
       # $submit Bundle Conformance Validation
