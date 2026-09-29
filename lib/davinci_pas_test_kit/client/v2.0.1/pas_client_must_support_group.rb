@@ -37,6 +37,15 @@ module DaVinciPASTestKit
         count.
       )
 
+      # The must support response inputs already belong to pas_client_v201_gather_must_support
+      # (the wait test below); declaring them here too, before it and the Bundle Conformance
+      # groups further down are defined, propagates them onto the bundle validation test slots
+      # in those groups as well, so they can tell whether a tester-provided response was used
+      # - see PasClientResponseBundleValidationTest/PasClientInquireResponseBundleValidationTest
+      # #failed_entities_description.
+      input :ms_submit_responses, optional: true
+      input :ms_inquire_responses, optional: true
+
       # Combined receive group - single wait test for both submit and inquire
       group do
         id :pas_client_v201_must_support_receive
@@ -62,9 +71,9 @@ module DaVinciPASTestKit
         run_as_group
 
         test from: :pas_client_v201_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
         test from: :pas_client_v201_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
       end
 
       # $submit Request Must Support (fail when errors detected)
@@ -84,9 +93,9 @@ module DaVinciPASTestKit
         run_as_group
 
         test from: :pas_client_v201_inquire_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
         test from: :pas_client_v201_inquire_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
       end
 
       # $inquire Request Must Support (fail when errors detected)

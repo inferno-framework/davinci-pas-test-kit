@@ -8,7 +8,7 @@ module DaVinciPASTestKit
     include UserInputResponse
 
     id :pas_client_gather_must_support
-    title 'PAS client submits Claims using the `$submit` and `$inquire` operations to demonstrate coverage of must ' \
+    title 'PAS client submits Claims using the $submit and $inquire operations to demonstrate coverage of must ' \
           'support elements'
     description %(
       During this test, Inferno will wait while the tester uses the client system to make `$submit`

@@ -16,10 +16,9 @@ module DaVinciPASTestKit
       title '$submit Response Must Support Coverage'
       description %(
         Check that `$submit` responses provided to the client contain
-        all PAS-defined profiles and their must support elements.
-        
-        **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
-        not the system under test. Errors will be treated as skips instead of failures.
+        all PAS-defined profiles and their must support elements. Demonstration
+        of the PAS ClaimResponse profile is strictly required while all others
+        are optional.
         
         For `$submit` responses, this includes the following profiles:
         
@@ -40,30 +39,39 @@ module DaVinciPASTestKit
 
       test from: :pas_client_v201_submit_response_must_support_pas_response_bundle do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_claimresponse do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_communication_request do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_insurer do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_requestor do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_beneficiary do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_practitioner do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_practitioner_role do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_submit_response_must_support_task do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_response_attest,
            title: 'PAS client handled the $submit response must support elements',
