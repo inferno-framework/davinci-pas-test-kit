@@ -8,7 +8,7 @@ The Da Vinci PAS Test Kit is designed to validate the conformance of healthcare 
 the HL7 FHIR Da Vinci Prior Authorization Support (PAS) Implementation Guide (IG) and includes suites
 for both [v2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/) and [v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/)
 of the specification. It helps implementers ensure their systems can correctly participate in electronic
-prior authorization workflows as defined by the PAS IG.
+prior authorization scenarios as defined by the PAS IG.
 
 The test kit is built using the [Inferno Framework](https://inferno-framework.github.io/), an open-source platform for building FHIR-based test kits.
 
@@ -23,7 +23,7 @@ The PAS Test Kit includes two main test suites:
 
 The test kit validates systems through:
 
-1. **Workflow Simulation**: Tests guide the system through key PAS workflows including:
+1. **Scenario Simulation**: Tests guide the system through key PAS scenarios including:
    * Prior authorization request submission and response handling
    * Approval, denial, and pended decision flows
    * Error condition handling
@@ -43,7 +43,7 @@ The test kit validates systems through:
 This test kit is a **DRAFT**. While it covers core aspects of the PAS IG, there are known limitations.
 
 The test kit currently focuses on validating core end-to-end prior authorization
-workflows, including the submission and handling of responses for prior
+scenarios, including the submission and handling of responses for prior
 authorization requests (approval, denial, pended) and claim updates. It also covers FHIR profile
 conformance, validation of must-support elements as defined in PAS IG profiles,
 basic subscription mechanics for pended request notifications, and core
@@ -52,7 +52,7 @@ authentication flows like SMART Backend Services and UDAP B2B.
 Several areas are generally considered out of scope for automated testing. This
 includes the proprietary details of X12 transactions, such as X12-based
 terminology validation and X12-based
-matching logic. Additionally, not all workflows and requirements are covered
+matching logic. Additionally, not all scenarios and requirements are covered
 by all suites in this test kit.
 
 For a details on specific specific limitations, detailed requirements, and known

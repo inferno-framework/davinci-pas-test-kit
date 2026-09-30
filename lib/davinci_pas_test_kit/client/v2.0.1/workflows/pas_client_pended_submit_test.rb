@@ -95,9 +95,9 @@ module DaVinciPASTestKit
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
         skip_if requests.empty?, # NOTE: subscription needed ahead of time to support notification generation
                 %(
-                  Pended workflow tests cannot proceed because no Subscription exists to receive notifications
+                  Pended scenario tests cannot proceed because no Subscription exists to receive notifications
                   for pended claims. Run the _PAS Subscription Setup_ tests to provide a Subscription for use
-                  in delivering notifications before re-running the pended workflow tests.
+                  in delivering notifications before re-running the pended scenario tests.
                 )
 
         if user_inputted_response? :pended_json_response
@@ -142,7 +142,7 @@ module DaVinciPASTestKit
           identifier: wait_identifier,
           timeout: 600,
           message: %(
-            **Pended Workflow Test**:
+            **Pended Scenario Test**:
 
             1. Submit a PAS request to
 

@@ -33,29 +33,29 @@ dedicated hostname.
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   A "User Action Required" dialog will appear indicating that the tests are waiting for Subscription interactions from the server, including a handshake notification based on the submitted Subscription. These
     requests will be sent by the client suite.
-    *   In the client suite session, check that the "User Action Required" asking for a Subscription Creation request has been replaced by a new one asking for an PAS request for an approval workflow. Once the new
-    dialog appears, return to the server suite session (approval workflow requests will occur in the next step).
+    *   In the client suite session, check that the "User Action Required" asking for a Subscription Creation request has been replaced by a new one asking for an PAS request for an approval scenario. Once the new
+    dialog appears, return to the server suite session (approval scenario requests will occur in the next step).
     *   The client suite has sent all expected notifications, so in the server suite session click the link to indicate that all requests have been sent, which will complete the test run.
-5.  **Approval Workflow Execution**:
-    *   In the server suite session, select the "**2.1** Successful Approval Workflow" group from the sidebar (typically found on the left side).
+5.  **Approval Scenario Execution**:
+    *   In the server suite session, select the "**2.1** Successful Approval Scenario" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
     *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved. Click the statement indicating that it was.
-    *   A new "User Action Required" dialog will appear asking for an PAS request for a denial workflow. These will be sent by the server tests in the next step.
-6.  **Denial Workflow Execution**:
-    *   In the server suite session, select the "**2.2** Successful Denial Workflow" group from the sidebar (typically found on the left side).
+    *   A new "User Action Required" dialog will appear asking for an PAS request for a denial scenario. These will be sent by the server tests in the next step.
+6.  **Denial Scenario Execution**:
+    *   In the server suite session, select the "**2.2** Successful Denial Scenario" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
     *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was denied. Click the statement indicating that it was.
-    *   A new "User Action Required" dialog will appear asking for an PAS request for a pended workflow. These will be sent by the server tests in the next step.
-7.  **Pended Workflow Execution**:
-    *   In the server suite session, select the "**2.3** Successful Pended Workflow" group from the sidebar (typically found on the left side).
+    *   A new "User Action Required" dialog will appear asking for an PAS request for a pended scenario. These will be sent by the server tests in the next step.
+7.  **Pended Scenario Execution**:
+    *   In the server suite session, select the "**2.3** Successful Pended Scenario" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response. A "User Action Required" dialog will appear indicating that the server suite session is waiting for a Subscription notification indicating that the pended claim has been finalized. 5-10 seconds later, the client suite session will send the notification and the server suite test run will complete automatically.
-    *   Once the server suite tests have completed, return to the client suite session and click the link in the current "User Action Dialog" to indicate that the workflow has completed.
+    *   Once the server suite tests have completed, return to the client suite session and click the link in the current "User Action Dialog" to indicate that the scenario has completed.
     *   A second "User Action Required" dialog will appear asking for an attestation that the client system initially indicated that the submitted prior authorization request was pended. Click the statement indicating that it was.
     *   A third "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved once the notification was received. Click the statement indicating that it was.
     *   A fourth "User Action Required" dialog will appear asking for additional PAS requests to be made to evaluate must support element coverage. These will be sent by the server tests in the next step.
@@ -110,25 +110,25 @@ in progress, so some tests do not fully align yet.
     requests will be sent by the client suite.
     *   In the client suite session, check that the "User Action Required" asking for a Subscription Creation request has disappeared and the tests have completed.
     *   The client suite has sent all expected notifications, so in the server suite session click the link to indicate that all requests have been sent, which will complete the test run.
-5.  **Approval Workflow Execution**:
-    *   In the client session, select the "**11.1** Approval Workflow" group from the sidebar (typically found on the left side).
+5.  **Approval Scenario Execution**:
+    *   In the client session, select the "**11.1** Approval Response" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
     *   Return to the server suite test session.
-    *   In the server suite session, select the "**2.1** Successful Approval Workflow" group from the sidebar (typically found on the left side).
+    *   In the server suite session, select the "**2.1** Successful Approval Scenario" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
     *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved. Click the statement indicating that it was to complete the tests.
-6.  **Denial Workflow Execution**: Repeat the same steps as in 5. for client group "**11.2** Denial Workflow" and server group "**2.2** Successful Denial Workflow".
-7.  **Pended Workflow Execution**:
-    *   In the client session, select the "**11.3** Pended Workflow" group from the sidebar (typically found on the left side).
+6.  **Denial Scenario Execution**: Repeat the same steps as in 5. for client group "**11.2** Denial Response" and server group "**2.2** Successful Denial Scenario".
+7.  **Pended Scenario Execution**:
+    *   In the client session, select the "**11.3** Pended Response" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
     *   Return to the server suite test session.
-    *   In the server suite session, select the "**2.3** Successful Pended Workflow" group from the sidebar (typically found on the left side).
+    *   In the server suite session, select the "**2.3** Successful Pended Scenario" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and then wait for a notification to be sent by the client suite. Wait for the server tests to complete.

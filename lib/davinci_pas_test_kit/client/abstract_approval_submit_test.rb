@@ -23,7 +23,7 @@ module DaVinciPASTestKit
           title: 'Claim approved response JSON',
           type: 'textarea',
           optional: true,
-          description: DaVinciPASTestKit.user_response_input_description('$submit', 'approved', 'Approval Workflow')
+          description: DaVinciPASTestKit.user_response_input_description('$submit', 'approved', 'Approval Scenario')
     input :client_id,
           title: 'Client Id',
           type: 'text',
@@ -57,7 +57,7 @@ module DaVinciPASTestKit
       wait(
         identifier: wait_identifier,
         message: <<~MESSAGE
-          **Approval Workflow Test**:
+          **Approval Scenario Test**:
 
           Inferno will wait while the tester uses the client system to submit a PAS request to
           Inferno. The tests will automatically continue once a request has been received.

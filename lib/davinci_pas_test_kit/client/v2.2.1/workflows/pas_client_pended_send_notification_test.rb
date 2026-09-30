@@ -40,7 +40,7 @@ module DaVinciPASTestKit
             title: 'Claim pended response JSON',
             type: 'textarea',
             optional: true,
-            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Workflow')
+            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Response')
       input :client_endpoint_access_token,
             optional: true,
             title: 'Client Notification Access Token',
@@ -57,14 +57,14 @@ module DaVinciPASTestKit
                 %(
                   No Subscription exists to receive the notification. Run the _PAS Subscription Setup_ tests to
                   provide a Subscription for use in delivering notifications before re-running the pended
-                  workflow tests.
+                  scenario tests.
                 )
         @subscription_json = JSON.parse(subscription_request.response_body)
 
         pended_submit_requests = load_tagged_requests(SUBMIT_TAG, PENDED_WORKFLOW_TAG)
         @pended_submit_request = pended_submit_requests.select { |req| req.status == 200 }.max_by(&:index)
         skip_if @pended_submit_request.blank?,
-                'The client made no successful $submit request during the pended workflow, so there is no pended ' \
+                'The client made no successful $submit request during the pended scenario, so there is no pended ' \
                 'response to send a notification about.'
 
         if notification_bundle.present?
@@ -83,7 +83,7 @@ module DaVinciPASTestKit
           identifier: test_session_id,
           timeout: 300,
           message: <<~MESSAGE
-            **Pended Workflow Test**:
+            **Pended Scenario Test**:
 
             Inferno will shortly send a full-resource notification to the endpoint specified in the client's
             Subscription to tell it that a final decision has been made on the pended prior authorization

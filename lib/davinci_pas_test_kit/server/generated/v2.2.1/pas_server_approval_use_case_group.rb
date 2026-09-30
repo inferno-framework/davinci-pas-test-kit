@@ -8,7 +8,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASServerApprovalUseCaseGroup < Inferno::TestGroup
       id :pas_server_v221_approval_use_case
-      title 'Successful Approval Workflow'
+      title 'Successful Approval Scenario'
       description %(
         Demonstrate the ability of the server to respond to a prior
         authorization request with an `approved` decision.

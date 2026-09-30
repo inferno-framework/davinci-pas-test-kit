@@ -55,7 +55,7 @@ module DaVinciPASTestKit
     def run_operation_test(request_payload)
       skip_if request_payload.blank?, "No bundle request provided to perform the #{operation} operation"
       assert_valid_json(request_payload,
-                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} workflow.")
+                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} scenario.")
 
       requests_performed = request_bundles(request_payload).map do |bundle|
         perform_operation(bundle)

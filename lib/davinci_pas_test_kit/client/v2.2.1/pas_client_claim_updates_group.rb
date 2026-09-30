@@ -67,6 +67,23 @@ module DaVinciPASTestKit
         )
 
         claim_update_submit_steps.each { |step| test from: step[:submit] }
+        test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_response_attest_updates,
+             title: 'PAS client handled the $submit responses without erroring',
+             description: %(
+               During this test, the tester will verify that the client handled
+               the `$submit` operation responses received during the update
+               sequence, making the result available to the user without failing
+               or erroring.
+             ),
+             config: { options: {
+               workflow_tag: [CLAIM_UPDATE_INITIAL_TAG, CLAIM_UPDATE_ADD_ITEM_TAG,
+                              CLAIM_UPDATE_MODIFY_CANCEL_TAG, CLAIM_UPDATE_CANCEL_ALL_TAG],
+               multiple_requests_ok: true,
+               attest_message: 'I attest that the client system correctly handled the `$submit` ' \
+                               'operation responses received from Inferno during this test, making the details ' \
+                               'available to users without errors.'
+             } }
       end
 
       group do

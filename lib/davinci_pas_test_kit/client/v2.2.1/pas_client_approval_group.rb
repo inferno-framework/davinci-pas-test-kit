@@ -8,7 +8,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASClientApprovalGroup < Inferno::TestGroup
       id :pas_client_v221_approval_group
-      title 'Approval Workflow'
+      title 'Approval Response'
       description %(
         During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to an 'approved' decision.
@@ -28,8 +28,9 @@ module DaVinciPASTestKit
            config: { options: {
              workflow_tag: APPROVAL_WORKFLOW_TAG,
              operation_tag: SUBMIT_TAG,
-             attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning " \
-                             'that the user can proceed with ordering or providing the requested service.'
+             attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                             "response and displays the submitted claim as 'approved' meaning that the " \
+                             'user can proceed with ordering or providing the requested service.'
            } }
       test from: :pas_client_v221_request_bundle_validation_test,
            config: { options: { workflow_tag: APPROVAL_WORKFLOW_TAG } }

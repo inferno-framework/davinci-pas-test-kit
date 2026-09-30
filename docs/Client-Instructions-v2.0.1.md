@@ -1,11 +1,11 @@
 # Da Vinci PAS Test Kit: Client Testing v2.0.1 Instructions
 
 This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **client system**
-against v2.0.1 of the IG. In this scenario, Inferno acts as the PAS server.
+against v2.0.1 of the IG. When testing a client, Inferno acts as the PAS server.
 
 ## Quick Start
 
-To execute a simple set of tests with minimal setup and input, perform an approval workflow using
+To execute a simple set of tests with minimal setup and input, perform an approval scenario using
 inferno-generated responses and dedicated session-specific endpoints with the following steps:
 
 1. Create a Da Vinci PAS Client Suite v2.0.1 session using the "Other Authentication" option
@@ -18,7 +18,7 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 1. Attest to an alternate authentication approach in the "User Action Required" dialog that appears and
    then configure your client to connect to the Inferno FHIR server subsequently displayed
    and click the link continue.
-1. Select the "Approval Workflow" group from the list at the left and click
+1. Select the "Approval Response" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
 1. Submit a PAS prior authorization request to the endpoint shown in the "User Action Required"
@@ -28,11 +28,11 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 1. Review the results including any errors or warnings found when checking the conformance
    of the request or the generated response.
 
-Group "Denial Workflow" can be run in the same manner. To run the "Pended Workflow" group,
+The "Denial Response" group can be run in the same manner. To run the "Pended Response" group,
 first run the "Subscription Setup" group, during which the client system will submit a
 Subscription so that Inferno knows how and where to send a notification that a decision has
 been rendered on a pended prior authorization request. Then proceed to execute the 
-"Pended Workflow" group and follow the instructions in the dialogs that appear.
+"Pended Response" group and follow the instructions in the dialogs that appear.
 
 ### Postman-based Demonstration
 
@@ -56,23 +56,23 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
      in the next two "User Action Required" dialogs until a **Subscription Creation Test** "User Action Required" dialog appears.
 1. In Postman, select the *Create Subscription Request* in the *Subscription Setup* folder
    and click the "Send" button in the upper right.
-1. Back in Inferno, the "User Action Required" dialog should disappear and a new **Approval Workflow Test** "User Action Required"
+1. Back in Inferno, the "User Action Required" dialog should disappear and a new **Approval Scenario Test** "User Action Required"
    dialog will appear.
-1. In Postman, select the *Prior Auth Request For Approval* in the *Approval Workflow* folder
+1. In Postman, select the *Prior Auth Request For Approval* in the *Approval Scenario* folder
    and click the "Send" button in the upper right.
 1. Back in Inferno, the "User Action Required" dialog should disappear and a new attestation "User Action Required" dialog will
    appear asking to confirm the system's interpretation of the "Approved" response. Check that
    the response from the last step in Postman contains the string "Certified in total" and respond
-   to the attestation. The "User Action Required" dialog should disappear and a new **Denial Workflow Test** "User Action Required"
+   to the attestation. The "User Action Required" dialog should disappear and a new **Denial Scenario Test** "User Action Required"
    dialog will appear.
-1. In Postman, select the *Prior Auth Request For Denial* in the *Denial Workflow* folder
+1. In Postman, select the *Prior Auth Request For Denial* in the *Denial Scenario* folder
    and click the "Send" button in the upper right.
 1. Back in Inferno, the "User Action Required" dialog should disappear and a new attestation "User Action Required" dialog will
    appear asking to confirm the system's interpretation of the "Denied" response. Check that
    the response from the last step in Postman contains the string "Not Certified" and respond
-   to the attestation. The "User Action Required" dialog should disappear and a new **Pended Workflow Test** "User Action Required"
+   to the attestation. The "User Action Required" dialog should disappear and a new **Pended Scenario Test** "User Action Required"
    dialog will appear.
-1. In Postman, select the *Prior Auth Request For Pended* entry under the *Pended Workflow* folder in the
+1. In Postman, select the *Prior Auth Request For Pended* entry under the *Pended Scenario* folder in the
    and click the "Send" button in the upper right.
 1. Search in the response returned to Postman for the string "Pending" which indicates the prior
    auth request was pended and a final decision will be made later. You'll use this information in
@@ -85,19 +85,19 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    hosts a notification endpoint that is used to receive Subscription notifications for this demo.
    Note that when looking for recent notifications, **Received** timestamps are in UTC which is
    5 hours ahead of Eastern Standard Time (4 hours ahead of Eastern Daylight Time).
-1. In Postman, select the *Prior Auth Inquiry for Pended* entry under the *Pended Workflow* folder in the
+1. In Postman, select the *Prior Auth Inquiry for Pended* entry under the *Pended Scenario* folder in the
    and click the "Send" button in the upper right.
 1. Search in the response returned to Postman for the string "Certified in total" which indicates the prior
    auth request was approved. You'll use this information in a later attestation.
 1. Back in Inferno, scroll down in "User Action Required" dialog and click the "click here to complete the test"
-   link to allow Inferno to evaluate the pended workflow.
+   link to allow Inferno to evaluate the pended scenario.
 1. The next two attestations ask whether the system displayed the claim as pended and approved at the
-   appropriate points in the workflow. Attest based on whether the correct strings were found in the
+   appropriate points in the scenario. Attest based on whether the correct strings were found in the
    responses in the previous steps.
 1. Two additional "User Action" dialogs will appear requesting additional `$submit` and `$inquire`
    requests to demonstrate must support elements. This demo does not have any additional requests
    and does not attempt to demonstrate all must support elements, so click the link to indicate
-   you are done submitting requests for each. Note that requests submitted during the workflow section
+   you are done submitting requests for each. Note that requests submitted during the scenario section
    will be evaluated and you can inspect the results under the Demonstrate Element Support test
    to see both passing and failing tests.
 1. Once Inferno finishes evaluating the requests, the test will complete allowing you to review the
@@ -107,7 +107,7 @@ The tests are expected to pass with the exception of the Must Support tests.
 
 #### Optional Demo Modification: full-resource Subscription
 
-This demo uses `id-only` notifications for Pended workflow. To see a demonstration of `full-resource`
+This demo uses `id-only` notifications for the Pended scenario. To see a demonstration of `full-resource`
 notifications, replace the string `id-only` in the "Create Subscription Request" entry under the 
 "Subscription Setup" folder in the collection with the string `full-resource` (found in an extension
 under the `_payload` element).

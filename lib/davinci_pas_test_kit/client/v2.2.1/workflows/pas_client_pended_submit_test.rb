@@ -27,7 +27,7 @@ module DaVinciPASTestKit
             title: 'Claim pended response JSON',
             type: 'textarea',
             optional: true,
-            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Workflow')
+            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Scenario')
       input :client_id,
             title: 'Client Id',
             type: 'text',
@@ -49,9 +49,9 @@ module DaVinciPASTestKit
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
         skip_if requests.empty?, # NOTE: subscription needed ahead of time to support notification generation
                 %(
-                  Pended workflow tests cannot proceed because no Subscription exists to receive notifications
+                  Pended scenario tests cannot proceed because no Subscription exists to receive notifications
                   for pended claims. Run the _PAS Subscription Setup_ tests to provide a Subscription for use
-                  in delivering notifications before re-running the pended workflow tests.
+                  in delivering notifications before re-running the pended scenario tests.
                 )
 
         if user_inputted_response? :pended_json_response
@@ -72,7 +72,7 @@ module DaVinciPASTestKit
         wait(
           identifier: wait_identifier,
           message: <<~MESSAGE
-            **Pended Workflow Test**:
+            **Pended Scenario Test**:
 
             Inferno will wait while the tester uses the client system to submit a PAS request to
             Inferno. The tests will automatically continue once a request has been received.

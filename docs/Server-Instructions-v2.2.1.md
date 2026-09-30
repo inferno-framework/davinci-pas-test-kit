@@ -11,7 +11,7 @@ To run against the Da Vinci PAS Server v2.2.1 Test Suite, a PAS server implement
 be able to receive PAS `$submit` requests from Inferno. Inferno must be able to reach the server's
 FHIR base URL, and the server must accept requests at the `/Claim/$submit` endpoint under that base URL.
 
-To perform a simple approval workflow, testers will need:
+To perform a simple approval scenario, testers will need:
 
 - The FHIR base URL for the PAS server under test.
 - OAuth credentials, if the server requires authentication. The suite assumes any required authentication
@@ -40,18 +40,18 @@ documentation for technical implementation details and known limitations.
 
 ### Network Preparation
 
-The pended workflow requires connectivity in both directions: Inferno must reach the server, and the server
+The pended scenario requires connectivity in both directions: Inferno must reach the server, and the server
 must be able to send REST-hook notifications to the endpoint placed in the Subscription by Inferno. Ensure that
 outbound network rules, proxy settings, and TLS configuration allow the server to reach that endpoint before
 starting the Subscription Setup group.
 
 ## Quick Start
 
-To execute a simple set of tests with minimal setup and input, perform an approval workflow with the
+To execute a simple set of tests with minimal setup and input, perform an approval scenario with the
 following steps:
 
 1. Create a Da Vinci PAS Server Suite v2.2.1 session.
-1. Select the "Successful Approval Workflow" group from the list at the left and click the "RUN TESTS"
+1. Select the "Successful Approval Scenario" group from the list at the left and click the "RUN TESTS"
    button in the upper right.
 1. In the input dialog, provide the following values:
    - **FHIR Server Endpoint URL**: the base FHIR URL for the PAS server. Inferno appends
@@ -69,24 +69,24 @@ following steps:
 The following groups and inputs can be used to expand the process described in the
 [Quick Start](#quick-start) section into a complete set of tests.
 
-### Testing the Denial Workflow
+### Testing the Denial Scenario
 
-Run the "Successful Denial Workflow" group in the same manner as the approval workflow. Provide a
+Run the "Successful Denial Scenario" group in the same manner as the approval scenario. Provide a
 **PAS Submit Request Payload for Denial Response** that is expected to result in a denial from the
 server under test.
 
-### Testing the Pended Workflow
+### Testing the Pended Scenario
 
-To run the "Successful Pended Workflow" group, first run the "Subscription Setup" group. Provide a
+To run the "Successful Pended Scenario" group, first run the "Subscription Setup" group. Provide a
 **Pended Prior Authorization Subscription** resource in JSON format and a **Notification Access Token**.
 Inferno validates the supplied Subscription and modifies its channel endpoint so that the server sends
 notifications to Inferno. Inferno also ensures that the Subscription contains the supplied token as a
 `Bearer` token in the `Authorization` header sent by the server to Inferno.
 
 The Subscription Setup group sends the Subscription to the server and waits for a handshake notification.
-After it completes, run the "Successful Pended Workflow" group with a **PAS Submit Request Payload for
+After it completes, run the "Successful Pended Scenario" group with a **PAS Submit Request Payload for
 Pended Response** that will result in a pended response from the server. After the server returns the
-pended response, finalize the pended claim in the server's workflow so that it sends a full-resource event
+pended response, finalize the pended claim in the server's scenario so that it sends a full-resource event
 notification to Inferno. Inferno automatically resumes when it receives the event notification, and then
 it validates the notification content.
 

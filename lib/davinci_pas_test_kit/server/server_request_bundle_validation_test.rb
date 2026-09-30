@@ -39,7 +39,7 @@ module DaVinciPASTestKit
     run do
       skip_if bundle_payload.blank?, 'No bundle request input provided.'
       assert_valid_json(bundle_payload,
-                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} workflow.")
+                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} scenario.")
       bundles_to_verify = bundles
 
       assert bundles_to_verify.present?, 'Provided input is not a Bundle or list of Bundles.'

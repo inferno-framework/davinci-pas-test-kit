@@ -8,7 +8,7 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASServerDenialUseCaseGroup < Inferno::TestGroup
       id :pas_server_v221_denial_use_case
-      title 'Successful Denial Workflow'
+      title 'Successful Denial Scenario'
       description %(
         Demonstrate the ability of the server to respond to a prior
         authorization request with a `denied` decision.

@@ -27,7 +27,9 @@ module DaVinciPASTestKit
     end
 
     def workflow_name
-      case workflow_tag
+      tag = workflow_tag.is_a?(Array) ? workflow_tag.first : workflow_tag
+
+      case tag
       when APPROVAL_WORKFLOW_TAG
         'Approval'
       when DENIAL_WORKFLOW_TAG
@@ -42,9 +44,21 @@ module DaVinciPASTestKit
         'Operation Failure'
       when PROCESSING_ERROR_WORKFLOW_TAG
         'Processing Error'
+      when CLAIM_UPDATE_INITIAL_TAG
+        'Claim Update'
       else
         raise Inferno::Exceptions::TestSuiteImplementationException.new('PAS Display Attestation',
                                                                         "No name for workflow tag #{workflow_tag}.")
+      end
+    end
+
+    def target_requests
+      if workflow_tag.is_a?(Array)
+        workflow_tag.flat_map do |one_workflow_tag|
+          load_tagged_requests(*[one_workflow_tag, operation_tag].compact)
+        end
+      else
+        load_tagged_requests(*tags_to_load)
       end
     end
 
@@ -57,7 +71,7 @@ module DaVinciPASTestKit
       # - raise an implementation error if there are more than 1 unless config set (shouldn't ever)
       # - skip if one that is a failure HTTP status unless config set
 
-      requests = load_tagged_requests(*tags_to_load)
+      requests = target_requests
       if requests.empty?
         if config.options[:no_requests_ok]
           pass 'Attestation not needed: no requests received or required for this group.'

@@ -23,7 +23,7 @@ module DaVinciPASTestKit
           title: 'Claim denied response JSON',
           type: 'textarea',
           optional: true,
-          description: DaVinciPASTestKit.user_response_input_description('$submit', 'denied', 'Denial Workflow')
+          description: DaVinciPASTestKit.user_response_input_description('$submit', 'denied', 'Denial Scenario')
     input :client_id,
           title: 'Client Id',
           type: 'text',
@@ -56,7 +56,7 @@ module DaVinciPASTestKit
       wait(
         identifier: wait_identifier,
         message: <<~MESSAGE
-          **Denial Workflow Test**:
+          **Denial Scenario Test**:
 
           Inferno will wait while the tester uses the client system to submit a PAS request to
           Inferno. The tests will automatically continue once a request has been received.

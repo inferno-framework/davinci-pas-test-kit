@@ -63,7 +63,7 @@ module DaVinciPASTestKit
         wait(
           identifier: wait_identifier,
           message: <<~MESSAGE
-            **Operation Failure Workflow Test**:
+            **Operation Failure Scenario Test**:
 
             Inferno will wait while the tester uses the client system to submit a PAS request to
             Inferno. Inferno will respond with exactly the provided OperationOutcome and HTTP status.

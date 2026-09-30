@@ -12,9 +12,9 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class PASServerPendedUseCaseGroup < Inferno::TestGroup
       id :pas_server_v221_pended_use_case
-      title 'Successful Pended Workflow'
+      title 'Successful Pended Scenario'
       description %(
-        Demonstrate a complete prior authorization workflow including a period
+        Demonstrate a complete prior authorization scenario including a period
         during which the final decision is pending. This includes demonstrating
         the ability of the server to
         

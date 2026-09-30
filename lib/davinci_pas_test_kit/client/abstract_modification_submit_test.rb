@@ -59,7 +59,7 @@ module DaVinciPASTestKit
       wait(
         identifier: wait_identifier,
         message: <<~MESSAGE
-          **Payer Modification Workflow Test**:
+          **Payer Modification Scenario Test**:
 
           Inferno will wait while the tester uses the client system to submit a PAS request to
           Inferno. The tests will automatically continue once a request has been received.

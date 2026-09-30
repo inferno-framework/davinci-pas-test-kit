@@ -7,7 +7,7 @@ module DaVinciPASTestKit
       title 'Response OperationOutcome has the correct structure and content'
       description %(
         This test verifies the validity of the OperationOutcome returned by Inferno during the
-        Operation Failure workflow. The OperationOutcome is validated against the base FHIR R4
+        Operation Failure scenario. The OperationOutcome is validated against the base FHIR R4
         OperationOutcome resource definition — no PAS-specific profile is required.
 
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
@@ -31,7 +31,7 @@ module DaVinciPASTestKit
                 "Expected an OperationOutcome but received #{operation_outcome.resourceType}."
 
         skip_if !resource_is_valid?(resource: operation_outcome),
-                'The OperationOutcome returned during the Operation Failure workflow is not conformant ' \
+                'The OperationOutcome returned during the Operation Failure scenario is not conformant ' \
                 'with the base FHIR R4 OperationOutcome resource definition.'
       end
     end

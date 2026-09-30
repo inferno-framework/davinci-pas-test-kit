@@ -63,7 +63,7 @@ module DaVinciPASTestKit
     run do
       bundles_to_verify = response_bundles
       assert bundles_to_verify.present?,
-             "No successful $#{operation} requests made during the #{use_case.titleize} workflow tests."
+             "No successful $#{operation} requests made during the #{use_case.titleize} scenario tests."
 
       bundle_messages = bundles_to_verify.flat_map do |bundle, request_bundle|
         perform_bundle_validation(

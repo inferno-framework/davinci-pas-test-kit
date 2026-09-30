@@ -13,7 +13,7 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v221_pended_group
-      title 'Pended Workflow'
+      title 'Pended Response'
       description %(
         During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to a 'pended' decision, including
@@ -34,7 +34,7 @@ module DaVinciPASTestKit
       group do
         title 'Interaction and Response Handling'
         description %(
-          All interactions for the pended prior authorization request workflow
+          All interactions for the pended prior authorization request scenario
           between Inferno and the client system will be performed during this group
           including
           - A `$submit` request from the client system to Inferno where Inferno returns a pended response.
@@ -58,7 +58,8 @@ module DaVinciPASTestKit
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
                opeation_tag: SUBMIT_TAG,
-               attest_message: "I attest that the client system displays the submitted claim as 'pended' meaning " \
+               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                               "response and displays the submitted claim as 'pended' meaning " \
                                'that a final decision on prior authorization of the service has not been made.'
              } }
         test from: :pas_client_v221_pended_notify_and_attest_finalized_test
@@ -72,9 +73,9 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that the client system displays the submitted claim as 'approved' based " \
-                               'on the full-resource notification, meaning that the user can proceed with ' \
-                               'ordering or providing the requested service.'
+               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                               "response and displays the submitted claim as 'approved' meaning that the " \
+                               'user can proceed with ordering or providing the requested service.'
              } }
       end
 

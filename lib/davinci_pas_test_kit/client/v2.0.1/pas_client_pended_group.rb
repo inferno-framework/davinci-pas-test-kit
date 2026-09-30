@@ -13,7 +13,7 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v201_pended_group
-      title 'Pended Workflow'
+      title 'Pended Response'
       description %(
         During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to a 'pended' decision, including
@@ -31,9 +31,9 @@ module DaVinciPASTestKit
                   :session_url_path
 
       group do
-        title 'Perform the pended workflow'
+        title 'Perform the pended scenario'
         description %(
-          All interactions for the pended prior authorization request workflow
+          All interactions for the pended prior authorization request scenario
           between Inferno and the client system will be performed during this group
           including
           - A `$submit` request from the client to Inferno where Inferno returns a pended response.
@@ -128,7 +128,9 @@ module DaVinciPASTestKit
                workflow_tag: PENDED_WORKFLOW_TAG,
                operation_tag: INQUIRE_TAG,
                multiple_requests_ok: true,
-               attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
+               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                               "response and displays the submitted claim as 'approved' meaning that the " \
+                               'user can proceed with ordering or providing the requested service.'
              } }
       end
     end

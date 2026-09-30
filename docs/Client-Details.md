@@ -23,7 +23,7 @@ requirements, including:
     - The approval of the request
     - The denial of the request
     - The pending of the request and a subsequent notification that a final decision was made
-    - additional workflows such as updates, payer modifications, and errors (v2.2.1 only)
+    - additional scenarios such as updates, payer modifications, and errors (v2.2.1 only)
 - The ability of the client to provide data covering the full scope of required by PAS, including
     - The ability to send prior auth requests and inquiries with all PAS profiles and all must
       support elements on those profiles
@@ -38,7 +38,7 @@ validated with the Java validator using `tx.fhir.org` as the terminology server.
 ### Responses
 
 Inferno contains basic logic to generate approval, denial, and pended responses, along with a
-notification that a final decision was made, as a part of the above workflows.
+notification that a final decision was made, as a part of the above scenarios.
 These responses are based on examples available in the PAS Implementation Guide
 and are conformant, but may not meet the needs of actual implementations. Thus,
 testers may provide Inferno with specific responses for Inferno to echo. If responses
@@ -47,7 +47,7 @@ a fully conformant exchange. See the **[Controlling Client Suite Simulated Respo
 section for details on how Inferno creates responses.
 
 Note that Inferno currently does not accept `$inquire` requests during most PAS tests. Only
-the Must Support tests and the v2.0.1 Pended Workflow tests will respond to `$inquire`
+the Must Support tests and the v2.0.1 Pended Response tests will respond to `$inquire`
 operation request with a successful response. This restriction may be relaxed in the
 future. Implementers are welcome to submit a [GitHub Issues](https://github.com/inferno-framework/davinci-pas-test-kit/issues)
 ticket in this repository if supporting `$inquire` requests at more points within the client
@@ -85,6 +85,13 @@ may instead attest to other authentication capabilities. In this case, the clien
 authenticate and will identify itself to Inferno by by sending requests to dedicated PAS endpoints
 created by Inferno for use during the testing session. To reduce configuration burden, the dedicated
 endpoints can be reused in subsequent sessions.
+
+### Must Support Tests
+
+PAS Clients are required to demonstrate support for some elements which appear only
+under certain conditions. See the **[Client Must Support](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support)**
+section for details on what Inferno checks for and the underlying requirements
+that drive those tests.
 
 ## Auth Configuration Details
 
@@ -164,7 +171,7 @@ implements and checks for the mechanics of Subscriptions and notifications, but 
 closely at the details. For example, `id-only` and `full-resource` are supported and the filter
 criteria format is not checked. The client 2.2.1 suite is more stringent.
 
-Additionally, to test Subscriptions and pending workflows, a new Subscription must be created for each
+Additionally, to test Subscriptions and pending scenarios, a new Subscription must be created for each
 test session, which may require testers to re-initialize previously-created Subscriptions. Future versions
 of these tests may relax this requirement and feedback on whether this would reduce burden and how this
 might look are welcome.
@@ -174,7 +181,7 @@ might look are welcome.
 The PAS IG places additional requirements on clients that are not currently tested by either or both
 versions of the client suite, including
 
-- Prior Authorization update workflows (tested by the client v2.2.1 suite only)
+- Prior Authorization update scenarios (tested by the client v2.2.1 suite only)
 - Requests for additional information handled through the CDex framework
 - PDF, CDA, and JPG attachments
 - Most details requiring manual review of the client system, e.g., the requirement that clinicians can update

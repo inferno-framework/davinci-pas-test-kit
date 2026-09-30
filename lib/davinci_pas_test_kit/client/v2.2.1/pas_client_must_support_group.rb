@@ -16,69 +16,16 @@ module DaVinciPASTestKit
       run_as_group
       description %(
         During these tests, Inferno will check that the client system demonstrates support for
-        all required profiles and elements. PAS requires that clients:
+        all required profiles and must support elements. When looking for demonstration of
+        these profiles and elements, Inferno will consider requests and responses from
+        interactions performed during the PAS scenario group as well as additional ones
+        made when executing this group.
 
-        - [Follow](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformance.html#mustsupport) the
-          [must support requirements for data sources defined in HRex](https://hl7.org/fhir/us/davinci-hrex/1.2.0/en/conformance.html#mustsupport)
-          and make prior authorization `$submit` and `$inquire` operation requests that contain all
-          PAS-defined profiles and their must support elements.
-        - Be able to [receive](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformance.html#ci-c-conf-7),
-          [without error](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformance.html#ci-c-conf-8),
-          all must support elements defined on the PAS ClaimResponse profiles.
-
-        To pass these tests, Inferno must see
-        - On Requests
-          - All must support elements defined on the [PAS Claim](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claim.html)
-            or [PAS Claim Update](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claim-update.html)
-            profiles on `$submit` requests, or the [PAS Claim Inquiry](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claim-inquiry.html)
-            profile on `$inquire` requests.
-          - For `$submit` requests, at least one instance of one of the request resource profiles ([DeviceRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-devicerequest.html),
-            [MedicationRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-medicationrequest.html),
-            [NutritionOrder](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-nutritionorder.html),
-            or [ServiceRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-servicerequest.html))
-            referenced from the [Requested Service extension](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-extension-requestedService.html)
-            on element `Claim.item`, and all must support elements defined in the profiles for each
-            request resource type that was observed. Testers may attest that such elements not observed
-            are not supported by their system and pass the test.
-          - For both `$submit` and `$inquire` requests, at least one instance of each other profile referenced from the PAS Claim profiles and
-            all must support elements defined on those profiles. Testers may attest that such
-            elements not observed are not supported by their system and pass the test. Specific
-            profiles for which must support coverage must be demonstrated include:
-            - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-coverage.html)
-            - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-encounter.html)
-            - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-insurer.html)
-            - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-requestor.html)
-            - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-beneficiary.html)
-            - [PAS Subscriber Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-subscriber.html)
-            - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-practitioner.html)
-            - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-practitionerrole.html)
-        - On Responses
-          - All must support elements defined on the [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claimresponse.html)
-            or [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claiminquiryresponse.html)
-            profiles for `$submit` and `$inquire` requests respectively.
-          - Optionally, for both `$submit` and `$inquire` requests, at least one instance of each
-            other profile referenced from the PAS ClaimResponse profiles and all must support
-            elements defined on those profiles. Specific profiles for which must support coverage
-            must be demonstrated include:
-            - [PAS CommunicationRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-communicationrequest.html)
-              (`$submit` responses only)
-            - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-insurer.html)
-            - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-requestor.html)
-            - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-beneficiary.html)
-            - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-practitioner.html)
-            - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-practitionerrole.html)
-            - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-task.html)
-
-        Inferno will consider `$submit` requests and responses made on the most recent execution of
-        each previously-executed group. When any group is re-run, including this one, the requests made
-        during the previous run of that group will no longer be considered.
-
-        As a part of executing this group, Inferno will wait for additional requests to be made, including
-        additional `$submit` requests covering must support elements not yet demonstrated and
-        `$inquire` requests which are not part of, or supported by Inferno during, any of the
-        prior workflow groups. Note that Inferno's mocked responses do not include all must support
-        elements, so testers will need to provide responses for Inferno to use that include
-        examples of all must support elements to pass these tests.
+        For additional details on these tests, what they check for, and the requirements
+        underlying them, see the ["Client Must Support Tests" section](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support)
+        of the Da Vinci PAS Test Kit wiki, specifically
+        - [Which messages Inferno considers when looking for demonstration of must support elements](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support#evaluated-messages).
+        - [What clients must demonstrate to pass these v2.2.1 client must support tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support#da-vinci-pas-v2-2-1).
       )
 
       # The must support response inputs already belong to pas_client_v221_gather_must_support

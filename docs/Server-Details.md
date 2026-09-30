@@ -116,8 +116,8 @@ the allowed response window, servers need to support FHIR Subscriptions. Subscri
 Organization submitting the prior authorization requests and so is expected to be performed once when a provider
 system registers with a specific payer.
 
-Inferno supports that workflow by splitting out Subscription setup tests into a group that can be run before the
-pended workflow group. Inferno assumes that the Subscriptions API is located under the same FHIR base URL as
+Inferno supports that scenario by splitting out Subscription setup tests into a group that can be run before the
+pended scenario group. Inferno assumes that the Subscriptions API is located under the same FHIR base URL as
 the `Claim/$submit` operation and that it uses the same authentication. Testers will provide the following inputs:
 - **Pended Prior Authorization Subscription**: A Subscription body for Inferno to submit to the server under test. 
   When submitted to the server under test, it should cause notifications to be generated when pended prior
@@ -127,10 +127,10 @@ the `Claim/$submit` operation and that it uses the same authentication. Testers 
   so that the request gets associated with this test session. The token must be provided as a Bearer token in the
   Authorization header of HTTP requests sent to Inferno.
 
-During the pended workflow test, testers will demonstrate that an update to the submitted and pended prior authorization
+During the pended scenario test, testers will demonstrate that an update to the submitted and pended prior authorization
 request causes the Subscription to trigger and send a notification to Inferno.
 
-The v2.0.1 and v2.2.1 pended workflows differ in that Inferno expects `id-only` notification content in v2.0.1 and
+The v2.0.1 and v2.2.1 pended scenarios differ in that Inferno expects `id-only` notification content in v2.0.1 and
 `full-resource` notification content in v2.2.1.
 
 ## Testing Limitations
@@ -173,7 +173,7 @@ if these requirements are not met.
 
 The PAS IG places additional requirements on servers that are not currently tested by this test kit, including
 
-- Prior Authorization update workflows (v2.0.1)
+- Prior Authorization update scenarios (v2.0.1)
 - Requests for additional information handled through the CDex framework
 - PDF, CDA, and JPG attachments
 - US Core profile support for supporting information

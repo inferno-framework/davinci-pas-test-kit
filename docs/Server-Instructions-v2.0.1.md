@@ -21,8 +21,8 @@ This example uses pre-configured inputs to test against the public Da Vinci PAS 
 6.  **Monitor Execution**:
     *   Inferno will begin executing the test sequences against the configured reference server. This process includes:
         *   **Subscription Setup**: Inferno sends a `Subscription` resource (defined in the preset inputs) to the server. The server is expected to process this and be ready to send notifications to an Inferno-hosted endpoint when relevant events occur.
-        *   **Core Workflows (Approval, Denial, Pended, Error)**: Inferno sends various `$submit` and `$inquire` FHIR Bundle requests (also from preset inputs) to the server. It then validates the server's responses for conformance and correctness according to the expected workflow outcome.
-        *   For the pended workflow, after sending a request that should result in a pended status, Inferno will wait for a notification from the server (triggered by the earlier `Subscription`) before proceeding with a `$inquire` request to get the final decision.
+        *   **Core Scenarios (Approval, Denial, Pended, Error)**: Inferno sends various `$submit` and `$inquire` FHIR Bundle requests (also from preset inputs) to the server. It then validates the server's responses for conformance and correctness according to the expected scenario outcome.
+        *   For the pended scenario, after sending a request that should result in a pended status, Inferno will wait for a notification from the server (triggered by the earlier `Subscription`) before proceeding with a `$inquire` request to get the final decision.
 7.  **Review Results**:
     *   Once all tests have completed, Inferno will display the results.
     *   **Note**: The public reference server may not always be perfectly aligned with the STU2 version of the PAS IG that these tests target. Therefore, some failures or warnings might be observed when testing against it. This is normal and primarily serves to demonstrate the test execution flow.
@@ -35,7 +35,7 @@ This section details how to configure and run the tests against your own PAS ser
 2.  **Create a Test Session**:
     *   Choose the "Da Vinci PAS Server Suite v2.0.1".
 3.  **Configure Inputs**:
-    *   When you select a specific test group (e.g., "Approval Workflow") or click "Run All Tests", an input dialog will appear. You **must** provide the following information tailored to your server:
+    *   When you select a specific test group (e.g., "Approval Scenario") or click "Run All Tests", an input dialog will appear. You **must** provide the following information tailored to your server:
         *   **FHIR Server Endpoint URL**: The base FHIR URL of your PAS server (e.g., `https://your-pas-server.com/fhir`). Inferno will append `/Claim/$submit`, `/Claim/$inquire`, and `/Subscription` to this base URL.
         *   **OAuth Credentials / Access Token**: If your server requires OAuth 2.0 authentication for its PAS endpoints, provide a valid Bearer token here. Inferno will include this token in the `Authorization` header of all requests it makes to your server.
         *   **PAS Submit Request Payload for Approval Response**: A complete JSON-encoded FHIR Bundle. This bundle should be a `$submit` request that, when sent to your server, is expected to result in a prior authorization approval.
@@ -54,7 +54,7 @@ This section details how to configure and run the tests against your own PAS ser
     *   Click "SUBMIT".
 5.  **Monitor and Ensure Server Readiness**:
     *   Inferno will begin sending requests to your server. Ensure your server is running, accessible from the Inferno instance, and correctly configured to handle PAS requests.
-    *   **For the Pended Workflow**:
+    *   **For the Pended Scenario**:
         *   Your server must successfully process the `Subscription` resource POSTed by Inferno.
         *   When the claim submitted via "PAS Submit Request Payload for Pended Response" is finalized by your server's internal logic, your server must send a notification (as per the active `Subscription`) to the endpoint Inferno provided (visible in the test execution logs or `Subscription` resource details).
         *   Inferno will wait for this notification before sending the "PAS Inquire Request Payload for Pended Claim".

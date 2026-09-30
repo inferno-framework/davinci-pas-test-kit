@@ -30,8 +30,9 @@ module DaVinciPASTestKit
       run_as_group
       
       # Mandatory - the PAS Claim Inquiry profile must always be demonstrated.
-      test from: :pas_client_v221_inquire_request_must_support_claim_inquiry
-
+      test from: :pas_client_v221_inquire_request_must_support_claim_inquiry do
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1'
+      end
       # All other inquire request profiles - unobserved must support elements may be
       # attested as not collected by the client system.
       test from: :pas_client_v221_must_support_with_attestation_option do
@@ -56,6 +57,7 @@ module DaVinciPASTestKit
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1'
       end
     end
   end

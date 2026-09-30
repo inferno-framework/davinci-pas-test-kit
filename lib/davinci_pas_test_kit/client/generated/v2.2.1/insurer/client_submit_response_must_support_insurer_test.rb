@@ -31,6 +31,7 @@ module DaVinciPASTestKit
         * Organization.telecom.value
         * Organization.type
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-2'
 
       config(
         options: {

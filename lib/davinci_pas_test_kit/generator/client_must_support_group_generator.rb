@@ -192,12 +192,9 @@ module DaVinciPASTestKit
       end
 
       def verifies_requirements
-        case "#{operation}_#{ig_version}"
-        when 'submit_v2.0.1'
-          return nil if type == 'response'
-
-          ['hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
-           'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202']
+        case "#{operation}_#{type}_#{ig_version}"
+        when 'submit_request_v2.2.1', 'inquire_request_v2.2.1'
+          ['hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1']
         end
       end
 

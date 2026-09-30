@@ -54,7 +54,7 @@ module DaVinciPASTestKit
         wait(
           identifier: wait_identifier,
           message: <<~MESSAGE
-            **Processing Error Workflow Test**:
+            **Processing Error Scenario Test**:
 
             Inferno will wait while the tester uses the client system to submit a PAS request to
             Inferno. Inferno will [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)

@@ -11,7 +11,7 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v201_denial_group
-      title 'Denial Workflow'
+      title 'Denial Response'
       description %(
         During these tests, the client system will initiate a prior authorization
         request and show it can react appropriately to a 'denied' decision.
@@ -38,7 +38,8 @@ module DaVinciPASTestKit
            ),
            config: { options: {
              workflow_tag: DENIAL_WORKFLOW_TAG,
-             attest_message: "I attest that the client system displays the submitted claim as 'denied', meaning " \
+             attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                             "response and displays the submitted claim as 'denied', meaning " \
                              'that the user cannot proceed with ordering or providing the requested service without ' \
                              'making adjustments and submitting for further review.'
            } }

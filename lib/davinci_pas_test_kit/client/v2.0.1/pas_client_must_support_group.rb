@@ -16,25 +16,16 @@ module DaVinciPASTestKit
       run_as_group
       description %(
         During these tests, Inferno will check that the client system demonstrates support for
-        all PAS-defined profiles and the must support elements defined in them. This includes:
+        all required profiles and must support elements. When looking for demonstration of
+        these profiles and elements, Inferno will consider requests and responses from
+        interactions performed during the PAS scenario group as well as additional ones
+        made when executing this group.
 
-        - The ability to make prior authorization `$submit` and `$inquire` operation requests that
-          contain all PAS-defined profiles and their must support elements.
-        - The ability to receive in responses to those requests all PAS-defined profiles and their
-          must support elements.
-
-        The tester will be able to use the client system to make additional requests to Inferno
-        demonstrating coverage of all must support items in the requests and responses. Because
-        Inferno's mocked responses do not include all must support elements, testers will need
-        to provide responses that include examples of all must support elements so that they can
-        demonstrate the client system's support for those elements.
-
-        Note that Inferno will consider requests made during the workflow group of tests, so only
-        profiles and must support elements not demonstrated during those earlier tests need to be
-        submitted as a part of these. However, Inferno will only consider requests made during the
-        most recent run of a given test. Therefore, if additional runs of this group, or others,
-        are needed, any elements only demonstrated in the prior run must be demonstrated again to
-        count.
+        For additional details on these tests, what they check for, and the requirements
+        underlying them, see the ["Client Must Support Tests" section](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support)
+        of the Da Vinci PAS Test Kit wiki, specifically
+        - [Which messages Inferno considers when looking for demonstration of must support elements](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support#evaluated-messages).
+        - [What clients must demonstrate to pass these v2.2.1 client must support tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support#da-vinci-pas-v2-0-1).
       )
 
       # The must support response inputs already belong to pas_client_v201_gather_must_support

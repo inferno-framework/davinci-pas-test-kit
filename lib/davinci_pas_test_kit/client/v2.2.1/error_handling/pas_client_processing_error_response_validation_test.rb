@@ -15,7 +15,7 @@ module DaVinciPASTestKit
         Errors encountered will be treated as a skip instead of a failure.
 
         This test verifies the conformity of the PAS Response Bundle returned by Inferno during the
-        Processing Error workflow. The bundle is validated against the
+        Processing Error scenario. The bundle is validated against the
         [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
         profile. Additionally, it checks that the ClaimResponse contains at least one error entry,
         as required by the processing error scenario.

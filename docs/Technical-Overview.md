@@ -9,7 +9,7 @@ The PAS Test Kit is built upon the Inferno Framework and adheres to its core des
 *   **FHIR-Native**: Tests are designed around FHIR interactions and data models.
 *   **IG-Centric**: Validation is based on the requirements and profiles defined in the Da Vinci PAS Implementation Guide.
 *   **Actor-Based Testing**: Separate test suites target client and server actors, simulating the counterpart system.
-*   **Automated Validation**: Wherever possible, conformance is checked automatically. This includes FHIR resource validation, profile conformance, and workflow logic.
+*   **Automated Validation**: Wherever possible, conformance is checked automatically. This includes FHIR resource validation, profile conformance, and scenario logic.
 *   **Transparency**: Test logic and results are intended to be clear and understandable, aiding implementers in identifying issues.
 *   **Extensibility**: The Inferno Framework allows for the creation of custom tests and test suites.
 
@@ -127,7 +127,7 @@ When making changes to the test kit itself, it's important to ensure the changes
         *   The public reference implementations (if applicable).
         *   Any local test servers or client simulators you have.
         *   The provided Postman collection for client tests.
-    *   This helps catch issues that RSpec tests might miss, especially those related to UI interactions or workflow logic as experienced by a user.
+    *   This helps catch issues that RSpec tests might miss, especially those related to UI interactions or scenario logic as experienced by a user.
 5.  **Test Generation (If Applicable)**:
     *   If you've modified the test generator (`lib/davinci_pas_test_kit/generator/`), you'll need to re-generate the affected tests:
         *   Ensure the relevant IG package is in `lib/davinci_pas_test_kit/igs/`.

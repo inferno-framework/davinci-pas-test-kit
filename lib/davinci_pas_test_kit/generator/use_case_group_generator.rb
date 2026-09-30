@@ -46,7 +46,7 @@ module DaVinciPASTestKit
       end
 
       def title
-        "Successful #{use_case.capitalize} Workflow"
+        "Successful #{use_case.capitalize} Scenario"
       end
 
       def output_file_name
@@ -144,7 +144,7 @@ module DaVinciPASTestKit
           when 'pended'
             if ig_version == 'v2.2.1'
               <<~DESCRIPTION
-                Demonstrate a complete prior authorization workflow including a period
+                Demonstrate a complete prior authorization scenario including a period
                 during which the final decision is pending. This includes demonstrating
                 the ability of the server to
 
@@ -154,7 +154,7 @@ module DaVinciPASTestKit
               DESCRIPTION
             else
               <<~DESCRIPTION
-                Demonstrate a complete prior authorization workflow including a period
+                Demonstrate a complete prior authorization scenario including a period
                 during which the final decision is pending. This includes demonstrating
                 the ability of the server to
 

@@ -30,8 +30,9 @@ server conformant to the PAS specification and not going beyond it. Each respons
 
 ## Mocked Responses
 
-When generating responses and notifications, Inferno uses the following logic. These conform to the
-requirements of the PAS specification, but may not make sense in an actual workflow.
+When generating responses and notifications, Inferno uses the following logic. Responses
+generated in this way conform to the requirements of the PAS specification, but may not
+make clinical sense when received by a real client.
 
 ### `$submit` and `$inquire` responses
 
@@ -50,9 +51,9 @@ These responses are created mostly from the incoming request. Specific details i
   `itemSequence` value copied over, `itemPreAuthIssueDate` and `itemPreAuthPeriod` extensions 
   added using the current date and a month starting on the current date respectively,
   and an adjudication entry with a `category` of `submitted` that contains the `reviewAction` extension with a
-  `reviewActionCode` that matches the current workflow: `A1` ("Certified in total") for approval,
+  `reviewActionCode` that matches the current scenario: `A1` ("Certified in total") for approval,
   `A3` ("Not Certified") for denial, `A4` ("Pending") for pending, and `A6` ("Modified") for
-  modified. For the claim updates workflow, `A1` ("Certified in total") will be used.
+  modified. For the claim updates scenario, `A1` ("Certified in total") will be used.
 - In the Payer Modification scenario, a `ClaimResponse.addItem` entry is added for each
   `item` entry in the Claim respresenting the modification. The `reviewActionCode` for these
   entries will be `A1` ("Certified in total"), but all other elements will be the same
@@ -211,7 +212,7 @@ that it needs to make the modifications, then the raw input will be used.
 
 Beyond the minor modifications described above, Inferno does not modify provided resources to ensure that
 they are consistent with each other or the time they are executed. For example, in the pended
-workflow, it is up to the tester to ensure that if they provide responses for the `$submit` operation and
+scenario, it is up to the tester to ensure that if they provide responses for the `$submit` operation and
 for the `$inquire` operation (v2.0.1) or notification body (v2.2.1) that both messages share whatever details,
 such as identifiers, needed to connect them together and drive the workflow in their system. Timestamps
 not associated with messaging time such as when a prior authorization response is valid are also not modified

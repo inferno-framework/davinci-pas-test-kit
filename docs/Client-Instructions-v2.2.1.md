@@ -31,7 +31,7 @@ section for details on specifying custom responses.
 
 ## Quick Start
 
-To execute a simple set of tests with minimal setup and input, perform an approval workflow using
+To execute a simple set of tests with minimal setup and input, perform an approval scenario using
 inferno-generated responses and dedicated session-specific endpoints with the following steps:
 
 1. Create a Da Vinci PAS Client Suite v2.2.1 session using the "Other Authentication" option
@@ -44,7 +44,7 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 1. Attest to an alternate authentication approach in the "User Action Required" dialog that appears and
    then configure your client to connect to the Inferno FHIR server subsequently displayed
    and click the link continue.
-1. Select the "Approval Workflow" group from the list at the left and click
+1. Select the "Approval Response" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
 1. Submit a PAS prior authorization request to the endpoint shown in the "User Action Required"
@@ -59,19 +59,19 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 The following groups and inputs can be used to expand the process described in the
 [Quick Start](#quick-start) section into a complete set of tests.
 
-### Testing the Denial, Claim Update, and Payer Mofidication Workflows
+### Testing the Denial, Claim Update, and Payer Mofidication Scenarios
 
-Groups "Denial Workflow", "Claim Updates" and "Payer Mofidication" can be run in the same manner as
+The "Denial Response", "Claim Updates" and "Payer Modification" groups can be run in the same manner as
 described above. Testers may specify the responses for Inferno to return, but Inferno is also able
 to generate [mocked responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic)
-for these workflows.
+for these scenarios.
 
-### Testing the Pended Workflow
+### Testing the Pended Response
 
-To run the "Pended Workflow" group, first run the "Subscription Setup" group, during which the
+To run the "Pended Response" group, first run the "Subscription Setup" group, during which the
 client system will submit a Subscription so that Inferno knows how and where to send a
 notification that a decision has been rendered on a pended prior authorization request.
-Once that group has been run, proceed to execute the "Pended Workflow" group and follow the
+Once that group has been run, proceed to execute the "Pended Response" group and follow the
 instructions in the "User Action Required" dialogs that appear. Inferno can
 generate a [mocked pended response and a notification with the rendered decision](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic).
 
@@ -143,7 +143,7 @@ against a real client system using SMART Backend Services for authentication.
    1. Click the "Bypass payor-handled check" box.
    1. Click the "Save" button and close the dialog to complete the setup.
 1. Back in the Inferno session tab, click the link to confirm the configuration and continue the tests.
-1. Select and run group "3.1 Approval Workflow" without any changes to the inputs so that the default
+1. Select and run group "3.1 Approval Response" without any changes to the inputs so that the default
    mocked response response will be used. When the dialog appears indicating Inferno is ready to
    receive requests, return to the tab with the reference implementation.
 1. In the reference implementation tab, select patient "Roosevelt, Theodor Alan Roosevelt"
@@ -170,7 +170,7 @@ against a real client system using SMART Backend Services for authentication.
 
 ## CRD Request Generator (old)
 
-If you would like to try out the PAS Approval Workflow tests against
+If you would like to try out the PAS Approval Response tests against
 [a public PAS reference client](https://crd-request-generator.davinci.hl7.org/),
 you can do so using the following steps. Note that this reference implementation has
 not been updated for the 2.2.1 version of the PAS IG so many failures are expected during this
@@ -198,7 +198,7 @@ client system will look like.
 11. In the "Select PriorAuth Endpoint" text box, put the FHIR Base URL from step 4.
 12. Edit the Bundle at the right so that the first Bundle entry has a `fullUrl` field before the `resource` field
     with a value of `urn:uuid:0583c759-bc19-4bfa-815c-8f43c1d488ea` or other uuid.
-12. Before, submitting return to the client session, select group "**11.1** Approval Workflow", click
+12. Before, submitting return to the client session, select group "**11.1** Approval Response", click
     the "Run Tests" button in the upper right, and click the "Submit" button on the input dialog that appears.
 13. When the "User Action Required" dialog appears asking for a $submit request, return to the crd-request-generator
     tab and click the "Submit" button. A response should be returned and the Inferno session will now

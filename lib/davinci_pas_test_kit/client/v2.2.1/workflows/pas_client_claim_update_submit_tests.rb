@@ -49,8 +49,9 @@ module DaVinciPASTestKit
 
       run do
         skip_if !config.options[:first_update_submission] && prior_submission_failed == 'true',
-                'Prior step of the update workflow not completed.'
+                'Prior step of the update scenario not completed.'
 
+        output prior_submission_failed: 'false' if config.options[:first_update_submission]
         response_input = config.options[:submit_respond_with]
         if response_input.present? && send(response_input).present?
           output prior_submission_failed: 'true'
@@ -76,7 +77,7 @@ module DaVinciPASTestKit
 
       def claim_update_wait_message(submit_endpoint)
         <<~MESSAGE
-          **Claim Update Workflow**:
+          **Claim Update Scenario**:
 
           Inferno will wait while the tester uses the system to #{interaction_instructions}.
           The tests will automatically continue once a request has been received.
