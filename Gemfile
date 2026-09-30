@@ -4,6 +4,8 @@ source "https://rubygems.org"
 
 gemspec
 
+gem 'inferno_core', path: '../inferno-core'
+
 gem "rubocop"
 gem 'rubocop-rspec', require: false
 
