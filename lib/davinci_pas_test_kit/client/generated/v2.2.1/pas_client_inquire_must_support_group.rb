@@ -8,9 +8,8 @@ module DaVinciPASTestKit
       title '$inquire Request Must Support Coverage'
       description %(
         Check that the client can demonstrate `$inquire` requests that contain
-        all PAS-defined profiles and their must support elements. For all profiles
-        other than PAS Claim Update, testers can attest that the missing elements
-        are not supported by their system to pass the tests.
+        all PAS-defined profiles present in requests and their must support elements.
+        For all profiles other than PAS Claim Update, testers can attest that the missing elements are not supported by their system to pass the tests.
         
         For `$inquire` requests, this includes the following profiles:
         

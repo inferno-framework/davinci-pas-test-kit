@@ -15,10 +15,9 @@ module DaVinciPASTestKit
       id :pas_client_v201_submit_response_must_support
       title '$submit Response Must Support Coverage'
       description %(
-        Check that `$submit` responses provided to the client contain
-        all PAS-defined profiles and their must support elements. Demonstration
-        of the PAS ClaimResponse profile is strictly required while all others
-        are optional.
+        Check that `$submit` responses  provided to the client contain
+        all PAS-defined profiles present in responses and their must support elements. 
+        
         
         For `$submit` responses, this includes the following profiles:
         
