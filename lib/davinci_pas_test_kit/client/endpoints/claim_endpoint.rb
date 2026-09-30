@@ -20,6 +20,12 @@ module DaVinciPASTestKit
       request.path.split('/custom/')[1].split('/')[0] # request.path = {base inferno path}/custom/{suite_id}/...
     end
 
+    error_response_format :operation_outcome
+
+    def test_run_identifier_location_description
+      'the path or embedded within the bearer token in the Authorization header'
+    end
+
     def test_run_identifier
       return request.params[:session_path] if request.params[:session_path].present?
 
