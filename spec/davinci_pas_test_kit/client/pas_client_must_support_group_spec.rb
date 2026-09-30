@@ -10,17 +10,17 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportGroup do
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
 
-  def response_validation_test(must_support_group, conformance_group_title, test_id_suffix)
+  def response_validation_test(must_support_group, receive_group_title, test_id_suffix)
     must_support_group.groups
-      .find { |group| group.title == conformance_group_title }
+      .find { |group| group.title == receive_group_title }
       .tests
       .find { |test| test.id.to_s.end_with?(test_id_suffix) }
   end
 
   it 'propagates ms_submit_responses/ms_inquire_responses onto the bundle validation tests' do
-    submit_response_test = response_validation_test(described_class, '$submit Bundle Conformance',
+    submit_response_test = response_validation_test(described_class, 'Demonstrate Must Support Coverage',
                                                     'pas_client_v221_response_bundle_validation_test')
-    inquire_response_test = response_validation_test(described_class, '$inquire Bundle Conformance',
+    inquire_response_test = response_validation_test(described_class, 'Demonstrate Must Support Coverage',
                                                      'pas_client_v221_inquire_response_bundle_validation_test')
 
     expect(submit_response_test.inputs).to include(:ms_submit_responses)
@@ -31,9 +31,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportGroup do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
 
     it 'propagates ms_submit_responses/ms_inquire_responses onto the bundle validation tests' do
-      submit_response_test = response_validation_test(described_class, '$submit Bundle Conformance',
+      submit_response_test = response_validation_test(described_class, 'Demonstrate Must Support Coverage',
                                                       'pas_client_v201_response_bundle_validation_test')
-      inquire_response_test = response_validation_test(described_class, '$inquire Bundle Conformance',
+      inquire_response_test = response_validation_test(described_class, 'Demonstrate Must Support Coverage',
                                                        'pas_client_v201_inquire_response_bundle_validation_test')
 
       expect(submit_response_test.inputs).to include(:ms_submit_responses)

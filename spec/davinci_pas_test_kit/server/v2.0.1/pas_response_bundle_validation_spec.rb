@@ -41,7 +41,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
   it 'fails if no requests made' do
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/No successful \$submit requests made during the Approval workflow tests./)
+    expect(result.result_message).to match(/No successful \$submit requests made during the Approval scenario tests./)
   end
 
   it 'fails if no requests made for the right workflow' do
@@ -50,7 +50,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/No successful \$submit requests made during the Approval workflow tests./)
+      .to match(/No successful \$submit requests made during the Approval scenario tests./)
   end
 
   it 'fails if no responses are FHIR Bundles' do
@@ -61,7 +61,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/No successful \$submit requests made during the Approval workflow tests./)
+      .to match(/No successful \$submit requests made during the Approval scenario tests./)
   end
 
   it 'passes when valid Bundles were returned' do

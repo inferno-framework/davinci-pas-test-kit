@@ -30,7 +30,7 @@ RSpec.describe DaVinciPASTestKit::ClaimSubmitOperationTest, :runnable do
       result = run(test, pa_submit_request_payload: 'not json', server_endpoint:)
       expect(result.result).to eq('fail')
       expect(result.result_message)
-        .to match(/Invalid JSON. Provide valid json to use for the \$submit during the Approval workflow./)
+        .to match(/Invalid JSON. Provide valid json to use for the \$submit during the Approval scenario./)
     end
   end
 

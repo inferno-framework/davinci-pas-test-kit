@@ -33,7 +33,7 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
     result = run(test, bundle_payload: 'not json')
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/Invalid JSON. Provide valid json to use for the \$submit during the Approval workflow./)
+      .to match(/Invalid JSON. Provide valid json to use for the \$submit during the Approval scenario./)
   end
 
   it 'fails if no inputs are Bundles' do

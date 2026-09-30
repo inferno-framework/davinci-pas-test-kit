@@ -97,7 +97,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientClaimUpdateInitialSub
       result = run(add_item_test, session_url_path:, prior_submission_failed: 'true')
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to include('Prior step of the update workflow not completed.')
+      expect(result.result_message).to include('Prior step of the update scenario not completed.')
     end
 
     it 'runs a later update test when the prior step did not fail' do

@@ -37,6 +37,11 @@ module DaVinciPASTestKit
       input :ms_submit_responses, optional: true
       input :ms_inquire_responses, optional: true
 
+      input_order :ms_submit_responses,
+                  :ms_inquire_responses,
+                  :client_id,
+                  :session_url_path
+
       # Combined receive group - single wait test for both submit and inquire
       group do
         id :pas_client_v201_must_support_receive
@@ -45,6 +50,9 @@ module DaVinciPASTestKit
           During this group, Inferno will wait while the tester uses the client system to
           make `$submit` and `$inquire` operation requests to Inferno demonstrating coverage
           of must support elements not yet demonstrated.
+
+          Inferno then asks for confirmation that all responses were handled
+          without error and verifies the conformance of all requests and responses.
         )
         run_as_group
 
@@ -64,23 +72,22 @@ module DaVinciPASTestKit
                attest_message: 'I attest that the client system correctly handled the `$submit` and `$inquire` ' \
                                'operation responses received from Inferno during this test, making the details ' \
                                'available to users without errors.'
-             } }
-      end
-
-      # $submit Bundle Conformance Validation
-      group do
-        title '$submit Bundle Conformance'
-        description %(
-          During this group, Inferno will verify that the `$submit` request bundles sent by
-          the client are conformant and that the $submit response bundles provided for Inferno
-          to send back are conformant.
-        )
-        run_as_group
+             } } do
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@41'
+        end
 
         test from: :pas_client_v201_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
         test from: :pas_client_v201_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v201_inquire_request_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v201_inquire_response_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
       end
 
       # $submit Request Must Support (fail when errors detected)
@@ -88,22 +95,6 @@ module DaVinciPASTestKit
 
       # $submit Response Must Support (skip when errors detected)
       group from: :pas_client_v201_submit_response_must_support
-
-      # $inquire Bundle Conformance Validation
-      group do
-        title '$inquire Bundle Conformance'
-        description %(
-          During this group, Inferno will verify that the `$inquire` request bundles sent by
-          the client are conformant and that the $inquire response bundles provided for Inferno
-          to send back are conformant.
-        )
-        run_as_group
-
-        test from: :pas_client_v201_inquire_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
-        test from: :pas_client_v201_inquire_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, multiple_requests_ok: true } }
-      end
 
       # $inquire Request Must Support (fail when errors detected)
       group from: :pas_client_v201_inquire_must_support
