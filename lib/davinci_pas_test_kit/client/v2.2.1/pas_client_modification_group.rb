@@ -37,9 +37,9 @@ module DaVinciPASTestKit
            config: { options: {
              workflow_tag: MODIFICATION_WORKFLOW_TAG,
              operation_tag: SUBMIT_TAG,
-             attest_message: 'I attest that the details of what the payer actually authorized, including any ' \
-                             'modifications made to the requested items, were made available to users in the ' \
-                             'client system.'
+             attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                             'response and displays the details of what the payer actually authorized, including any ' \
+                             'modifications made to the requested items.'
            } }
       test from: :pas_client_v221_request_bundle_validation_test,
            config: { options: { workflow_tag: MODIFICATION_WORKFLOW_TAG } }
