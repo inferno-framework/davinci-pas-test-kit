@@ -49,6 +49,19 @@ module DaVinciPASTestKit
       string.gsub(/\{\{.*?\}\}/, replacements)
     end
 
+    # Replaces {{fhirpath}} tokens in a JSON string with values evaluated against `request`, then
+    # round-trips the result through the FHIR model to normalize it - shared by every place that
+    # instantiates tester-provided JSON this way (a $submit/$inquire response candidate, or a
+    # Subscription notification body). Returns the original string unchanged if it contains no
+    # tokens. Raises JSON::ParserError if the string is not valid JSON after replacement (for
+    # example because a token value contains a double quote); callers decide how to report that.
+    def replace_tokens_and_normalize(json_string, request)
+      replaced = replace_tokens_in_string(json_string, request)
+      return json_string if replaced.equal?(json_string)
+
+      FHIR.from_contents(replaced)&.to_json || replaced
+    end
+
     def calculate_expression_string_value(request, expression)
       fhirpath_result = execute_fhirpath(request, expression)
       JSON.parse(fhirpath_result.body)

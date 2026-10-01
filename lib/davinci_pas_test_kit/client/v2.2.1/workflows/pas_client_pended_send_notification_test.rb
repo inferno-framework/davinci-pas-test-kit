@@ -3,6 +3,7 @@ require_relative '../../client_input_descriptions'
 require_relative '../../user_input_response'
 require_relative '../../subscription_notification_trigger'
 require_relative '../../../cross_suite/tags'
+require_relative '../../../cross_suite/fhirpath_utils'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -10,6 +11,7 @@ module DaVinciPASTestKit
       include URLs
       include UserInputResponse
       include SubscriptionNotificationTrigger
+      include FhirpathUtils
 
       id :pas_client_v221_pended_notify_and_attest_finalized_test
       title 'Inferno sends a notification that the pended request has been finalized'
@@ -24,18 +26,7 @@ module DaVinciPASTestKit
             title: 'Claim updated notification JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be sent as the notification for the
-              PAS Subscription to tell the client that a decision has been made on the pended claim.
-              Before sending, Inferno will update the provided notification with details that the tester cannot
-              know ahead of time, including timestamps corresponding to the notification trigger time, and the id of
-              the triggering ClaimResponse if Inferno mocks that ClaimResponse because it is not provided by the
-              tester through the *Claim pended response JSON* input.
-              If not provided, a notification will be generated from the returned ClaimResponse.
-              In either case the response will be validated to ensure that the notification
-              is conformant. For PAS v2.2.1, the notification must be a full-resource notification
-              containing the complete ClaimResponse.
-            )
+            description: DaVinciPASTestKit.notification_bundle_input_description(full_resource_required: true)
       input :pended_json_response,
             title: 'Claim pended response JSON',
             type: 'textarea',
@@ -44,12 +35,7 @@ module DaVinciPASTestKit
       input :client_endpoint_access_token,
             optional: true,
             title: 'Client Notification Access Token',
-            description: %(
-              The bearer token that Inferno will send on requests to the client system's rest-hook notification
-              endpoint. Not needed if the client system will create a Subscription with an appropriate header value
-              in the `channel.header` element. If a value for the `authorization` header is provided in
-              `channel.header`, this value will override it.
-            )
+            description: INPUT_CLIENT_ENDPOINT_ACCESS_TOKEN
 
       run do
         subscription_request = load_tagged_requests(SUBSCRIPTION_CREATE_TAG).find { |req| req.status == 201 }
@@ -123,8 +109,27 @@ module DaVinciPASTestKit
         client_endpoint_access_token
       end
 
+      # Replaces {{fhirpath}} tokens in the tester-provided notification body using values from the
+      # $submit request the notification is finalizing, the same way as a tester-provided response
+      # candidate. If a replaced value breaks the JSON structure, nil is returned with a warning so
+      # that Inferno generates a notification instead (see SubscriptionNotificationTrigger#notification_json).
       def tester_notification_bundle
-        notification_bundle
+        return if notification_bundle.blank?
+
+        replace_tokens_and_normalize(notification_bundle, submitted_claim_bundle)
+      rescue JSON::ParserError
+        add_message('warning',
+                    'Unable to use the provided notification body, so Inferno will generate one instead. The ' \
+                    'notification is not valid JSON after {{fhirpath}} token replacement, for example because a ' \
+                    'token value contains a double quote.')
+        nil
+      end
+
+      def submitted_claim_bundle
+        return @submitted_claim_bundle if defined?(@submitted_claim_bundle)
+
+        request_body = @pended_submit_request&.request_body
+        @submitted_claim_bundle = request_body.present? ? FHIR.from_contents(request_body) : nil
       end
 
       def client_subscription_json

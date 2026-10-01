@@ -64,6 +64,35 @@ module DaVinciPASTestKit
       requests
     end
 
+    # $submit responses may also be delivered later via a Subscription notification (the pended
+    # workflow's finalized decision), rather than directly in the $submit response - see
+    # DaVinciPASTestKit::ResponseGenerator#mock_full_resource_notification_bundle. By default this
+    # uses load_tagged_requests, associating the requests with this test's result; tests that should
+    # not own that association can override notification_requests as must_support_requests does.
+    def notification_requests
+      load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)
+    end
+
+    # A full-resource notification's outer Bundle carries the $submit response Bundle nested in one
+    # of its entries (alongside the SubscriptionStatus entry), rather than as the notification's own
+    # resourceType, so it needs to be extracted before it can be assessed like any other $submit
+    # response Bundle.
+    def bundles_from_notification(notification_request)
+      notification_bundle = FHIR.from_contents(notification_request.request_body)
+      return [] unless notification_bundle.is_a?(FHIR::Bundle)
+
+      notification_bundle.entry.to_a.filter_map { |entry| entry.resource if entry.resource.is_a?(FHIR::Bundle) }
+    rescue StandardError
+      []
+    end
+
+    # A notification Inferno failed to deliver (a non-2xx response, or none at all - see
+    # DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification#send_notification) never reached the
+    # client, so its contents cannot count as something the client demonstrated must support for.
+    def successful_notification?(notification_request)
+      (200..299).cover?(notification_request.status.to_i)
+    end
+
     def fetch_tagged_resources
       resources = []
       tagged = must_support_requests
@@ -93,6 +122,23 @@ module DaVinciPASTestKit
           resources << response_resource
           entry_resources = response_resource.entry.map(&:resource)
           resources.concat(entry_resources)
+        end
+      end
+
+      if operation == 'submit' && type == 'response'
+        notification_requests.each_with_index do |req, index|
+          unless successful_notification?(req)
+            add_message('info',
+                        "Subscription notification #{index + 1} was not successfully delivered (delivery " \
+                        "status #{req.status.inspect}), so its contents were not included in the must " \
+                        'support analysis.')
+            next
+          end
+
+          bundles_from_notification(req).each do |bundle|
+            resources << bundle
+            resources.concat(bundle.entry.to_a.map(&:resource))
+          end
         end
       end
 

@@ -42,12 +42,27 @@ module DaVinciPASTestKit
           title: 'Must Support $submit Response Bundles',
           type: 'textarea',
           optional: true,
-          description: DaVinciPASTestKit.ms_responses_input_description('$submit')
+          description: DaVinciPASTestKit.ms_responses_input_description('$submit', supports_notification: true)
+    input :ms_notification_bodies,
+          title: 'Must Support Notification Bodies',
+          type: 'textarea',
+          optional: true,
+          description: DaVinciPASTestKit.ms_notification_bodies_input_description
     input :ms_inquire_responses,
           title: 'Must Support $inquire Response Bundles',
           type: 'textarea',
           optional: true,
           description: DaVinciPASTestKit.ms_responses_input_description('$inquire')
+    input :client_endpoint_access_token,
+          optional: true,
+          title: 'Client Notification Access Token',
+          description: INPUT_CLIENT_ENDPOINT_ACCESS_TOKEN
+    input_order :ms_submit_responses,
+                :ms_notification_bodies,
+                :ms_inquire_responses,
+                :client_endpoint_access_token,
+                :client_id,
+                :session_url_path
     config options: { accepts_multiple_requests: true, submit_enabled: true, inquire_enabled: true }
     output :confirmation_url
 

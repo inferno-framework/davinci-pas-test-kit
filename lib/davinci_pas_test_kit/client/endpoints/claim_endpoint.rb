@@ -118,6 +118,7 @@ module DaVinciPASTestKit
       response.status = 200
 
       req_bundle = FHIR.from_contents(request.body.string)
+      @req_bundle = req_bundle # so #tester_notification_bundle can evaluate {{fhirpath}} tokens against it
       claim_entry = req_bundle&.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
       claim_full_url = claim_entry&.fullUrl
       if claim_entry.blank? || claim_full_url.blank?
@@ -143,11 +144,18 @@ module DaVinciPASTestKit
       end
 
       response.body = response_bundle_json
+      trigger_notification_if_needed(response_bundle_json, generated_claim_response_uuid)
+    end
 
-      # Claim Update wait tests must never trigger a Subscription notification,
-      # even if the tester supplies a pended response body.
+    # Claim Update wait tests must never trigger a Subscription notification, even if the tester
+    # supplies a pended response body (suppress_notifications?). Both the pended workflow and a must
+    # support candidate that requests one go through the same start_notification_job call - the
+    # difference between them (a single notification_bundle input vs. a candidate-selected
+    # ms_notification_bodies entry) is resolved by #tester_notification_bundle.
+    def trigger_notification_if_needed(response_bundle_json, generated_claim_response_uuid)
       return if suppress_notifications?
-      return unless workflow == :pended && operation == 'submit'
+      return unless operation == 'submit'
+      return unless workflow == :pended || must_support_notification_ready?(response_bundle_json)
 
       start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
     end
@@ -216,7 +224,8 @@ module DaVinciPASTestKit
         "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
         "for #{operation_url_suffix} request ##{request_number}."
       )
-      entity_bundle(candidates[selected_index])
+      @selected_ms_candidate = candidates[selected_index]
+      entity_bundle(@selected_ms_candidate)
     rescue UserInputResponse::InvalidInputError, FhirpathUtils::FhirpathServiceError => e
       add_result_warning(
         'Unable to select a tester-provided response, so Inferno will generate a default response: ' \
@@ -232,10 +241,7 @@ module DaVinciPASTestKit
     # returned with a warning on the waiting test and Inferno generates a default response.
     def replace_tokens(bundle_hash, req_bundle)
       bundle_json = bundle_hash.is_a?(String) ? bundle_hash : bundle_hash.to_json
-      replaced = replace_tokens_in_string(bundle_json, req_bundle)
-      return bundle_json if replaced.equal?(bundle_json)
-
-      FHIR.from_contents(replaced)&.to_json || replaced
+      replace_tokens_and_normalize(bundle_json, req_bundle)
     rescue JSON::ParserError
       add_result_warning(
         'Unable to use the selected tester-provided response, so Inferno will generate a default response. ' \
@@ -332,6 +338,78 @@ module DaVinciPASTestKit
       request.path.split('$').last
     end
 
+    # Whether a must support $submit response should trigger a Subscription notification, per the
+    # selected response candidate's "notification" key (see AbstractGatherMustSupportTest) - as for a
+    # pended decision that is later finalized. False if no candidate was selected, the selected
+    # candidate has no "notification" key, the client has not yet created a Subscription for Inferno
+    # to notify, or (for a numeric "notification") the index has no corresponding
+    # ms_notification_bodies entry. When true, #tester_notification_bundle returns the tester-provided
+    # override this resolved (if any), for #start_notification_job to send exactly as it would for the
+    # pended workflow's single notification_bundle input.
+    def must_support_notification_ready?(response_bundle_json)
+      return false unless must_support_workflow?
+
+      notification = selected_ms_notification
+      return false if notification.blank?
+
+      if client_subscription_json.blank?
+        add_result_warning(
+          'A must support response candidate requested a Subscription notification, but the client system ' \
+          'has not created a Subscription yet, so no notification will be sent.'
+        )
+        return false
+      end
+
+      unless pended_response?(response_bundle_json)
+        add_result_info(
+          'Sending a Subscription notification for a must support $submit response that does not appear to ' \
+          'indicate a pended decision (no ClaimResponse item adjudication with reviewActionCode ' \
+          "'#{PENDED_REVIEW_ACTION_CODE}'). A conformant PAS payer only sends a Subscription notification to " \
+          'finalize a previously pended claim.'
+        )
+      end
+
+      return true if notification == 'generate'
+
+      @ms_notification_override = ms_notification_body_for_index(notification)
+      @ms_notification_override.present?
+    end
+
+    def selected_ms_notification
+      entity_notification(@selected_ms_candidate) if @selected_ms_candidate
+    end
+
+    # The raw tester-provided notification body at the 1-based index given by the selected
+    # candidate's "notification" value. Warns and returns nil if the index does not correspond to an
+    # entry in the ms_notification_bodies input.
+    def ms_notification_body_for_index(notification)
+      index = notification.to_s.to_i
+      bodies = ms_notification_bodies
+      if index < 1 || index > bodies.length
+        add_result_warning(
+          "The \"notification\" value #{notification.inspect} on the selected must support response candidate " \
+          "does not correspond to an entry in the '#{UserInputResponse.input_title(test, :ms_notification_bodies)}' " \
+          'input. No notification will be sent.'
+        )
+        return
+      end
+
+      bodies[index - 1].to_json
+    end
+
+    def ms_notification_bodies
+      @ms_notification_bodies ||= begin
+        input_value = UserInputResponse.read_input(result, 'ms_notification_bodies')
+        parsed = input_value.present? ? JSON.parse(input_value) : []
+        parsed.is_a?(Array) ? parsed : [parsed]
+      rescue JSON::ParserError
+        add_result_warning(
+          "The '#{UserInputResponse.input_title(test, :ms_notification_bodies)}' input is not valid JSON."
+        )
+        []
+      end
+    end
+
     # Helper methods for SubscriptionNotificationTrigger
 
     def notification_test_run_id
@@ -346,12 +424,45 @@ module DaVinciPASTestKit
       result.id
     end
 
+    # These two use the safe UserInputResponse reader rather than SubscriptionSimulationUtils'
+    # client_access_token_input/notification_bundle_input, which raise when the waiting test has no
+    # "client_endpoint_access_token"/"notification_bundle" input at all - true for the must support
+    # gather test, which offers its own ms_notification_bodies input instead (see
+    # #must_support_notification_ready?) and has no equivalent to client_endpoint_access_token.
     def notification_bearer_token
-      client_access_token_input(result)
+      UserInputResponse.read_input(result, :client_endpoint_access_token)
     end
 
+    # The must support workflow selects its override from ms_notification_bodies (resolved by
+    # #must_support_notification_ready? into @ms_notification_override) instead of the single
+    # notification_bundle input other workflows use - either way, this is the one place
+    # SubscriptionNotificationTrigger asks whether there is a tester-provided notification to send.
     def tester_notification_bundle
-      notification_bundle_input(result)
+      notification_json =
+        if must_support_workflow?
+          @ms_notification_override
+        else
+          UserInputResponse.read_input(result, :notification_bundle)
+        end
+      replace_notification_tokens(notification_json)
+    end
+
+    # Replaces {{fhirpath}} tokens in a tester-provided notification body using values from the
+    # $submit request it is finalizing, the same way as a tester-provided response candidate. If a
+    # replaced value breaks the JSON structure, nil is returned with a warning on the waiting test so
+    # that Inferno generates a notification instead (see #tester_notification_bundle's caller,
+    # SubscriptionNotificationTrigger#notification_json).
+    def replace_notification_tokens(notification_json)
+      return notification_json if notification_json.blank?
+
+      replace_tokens_and_normalize(notification_json, @req_bundle)
+    rescue JSON::ParserError
+      add_result_warning(
+        'Unable to use the provided notification body, so Inferno will generate one instead. The notification ' \
+        'is not valid JSON after {{fhirpath}} token replacement, for example because a token value contains a ' \
+        'double quote.'
+      )
+      nil
     end
 
     def client_subscription_json

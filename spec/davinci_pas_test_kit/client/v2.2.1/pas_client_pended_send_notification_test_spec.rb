@@ -19,13 +19,16 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
   let(:tester_notification_json) do
     File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_notification_example_id_only.json'))
   end
+  let(:submitted_claim_json) do
+    File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json'))
+  end
 
   # Only requests from the most recent result of a runnable are found by tag, so share one result
   let(:earlier_result) { repo_create(:result, test_session_id: test_session.id) }
 
-  def create_request(tags:, status:, response_body:)
+  def create_request(tags:, status:, response_body:, request_body: nil)
     repo_create(:request, direction: 'incoming', url: 'http://example.org/fhir', test_session_id: test_session.id,
-                          result: earlier_result, status:, response_body:, tags:)
+                          result: earlier_result, status:, response_body:, request_body:, tags:)
   end
 
   def create_subscription_request
@@ -33,9 +36,15 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
                    response_body: subscription_json.to_json)
   end
 
-  def create_pended_submit_request(status: 200)
+  def create_pended_submit_request(status: 200, request_body: submitted_claim_json)
     create_request(tags: [DaVinciPASTestKit::SUBMIT_TAG, DaVinciPASTestKit::PENDED_WORKFLOW_TAG], status:,
-                   response_body: pended_response_json)
+                   response_body: pended_response_json, request_body:)
+  end
+
+  def stub_fhirpath_service(expression, results)
+    stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+      .with(query: { 'path' => expression })
+      .to_return(status: 200, body: results.to_json)
   end
 
   def run_capturing_job_args(inputs = {})
@@ -121,6 +130,33 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
                                              pended_json_response: pended_response_json)
 
       expect(args[5]).to_not include("urn:uuid:#{claim_response_uuid}")
+    end
+
+    it 'replaces {{fhirpath}} tokens in the tester-provided notification using the submitted claim' do
+      tokenized_notification = JSON.parse(tester_notification_json)
+      tokenized_notification['entry'].first['resource']['id'] = '{{Bundle.entry.first().resource.id}}'
+      stub_fhirpath_service('Bundle.entry.first().resource.id',
+                            [{ type: 'string', element: 'ReferralAuthorizationExample' }])
+
+      _result, args = run_capturing_job_args(notification_bundle: tokenized_notification.to_json)
+
+      expect(FHIR.from_contents(args[5]).entry.first.resource.id).to eq('ReferralAuthorizationExample')
+    end
+
+    it 'generates a notification with a warning when token replacement breaks the JSON structure' do
+      tokenized_notification = JSON.parse(tester_notification_json)
+      tokenized_notification['entry'].first['resource']['id'] = '{{Bundle.id}}'
+      stub_fhirpath_service('Bundle.id', [{ type: 'string', element: 'value with "quotes"' }])
+
+      result, args = run_capturing_job_args(notification_bundle: tokenized_notification.to_json)
+      notification = FHIR.from_contents(args[5])
+
+      resource_types = notification.entry.map { |entry| entry.resource.resourceType }
+      expect(resource_types).to include('Parameters', 'Bundle') # generated, not the tester-provided one
+      messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+      expect(messages.map(&:message)).to include(
+        a_string_matching(/not valid JSON after \{\{fhirpath\}\} token replacement/)
+      )
     end
   end
 

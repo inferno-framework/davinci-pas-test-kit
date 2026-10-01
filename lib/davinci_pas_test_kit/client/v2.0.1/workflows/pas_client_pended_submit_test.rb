@@ -32,17 +32,7 @@ module DaVinciPASTestKit
             title: 'Claim updated notification JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be sent as the notification for the
-              PAS Subscription to tell the client that a decision has been made on the pended claim.
-              Before sending, Inferno will update the provided notification with details that the tester cannot
-              know ahead of time, including timestamps corresponding to the notification trigger time, and the id of
-              the triggering ClaimResponse if Inferno mocks that ClaimResponse because it is not provided by the
-              tester through the *Claim pended response JSON* input.
-              If not provided, a notification will be generated from the returned ClaimResponse.
-              In either case the response will be validated to ensure that the notification
-              is conformant.
-            )
+            description: DaVinciPASTestKit.notification_bundle_input_description
       input :pended_json_response,
             title: 'Claim pended response JSON',
             type: 'textarea',
@@ -68,12 +58,7 @@ module DaVinciPASTestKit
       input :client_endpoint_access_token,
             optional: true,
             title: 'Client Notification Access Token',
-            description: %(
-              The bearer token that Inferno will send on requests to the client system's rest-hook notification
-              endpoint. Not needed if the client system will create a Subscription with an appropriate header value
-              in the `channel.header` element. If a value for the `authorization` header is provided in
-              `channel.header`, this value will override it.
-            )
+            description: INPUT_CLIENT_ENDPOINT_ACCESS_TOKEN
       input :client_id,
             title: 'Client Id',
             type: 'text',

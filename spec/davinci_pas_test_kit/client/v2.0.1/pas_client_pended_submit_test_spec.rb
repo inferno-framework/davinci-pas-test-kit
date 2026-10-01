@@ -357,6 +357,35 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
             .to eq(FHIR.from_contents(notification_json_bundle).entry[0].resource.id)
         end
 
+        def stub_fhirpath_service(expression, results)
+          stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+            .with(query: { 'path' => expression })
+            .to_return(status: 200, body: results.to_json)
+        end
+
+        it 'replaces {{fhirpath}} tokens in the notification using values from the $submit request' do
+          create_subscription_request
+          tokenized_notification = JSON.parse(notification_json_bundle)
+          tokenized_notification['entry'].first['resource']['id'] = '{{Bundle.entry.first().resource.id}}'
+          inputs = { session_url_path:, notification_bundle: tokenized_notification.to_json }
+          result = run(test, inputs)
+          expect(result.result).to eq('wait')
+
+          notification_request = stub_request(:post, 'https://subscriptions.argo.run/fhir/r4/$subscription-hook')
+            .to_return(status: 200)
+          stub_fhirpath_service('Bundle.entry.first().resource.id',
+                                [{ type: 'string', element: 'ReferralAuthorizationExample' }])
+          allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification) # skip notification
+            .to receive(:rand).with(5..10).and_return(0)
+          post_json(submit_url, submit_request_json)
+
+          expect(notification_request).to have_been_made.times(1)
+          notifications = requests_repo.tagged_requests(result.test_session_id,
+                                                        [DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG])
+          fhir_body = FHIR.from_contents(notifications[0].request_body)
+          expect(fhir_body.entry[0].resource.id).to eq('ReferralAuthorizationExample')
+        end
+
         it 'fails when a non-json notification provided' do
           create_subscription_request
           inputs = { session_url_path:, notification_bundle: 'not json' }

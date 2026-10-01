@@ -52,6 +52,12 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
         .map(&:message)
     end
 
+    def result_infos(result)
+      Inferno::Repositories::Messages.new.messages_for_result(result.id)
+        .select { |message| message.type == 'info' }
+        .map(&:message)
+    end
+
     it 'returns a tester-provided response given as a single bare bundle' do
       inputs = { session_url_path:, ms_submit_responses: response_bundle(id: 'single-bundle').to_json }
       result = run(test, inputs)
@@ -345,6 +351,248 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
 
       expect(last_response.status).to be(200)
       expect(returned_claim_response.id).to eq('inquire-bundle')
+    end
+
+    describe 'notifications for pended must support responses' do
+      let(:result) { repo_create(:result, test_session_id: test_session.id) }
+      let(:requests_repo) { Inferno::Repositories::Requests.new }
+      let(:subscription_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}" }
+      let(:subscription_create_response_full_resource) do
+        JSON.parse(
+          File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_Subscription_example_full_resource.json'))
+        )
+      end
+      let(:notification_endpoint) { 'https://subscriptions.argo.run/fhir/r4/$subscription-hook' }
+
+      def create_subscription_request
+        repo_create(
+          :request,
+          direction: 'incoming',
+          url: subscription_url,
+          test_session_id: test_session.id,
+          result:,
+          response_body: subscription_create_response_full_resource.to_json,
+          tags: [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG],
+          status: 201
+        )
+      end
+
+      def notification_requests(test_session_id)
+        requests_repo.tagged_requests(test_session_id, [DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG])
+      end
+
+      def notification_candidate(id:, notification:, criteria: nil, pended: false)
+        bundle = pended ? pended_response_bundle(id:) : response_bundle(id:)
+        candidate = { 'bundle' => bundle, 'notification' => notification }
+        candidate['criteria'] = criteria if criteria
+        candidate
+      end
+
+      # response_bundle's fixture ClaimResponse indicates approval (reviewActionCode A1); this
+      # flips it to pended (A4) to exercise the pended-decision check on the notification trigger.
+      def pended_response_bundle(id:)
+        bundle = response_bundle(id:)
+        claim_response = bundle['entry'][0]['resource']
+        claim_response['item'].each do |item|
+          item['adjudication'].each { |adjudication| set_review_action_code(adjudication, 'A4') }
+        end
+        bundle
+      end
+
+      def set_review_action_code(adjudication, code)
+        review_action = adjudication['extension'].to_a.find do |ext|
+          ext['url'] == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'
+        end
+        review_code = review_action&.dig('extension').to_a.find do |ext|
+          ext['url'] == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'
+        end
+        return if review_code.blank?
+
+        review_code['valueCodeableConcept']['coding'][0]['code'] = code
+      end
+
+      before do
+        allow_any_instance_of(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification)
+          .to receive(:rand).with(5..10).and_return(0)
+      end
+
+      it 'sends a generated notification when the selected candidate asks Inferno to generate one' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 'generate')
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        notification_request = stub_request(:post, notification_endpoint).to_return(status: 200)
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_request).to have_been_made.times(1)
+        expect(notification_requests(result.test_session_id).length).to eq(1)
+      end
+
+      it 'adds an info message when the notified response does not indicate a pended decision' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 'generate')
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        stub_request(:post, notification_endpoint).to_return(status: 200)
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(result_infos(result)).to contain_exactly(
+          a_string_matching(/does not appear to indicate a pended decision/)
+        )
+      end
+
+      it 'does not add that info message when the notified response indicates a pended decision' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 'generate', pended: true)
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        stub_request(:post, notification_endpoint).to_return(status: 200)
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(result_infos(result)).to be_empty
+      end
+
+      it 'sends the client_endpoint_access_token input as the bearer token on the notification request' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 'generate')
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json,
+                   client_endpoint_access_token: 'ms-notification-token' }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        notification_request = stub_request(:post, notification_endpoint)
+          .with(headers: { 'Authorization' => 'Bearer ms-notification-token' })
+          .to_return(status: 200)
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_request).to have_been_made.times(1)
+      end
+
+      def notification_body_with_id(id)
+        notification = JSON.parse(
+          File.read(File.join(__dir__, '../../..', 'fixtures', 'PAS_notification_example_id_only.json'))
+        )
+        notification['entry'].first['resource']['id'] = id
+        notification
+      end
+
+      it 'sends the entry selected by index from ms_notification_bodies when notification is a number' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 2)
+        bodies = [notification_body_with_id('unselected-notification'),
+                  notification_body_with_id('selected-notification')]
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json,
+                   ms_notification_bodies: bodies.to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        notification_request = stub_request(:post, notification_endpoint).to_return(status: 200)
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_request).to have_been_made.times(1)
+        notifications = notification_requests(result.test_session_id)
+        expect(notifications.length).to eq(1)
+        expect(FHIR.from_contents(notifications[0].request_body).entry[0].resource.id)
+          .to eq('selected-notification')
+      end
+
+      it 'replaces {{fhirpath}} tokens in the selected ms_notification_bodies entry using the $submit request' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 1)
+        body = notification_body_with_id('{{Bundle.entry.first().resource.id}}')
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json,
+                   ms_notification_bodies: [body].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        notification_request = stub_request(:post, notification_endpoint).to_return(status: 200)
+        stub_fhirpath_service('Bundle.entry.first().resource.id',
+                              [{ type: 'string', element: 'ReferralAuthorizationExample' }])
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_request).to have_been_made.times(1)
+        notifications = notification_requests(result.test_session_id)
+        expect(FHIR.from_contents(notifications[0].request_body).entry[0].resource.id)
+          .to eq('ReferralAuthorizationExample')
+      end
+
+      it 'generates a notification with a warning when token replacement breaks the JSON structure' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 1)
+        body = notification_body_with_id('{{Bundle.id}}')
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json,
+                   ms_notification_bodies: [body].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        notification_request = stub_request(:post, notification_endpoint).to_return(status: 200)
+        stub_fhirpath_service('Bundle.id', [{ type: 'string', element: 'value with "quotes"' }])
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_request).to have_been_made.times(1)
+        expect(notification_requests(result.test_session_id).length).to eq(1)
+        expect(result_warnings(result)).to contain_exactly(
+          a_string_matching(/not valid JSON after \{\{fhirpath\}\} token replacement/)
+        )
+      end
+
+      it 'does not send a notification when the selected candidate has no "notification" key' do
+        create_subscription_request
+        candidate = { 'bundle' => response_bundle(id: 'pended') }
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_requests(result.test_session_id)).to be_empty
+      end
+
+      it 'warns and sends nothing when the client has not created a Subscription yet' do
+        candidate = notification_candidate(id: 'pended', notification: 'generate')
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_requests(result.test_session_id)).to be_empty
+        expect(result_warnings(result)).to contain_exactly(
+          a_string_matching(/has not created a Subscription yet/)
+        )
+      end
+
+      it 'warns and sends nothing when the notification index is out of range' do
+        create_subscription_request
+        candidate = notification_candidate(id: 'pended', notification: 5)
+        inputs = { session_url_path:, ms_submit_responses: [candidate].to_json,
+                   ms_notification_bodies: [{ 'resourceType' => 'Bundle' }].to_json }
+        result = run(test, inputs)
+        expect(result.result).to eq('wait')
+
+        post_json(submit_url, submit_request_json)
+
+        expect(last_response.status).to be(200)
+        expect(notification_requests(result.test_session_id)).to be_empty
+        expect(result_warnings(result)).to contain_exactly(
+          a_string_matching(/does not correspond to an entry in the 'Must Support Notification Bodies' input/)
+        )
+      end
     end
   end
 

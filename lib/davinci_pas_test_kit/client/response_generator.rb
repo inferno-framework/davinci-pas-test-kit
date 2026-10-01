@@ -4,6 +4,11 @@ module DaVinciPASTestKit
   module ResponseGenerator
     include ParametersHelper
 
+    REVIEW_ACTION_EXTENSION_URL = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'.freeze
+    REVIEW_ACTION_CODE_EXTENSION_URL =
+      'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'.freeze
+    PENDED_REVIEW_ACTION_CODE = 'A4'.freeze
+
     def mock_id_only_notification_bundle(submit_response, subscription_reference, subscription_topic,
                                          ig_version = 'v2.0.1')
       notification_timestamp = Time.now.utc
@@ -438,7 +443,7 @@ module DaVinciPASTestKit
         code = 'A3'
         display = 'Not Certified'
       when :pended
-        code = 'A4'
+        code = PENDED_REVIEW_ACTION_CODE
         display = 'Pending'
       when :modification
         code = 'A6'
@@ -452,6 +457,30 @@ module DaVinciPASTestKit
         code:,
         display:
       )
+    end
+
+    # Whether a $submit response Bundle indicates a pended decision - at least one ClaimResponse
+    # item adjudication carrying reviewActionCode A4 (see #get_review_action_code). Used to flag
+    # cases where Inferno is about to send a Subscription notification for a response that does not
+    # look pended: a conformant PAS payer only sends one to finalize a previously pended claim, so a
+    # notification for anything else would be a mistake in the tester-provided response/candidate.
+    def pended_response?(response_bundle_json)
+      response_bundle = FHIR.from_contents(response_bundle_json)
+      return false unless response_bundle.is_a?(FHIR::Bundle)
+
+      claim_response = response_bundle.entry.to_a.map(&:resource).find { |resource| resource.is_a?(FHIR::ClaimResponse) }
+      return false if claim_response.blank?
+
+      claim_response.item.to_a.any? do |item|
+        item.adjudication.to_a.any? { |adjudication| review_action_code(adjudication) == PENDED_REVIEW_ACTION_CODE }
+      end
+    end
+
+    def review_action_code(adjudication)
+      review_action = adjudication.extension&.find { |ext| ext.url == REVIEW_ACTION_EXTENSION_URL }
+      review_code = review_action&.extension&.find { |ext| ext.url == REVIEW_ACTION_CODE_EXTENSION_URL }
+      coding = review_code&.valueCodeableConcept&.coding
+      coding&.first&.code
     end
 
     def absolute_reference(ref, entries, root_url)

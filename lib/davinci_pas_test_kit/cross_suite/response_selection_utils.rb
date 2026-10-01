@@ -12,6 +12,7 @@ module DaVinciPASTestKit
   module ResponseSelectionUtils
     CRITERIA_KEY = 'criteria'.freeze
     BUNDLE_KEY = 'bundle'.freeze
+    NOTIFICATION_KEY = 'notification'.freeze
     REQUEST_RANGE_KEY = 'requestRange'.freeze
     FHIRPATH_KEY = 'fhirpath'.freeze
 
@@ -30,6 +31,14 @@ module DaVinciPASTestKit
     def entity_criteria(entity)
       criteria = bare_bundle?(entity) ? nil : entity[CRITERIA_KEY]
       criteria.is_a?(Hash) ? criteria : {}
+    end
+
+    # A wrapper entity may ask Inferno to send a Subscription event notification after its Bundle is
+    # returned, as for a pended decision that is later finalized. The value is either the string
+    # "generate", to have Inferno generate the notification itself, or a number giving the 1-based
+    # index of the entry to send instead from a separate list of tester-provided notification bodies.
+    def entity_notification(entity)
+      bare_bundle?(entity) ? nil : entity[NOTIFICATION_KEY]
     end
 
     def include_entity?(entity, request_fhir_obj, request_number)
@@ -87,18 +96,28 @@ module DaVinciPASTestKit
     end
 
     # ***********************************************************************
-    # Tester-facing warnings
+    # Tester-facing messages
     # ***********************************************************************
 
-    # Records a warning on the result of the waiting test, where the tester will see it,
-    # since problems with response selection stem from tester-provided input. The same
-    # input is evaluated for every incoming request, so a warning identical to one the
-    # result already has is not recorded again.
-    def add_result_warning(message)
+    # Records a message on the result of the waiting test, where the tester will see it. The same
+    # input is evaluated for every incoming request, so a message identical to one the result
+    # already has is not recorded again.
+    def add_result_message(type, message)
       messages_repo = Inferno::Repositories::Messages.new
       return if messages_repo.messages_for_result(result.id).any? { |existing| existing.message == message }
 
-      messages_repo.create(result_id: result.id, type: 'warning', message:)
+      messages_repo.create(result_id: result.id, type:, message:)
+    end
+
+    # Problems with response selection stem from tester-provided input, so they are warnings.
+    def add_result_warning(message)
+      add_result_message('warning', message)
+    end
+
+    # Informational notes about a decision Inferno made that the tester should be aware of, but
+    # which is not necessarily a problem.
+    def add_result_info(message)
+      add_result_message('info', message)
     end
   end
 end
