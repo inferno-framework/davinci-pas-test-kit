@@ -64,32 +64,12 @@ module DaVinciPASTestKit
       requests
     end
 
-    # $submit responses may also be delivered later via a Subscription notification (the pended
-    # workflow's finalized decision), rather than directly in the $submit response - see
-    # DaVinciPASTestKit::ResponseGenerator#mock_full_resource_notification_bundle. By default this
-    # uses load_tagged_requests, associating the requests with this test's result; tests that should
-    # not own that association can override notification_requests as must_support_requests does.
-    def notification_requests
-      load_tagged_requests(REST_HOOK_EVENT_NOTIFICATION_TAG)
-    end
-
-    # A full-resource notification's outer Bundle carries the $submit response Bundle nested in one
-    # of its entries (alongside the SubscriptionStatus entry), rather than as the notification's own
-    # resourceType, so it needs to be extracted before it can be assessed like any other $submit
-    # response Bundle.
-    def bundles_from_notification(notification_request)
-      notification_bundle = FHIR.from_contents(notification_request.request_body)
-      return [] unless notification_bundle.is_a?(FHIR::Bundle)
-
-      notification_bundle.entry.to_a.filter_map { |entry| entry.resource if entry.resource.is_a?(FHIR::Bundle) }
-    rescue StandardError
-      []
-    end
-
     def fetch_tagged_resources
       resources = []
+      tagged = must_support_requests
+      return resources if tagged.blank?
 
-      must_support_requests.each do |req|
+      tagged.each do |req|
         begin
           response_resource = FHIR.from_contents(type == 'request' ? req.request_body : req.response_body)
         rescue StandardError
@@ -113,15 +93,6 @@ module DaVinciPASTestKit
           resources << response_resource
           entry_resources = response_resource.entry.map(&:resource)
           resources.concat(entry_resources)
-        end
-      end
-
-      if operation == 'submit' && type == 'response'
-        notification_requests.each do |req|
-          bundles_from_notification(req).each do |bundle|
-            resources << bundle
-            resources.concat(bundle.entry.to_a.map(&:resource))
-          end
         end
       end
 

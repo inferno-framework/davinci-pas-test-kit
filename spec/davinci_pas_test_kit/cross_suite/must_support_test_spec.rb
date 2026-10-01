@@ -110,30 +110,6 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
       expect(result.result).to eq('fail')
       expect(result.result_message).to include('Could not find')
     end
-
-    it 'passes if a full-resource notification carries the response bundle instead' do
-      notification_bundle = FHIR::Bundle.new(
-        type: 'history',
-        entry: [
-          { resource: FHIR::Parameters.new },
-          { resource: FHIR.from_contents(json_pas_response_bundle) }
-        ]
-      )
-      repo_create(
-        :request,
-        direction: 'outgoing',
-        url: 'https://example.com/notification-endpoint',
-        test_session_id: test_session.id,
-        result:,
-        request_body: notification_bundle.to_json,
-        response_body: '',
-        tags: [DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG],
-        status: 200
-      )
-
-      result = run(test)
-      expect(result.result).to eq('pass')
-    end
   end
 
   describe 'when PAS inquiry request bundle' do

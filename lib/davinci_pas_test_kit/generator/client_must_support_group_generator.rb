@@ -201,9 +201,10 @@ module DaVinciPASTestKit
       def description
         if type == 'response'
           <<~DESCRIPTION
-            Check that `$#{operation}` responses #{'and Subscription notification contents ' if operation == 'submit' && ig_version == 'v2.2.1'} provided to the client contain
-            all PAS-defined profiles present in responses and their must support elements.#{' '}
-            #{'Demonstration of the PAS ClaimResponse profile is strictly required while all others are optional.' if ig_version == 'v2.2.1'}
+            Check that `$#{operation}` responses provided to the client contain
+            all PAS-defined profiles and their must support elements. Demonstration
+            of the PAS ClaimResponse profile is strictly required while all others
+            are optional.
 
             For `$#{operation}` responses, this includes the following profiles:
 
@@ -212,8 +213,9 @@ module DaVinciPASTestKit
         else
           <<~DESCRIPTION
             Check that the client can demonstrate `$#{operation}` requests that contain
-            all PAS-defined profiles present in requests and their must support elements.
-            #{'For all profiles other than PAS Claim Update, testers can attest that the missing elements are not supported by their system to pass the tests.' if ig_version == 'v2.2.1'}
+            all PAS-defined profiles and their must support elements. For all profiles
+            other than PAS Claim Update, testers can attest that the missing elements
+            are not supported by their system to pass the tests.
 
             For `$#{operation}` requests, this includes the following profiles:
 
