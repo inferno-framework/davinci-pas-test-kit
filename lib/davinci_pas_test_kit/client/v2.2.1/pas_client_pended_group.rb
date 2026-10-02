@@ -57,7 +57,7 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               opeation_tag: SUBMIT_TAG,
+               operation_tag: SUBMIT_TAG,
                attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
                                "response and displays the submitted claim as 'pended' meaning " \
                                'that a final decision on prior authorization of the service has not been made.'
