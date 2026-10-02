@@ -13,53 +13,21 @@ module DaVinciPASTestKit
       include PasBundleValidation
 
       id :pas_client_v221_pended_submit_test
-      title 'PAS Client submits a claim and receives a final decision via a notification'
+      title 'PAS client submits a claim using the $submit operation'
       description %(
-        Inferno will wait for a prior authorization submission request
-        from the client. Upon receipt, Inferno will respond with the
-        provided pended response. Subsequently, Inferno will send a
-        full-resource notification containing the final decision.
-        In v2.2.1, no follow-up `$inquire` request is needed as the
-        notification includes all details.
+        During this test, Inferno will wait for a prior authorization submission request
+        from the client using the `$submit` operation. Upon receipt, Inferno will respond
+        with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        pended response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
 
-      config options: { accepts_multiple_requests: true }
-      input :notification_bundle,
-            title: 'Claim updated notification JSON',
-            type: 'textarea',
-            optional: true,
-            description: %(
-              If provided, this JSON will be sent as the notification for the
-              PAS Subscription to tell the client that a decision has been made on the pended claim.
-              Before sending, Inferno will update the provided notification with details that the tester cannot
-              know ahead of time, including timestamps corresponding to the notification trigger time, and the id of
-              the triggering ClaimResponse if Inferno mocks that ClaimResponse because it is not provided by the
-              tester through the *Claim pended response JSON* input.
-              If not provided, a notification will be generated from the returned ClaimResponse.
-              In either case the response will be validated to ensure that the notification
-              is conformant. For v2.2.1, the notification will be a full-resource notification
-              containing the complete ClaimResponse.
-            )
       input :pended_json_response,
             title: 'Claim pended response JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be sent in response to $submit requests during this test
-              to indicate that the request has been pended awaiting a final decision.
-              It will be updated to make creation timestamps current.
-              If not provided, a pended response will be generated from the submitted Claim.
-              In either case the response will be validated against the PAS Response Bundle profile.
-            )
-      input :client_endpoint_access_token,
-            optional: true,
-            title: 'Client Notification Access Token',
-            description: %(
-              The bearer token that Inferno will send on requests to the client under test's rest-hook notification
-              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value
-              in the `channel.header` element. If a value for the `authorization` header is provided in
-              `channel.header`, this value will override it.
-            )
+            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Scenario')
       input :client_id,
             title: 'Client Id',
             type: 'text',
@@ -74,15 +42,16 @@ module DaVinciPASTestKit
             description: INPUT_SESSION_URL_PATH_LOCKED
 
       submit_respond_with :pended_json_response
+      config options: { submit_enabled: true, suppress_notifications: true } # handling notification separately
       output :confirmation_url
 
       run do
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
         skip_if requests.empty?, # NOTE: subscription needed ahead of time to support notification generation
                 %(
-                  Pended workflow tests cannot proceed because no Subscription exists to receive notifications
+                  Pended scenario tests cannot proceed because no Subscription exists to receive notifications
                   for pended claims. Run the _PAS Subscription Setup_ tests to provide a Subscription for use
-                  in delivering notifications before re-running the pended workflow tests.
+                  in delivering notifications before re-running the pended scenario tests.
                 )
 
         if user_inputted_response? :pended_json_response
@@ -95,17 +64,6 @@ module DaVinciPASTestKit
           ))
         end
 
-        if notification_bundle.present?
-          assert_valid_json notification_bundle,
-                            "Input '#{input_title(:notification_bundle)}' must be valid JSON"
-        else
-          add_message('info', %(
-            No notification body provided in input '#{input_title(:notification_bundle)}'. When sending a
-            notification finalizing a pended $submit response, the notification body will be generated by Inferno
-            from the submitted Claim.
-          ))
-        end
-
         wait_identifier = session_wait_identifier(client_id, session_url_path)
         submit_endpoint = session_endpoint_url(:submit, client_id, session_url_path)
         confirmation_url = "#{resume_pass_url}?token=#{wait_identifier}"
@@ -113,34 +71,30 @@ module DaVinciPASTestKit
 
         wait(
           identifier: wait_identifier,
-          timeout: 600,
-          message: %(
-            **Pended Workflow Test**:
+          message: <<~MESSAGE
+            **Pended Scenario Test**:
 
-            1. Submit a PAS request to
+            Inferno will wait while the tester uses the client system to submit a PAS request to
+            Inferno. The tests will automatically continue once a request has been received.
+
+            ### Endpoints
+
+            Submit a PAS request to
 
             `#{submit_endpoint}`
 
-            If the optional '**#{input_title(:pended_json_response)}**' input is populated, it will
-            be returned, updated with current timestamps. Otherwise, a pended response will
-            be generated by Inferno using the received Claim.
+            ### Authentication and Identification
 
-            2. Within 5-10 seconds, Inferno will send a full-resource notification indicating that the
-               ClaimResponse has been finalized. The notification will contain the complete updated
-               ClaimResponse. If the optional '**#{input_title(:notification_bundle)}**' input is populated
-                Inferno will send it as a notification. Otherwise, a notification will be generated
-                from Inferno. In either case, the notification will be delivered to the endpoint provided on the
-                Subscription during the _PAS Subscription Setup_ tests.
+            #{auth_description_for_wait(client_id)}
 
-            Note that Inferno will ask testers to attest to correct behavior of the system between these steps,
-            i.e., that the system marked the pended prior auth request appropriately after step 1 (submit) but
-            before step 2 (notification). Thus testers should check their system state as appropriate in order
-            to be able to faithfully answer the attestations.
+            ### Responses
 
-            Once the client has completed these steps,
-            [click here to complete the test](#{confirmation_url})
-            and continue Inferno's evaluation of the interaction.
-          )
+            #{response_description_for_wait(user_inputted_response?(:pended_json_response),
+                                            input_title(:pended_json_response),
+                                            '$submit')}
+
+            Inferno will not respond to `$inquire` requests during this test.
+          MESSAGE
         )
       end
     end

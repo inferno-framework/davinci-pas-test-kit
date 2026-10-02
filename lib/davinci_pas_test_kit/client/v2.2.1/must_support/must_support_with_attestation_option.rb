@@ -5,10 +5,9 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     # Aggregates the must support assessment across a list of profiles. Each must support element
     # that was not observed is logged as an info message, and when at least one was not observed the
-    # tester is given the opportunity to attest that the client system does not collect that data
-    # (and is not required to under the PAS implementation guide). A true attestation passes the
-    # test; a false attestation fails it. When every must support element was observed, the test
-    # passes without requiring any further input.
+    # tester is asked to attest that the client system does not collect that data. A true attestation
+    # passes the test; a false attestation fails it. When every must support element was observed, the
+    # test passes without requiring any further input.
     #
     # The must support assessment - including the shared X12 / DataAbsentReason false-positive
     # handling (remove_must_support_false_positives) is leveraged from the cross_suite must support
@@ -19,10 +18,9 @@ module DaVinciPASTestKit
       id :pas_client_v221_must_support_with_attestation_option
       title 'Must support elements are observed across requests'
       description %(
-        This test reviews the must support elements observed across the listed profiles in the
-        requests made by the client. If any were not observed, the tester has the opportunity to
-        attest that the client system does not collect that data (and is not required to under the
-        PAS implementation guide).
+        During this test, Inferno will check that all must support elements defined in the listed
+        profiles were observed in the requests made by the client. If any were not observed, the
+        tester has the option to attest that the client system does not collect that data.
       )
 
       # config.options:
@@ -95,7 +93,7 @@ module DaVinciPASTestKit
         end
 
         # If nothing was unobserved, the test passes immediately without requiring any attestation.
-        # Otherwise, the tester is given the opportunity to attest that the client system does not collect
+        # Otherwise, the tester can attest that the client system does not collect
         pass 'All must support elements were observed in the requests made by the client.' if
           unobserved_by_profile.empty?
 
@@ -145,9 +143,9 @@ module DaVinciPASTestKit
           Attest that the client system does **not** collect the data for these unobserved
           must support elements (and is not required to under the PAS implementation guide).
 
-          [Click here](#{attest_true_url}) if the above statement is **true**. The test will **pass**.
+          [Click here](#{attest_true_url}) if the above statement is **true**.
 
-          [Click here](#{attest_false_url}) if the above statement is **false**. The test will **fail**.
+          [Click here](#{attest_false_url}) if the above statement is **false**.
         MESSAGE
       end
 

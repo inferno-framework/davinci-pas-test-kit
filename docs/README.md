@@ -11,6 +11,7 @@ Guide. The following documentation provides information on how to use and contri
 *   **[Getting Started](../tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
 *   **[Test Kit Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 *   **[Client Testing Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details)**: Details on the client suites
+*   **[Controlling Client Suite Simulated Responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how the client suites' simulated PAS payer servers respond to requests and how testers can control those responses.
 *   **[Server Testing Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)**: Details on the server suites
 
 ## Contributing to this Test Kit

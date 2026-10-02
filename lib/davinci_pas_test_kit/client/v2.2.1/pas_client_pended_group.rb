@@ -1,4 +1,5 @@
 require_relative 'workflows/pas_client_pended_submit_test'
+require_relative 'workflows/pas_client_pended_send_notification_test'
 require_relative 'workflows/pas_client_response_attest'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative 'workflows/pas_client_request_bundle_validation_test'
@@ -12,60 +13,83 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v221_pended_group
-      title 'Pended Workflow'
+      title 'Pended Response'
       description %(
-        During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a 'pended' decision, including
+        During these tests, the client system will initiate a prior authorization
+        request and show it can react appropriately to a 'pended' decision, including
         waiting for a full-resource notification that contains the final decision.
-        In v2.2.1, the notification includes all details so no follow-up `$inquire`
-        request is needed.
+        In PAS v2.2.1, the notification includes all details so no follow-up `$inquire`
+        request is needed and Inferno does not currently accept them during this group.
       )
       run_as_group
 
       input :pended_json_response, optional: true
 
       input_order :pended_json_response,
+                  :notification_bundle,
+                  :client_endpoint_access_token,
                   :client_id,
                   :session_url_path
 
       group do
-        title 'Interaction'
+        title 'Interaction and Response Handling'
         description %(
-          All interactions for the pended prior authorization request workflow
-          between Inferno and the client under test will be performed during this test
+          All interactions for the pended prior authorization request scenario
+          between Inferno and the client system will be performed during this group
           including
-          - A `$submit` request from the client to Inferno where Inferno returns a pended response.
+          - A `$submit` request from the client system to Inferno where Inferno returns a pended response.
           - A full-resource notification that the prior authorization decision has been finalized
-            from Inferno to the client under test.
+            from Inferno to the client system.
+
+          In between these requests, testers will confirm that the system registers
+          the request as pended and that it is updated with the final response
+          after the notification is received.
         )
 
         test from: :pas_client_v221_pended_submit_test
-      end
-
-      group do
-        title '$submit Conformance and Handling'
-
-        test from: :pas_client_v221_request_bundle_validation_test,
-             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
-        test from: :pas_client_v221_response_bundle_validation_test,
-             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_pended_response_attest,
              title: 'PAS client displays the request as "pended"',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the pended response and attest that users are able to determine
               that the response has been pended and a decision will be forthcoming.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
-                               'claim, the client system indicates to users that a final decision on request ' \
-                               'has not yet been made.'
+               operation_tag: SUBMIT_TAG,
+               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                               "response and displays the submitted claim as 'pended' meaning " \
+                               'that a final decision on prior authorization of the service has not been made.'
+             } }
+        test from: :pas_client_v221_pended_notify_and_attest_finalized_test
+        test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_pended_finalized_response_attest,
+             title: 'PAS client displays the final decision as "approved"',
+             description: %(
+              During this test, the tester will observe the client system following
+              the receipt of the full-resource notification containing the approved final decision
+              and attest that users are able to determine that the request has been approved.
+             ),
+             config: { options: {
+               workflow_tag: PENDED_WORKFLOW_TAG,
+               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                               "response and displays the submitted claim as 'approved' meaning that the " \
+                               'user can proceed with ordering or providing the requested service.'
              } }
       end
 
       group do
-        title 'Notification Conformance and Handling'
+        title '$submit Conformance'
+
+        test from: :pas_client_v221_request_bundle_validation_test,
+             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
+        test from: :pas_client_v221_response_bundle_validation_test,
+             config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
+      end
+
+      group do
+        title 'Notification Conformance'
 
         test from: :subscriptions_r4_client_notification_input_verification,
              title: 'Inferno\'s event notification Bundle is conformant',
@@ -87,7 +111,7 @@ module DaVinciPASTestKit
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
-               requested in the Subscription provided during the **2.1** "PAS Subscription Setup" tests.
+               requested in the Subscription provided during the "Subscription Setup" tests.
              ),
              simulation_verification: true,
              config: {
@@ -106,19 +130,6 @@ module DaVinciPASTestKit
                verifies_requirements(*SubscriptionsTestKit::SubscriptionsR5BackportR4Client::EventNotificationVerificationTest.verifies_requirements,
                                      'hl7.fhir.us.davinci-pas_2.2.1@spec-8')
              end
-        test from: :pas_client_v221_response_attest,
-             title: 'PAS client displays the final decision as "approved"',
-             description: %(
-              This test provides the tester an opportunity to observe their client following
-              the receipt of the full-resource notification containing the approved final decision
-              and attest that users are able to determine that the request has been approved.
-             ),
-             config: { options: {
-               workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that the client system displays the submitted claim as 'approved' based " \
-                               'on the full-resource notification, meaning that the user can proceed with ' \
-                               'ordering or providing the requested service.'
-             } }
       end
     end
   end

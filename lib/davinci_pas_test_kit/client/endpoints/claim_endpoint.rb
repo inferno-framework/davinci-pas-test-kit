@@ -1,7 +1,7 @@
 require_relative '../user_input_response'
 require_relative '../response_generator'
+require_relative '../subscription_notification_trigger'
 require_relative '../client_urls'
-require_relative '../jobs/send_pas_subscription_notification'
 require_relative '../../cross_suite/fhirpath_utils'
 require_relative '../../cross_suite/response_selection_utils'
 require 'subscriptions_test_kit'
@@ -11,6 +11,7 @@ module DaVinciPASTestKit
   class ClaimEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
     include ResponseGenerator
+    include SubscriptionNotificationTrigger
     include ClientURLs
     include FhirpathUtils
     include ResponseSelectionUtils
@@ -29,6 +30,10 @@ module DaVinciPASTestKit
     end
 
     def tags
+      # Requests rejected for an expired token or a rejected $inquire are not treated as
+      # submissions of any workflow.
+      return [] if expired_token? || !operation_enabled?
+
       operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
       workflow_tag = WORKFLOW_TAG_MAP[workflow]
 
@@ -52,6 +57,13 @@ module DaVinciPASTestKit
       test.config.options[:suppress_notifications] == true
     end
 
+    # Tests must opt in to each operation with the submit_enabled and inquire_enabled options. Inferno responds
+    # to every request for an operation that is not enabled with an OperationOutcome, without tagging the
+    # request or continuing the test.
+    def operation_enabled?
+      %w[inquire submit].include?(operation) && test.config.options[:"#{operation}_enabled"] == true
+    end
+
     def workflow
       case test.id
       when /.*pended.*/
@@ -70,7 +82,7 @@ module DaVinciPASTestKit
     end
 
     def must_support_workflow?
-      test.id =~ /.*must_support.*/ || test.id =~ /.*gather_must_support.*/
+      test.id =~ /.*must_support.*/
     end
 
     WORKFLOW_TAG_MAP = {
@@ -86,6 +98,11 @@ module DaVinciPASTestKit
       return if response.status == 401 # set in update_result (expired token handling there)
 
       response.format = :json
+
+      unless operation_enabled?
+        make_rejected_operation_response
+        return
+      end
 
       # Handle the operation failure and processing error workflows, which require a user-provided response.
       if workflow == :operation_failure
@@ -136,10 +153,11 @@ module DaVinciPASTestKit
     end
 
     def update_result
-      if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+      if expired_token?
         UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response, 'Bearer token')
         return
       end
+      return unless operation_enabled? # keep waiting for the request that the test is looking for
 
       results_repo.update_result(result.id, 'pass') unless test.config.options[:accepts_multiple_requests]
     end
@@ -151,20 +169,38 @@ module DaVinciPASTestKit
 
     private
 
+    # Memoized so the token is only decoded and parsed once per request, even though both
+    # #tags and #update_result/#make_response need to check it.
+    def expired_token?
+      return @expired_token if defined?(@expired_token)
+
+      @expired_token = UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+    end
+
     # Resolves the user-provided response, using criteria-based selection for must support
-    # workflows or the single-response approach for other workflows.
+    # workflows or the single-response approach for other workflows
+    # and replaces {{fhirpath}} tokens with values from the request.
     def resolve_user_response(req_bundle)
-      if must_support_workflow?
-        select_must_support_response(req_bundle)
-      else
-        UserInputResponse.user_inputted_response(test, operation, result)
-      end
+      user_response = if must_support_workflow?
+                        select_must_support_response(req_bundle)
+                      else
+                        UserInputResponse.user_inputted_response(test, operation, result)
+                      end
+
+      return nil unless user_response.present?
+
+      replace_tokens(user_response, req_bundle)
+    rescue FhirpathUtils::FhirpathServiceError => e
+      add_result_warning(
+        'Unable to instantiate a tester-provided response, so Inferno will generate a default response: ' \
+        "#{e.message}"
+      )
+      nil
     end
 
     # Selects the first tester-provided response candidate whose selection criteria all
     # match the incoming request, extracts its response Bundle (unwrapping it when the
-    # candidate pairs the Bundle with criteria), and replaces {{fhirpath}} tokens with
-    # values from the request. Returns nil, causing Inferno to generate a default
+    # candidate pairs the Bundle with criteria). Returns nil, causing Inferno to generate a default
     # response, if no candidates are provided or none match. Problems with the
     # tester-provided input or the FHIRPath service also result in nil, with a warning
     # on the waiting test so that the tester can see what went wrong.
@@ -188,20 +224,22 @@ module DaVinciPASTestKit
         "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
         "for #{operation_url_suffix} request ##{request_number}."
       )
-      replace_tokens(entity_bundle(candidates[selected_index]), req_bundle)
+      entity_bundle(candidates[selected_index])
     rescue UserInputResponse::InvalidInputError, FhirpathUtils::FhirpathServiceError => e
       add_result_warning(
-        "Unable to select a tester-provided response, so Inferno will generate a default response. #{e.message}"
+        'Unable to select a tester-provided response, so Inferno will generate a default response: ' \
+        "#{e.message}"
       )
       nil
     end
 
     # Replaces {{fhirpath}} tokens using values from the incoming request, round-tripping
-    # the result through the FHIR model to normalize it. If a replaced value breaks the
-    # JSON structure, the result cannot be returned as a FHIR response, so nil is returned
-    # with a warning on the waiting test and Inferno generates a default response.
+    # the result through the FHIR model to normalize it. The response may be a parsed hash
+    # (must support workflow) or the raw JSON string of a single input. If a replaced value
+    # breaks the JSON structure, the result cannot be returned as a FHIR response, so nil is
+    # returned with a warning on the waiting test and Inferno generates a default response.
     def replace_tokens(bundle_hash, req_bundle)
-      bundle_json = bundle_hash.to_json
+      bundle_json = bundle_hash.is_a?(String) ? bundle_hash : bundle_hash.to_json
       replaced = replace_tokens_in_string(bundle_json, req_bundle)
       return bundle_json if replaced.equal?(bundle_json)
 
@@ -252,68 +290,80 @@ module DaVinciPASTestKit
     end
 
     def make_processing_error_response
-      user_provided_bundle = UserInputResponse.user_inputted_response(test, operation, result)
-      unless user_provided_bundle.present?
-        response.status = 400
-        response.body = FHIR::OperationOutcome.new(
-          issue: FHIR::OperationOutcome::Issue.new(
-            severity: 'fatal', code: 'required',
-            details: FHIR::CodeableConcept.new(
-              text: 'The processing_error_response input is required for this test and was not provided.'
-            )
-          )
-        ).to_json
+      unless UserInputResponse.user_inputted_response(test, operation, result).present?
+        error_outcome_response('The processing_error_response input is required for this test and was not provided.')
         return
       end
 
+      req_bundle = FHIR.from_contents(request.body.string)
+      if req_bundle.blank?
+        handle_missing_required_elements(nil, response)
+        return
+      end
+
+      # Unlike other workflows, there is no mocked response to fall back to when instantiation fails.
+      instantiated_response = resolve_user_response(req_bundle)
+      if instantiated_response.blank?
+        error_outcome_response('The processing_error_response input could not be instantiated. ' \
+                               'See the warnings on the waiting test for details.')
+        return
+      end
+
+      claim_entry = req_bundle.entry&.find { |e| e&.resource&.resourceType == 'Claim' }
       response.status = 200
-      response.body = user_provided_bundle
+      response.body = update_tester_provided_response(instantiated_response, claim_entry&.fullUrl, operation,
+                                                      ig_version)
+    end
+
+    def make_rejected_operation_response
+      response.status = 501
+      response.body = FHIR::OperationOutcome.new(
+        issue: FHIR::OperationOutcome::Issue.new(
+          severity: 'error', code: 'not-supported',
+          details: FHIR::CodeableConcept.new(
+            text: "Inferno does not support the $#{operation} operation during this test."
+          )
+        )
+      ).to_json
+    end
+
+    def error_outcome_response(text)
+      response.status = 400
+      response.body = FHIR::OperationOutcome.new(
+        issue: FHIR::OperationOutcome::Issue.new(
+          severity: 'fatal', code: 'required', details: FHIR::CodeableConcept.new(text:)
+        )
+      ).to_json
     end
 
     def operation
       request.path.split('$').last
     end
 
-    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid)
-      notification_bearer_token = client_access_token_input(result)
-      notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
+    # Helper methods for SubscriptionNotificationTrigger
 
-      Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, test_run.id, test_run.test_session_id, result.id,
-                            notification_bearer_token, notification_contents, test_run_identifier, suite_id,
-                            ig_version)
+    def notification_test_run_id
+      test_run.id
     end
 
-    def notification_json(response_bundle_json, decision, generated_claim_response_uuid)
-      user_inputted_notification_json =
-        JSON.parse(result.input_json).find { |i| i['name'] == 'notification_bundle' }['value']
-
-      if user_inputted_notification_json.present?
-        update_tester_provided_notification(user_inputted_notification_json, generated_claim_response_uuid)
-      else
-        generate_notification(response_bundle_json, decision)
-      end
+    def notification_test_session_id
+      test_run.test_session_id
     end
 
-    def generate_notification(response_bundle_json, decision)
-      subscription = find_subscription(test_run.test_session_id, as_json: true)
-      subscription_reference = "#{fhir_subscription_url}/#{subscription['id']}"
-      subscription_topic = subscription['criteria']
-
-      if find_subscription_content_type(subscription) == 'full-resource'
-        mock_full_resource_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
-                                               decision, ig_version)
-      else # assume id-only since empty not allowed - if asked for empty, other failures will occur
-        mock_id_only_notification_bundle(response_bundle_json, subscription_reference, subscription_topic,
-                                         ig_version)
-      end
+    def notification_result_id
+      result.id
     end
 
-    def find_subscription_content_type(subscription)
-      content_ext = subscription.dig('channel', '_payload', 'extension')
-        &.find do |ext|
-          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
-        end
-      content_ext&.dig('valueCode')
+    def notification_bearer_token
+      client_access_token_input(result)
+    end
+
+    def tester_notification_bundle
+      notification_bundle_input(result)
+    end
+
+    def client_subscription_json
+      find_subscription(test_run.test_session_id, as_json: true)
     end
   end
 end

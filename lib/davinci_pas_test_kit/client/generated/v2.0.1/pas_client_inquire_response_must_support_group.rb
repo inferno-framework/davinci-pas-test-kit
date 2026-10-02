@@ -15,10 +15,9 @@ module DaVinciPASTestKit
       title '$inquire Response Must Support Coverage'
       description %(
         Check that `$inquire` responses provided to the client contain
-        all PAS-defined profiles and their must support elements.
-        
-        **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
-        not the system under test. Errors will be treated as skips instead of failures.
+        all PAS-defined profiles and their must support elements. Demonstration
+        of the PAS ClaimResponse profile is strictly required while all others
+        are optional.
         
         For `$inquire` responses, this includes the following profiles:
         
@@ -38,41 +37,35 @@ module DaVinciPASTestKit
 
       test from: :pas_client_v201_inquire_response_must_support_pas_inquiry_response_bundle do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_claiminquiryresponse do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_insurer do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_requestor do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_beneficiary do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_practitioner do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_practitioner_role do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_task do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
-      end
-      test from: :pas_client_v201_response_attest,
-           title: 'PAS client handled the $inquire response must support elements',
-           description: %(
-             This test provides the tester an opportunity to verify that their client
-             correctly processed and used the must support elements present in the
-             $inquire responses received from Inferno during these tests.
-           ),
-           config: { options: {
-             workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
-             attest_message: "I attest that the client system correctly processed the must support elements " \
-                             "contained in the $inquire responses received from Inferno and did not error."
-           } } do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+        simulation_verification
       end
     end
   end

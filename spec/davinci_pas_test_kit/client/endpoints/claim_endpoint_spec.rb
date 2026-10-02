@@ -330,7 +330,7 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
       expect(result_warnings(result)).to contain_exactly(
         a_string_matching(
-          /default response\. The 'Must Support \$submit Response Bundles' input is not valid JSON\./
+          /default response: The 'Must Support \$submit Response Bundles' input is not valid JSON\./
         )
       )
     end
@@ -345,6 +345,79 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
 
       expect(last_response.status).to be(200)
       expect(returned_claim_response.id).to eq('inquire-bundle')
+    end
+  end
+
+  describe 'single tester-provided response (non must support workflow)' do
+    let(:session_url_path) { '1234' }
+    let(:test) do
+      Class.new(DaVinciPASTestKit::AbstractApprovalSubmitTest) do
+        include DaVinciPASTestKit::DaVinciPASV201::URLs
+
+        def suite_id
+          'davinci_pas_client_suite_v201'
+        end
+      end
+    end
+    let(:submit_url) { "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::SUBMIT_PATH}" }
+    let(:submit_request_json) do
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
+    end
+    let(:response_json) do
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json')))
+    end
+
+    def returned_claim_response
+      FHIR.from_contents(last_response.body).entry[0].resource
+    end
+
+    def result_warnings(result)
+      Inferno::Repositories::Messages.new.messages_for_result(result.id)
+        .select { |message| message.type == 'warning' }
+        .map(&:message)
+    end
+
+    it 'serves the provided response when it contains no tokens' do
+      response_json['entry'][0]['resource']['id'] = 'approval-bundle'
+      result = run(test, session_url_path:, approval_json_response: response_json.to_json)
+      expect(result.result).to eq('wait')
+
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response.id).to eq('approval-bundle')
+    end
+
+    it 'replaces {{fhirpath}} tokens in the provided response' do
+      response_json['entry'][0]['resource']['preAuthRef'] = '{{Bundle.entry.first().resource.id}}'
+      result = run(test, session_url_path:, approval_json_response: response_json.to_json)
+      expect(result.result).to eq('wait')
+
+      stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+        .with(query: { 'path' => 'Bundle.entry.first().resource.id' })
+        .to_return(status: 200, body: [{ type: 'string', element: 'ReferralAuthorizationExample' }].to_json)
+      post_json(submit_url, submit_request_json)
+
+      expect(returned_claim_response.preAuthRef).to eq('ReferralAuthorizationExample')
+    end
+
+    it 'generates a default response with a warning when the FHIRPath service fails during token replacement' do
+      response_json['entry'][0]['resource']['id'] = 'approval-bundle'
+      response_json['entry'][0]['resource']['preAuthRef'] = '{{Bundle.id}}'
+      result = run(test, session_url_path:, approval_json_response: response_json.to_json)
+      expect(result.result).to eq('wait')
+
+      stub_request(:post, "#{ENV.fetch('FHIRPATH_URL')}/evaluate")
+        .with(query: { 'path' => 'Bundle.id' })
+        .to_return(status: 500, body: 'internal error')
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to be(200)
+      expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
+      expect(returned_claim_response.id).to_not eq('approval-bundle')
+      expect(result_warnings(result)).to contain_exactly(
+        a_string_matching(/Unable to instantiate a tester-provided response.*HTTP 500 for query 'Bundle.id'/)
+      )
     end
   end
 end

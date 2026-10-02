@@ -1,9 +1,11 @@
 require_relative '../../../cross_suite/pas_bundle_validation'
+require_relative '../../client_bundle_validation_helper'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
     class PasClientInquireRequestBundleValidationTest < Inferno::Test
       include DaVinciPASTestKit::PasBundleValidation
+      include DaVinciPASTestKit::ClientBundleValidationHelper
 
       id :pas_client_v221_inquire_request_bundle_validation_test
       title '$inquire request Bundles have the correct structure and content'
@@ -25,30 +27,22 @@ module DaVinciPASTestKit
         sets containing X12 codes are not validated.
       )
 
-      def request_type_tag
-        INQUIRE_TAG
+      def operation_name
+        'inquire'
       end
 
-      def workflow_tag
-        config.options[:workflow_tag]
+      def message_direction_name
+        'request'
+      end
+
+      def ig_version
+        '2.2.1'
       end
 
       run do
-        if workflow_tag.present?
-          load_tagged_requests(request_type_tag, workflow_tag)
-        else
-          load_tagged_requests(request_type_tag)
-        end
-        skip_if !request.present?, 'No inquire requests received.'
-
-        validate_pas_bundle_json(
-          request.request_body,
-          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-request-bundle',
-          '2.2.1',
-          'inquire',
-          'request_bundle',
-          message: 'The Bundle provided for the Claim/$inquire operation is invalid:'
-        )
+        failed = non_conformant_bundles
+        assert failed.empty?,
+               "Non-conformant request Bundles detected: #{failed.join(', ')}. Check messages for issues found."
       end
     end
   end

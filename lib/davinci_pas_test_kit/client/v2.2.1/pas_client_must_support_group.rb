@@ -7,6 +7,7 @@ require_relative 'workflows/pas_client_request_bundle_validation_test'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative 'workflows/pas_client_inquire_request_bundle_validation_test'
 require_relative 'workflows/pas_client_inquire_response_bundle_validation_test'
+require_relative '../client_input_descriptions'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -14,54 +15,55 @@ module DaVinciPASTestKit
       id :pas_client_v221_must_support
       title 'Must Support Elements'
       run_as_group
-      description %(
-        During these tests, the client will show that it supports all PAS-defined profiles and the must support
-        elements defined in them. This includes
+      description DaVinciPASTestKit.must_support_group_description('v2.2.1', 'da-vinci-pas-v2-2-1')
 
-        - The ability to make prior authorization submission and inquiry requests that contain all
-          PAS-defined profiles and their must support elements.
-        - The ability to receive in responses to those requests all PAS-defined profiles and their
-          must support elements.
+      # The must support response inputs already belong to pas_client_v221_gather_must_support
+      # (the wait test below); declaring them here too, before it and the Bundle Conformance
+      # groups further down are defined, propagates them onto the bundle validation test slots
+      # in those groups as well, so they can tell whether a tester-provided response was used
+      # - see PasClientResponseBundleValidationTest/PasClientInquireResponseBundleValidationTest
+      # #failed_entities_description.
+      input :ms_submit_responses, optional: true
+      input :ms_inquire_responses, optional: true
 
-        Clients under test will be asked to make additional requests to Inferno demonstrating coverage
-        of all must support items in the requests. Clients must also demonstrate that they can handle
-        all response must support elements. Because Inferno's mocked responses do not include all must
-        support elements, testers will need to provide responses that include examples of all must
-        support elements for Inferno to respond with.
-
-        Note that Inferno will consider requests made during the workflow group of tests, so only
-        profiles and must support elements not demonstrated during those tests need to be submitted
-        as a part of these.
-      )
+      input_order :ms_submit_responses,
+                  :ms_inquire_responses,
+                  :client_id,
+                  :session_url_path
 
       # Combined receive group - single wait test for both submit and inquire
       group do
         id :pas_client_v221_must_support_receive
-        title 'Demonstrate Must Support Coverage'
-        description %(
-          Submit $submit and $inquire requests demonstrating coverage of must support elements.
-          Optionally, provide response bundles for Inferno to use when responding. Inferno will
-          verify both the requests received and the responses provided.
-        )
+        title MUST_SUPPORT_RECEIVE_GROUP_TITLE
+        description MUST_SUPPORT_RECEIVE_GROUP_DESCRIPTION
         run_as_group
 
         test from: :pas_client_v221_gather_must_support
-      end
-
-      # $submit Bundle Conformance Validation
-      group do
-        title '$submit Bundle Conformance'
-        description %(
-          Verify that the $submit request bundles sent by the client are conformant
-          and that the $submit response bundles provided for Inferno to send back
-          are conformant.
-        )
-        run_as_group
+        test from: :pas_client_v221_response_attest,
+             id: :pas_client_v221_response_attest_ms_submit_inquire,
+             title: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_TITLE,
+             description: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_DESCRIPTION,
+             config: { options: {
+               workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
+               no_requests_ok: true,
+               multiple_requests_ok: true,
+               attest_message: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_MESSAGE
+             } } do
+          verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+        end
 
         test from: :pas_client_v221_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
         test from: :pas_client_v221_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v221_inquire_request_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
+        test from: :pas_client_v221_inquire_response_bundle_validation_test,
+             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
+                                  multiple_requests_ok: true } }
       end
 
       # $submit Request Must Support (fail when errors detected)
@@ -69,22 +71,6 @@ module DaVinciPASTestKit
 
       # $submit Response Must Support (skip when errors detected)
       group from: :pas_client_v221_submit_response_must_support
-
-      # $inquire Bundle Conformance Validation
-      group do
-        title '$inquire Bundle Conformance'
-        description %(
-          Verify that the $inquire request bundles sent by the client are conformant
-          and that the $inquire response bundles provided for Inferno to send back
-          are conformant.
-        )
-        run_as_group
-
-        test from: :pas_client_v221_inquire_request_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
-        test from: :pas_client_v221_inquire_response_bundle_validation_test,
-             config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG } }
-      end
 
       # $inquire Request Must Support (fail when errors detected)
       group from: :pas_client_v221_inquire_must_support

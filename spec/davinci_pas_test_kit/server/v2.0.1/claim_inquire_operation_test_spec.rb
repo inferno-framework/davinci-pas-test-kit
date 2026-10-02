@@ -30,7 +30,7 @@ RSpec.describe DaVinciPASTestKit::ClaimInquireOperationTest, :runnable do
       result = run(test, pa_inquire_request_payload: 'not json', server_endpoint:)
       expect(result.result).to eq('fail')
       expect(result.result_message)
-        .to match(/Invalid JSON. Provide valid json to use for the \$inquire during the Pended workflow./)
+        .to match(/Invalid JSON. Provide valid json to use for the \$inquire during the Pended scenario./)
     end
   end
 

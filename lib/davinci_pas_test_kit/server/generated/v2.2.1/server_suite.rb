@@ -128,9 +128,9 @@ module DaVinciPASTestKit
 
       group from: :pas_server_v221_subscription_setup
 
-      group 'Demonstrate Workflow Support' do
+      group 'Demonstrate Scenario Support' do
         description %(
-          The workflow tests validate that the server can participate in complete
+          The scenario tests validate that the server can participate in complete
           end-to-end prior authorization interactions, returning responses that are
           conformant and also contain the correct codes.
         )

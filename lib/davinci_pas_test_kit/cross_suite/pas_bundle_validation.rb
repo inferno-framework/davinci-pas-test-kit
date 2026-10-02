@@ -4,85 +4,25 @@ require_relative '../parameters_helper'
 require_relative 'validation_test'
 require_relative 'pas_constants'
 require_relative 'pas_datatype_constraints'
+require_relative 'referenced_resource_presence_validation'
 
 module DaVinciPASTestKit
   module PasBundleValidation
     include DaVinciPASTestKit::ValidationTest
     include DaVinciPASTestKit::PasDatatypeConstraints
+    include DaVinciPASTestKit::ReferencedResourcePresenceValidation
     include ParametersHelper
 
-    US_CORE_VERSION = '6.1.0'
-    US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
-    BASE_R4_PROFILE = :base_r4
-    CLAIM_ENCOUNTER_EXTENSION_URL = 'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter'
-    LOINC_SYSTEM = 'http://loinc.org'
-    TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
-    OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
-    DIAGNOSTIC_REPORT_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v2-0074'
+    ###########################################################################
+    # Public API
+    ###########################################################################
 
-    US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE = {
-      'AllergyIntolerance' => 'us-core-allergyintolerance',
-      'CarePlan' => 'us-core-careplan',
-      'CareTeam' => 'us-core-careteam',
-      'Coverage' => 'us-core-coverage',
-      'Device' => 'us-core-implantable-device',
-      'DocumentReference' => 'us-core-documentreference',
-      'Encounter' => 'us-core-encounter',
-      'Goal' => 'us-core-goal',
-      'Immunization' => 'us-core-immunization',
-      'Location' => 'us-core-location',
-      'Medication' => 'us-core-medication',
-      'MedicationDispense' => 'us-core-medicationdispense',
-      'MedicationRequest' => 'us-core-medicationrequest',
-      'Organization' => 'us-core-organization',
-      'Patient' => 'us-core-patient',
-      'Practitioner' => 'us-core-practitioner',
-      'PractitionerRole' => 'us-core-practitionerrole',
-      'Procedure' => 'us-core-procedure',
-      'Provenance' => 'us-core-provenance',
-      'QuestionnaireResponse' => 'us-core-questionnaireresponse',
-      'RelatedPerson' => 'us-core-relatedperson',
-      'ServiceRequest' => 'us-core-servicerequest',
-      'Specimen' => 'us-core-specimen'
-    }.freeze
-
-    US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID = 'us-core-condition-encounter-diagnosis'
-    US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID = 'us-core-condition-problems-health-concerns'
-    US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID = 'us-core-diagnosticreport-lab'
-    US_CORE_DIAGNOSTIC_REPORT_NOTE_PROFILE_ID = 'us-core-diagnosticreport-note'
-    US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID = 'us-core-observation-clinical-result'
-    US_CORE_OBSERVATION_LAB_PROFILE_ID = 'us-core-observation-lab'
-    US_CORE_OBSERVATION_SCREENING_ASSESSMENT_PROFILE_ID = 'us-core-observation-screening-assessment'
-    US_CORE_SIMPLE_OBSERVATION_PROFILE_ID = 'us-core-simple-observation'
-    US_CORE_SMOKING_STATUS_PROFILE_ID = 'us-core-smokingstatus'
-    US_CORE_VITAL_SIGNS_PROFILE_ID = 'us-core-vital-signs'
-
-    US_CORE_OBSERVATION_CODE_PROFILE_IDS = {
-      '11341-5' => 'us-core-observation-occupation',
-      '86645-9' => 'us-core-observation-pregnancyintent',
-      '82810-3' => 'us-core-observation-pregnancystatus',
-      '76690-7' => 'us-core-observation-sexual-orientation',
-      '8289-1' => 'head-occipital-frontal-circumference-percentile',
-      '59576-9' => 'pediatric-bmi-for-age',
-      '77606-2' => 'pediatric-weight-for-height',
-      '85354-9' => 'us-core-blood-pressure',
-      '39156-5' => 'us-core-bmi',
-      '8302-2' => 'us-core-body-height',
-      '8310-5' => 'us-core-body-temperature',
-      '29463-7' => 'us-core-body-weight',
-      '9843-4' => 'us-core-head-circumference',
-      '8867-4' => 'us-core-heart-rate',
-      '59408-5' => 'us-core-pulse-oximetry',
-      '2708-6' => 'us-core-pulse-oximetry',
-      '9279-1' => 'us-core-respiratory-rate',
-      '72166-2' => 'us-core-smokingstatus'
-    }.freeze
-
-    def validation_error_messages
-      @validation_error_messages ||= []
-    end
-
+    # @return [Array<Hash>] The messages (of every severity) found while validating this
+    #   bundle, each a { type:, message: } hash. Callers that only care about failure should
+    #   check for a message with type: 'error' rather than just whether this is present -
+    #   see validation_messages.
     def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
+      @validation_messages = []
       target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
       request_type = "#{operation}_#{type}"
       if type == 'request'
@@ -90,6 +30,28 @@ module DaVinciPASTestKit
       else
         perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type, request_bundle)
       end
+      validation_messages
+    end
+
+    ###########################################################################
+    # Internal Validation Methods
+    ###########################################################################
+
+    # Every message (of every severity, not just errors) collected while validating the
+    # current bundle. Passing-profile messages and per-issue profile-conformance messages
+    # (see validate_bundle_entries_against_profiles) may be warnings or info, not just
+    # errors, which is why this isn't error-only despite most entries being added via
+    # add_validation_error.
+    def validation_messages
+      @validation_messages ||= []
+    end
+
+    # Appends a plain error string to validation_messages as a { type:, message: } hash,
+    # for the many checks in this file that only ever produce errors (as opposed to
+    # validate_bundle_entries_against_profiles, which already has typed messages from the
+    # validator and concats them directly).
+    def add_validation_error(message)
+      validation_messages << { type: 'error', message: }
     end
 
     def perform_request_validation(bundle, profile_url, version, request_type)
@@ -102,53 +64,9 @@ module DaVinciPASTestKit
       validate_resources_conformance_against_profile(response_bundle, profile_url, version, request_type)
     end
 
-    def validate_pas_bundle_json(json, profile_url, version, request_type, bundle_type, skips: false, message: '')
-      assert_valid_json(json)
-      resource = FHIR.from_contents(json)
-      assert resource.present?, 'Not a FHIR resource'
-
-      # For v2.2.1 inquire responses, expect Parameters resource
-      if version == '2.2.1' && request_type == 'inquire' && bundle_type == 'response_bundle'
-        if resource.resourceType == 'Parameters'
-          # Extract and validate each Bundle in the Parameters
-          bundles = extract_bundles_from_pas_inquiry_response_parameters(resource)
-
-          bundles.each do |bundle|
-            perform_response_validation(bundle, profile_url, version, request_type)
-          end
-        elsif resource.is_a?(FHIR::Bundle)
-          # Bundle received instead of Parameters - validate it but log an error
-          validation_error_messages << 'Expected Parameters resource for v2.2.1 inquire response, but received ' \
-                                       'Bundle. The response Bundle should be wrapped in a ' \
-                                       'Parameters resource with a return parameter.'
-          perform_response_validation(resource, profile_url, version, request_type)
-        else
-          assert false,
-                 "Expected Parameters resource for v2.2.1 inquire response, but received #{resource.resourceType}"
-        end
-      else
-        # For v2.0.1 or non-inquire operations, expect Bundle resource
-        assert_resource_type(:bundle, resource: resource)
-        bundle = resource
-
-        if bundle_type == 'request_bundle'
-          perform_request_validation(bundle, profile_url, version, request_type)
-        else
-          perform_response_validation(bundle, profile_url, version, request_type)
-        end
-      end
-
-      validation_error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
-      msg = 'Bundle and/or entry resources are not conformant. Check messages for issues found.'
-      assert validation_error_messages.blank?, msg
-    rescue Inferno::Exceptions::AssertionException => e
-      msg = "#{message} #{e.message}".strip
-      raise e.class, msg unless skips
-
-      skip msg
-    end
+    ###########################################################################
+    # Structure Validation
+    ###########################################################################
 
     # Validates the structure of a Prior Authorization (PA) request Bundle.
     #
@@ -167,10 +85,14 @@ module DaVinciPASTestKit
       base_url = extract_base_url(bundle.entry.first&.fullUrl)
 
       check_presence_of_referenced_resources(first_entry, base_url, bundle.entry)
+        .each { |msg| add_validation_error(msg) }
 
-      if request_type == 'submit'
+      # request_type is 'submit' from client tests, or the compound 'submit_request' from
+      # perform_bundle_validation (server tests) - start_with? matches both, consistent with
+      # find_profile_url and validate_resources_conformance_against_profile below.
+      if request_type.start_with?('submit')
         unless first_entry.is_a?(FHIR::Claim)
-          validation_error_messages << "[Bundle/#{bundle.id}]: The first bundle entry must be a Claim"
+          add_validation_error("[Bundle/#{bundle.id}]: The first bundle entry must be a Claim")
         end
 
         validate_uniqueness_of_supporting_info_sequences(first_entry)
@@ -178,7 +100,7 @@ module DaVinciPASTestKit
       else
         claim_resource = bundle_entry_resources.find { |resource| resource.resourceType == 'Claim' }
         if claim_resource.blank?
-          validation_error_messages << "[Bundle/#{bundle.id}]: Claim must be present for inquiry request"
+          add_validation_error("[Bundle/#{bundle.id}]: Claim must be present for inquiry request")
         end
 
         # The inquiry operation must contain a requesting provider organization,
@@ -188,16 +110,15 @@ module DaVinciPASTestKit
         payer_reference = claim_resource&.insurer&.reference
 
         if patient_reference.blank?
-          validation_error_messages <<
-            "[Bundle/#{bundle.id}]: The Claim for inquiry operation must reference a patient."
+          add_validation_error("[Bundle/#{bundle.id}]: The Claim for inquiry operation must reference a patient.")
         end
         if provider_reference.blank?
-          validation_error_messages << "[Bundle/#{bundle.id}]: The claim for inquiry operation must reference " \
-                                       'a requesting provider organization.'
+          add_validation_error("[Bundle/#{bundle.id}]: The claim for inquiry operation must reference " \
+                               'a requesting provider organization.')
         end
         if payer_reference.blank?
-          validation_error_messages << "[Bundle/#{bundle.id}]: The Claim for inquiry operation must contain " \
-                                       'a payer organization.'
+          add_validation_error("[Bundle/#{bundle.id}]: The Claim for inquiry operation must contain " \
+                               'a payer organization.')
         end
       end
     end
@@ -217,14 +138,14 @@ module DaVinciPASTestKit
     # to ensure the same fullUrl and resource identifiers as in the
     # request are used.
     def validate_pa_response_body_structure(pa_response_bundle, pa_request_bundle)
-      first_entry = pa_response_bundle.entry.first.resource
+      first_entry = pa_response_bundle.entry.first&.resource
       unless first_entry.is_a?(FHIR::ClaimResponse)
-        validation_error_messages <<
-          "[Bundle/#{pa_response_bundle.id}]: The first bundle entry must be a ClaimResponse"
+        add_validation_error("[Bundle/#{pa_response_bundle.id}]: The first bundle entry must be a ClaimResponse")
       end
 
       base_url = extract_base_url(pa_response_bundle.entry.last&.fullUrl)
       check_presence_of_referenced_resources(first_entry, base_url, pa_response_bundle.entry)
+        .each { |msg| add_validation_error(msg) }
 
       validate_echoed_response_resources(pa_response_bundle, pa_request_bundle)
     end
@@ -246,10 +167,10 @@ module DaVinciPASTestKit
 
         next if echoed_resource_identifiers_match?(request_entry, response_entry)
 
-        validation_error_messages << resource_present_in_pa_request_and_response_msg(response_resource)
+        add_validation_error(resource_present_in_pa_request_and_response_msg(response_resource))
       end
     rescue StandardError
-      validation_error_messages << 'Unable to compare PAS request and response Bundle resources for echoed identifiers.'
+      add_validation_error('Unable to compare PAS request and response Bundle resources for echoed identifiers.')
     end
 
     def echoed_resource?(request_entry, response_entry)
@@ -273,6 +194,10 @@ module DaVinciPASTestKit
         request_resource.id == response_resource.id &&
         request_resource.identifier == response_resource.identifier
     end
+
+    ###########################################################################
+    # Bundle entry profile validation
+    ###########################################################################
 
     # Profile conformance of Prior Authorization (PA) resources.
     #
@@ -333,7 +258,10 @@ module DaVinciPASTestKit
     # Validates bundle resource and each entry in the bundle against its target profiles.
     # Validation messages are collected per profile rather than logged directly, so a
     # resource with multiple candidate profiles only reports errors when it fails all of
-    # them. When a profile passes, only that profile's (non-error) messages are logged.
+    # them. When a profile passes, only that profile's (non-error) messages are kept. Either
+    # way, messages go into validation_messages rather than straight to the runnable's
+    # `messages` - see perform_bundle_validation - so callers see every message this method
+    # finds, not just the summary line for a resource that conformed to nothing.
     # @param version [String] The version of the IG.
     def validate_bundle_entries_against_profiles(version)
       bundle_resources_target_profile_map.each do |key, item|
@@ -356,10 +284,10 @@ module DaVinciPASTestKit
         end
 
         if success_profile
-          messages.concat(messages_by_profile[success_profile])
+          validation_messages.concat(messages_by_profile[success_profile])
         else
-          messages_by_profile.each_value { |profile_messages| messages.concat(profile_messages) }
-          validation_error_messages << generate_non_conformance_message(item)
+          messages_by_profile.each_value { |profile_messages| validation_messages.concat(profile_messages) }
+          add_validation_error(generate_non_conformance_message(item))
         end
       end
     end
@@ -710,29 +638,6 @@ module DaVinciPASTestKit
       bundle_map[key]
     end
 
-    def absolute_url(reference, base_url)
-      return if reference.blank?
-      return reference if base_url.blank? || reference.starts_with?('urn:uuid:') || URI(reference).absolute?
-
-      "#{base_url}/#{reference}"
-    end
-
-    # Extracts the base URL from an absolute URL by removing the resource type and ID.
-    # @param absolute_url [String] The absolute URL.
-    # @return [String] The base URL, or an empty string if the URL format is not as expected.
-    def extract_base_url(absolute_url)
-      return '' if absolute_url.blank?
-
-      uri = URI(absolute_url)
-      return '' unless uri.scheme && uri.host
-
-      # Split the path segments and remove the last two segments (resource type and id)
-      path_segments = uri.path.split('/')
-      base_path = path_segments[0...-2].join('/')
-
-      "#{uri.scheme}://#{uri.host}#{base_path}"
-    end
-
     # Resource Types to validate in request/ response bundle
     def find_profile_url(request_type)
       {
@@ -751,7 +656,7 @@ module DaVinciPASTestKit
 
     # Determines the target profile URL for a Claim resource in a submit request bundle.
     #
-    # In v2.2.1, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
+    # In PAS v2.2.1, profile-pas-request-bundle permits either profile-claim or profile-claim-update.
     # The structural discriminator is Claim.related: profile-claim-update requires it (must-support)
     # while profile-claim disallows it (max: 0). For all other versions, profile-claim-update is
     # used unconditionally.
@@ -785,15 +690,15 @@ module DaVinciPASTestKit
       is_unique = sequences.uniq.length == sequences.length
       return if is_unique
 
-      validation_error_messages << "[Claim/#{claim.id}]: The sequence element for each supportingInfo entry SHALL be " \
-                                   'unique within the Claim.'
+      add_validation_error("[Claim/#{claim.id}]: The sequence element for each supportingInfo entry SHALL be " \
+                           'unique within the Claim.')
     end
 
     def validate_bundle_entries_full_url(bundle)
       msg = "[Bundle/#{bundle.id}]: Bundle.entry.fullUrl values SHALL be a valid url or in the form " \
             "'urn:uuid:[some guid]'."
       bundle.entry.each do |entry|
-        validation_error_messages << msg unless valid_url_or_urn_uuid?(entry.fullUrl)
+        add_validation_error(msg) unless valid_url_or_urn_uuid?(entry.fullUrl)
       end
     end
 
@@ -805,75 +710,6 @@ module DaVinciPASTestKit
       urn_uuid_regex = /\Aurn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/i
 
       string&.match?(url_regex) || string&.match?(urn_uuid_regex)
-    end
-
-    # This method traverses references within a FHIR resource, ensuring that referenced resources
-    # are populated in the bundle. It also enforces that a referenced resource appears only once in the bundle,
-    # as required by the PAS IG.
-    # @param target_resource [FHIR::Model] The FHIR resource to traverse and validate.
-    # @param base_url [String] The server base url.
-    # @param resources_to_match [Array<FHIR:Bundle:Entry] The list of FHIR bundle entries to match references against.
-    # @param skip_claim_related [Boolean] When true, a Claim's `related` element is not traversed. This is set
-    #   for any Claim reached by following a reference (i.e. a non-primary Claim in a Claim Update chain), whose
-    #   own Claim.related.claim (the grandparent) is deliberately omitted from the Bundle per spec-65/66. The
-    #   primary Claim passed in by the caller keeps `skip_claim_related: false`, so its parent reference - and the
-    #   parent's own referenced resources - are still checked.
-    def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match,
-                                               skip_claim_related: false)
-      return if target_resource.blank?
-
-      if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
-        ref = target_resource.reference
-        absolute_ref = absolute_url(ref, base_url)
-        matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
-
-        if matching_resources.length != 1
-          validation_error_messages << resource_shall_appear_once_message(absolute_ref,
-                                                                          matching_resources.length)
-        end
-
-        if matching_resources.length.positive?
-          # A resource reached by following a reference is an included resource, not the primary Claim
-          # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
-          check_presence_of_referenced_resources(matching_resources.first.resource, base_url, resources_to_match,
-                                                 skip_claim_related: true)
-        end
-      else
-        target_resource.source_hash.each_key do |attr|
-          next if claim_response_request_attr?(target_resource, attr)
-          next if skip_claim_related && claim_related_attr?(target_resource, attr)
-
-          value = target_resource.send(attr.to_sym)
-          if value.is_a?(FHIR::Model)
-            check_presence_of_referenced_resources(value, base_url, resources_to_match, skip_claim_related:)
-          elsif value.is_a?(Array) && value.all?(FHIR::Model)
-            value.each do |elmt|
-              check_presence_of_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:)
-            end
-          end
-        end
-      end
-    end
-
-    # ClaimResponse.request is a back-reference to the submitted Claim. The PAS IG response bundle
-    # profile (profile-pas-response-bundle) has no required Claim entry slice, so the Claim need
-    # not be present in the response bundle. Skipping here matches the identical guard in
-    # ResponseGenerator#referenced_entities, which also skips ClaimResponse.request when
-    # building mock response bundles.
-    def claim_response_request_attr?(resource, attr)
-      attr.to_s == 'request' &&
-        resource.respond_to?(:resourceType) &&
-        resource.resourceType == 'ClaimResponse'
-    end
-
-    # Claim.related.claim points to the Claim being updated. For a non-primary Claim in a Claim Update
-    # chain (one reached by following a reference), that prior Claim is the grandparent, which spec-65/66
-    # require to be omitted from the Bundle. Used with the `skip_claim_related` flag so the generic
-    # reference-presence check does not flag the deliberately-omitted grandparent as missing.
-    def claim_related_attr?(resource, attr)
-      attr.to_s == 'related' &&
-        resource.respond_to?(:resourceType) &&
-        resource.resourceType == 'Claim'
     end
 
     # Extracts resources from a bundle while following "next" links.
@@ -908,18 +744,6 @@ module DaVinciPASTestKit
       resources
     end
 
-    # Generates a message for a resource that appears more than once in a bundle.
-    #
-    # @param reference_resource_type [String] The resource type being referenced.
-    # @param reference_resource_id [String] The resource ID being referenced.
-    # @param total_matches [Integer] The total number of matches found in the bundle.
-    #
-    # This method generates an error message when a referenced resource appears more than once
-    # in a FHIR bundle, which is not allowed.
-    def resource_shall_appear_once_message(absolute_ref, total_matches)
-      " The referenced #{absolute_ref} resource SHALL appear exactly once in the Bundle, but found #{total_matches}."
-    end
-
     # Generates a message for a resource present in both the PA request and response bundles.
     #
     # @param resource [FHIR::Model] The resource present in both bundles.
@@ -930,5 +754,76 @@ module DaVinciPASTestKit
       "Resource #{resource.resourceType}/#{resource.id} is an entry in both the PA Request Bundle and the Response " \
         'Bundle, but they do not have the same fullUrl or identifiers'
     end
+
+    ###########################################################################
+    # US Core Version Constants
+    ###########################################################################
+
+    US_CORE_VERSION = '6.1.0'
+    US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
+    BASE_R4_PROFILE = :base_r4
+    CLAIM_ENCOUNTER_EXTENSION_URL = 'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter'
+    LOINC_SYSTEM = 'http://loinc.org'
+    TERMINOLOGY_CONDITION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/condition-category'
+    OBSERVATION_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/observation-category'
+    DIAGNOSTIC_REPORT_CATEGORY_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v2-0074'
+
+    US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE = {
+      'AllergyIntolerance' => 'us-core-allergyintolerance',
+      'CarePlan' => 'us-core-careplan',
+      'CareTeam' => 'us-core-careteam',
+      'Coverage' => 'us-core-coverage',
+      'Device' => 'us-core-implantable-device',
+      'DocumentReference' => 'us-core-documentreference',
+      'Encounter' => 'us-core-encounter',
+      'Goal' => 'us-core-goal',
+      'Immunization' => 'us-core-immunization',
+      'Location' => 'us-core-location',
+      'Medication' => 'us-core-medication',
+      'MedicationDispense' => 'us-core-medicationdispense',
+      'MedicationRequest' => 'us-core-medicationrequest',
+      'Organization' => 'us-core-organization',
+      'Patient' => 'us-core-patient',
+      'Practitioner' => 'us-core-practitioner',
+      'PractitionerRole' => 'us-core-practitionerrole',
+      'Procedure' => 'us-core-procedure',
+      'Provenance' => 'us-core-provenance',
+      'QuestionnaireResponse' => 'us-core-questionnaireresponse',
+      'RelatedPerson' => 'us-core-relatedperson',
+      'ServiceRequest' => 'us-core-servicerequest',
+      'Specimen' => 'us-core-specimen'
+    }.freeze
+
+    US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID = 'us-core-condition-encounter-diagnosis'
+    US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID = 'us-core-condition-problems-health-concerns'
+    US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID = 'us-core-diagnosticreport-lab'
+    US_CORE_DIAGNOSTIC_REPORT_NOTE_PROFILE_ID = 'us-core-diagnosticreport-note'
+    US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID = 'us-core-observation-clinical-result'
+    US_CORE_OBSERVATION_LAB_PROFILE_ID = 'us-core-observation-lab'
+    US_CORE_OBSERVATION_SCREENING_ASSESSMENT_PROFILE_ID = 'us-core-observation-screening-assessment'
+    US_CORE_SIMPLE_OBSERVATION_PROFILE_ID = 'us-core-simple-observation'
+    US_CORE_SMOKING_STATUS_PROFILE_ID = 'us-core-smokingstatus'
+    US_CORE_VITAL_SIGNS_PROFILE_ID = 'us-core-vital-signs'
+
+    US_CORE_OBSERVATION_CODE_PROFILE_IDS = {
+      '11341-5' => 'us-core-observation-occupation',
+      '86645-9' => 'us-core-observation-pregnancyintent',
+      '82810-3' => 'us-core-observation-pregnancystatus',
+      '76690-7' => 'us-core-observation-sexual-orientation',
+      '8289-1' => 'head-occipital-frontal-circumference-percentile',
+      '59576-9' => 'pediatric-bmi-for-age',
+      '77606-2' => 'pediatric-weight-for-height',
+      '85354-9' => 'us-core-blood-pressure',
+      '39156-5' => 'us-core-bmi',
+      '8302-2' => 'us-core-body-height',
+      '8310-5' => 'us-core-body-temperature',
+      '29463-7' => 'us-core-body-weight',
+      '9843-4' => 'us-core-head-circumference',
+      '8867-4' => 'us-core-heart-rate',
+      '59408-5' => 'us-core-pulse-oximetry',
+      '2708-6' => 'us-core-pulse-oximetry',
+      '9279-1' => 'us-core-respiratory-rate',
+      '72166-2' => 'us-core-smokingstatus'
+    }.freeze
   end
 end

@@ -8,8 +8,8 @@ module DaVinciPASTestKit
     id :pas_notification_pas_conformance_test
     title 'Notification conforms to PAS-specific requirements'
     description %(
-      This test verifies that the notification sent to the client under test
-      for a pended claim update (or sent by the server under test) conforms
+      This test verifies that the notification sent to the client system
+      for a pended claim update conforms
       to PAS-specific requirements beyond the base Subscription Backport IG
       notification requirements. In particular, the focus resource in the
       notification should be the updated ClaimResponse conformant to the

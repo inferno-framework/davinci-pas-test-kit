@@ -2,11 +2,16 @@ require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
 
 RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
-  let(:random_id) { '1234' }
+  let(:random_id) { test_session.id }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{random_id}" }
   let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{random_id}" }
-  let(:approval_attest_test) do
+  let(:base_options) do
+    { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, attest_message: 'blah blah' }
+  end
+  let(:approval_attest_test) { attest_test_with(base_options) }
+
+  def attest_test_with(options)
     Class.new(described_class) do
       include DaVinciPASTestKit::DaVinciPASV201::URLs
 
@@ -14,16 +19,26 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
         'davinci_pas_client_suite_v201'
       end
 
-      config(
-        options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG,
-                   attest_message: 'blah blah' }
-      )
+      config(options:)
     end
   end
 
+  def create_tagged_request(tags:, status: 200, result: repo_create(:result, test_session_id: test_session.id))
+    repo_create(
+      :request,
+      direction: 'incoming',
+      url: "/custom/#{suite_id}/submit",
+      test_session_id: test_session.id,
+      result:,
+      status:,
+      tags:
+    )
+  end
+
   describe 'When asking for an attestation' do
+    before { create_tagged_request(tags: [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG]) }
+
     it 'passes when responding true' do
-      allow_any_instance_of(approval_attest_test).to receive(:test_session_id).and_return(random_id)
       result = run(approval_attest_test)
       expect(result.result).to eq('wait')
 
@@ -33,13 +48,148 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
     end
 
     it 'passes when responding false' do
-      allow_any_instance_of(approval_attest_test).to receive(:test_session_id).and_return(random_id)
       result = run(approval_attest_test)
       expect(result.result).to eq('wait')
 
       get continue_fail_url
       result = results_repo.find(result.id)
       expect(result.result).to eq('fail')
+    end
+  end
+
+  describe 'checking for requests before asking for an attestation' do
+    let(:approval_tag) { DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG }
+
+    def run_attest(extra_options = {})
+      run(attest_test_with(base_options.merge(extra_options)))
+    end
+
+    describe 'when no requests were received' do
+      it 'skips' do
+        result = run_attest
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('No requests made demonstrating the Approval workflow')
+      end
+
+      it 'passes without waiting when no requests are ok' do
+        result = run_attest(no_requests_ok: true)
+
+        expect(result.result).to eq('pass')
+        expect(result.result_message).to include('Attestation not needed')
+      end
+
+      it 'ignores requests tagged for other workflows' do
+        create_tagged_request(tags: [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG])
+
+        expect(run_attest.result).to eq('skip')
+      end
+    end
+
+    describe 'when one request was received' do
+      it 'waits for the attestation when the response was successful and a success is expected' do
+        create_tagged_request(tags: [approval_tag], status: 200)
+
+        expect(run_attest.result).to eq('wait')
+      end
+
+      it 'skips when the response was an error but a success is expected' do
+        create_tagged_request(tags: [approval_tag], status: 400)
+        result = run_attest
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('expected to return a succesful response')
+      end
+
+      it 'waits for the attestation when the response was an error and an error is expected' do
+        create_tagged_request(tags: [approval_tag], status: 400)
+
+        expect(run_attest(error_status_expected: true).result).to eq('wait')
+      end
+
+      it 'skips when the response was successful but an error is expected' do
+        create_tagged_request(tags: [approval_tag], status: 200)
+        result = run_attest(error_status_expected: true)
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('expected to return a HTTP error response')
+      end
+    end
+
+    describe 'when multiple requests were received' do
+      before do
+        shared_result = repo_create(:result, test_session_id: test_session.id)
+        2.times { create_tagged_request(tags: [approval_tag], result: shared_result) }
+      end
+
+      it 'raises an implementation error' do
+        result = run_attest
+
+        expect(result.result).to eq('error')
+        expect(result.result_message).to include('multiple requests tagged with workflow tag')
+      end
+
+      it 'waits for the attestation when multiple requests are ok' do
+        expect(run_attest(multiple_requests_ok: true).result).to eq('wait')
+      end
+    end
+
+    describe 'when multiple requests were received and one of them errored' do
+      before do
+        shared_result = repo_create(:result, test_session_id: test_session.id)
+        create_tagged_request(tags: [approval_tag], status: 200, result: shared_result)
+        create_tagged_request(tags: [approval_tag], status: 400, result: shared_result)
+      end
+
+      it 'skips instead of waiting for the attestation' do
+        result = run_attest(multiple_requests_ok: true)
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('expected to return a succesful response')
+      end
+    end
+
+    describe 'with an operation tag' do
+      it 'only considers requests with both the workflow and operation tags' do
+        create_tagged_request(tags: [approval_tag])
+
+        result = run_attest(operation_tag: DaVinciPASTestKit::INQUIRE_TAG)
+
+        expect(result.result).to eq('skip')
+      end
+
+      it 'waits when a request has both tags' do
+        create_tagged_request(tags: [approval_tag, DaVinciPASTestKit::INQUIRE_TAG])
+
+        expect(run_attest(operation_tag: DaVinciPASTestKit::INQUIRE_TAG).result).to eq('wait')
+      end
+    end
+
+    it 'raises an implementation error for a workflow tag without a name' do
+      create_tagged_request(tags: ['unknown_workflow'])
+      result = run_attest(workflow_tag: 'unknown_workflow')
+
+      expect(result.result).to eq('error')
+      expect(result.result_message).to include('No name for workflow tag')
+    end
+  end
+
+  describe 'pended workflow with both a $submit and an $inquire request' do
+    let(:pended_tag) { DaVinciPASTestKit::PENDED_WORKFLOW_TAG }
+
+    before do
+      shared_result = repo_create(:result, test_session_id: test_session.id)
+      create_tagged_request(tags: [pended_tag, DaVinciPASTestKit::SUBMIT_TAG], result: shared_result)
+      create_tagged_request(tags: [pended_tag, DaVinciPASTestKit::INQUIRE_TAG], result: shared_result)
+    end
+
+    [DaVinciPASTestKit::SUBMIT_TAG, DaVinciPASTestKit::INQUIRE_TAG].each do |operation_tag|
+      it "waits for the attestation for the #{operation_tag} interaction" do
+        result = run(attest_test_with(workflow_tag: pended_tag, operation_tag:, multiple_requests_ok: true,
+                                      attest_message: 'blah blah'))
+
+        expect(result.result).to eq('wait')
+      end
     end
   end
 end

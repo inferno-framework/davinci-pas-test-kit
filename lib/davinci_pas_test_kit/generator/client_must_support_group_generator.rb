@@ -192,12 +192,9 @@ module DaVinciPASTestKit
       end
 
       def verifies_requirements
-        case "#{operation}_#{ig_version}"
-        when 'submit_v2.0.1'
-          return nil if type == 'response'
-
-          ['hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
-           'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202']
+        case "#{operation}_#{type}_#{ig_version}"
+        when 'submit_request_v2.2.1', 'inquire_request_v2.2.1'
+          ['hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1']
         end
       end
 
@@ -205,10 +202,9 @@ module DaVinciPASTestKit
         if type == 'response'
           <<~DESCRIPTION
             Check that `$#{operation}` responses provided to the client contain
-            all PAS-defined profiles and their must support elements.
-
-            **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
-            not the system under test. Errors will be treated as skips instead of failures.
+            all PAS-defined profiles and their must support elements. Demonstration
+            of the PAS ClaimResponse profile is strictly required while all others
+            are optional.
 
             For `$#{operation}` responses, this includes the following profiles:
 
@@ -217,7 +213,9 @@ module DaVinciPASTestKit
         else
           <<~DESCRIPTION
             Check that the client can demonstrate `$#{operation}` requests that contain
-            all PAS-defined profiles and their must support elements.
+            all PAS-defined profiles and their must support elements. For all profiles
+            other than PAS Claim Update, testers can attest that the missing elements
+            are not supported by their system to pass the tests.
 
             For `$#{operation}` requests, this includes the following profiles:
 

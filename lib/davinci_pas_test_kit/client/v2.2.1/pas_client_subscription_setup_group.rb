@@ -14,10 +14,12 @@ module DaVinciPASTestKit
       )
       run_as_group
 
+      input_order :client_endpoint_access_token
+
       test from: :pas_client_v221_subscription_create_test
       test from: :pas_client_subscription_pas_conformance_test,
            description: %(
-             This test verifies that the Subscription created by the client under test
+             This test verifies that the Subscription created by the client system
              is conformant to PAS requirements on the Subscription, including
              - The use of the [PAS-defined Subscription
                Topic](https://hl7.org/fhir/us/davinci-pas/2.2.1/SubscriptionTopic-PASSubscriptionTopic.html), and

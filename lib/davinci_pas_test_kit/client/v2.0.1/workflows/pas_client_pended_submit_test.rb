@@ -15,11 +15,11 @@ module DaVinciPASTestKit
       id :pas_client_v201_pended_submit_test
       title 'Client submits a claim and reacts to a pended response'
       description %(
-        Inferno will wait for a prior authorization submission request
+        During this test, Inferno will wait for a prior authorization submission request
         from the client. Upon receipt, Inferno will respond with the
         provided pended response. Subsequently, Inferno will send a
         notification that the claim has been finalized and expect the
-        client under test to send a follow-up inquiry.
+        client system to send a follow-up inquiry.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
                             'hl7.fhir.us.davinci-pas_2.0.1@67', 'hl7.fhir.us.davinci-pas_2.0.1@70',
@@ -27,7 +27,7 @@ module DaVinciPASTestKit
                             'hl7.fhir.us.davinci-pas_2.0.1@153', 'hl7.fhir.us.davinci-pas_2.0.1@202',
                             'hl7.fhir.us.davinci-pas_2.0.1@203'
 
-      config options: { accepts_multiple_requests: true }
+      config options: { accepts_multiple_requests: true, submit_enabled: true, inquire_enabled: true }
       input :notification_bundle,
             title: 'Claim updated notification JSON',
             type: 'textarea',
@@ -69,8 +69,8 @@ module DaVinciPASTestKit
             optional: true,
             title: 'Client Notification Access Token',
             description: %(
-              The bearer token that Inferno will send on requests to the client under test's rest-hook notification
-              endpoint. Not needed if the client under test will create a Subscription with an appropriate header value
+              The bearer token that Inferno will send on requests to the client system's rest-hook notification
+              endpoint. Not needed if the client system will create a Subscription with an appropriate header value
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
@@ -95,9 +95,9 @@ module DaVinciPASTestKit
         load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
         skip_if requests.empty?, # NOTE: subscription needed ahead of time to support notification generation
                 %(
-                  Pended workflow tests cannot proceed because no Subscription exists to receive notifications
+                  Pended scenario tests cannot proceed because no Subscription exists to receive notifications
                   for pended claims. Run the _PAS Subscription Setup_ tests to provide a Subscription for use
-                  in delivering notifications before re-running the pended workflow tests.
+                  in delivering notifications before re-running the pended scenario tests.
                 )
 
         if user_inputted_response? :pended_json_response
@@ -142,7 +142,7 @@ module DaVinciPASTestKit
           identifier: wait_identifier,
           timeout: 600,
           message: %(
-            **Pended Workflow Test**:
+            **Pended Scenario Test**:
 
             1. Submit a PAS request to
 

@@ -3,9 +3,12 @@ module DaVinciPASTestKit
     id :pas_client_reg_config_smart_display
     title 'PAS client registers Inferno as a PAS server'
     description %(
-      This test provides all the information needed for testers to configure
-      the client under test to communicate with Inferno's simulated PAS server
-      including SMART endpoints to obtain access tokens.
+      During this test, Inferno will wait while the tester configures the client
+      system to communicate with Inferno's simulated PAS server using
+      endpoints authenticated using SMART Backend Services. The "User Action Required"
+      dialog that appears during the test will provide all the information needed
+      for testers to configure the client system, including the FHIR base URL, the
+      token endpoint, and the system's assigned client id.
     )
     attestation
 
@@ -29,7 +32,8 @@ module DaVinciPASTestKit
           - Token endpoint: `#{token_url}`
 
           [Click here](#{confirmation_url}) once you have configured
-          the client to connect to Inferno at the above endpoints.
+          the client to authenticate with Inferno and send PAS requests
+          to Inferno at the above endpoint.
         )
       )
     end

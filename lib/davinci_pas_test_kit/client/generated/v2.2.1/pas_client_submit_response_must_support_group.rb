@@ -16,10 +16,9 @@ module DaVinciPASTestKit
       title '$submit Response Must Support Coverage'
       description %(
         Check that `$submit` responses provided to the client contain
-        all PAS-defined profiles and their must support elements.
-        
-        **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
-        not the system under test. Errors will be treated as skips instead of failures.
+        all PAS-defined profiles and their must support elements. Demonstration
+        of the PAS ClaimResponse profile is strictly required while all others
+        are optional.
         
         For `$submit` responses, this includes the following profiles:
         
@@ -40,44 +39,39 @@ module DaVinciPASTestKit
 
       test from: :pas_client_v221_submit_response_must_support_pas_response_bundle do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_claimresponse do
         verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_communication_request do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_insurer do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_requestor do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_beneficiary do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_practitioner do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_practitioner_role do
         optional
+        simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_task do
         optional
-      end
-      test from: :pas_client_v221_response_attest,
-           title: 'PAS client handled the $submit response must support elements',
-           description: %(
-             This test provides the tester an opportunity to verify that their client
-             correctly processed and used the must support elements present in the
-             $submit responses received from Inferno during these tests.
-           ),
-           config: { options: {
-             workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
-             attest_message: "I attest that the client system correctly processed the must support elements " \
-                             "contained in the $submit responses received from Inferno and did not error."
-           } } do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
+        simulation_verification
       end
     end
   end

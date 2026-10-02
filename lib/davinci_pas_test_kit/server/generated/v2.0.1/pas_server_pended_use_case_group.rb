@@ -12,9 +12,9 @@ module DaVinciPASTestKit
   module DaVinciPASV201
     class PASServerPendedUseCaseGroup < Inferno::TestGroup
       id :pas_server_v201_pended_use_case
-      title 'Successful Pended Workflow'
+      title 'Successful Pended Scenario'
       description %(
-        Demonstrate a complete prior authorization workflow including a period
+        Demonstrate a complete prior authorization scenario including a period
         during which the final decision is pending. This includes demonstrating
         the ability of the server to
         
@@ -38,7 +38,7 @@ module DaVinciPASTestKit
             
             This test validates the conformity of the
             user input to the
-            [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle|v2.0.1)
+            [PAS Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
             profile, ensuring subsequent tests can accurately simulate content.
             
             It also checks that other conformance requirements defined in the [PAS Formal
@@ -102,7 +102,7 @@ module DaVinciPASTestKit
           description %(
             This test validates the conformity of the
             server's response to the
-            [PAS Response Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle|v2.0.1)
+            [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-response-bundle.html)
             profile.
             
             It also checks that other conformance requirements defined in the [PAS Formal
@@ -175,7 +175,7 @@ module DaVinciPASTestKit
             
             This test validates the conformity of the
             user input to the
-            [PAS Inquiry Request Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-request-bundle|v2.0.1)
+            [PAS Inquiry Request Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-request-bundle.html)
             profile, ensuring subsequent tests can accurately simulate content.
             
             It also checks that other conformance requirements defined in the [PAS Formal
@@ -239,7 +239,7 @@ module DaVinciPASTestKit
           description %(
             This test validates the conformity of the
             server's response to the
-            [PAS Inquiry Response Bundle](http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-inquiry-response-bundle|v2.0.1)
+            [PAS Inquiry Response Bundle](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-inquiry-response-bundle.html)
             profile.
             
             It also checks that other conformance requirements defined in the [PAS Formal
