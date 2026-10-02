@@ -151,7 +151,7 @@ token requests sent intentionally by the SMART Backend Services server tests.
 To use the UDAP Client Credentials with the demo, choose the "UDAP B2B Client Credentials" Client
 Security Type option and replace the 3. Client Registration steps above with the following:
 
-- In the **UDAP Client URI** input, put `http://localhost:4567/custom/udap_security/fhir`
+- In the **UDAP Client URI** input, put `https://inferno.healthit.gov/suites/custom/udap_security/fhir`
 - Click the **SUBMIT** button and a "User Action Required" dialog will display asking the tester to perform UDAP dynamic
   registration. Note the FHIR server endpoint displayed in the dialog.
 - Start an instance of the UDAP Security Server test suite.

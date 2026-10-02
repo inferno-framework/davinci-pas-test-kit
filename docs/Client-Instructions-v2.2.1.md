@@ -10,7 +10,7 @@ against v2.2.1 of the IG. In this scenario, Inferno acts as the PAS server.
 To run against the Da Vinci PAS Client v2.2.1 Test Suite, a PAS client implementation must at minimum
 be configured to make PAS $submit operation invocations against Inferno such that Inferno can
 associate the requests with the session. The PAS Client v2.2.1 suite piggybacks on the [authentication
-mechanism to identify the target session for a request](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#authentication-and-session-identification).
+mechanism to identify the target session for a request](Client-Details#authentication-and-session-identification).
 A standards-based authentication mechanism is not required to run the tests because the PAS Client v2.2.1
 suite supports the use of dedicated endpoints without a formal authentication step for identification
 of the session for a request.
@@ -23,10 +23,10 @@ In order to pass all tests in the suite, a PAS client implementation must
 - Support the creation of Subscriptions and receipt of Notifications indicating that a final decision
   has been provided for a pended Claim.
 
-Additionally, because the [mocked responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic)
+Additionally, because the [mocked responses](Controlling-Simulated-Responses#mocked-responses)
 created by Inferno's simulation do not demonstrate all of the PAS must support elements defined
 on the ClaimResponse profiles, testers will need to provide some custom responses that demonstrate all
-of those elements. See the [Response and Notification Content](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#response-and-notification-content)
+of those elements. See the [Tester-directed Custom Responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 section for details on specifying custom responses.
 
 ## Quick Start
@@ -63,7 +63,7 @@ The following groups and inputs can be used to expand the process described in t
 
 The "Denial Response", "Claim Updates" and "Payer Modification" groups can be run in the same manner as
 described above. Testers may specify the responses for Inferno to return, but Inferno is also able
-to generate [mocked responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic)
+to generate [mocked responses](Controlling-Simulated-Responses#mocked-responses)
 for these scenarios.
 
 ### Testing the Pended Response
@@ -73,14 +73,14 @@ client system will submit a Subscription so that Inferno knows how and where to 
 notification that a decision has been rendered on a pended prior authorization request.
 Once that group has been run, proceed to execute the "Pended Response" group and follow the
 instructions in the "User Action Required" dialogs that appear. Inferno can
-generate a [mocked pended response and a notification with the rendered decision](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#generation-logic).
+generate a [mocked pended response and a notification with the rendered decision](Controlling-Simulated-Responses#mocked-responses).
 
 ### Testing Must Support Elements
 
 During the "Must Support Elements" group, the client system will submit multiple $submit and $inquire requests
 to demonstrate all required must support elements, including on both the requests and response.
 These tests can be run without providing custom responses, but because Inferno's mocked responses
-will not populate all ClaimResponse must support elements, [custom responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#response-and-notification-content)
+will not populate all ClaimResponse must support elements, [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 will be needed to pass the group.
 
 ### Testing Error Responses
@@ -102,8 +102,8 @@ the authentication details are conformant.
 
 ## Interpreting Results
 
-Due to [limitations of these tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview#test-scope-and-limitations),
-passing this test suite in its entirety [does not prove conformance to the specification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview#conformance-criteria--interpreting-results).
+Due to [limitations of these tests](Overview#test-scope-and-limitations),
+passing this test suite in its entirety [does not prove conformance to the specification](Overview#conformance-criteria--interpreting-results).
 Additionally, some of the capabilities tested by this suite are optional including many of the hooks
 and response types, meaning that a conformant system will not necessarily be able to pass all tests
 in the suite.

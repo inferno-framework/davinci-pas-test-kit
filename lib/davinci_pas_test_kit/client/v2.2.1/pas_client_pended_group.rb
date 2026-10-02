@@ -111,7 +111,7 @@ module DaVinciPASTestKit
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
-               requested in the Subscription provided during the **2.1** "PAS Subscription Setup" tests.
+               requested in the Subscription provided during the "Subscription Setup" tests.
              ),
              simulation_verification: true,
              config: {

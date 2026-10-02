@@ -25,17 +25,6 @@ For comprehensive documentation, including detailed walkthroughs, overviews, and
 technical references, please see the [Da Vinci PAS Test Kit
 Documentation](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/).
 
-## Getting Started
-
-ONC hosts a [public
-instance](https://inferno.healthit.gov/suites/g10_certification) of this test
-kit that developers and testers are welcome to use. However, users are
-encouraged to download and run this tool locally to allow testing within private
-networks and to avoid being affected by downtime of this shared resource.
-Please see the [Local Installation
-Instructions](#local-installation-instructions) section below for more
-information.
-
 ## Status
 
 These tests are a **DRAFT** and are intended to allow PAS implementers to perform 
@@ -87,7 +76,7 @@ The default configuration of this test kit uses SQLite for data persistence and
 is optimized for running on a local machine with a single user. For
 installations on shared servers that may have multiple tests running
 simultaneously, please [configure the installation to use
-PostgreSQL](https://inferno-framework.github.io/inferno-core/deployment/database.html#postgresql)
+PostgreSQL](https://inferno-framework.github.io/docs/deployment/database.html#database-configuration)
 to ensure stability in this type of environment.
 
 ## Providing Feedback and Reporting Issues
@@ -98,7 +87,7 @@ We welcome feedback on the tests, including but not limited to the following are
 - User experience, such as confusing or missing information in the test UI.
 
 Please report any issues with this set of tests in the [issues
-section](https://github.com/inferno-framework/da-vinci-pas-test-kit/issues)
+section](https://github.com/inferno-framework/davinci-pas-test-kit/issues)
 section of this repository.
 
 ## License

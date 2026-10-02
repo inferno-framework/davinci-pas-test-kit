@@ -43,7 +43,7 @@ These responses are based on examples available in the PAS Implementation Guide
 and are conformant, but may not meet the needs of actual implementations. Thus,
 testers may provide Inferno with specific responses for Inferno to echo. If responses
 are provided, Inferno will check them for conformance to ensure that they demonstrate
-a fully conformant exchange. See the **[Controlling Client Suite Simulated Responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses)**
+a fully conformant exchange. See the **[Controlling Client Suite Simulated Responses](Controlling-Simulated-Responses)**
 section for details on how Inferno creates responses.
 
 Note that Inferno currently does not accept `$inquire` requests during most PAS tests. Only
@@ -89,7 +89,7 @@ endpoints can be reused in subsequent sessions.
 ### Must Support Tests
 
 PAS Clients are required to demonstrate support for some elements which appear only
-under certain conditions. See the **[Client Must Support](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support)**
+under certain conditions. See the **[Client Must Support](Client-Must-Support)**
 section for details on what Inferno checks for and the underlying requirements
 that drive those tests.
 

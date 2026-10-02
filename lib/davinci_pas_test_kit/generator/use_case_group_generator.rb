@@ -1,4 +1,5 @@
 require_relative '../cross_suite/pas_constants'
+require_relative 'descriptions'
 
 module DaVinciPASTestKit
   class Generator
@@ -181,8 +182,7 @@ module DaVinciPASTestKit
       end
 
       def profile_link(operation, type)
-        "[#{PASConstants.bundle_profile_name_for_operation_and_type(operation, type)}]" \
-          "(#{PASConstants.bundle_profile_url_for_operation_and_type(operation, type)}|#{ig_version})"
+        Descriptions.bundle_profile_link(operation, type, ig_version)
       end
 
       def bundle_validation_test_description(operation, type)

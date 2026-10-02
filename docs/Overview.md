@@ -16,8 +16,8 @@ The test kit is built using the [Inferno Framework](https://inferno-framework.gi
 
 The PAS Test Kit includes two main test suites:
 
-* **Server Test Suite**: For systems acting as payers (see [Server Details](Server-Details.md) for more information)
-* **Client Test Suite**: For systems acting as providers (see [Client Details](Client-Details.md) for more information)
+* **Server Test Suite**: For systems acting as payers (see [Server Details](Server-Details) for more information)
+* **Client Test Suite**: For systems acting as providers (see [Client Details](Client-Details) for more information)
 
 ## General Testing Approach
 
@@ -57,8 +57,8 @@ by all suites in this test kit.
 
 For a details on specific specific limitations, detailed requirements, and known
 issues, please consult the following resources: 
-- [Client Testing Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details#testing-limitations)
-- [Server Testing Limitations](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details#testing-limitations)
+- [Client Testing Limitations](Client-Details#testing-limitations)
+- [Server Testing Limitations](Server-Details#testing-limitations)
 - Relevant [requirements](https://inferno-framework.github.io/docs/advanced-test-features/requirements.html)
   including those in the PAS Requirements Spreadsheets
    - [v2.0.1](https://github.com/inferno-framework/davinci-pas-test-kit/blob/main/lib/davinci_pas_test_kit/requirements/hl7.fhir.us.davinci-pas_2.0.1_requirements.xlsx)
@@ -77,7 +77,7 @@ Given the known limitations, especially regarding X12, passing all automated tes
 solely constitute full PAS IG conformance.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
-* [Client v2.0.1 Instructions](Client-Instructions-v2.0.1.md)
-* [Client v2.2.1 Instructions](Client-Instructions-v2.2.1.md)
-* [Server v2.0.1 Instructions](Server-Instructions-v2.0.1.md)
-* [Server v2.2.1 Instructions](Server-Instructions-v2.2.1.md)
+* [Client v2.0.1 Instructions](Client-Instructions-v2.0.1)
+* [Client v2.2.1 Instructions](Client-Instructions-v2.2.1)
+* [Server v2.0.1 Instructions](Server-Instructions-v2.0.1)
+* [Server v2.2.1 Instructions](Server-Instructions-v2.2.1)

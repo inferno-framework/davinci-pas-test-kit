@@ -35,7 +35,7 @@ In order to pass all tests in the suite, a PAS server implementation must
 Because the business logic that determines decisions and the elements populated in responses varies between
 implementers, testers must provide the request Bundles that Inferno will send to the server. To pass the
 Must Support Elements group, those Bundles must collectively contain and elicit the required content. See the
-[Server Testing Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)
+[Server Testing Details](Server-Details)
 documentation for technical implementation details and known limitations.
 
 ### Network Preparation
@@ -122,8 +122,8 @@ is expected to return a non-2xx response containing an `OperationOutcome`.
 
 ## Interpreting Results
 
-Due to [limitations of these tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview#test-scope-and-limitations),
-passing this test suite in its entirety [does not prove conformance to the specification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Overview#conformance-criteria--interpreting-results).
+Due to [limitations of these tests](Overview#test-scope-and-limitations),
+passing this test suite in its entirety [does not prove conformance to the specification](Overview#conformance-criteria--interpreting-results).
 
 The request Bundle validation tests are marked as **Simulation Verifcation**. A skip in one of these tests
 means Inferno deemed the supplied Bundle invalid. These validation errors should be considered when

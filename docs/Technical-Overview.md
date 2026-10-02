@@ -134,7 +134,7 @@ When making changes to the test kit itself, it's important to ensure the changes
         *   Run `bundle exec rake pas:generate`.
         *   Review the generated files for correctness.
         *   Run the re-generated tests in the Inferno UI.
-6.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details, update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's [GitHub Wiki](https://github.com/inferno-framework/davinci-pas-test-kit/wiki).
+6.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details, update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's [GitHub Wiki](/inferno-framework/davinci-pas-test-kit/wiki).
 
 
 ## Contribution Guidelines
