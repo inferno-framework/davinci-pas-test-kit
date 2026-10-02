@@ -143,7 +143,7 @@ against a real client system using SMART Backend Services for authentication.
    1. Click the "Bypass payor-handled check" box.
    1. Click the "Save" button and close the dialog to complete the setup.
 1. Back in the Inferno session tab, click the link to confirm the configuration and continue the tests.
-1. Select and run group "3.1 Approval Response" without any changes to the inputs so that the default
+1. Select and run group "**3.1** Approval Response" without any changes to the inputs so that the default
    mocked response response will be used. When the dialog appears indicating Inferno is ready to
    receive requests, return to the tab with the reference implementation.
 1. In the reference implementation tab, select patient "Roosevelt, Theodor Alan Roosevelt"
@@ -165,7 +165,7 @@ against a real client system using SMART Backend Services for authentication.
    that the order displayed has having prior authorization "approved". Click the
    appropriate answer based on what you saw in the reference implementation. This
    will complete the tests.
-1. Run group "6 Review Authentication Interactions" to have Inferno verify the authentication
+1. Run group "**11** Review Authentication Interactions" to have Inferno verify the authentication
    requests received during this session.
 
 ## CRD Request Generator (old)
@@ -198,7 +198,7 @@ client system will look like.
 11. In the "Select PriorAuth Endpoint" text box, put the FHIR Base URL from step 4.
 12. Edit the Bundle at the right so that the first Bundle entry has a `fullUrl` field before the `resource` field
     with a value of `urn:uuid:0583c759-bc19-4bfa-815c-8f43c1d488ea` or other uuid.
-12. Before, submitting return to the client session, select group "**11.1** Approval Response", click
+12. Before, submitting return to the client session, select group "**9.1** Approval Response", click
     the "Run Tests" button in the upper right, and click the "Submit" button on the input dialog that appears.
 13. When the "User Action Required" dialog appears asking for a $submit request, return to the crd-request-generator
     tab and click the "Submit" button. A response should be returned and the Inferno session will now
