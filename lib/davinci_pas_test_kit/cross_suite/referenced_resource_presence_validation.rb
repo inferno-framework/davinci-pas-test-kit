@@ -20,7 +20,11 @@ module DaVinciPASTestKit
     # @return [Array<String>] The error messages found during traversal.
     def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match,
                                                skip_claim_related: false)
-      traverse_referenced_resources(target_resource, base_url, resources_to_match,
+      # Indexed once per call rather than linearly scanned per reference encountered during the
+      # traversal below. Grouped (not a plain Hash) so a fullUrl appearing on more than one entry
+      # is still detected as an error instead of being silently collapsed to the last match.
+      entries_by_full_url = resources_to_match.group_by(&:fullUrl)
+      traverse_referenced_resources(target_resource, base_url, entries_by_full_url,
                                     skip_claim_related:, errors: [])
     end
 
@@ -84,13 +88,15 @@ module DaVinciPASTestKit
 
     # Recursive worker for check_presence_of_referenced_resources; errors is threaded through the
     # recursive calls and is private so callers can't pass in (and so corrupt) their own accumulator.
-    def traverse_referenced_resources(target_resource, base_url, resources_to_match, skip_claim_related:, errors:)
+    # entries_by_full_url is a fullUrl => Array<Bundle::Entry> index built once by the public method,
+    # so each reference encountered is an O(1) lookup instead of a linear scan of every entry.
+    def traverse_referenced_resources(target_resource, base_url, entries_by_full_url, skip_claim_related:, errors:)
       return errors if target_resource.blank?
 
       if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
         ref = target_resource.reference
         absolute_ref = absolute_url(ref, base_url)
-        matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
+        matching_resources = entries_by_full_url[absolute_ref] || []
 
         if matching_resources.length != 1
           errors << resource_shall_appear_once_message(absolute_ref, matching_resources.length)
@@ -99,7 +105,7 @@ module DaVinciPASTestKit
         if matching_resources.length.positive?
           # A resource reached by following a reference is an included resource, not the primary Claim
           # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
-          traverse_referenced_resources(matching_resources.first.resource, base_url, resources_to_match,
+          traverse_referenced_resources(matching_resources.first.resource, base_url, entries_by_full_url,
                                         skip_claim_related: true, errors:)
         end
       else
@@ -109,10 +115,10 @@ module DaVinciPASTestKit
 
           value = target_resource.send(attr.to_sym)
           if value.is_a?(FHIR::Model)
-            traverse_referenced_resources(value, base_url, resources_to_match, skip_claim_related:, errors:)
+            traverse_referenced_resources(value, base_url, entries_by_full_url, skip_claim_related:, errors:)
           elsif value.is_a?(Array) && value.all?(FHIR::Model)
             value.each do |elmt|
-              traverse_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:, errors:)
+              traverse_referenced_resources(elmt, base_url, entries_by_full_url, skip_claim_related:, errors:)
             end
           end
         end

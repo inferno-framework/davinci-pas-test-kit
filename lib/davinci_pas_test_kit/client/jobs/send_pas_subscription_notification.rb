@@ -111,8 +111,12 @@ module DaVinciPASTestKit
         @test_runs_repo ||= Inferno::Repositories::TestRuns.new
       end
 
+      # @resume_token is the same identifier the test's own wait() call registers (and that
+      # resume_test later ends the wait with), so this is an exact match on the waiting test
+      # run - not a guess at "the most recent run for this session", which could pick up an
+      # unrelated run if the tester has more than one for the same session.
       def test_run_id
-        @test_run_id ||= test_runs_repo.last_test_run(@test_session_id)&.id
+        @test_run_id ||= test_runs_repo.find_latest_waiting_by_identifier(@resume_token)&.id
       end
 
       def waiting_result

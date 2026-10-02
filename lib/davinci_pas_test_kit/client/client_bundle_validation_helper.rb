@@ -25,23 +25,15 @@ module DaVinciPASTestKit
       config.options[:workflow_tag]
     end
 
-    def fetch_requests
-      if workflow_tag.present?
-        load_tagged_requests(request_type_tag, workflow_tag)
-      else
-        load_tagged_requests(request_type_tag)
-      end
+    # workflow_tag may be a single tag or an Array of tags; normalized to an Array so fetch_requests
+    # doesn't need its own is_a?(Array) check.
+    def workflow_tags
+      Array(workflow_tag)
     end
 
-    ###########################################################################
-    # JSON format check
-    ###########################################################################
-
-    def valid_json?(json)
-      JSON.parse(json)
-      true
-    rescue JSON::ParserError, TypeError
-      false
+    def fetch_requests
+      tags = workflow_tags.presence || [nil]
+      tags.flat_map { |tag| load_tagged_requests(*[request_type_tag, tag].compact) }
     end
 
     ###########################################################################
@@ -150,14 +142,12 @@ module DaVinciPASTestKit
     end
 
     def resource_from_message_contents(contents, label)
-      unless valid_json?(contents)
-        messages << { type: 'error', message: "#{label} Invalid JSON." }
-        return nil
-      end
-
       resource = FHIR.from_contents(contents)
       messages << { type: 'error', message: "#{label} Not a FHIR resource." } unless resource.present?
       resource
+    rescue StandardError
+      messages << { type: 'error', message: "#{label} Invalid JSON." }
+      nil
     end
 
     # standard Bundle extraction: 1 Bundle, not wrapped in Parameters
