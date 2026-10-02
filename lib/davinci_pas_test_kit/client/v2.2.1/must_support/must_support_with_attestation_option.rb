@@ -143,9 +143,9 @@ module DaVinciPASTestKit
           Attest that the client system does **not** collect the data for these unobserved
           must support elements (and is not required to under the PAS implementation guide).
 
-          [Click here](#{attest_true_url}) if the above statement is **true**. The test will **pass**.
+          [Click here](#{attest_true_url}) if the above statement is **true**.
 
-          [Click here](#{attest_false_url}) if the above statement is **false**. The test will **fail**.
+          [Click here](#{attest_false_url}) if the above statement is **false**.
         MESSAGE
       end
 

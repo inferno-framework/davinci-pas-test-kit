@@ -301,8 +301,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       message = result.result_message
       expect(message).to match(/- PAS Coverage: .+/) # profile name + at least one element listed
-      expect(message).to include('The test will **pass**')
-      expect(message).to include('The test will **fail**')
+      expect(message).to include('is **true**')
+      expect(message).to include('is **false**')
       expect(message).to match(/\[Click here\]\(http.*\)/) # markdown attestation links
     end
   end
