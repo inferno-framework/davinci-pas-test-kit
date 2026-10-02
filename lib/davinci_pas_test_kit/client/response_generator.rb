@@ -505,7 +505,7 @@ module DaVinciPASTestKit
     # Finds the Bundle.entry for the ClaimResponse in a $submit response, which may be wrapped in a
     # FHIR::Parameters resource (v2.2.1). Returns nil if there is no response bundle or no such entry.
     def claim_response_entry_from_response_bundle(response_bundle)
-      response_bundle = response_bundle.parameter[0] if response_bundle.is_a?(FHIR::Parameters)
+      response_bundle = response_bundle.parameter[0]&.resource if response_bundle.is_a?(FHIR::Parameters)
 
       response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
     end

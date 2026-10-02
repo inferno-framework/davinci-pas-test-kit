@@ -134,6 +134,21 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
       end
     end
 
+    describe 'when multiple requests were received and one of them errored' do
+      before do
+        shared_result = repo_create(:result, test_session_id: test_session.id)
+        create_tagged_request(tags: [approval_tag], status: 200, result: shared_result)
+        create_tagged_request(tags: [approval_tag], status: 400, result: shared_result)
+      end
+
+      it 'skips instead of waiting for the attestation' do
+        result = run_attest(multiple_requests_ok: true)
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('expected to return a succesful response')
+      end
+    end
+
     describe 'with an operation tag' do
       it 'only considers requests with both the workflow and operation tags' do
         create_tagged_request(tags: [approval_tag])

@@ -79,18 +79,18 @@ module DaVinciPASTestKit
         else
           skip "Skipping attestation: No requests made demonstrating the #{workflow_name} workflow."
         end
-      elsif requests.one?
-        is_success_response = requests.first.status.to_s.start_with?('2')
-        if is_success_response && config.options[:error_status_expected]
-          skip 'Skipping attestation: Inferno expected to return a HTTP error response, but did not.'
-        elsif !is_success_response && !config.options[:error_status_expected]
-          skip 'Skipping attestation: Inferno expected to return a succesful response, but did not.'
-        end
-      elsif !multiple_requests_ok?
+      elsif requests.length > 1 && !multiple_requests_ok?
         raise Inferno::Exceptions::TestSuiteImplementationException.new(
           'PAS request tagging',
           "multiple requests tagged with workflow tag #{workflow_tag}."
         )
+      else
+        success_responses, error_responses = requests.partition { |r| r.status.to_s.start_with?('2') }
+        if success_responses.present? && config.options[:error_status_expected]
+          skip 'Skipping attestation: Inferno expected to return a HTTP error response, but did not.'
+        elsif error_responses.present? && !config.options[:error_status_expected]
+          skip 'Skipping attestation: Inferno expected to return a succesful response, but did not.'
+        end
       end
 
       identifier = test_session_id
