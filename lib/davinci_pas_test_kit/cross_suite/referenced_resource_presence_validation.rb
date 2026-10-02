@@ -17,45 +17,11 @@ module DaVinciPASTestKit
     #   own Claim.related.claim (the grandparent) is deliberately omitted from the Bundle per spec-65/66. The
     #   primary Claim passed in by the caller keeps `skip_claim_related: false`, so its parent reference - and the
     #   parent's own referenced resources - are still checked.
-    # @param errors [Array<String>] Accumulator for error messages found during traversal; callers should not pass
-    #   this in, it is threaded through the recursive calls.
     # @return [Array<String>] The error messages found during traversal.
     def check_presence_of_referenced_resources(target_resource, base_url, resources_to_match,
-                                               skip_claim_related: false, errors: [])
-      return errors if target_resource.blank?
-
-      if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
-        ref = target_resource.reference
-        absolute_ref = absolute_url(ref, base_url)
-        matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
-
-        if matching_resources.length != 1
-          errors << resource_shall_appear_once_message(absolute_ref, matching_resources.length)
-        end
-
-        if matching_resources.length.positive?
-          # A resource reached by following a reference is an included resource, not the primary Claim
-          # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
-          check_presence_of_referenced_resources(matching_resources.first.resource, base_url, resources_to_match,
-                                                 skip_claim_related: true, errors:)
-        end
-      else
-        target_resource.source_hash.each_key do |attr|
-          next if claim_response_request_attr?(target_resource, attr)
-          next if skip_claim_related && claim_related_attr?(target_resource, attr)
-
-          value = target_resource.send(attr.to_sym)
-          if value.is_a?(FHIR::Model)
-            check_presence_of_referenced_resources(value, base_url, resources_to_match, skip_claim_related:, errors:)
-          elsif value.is_a?(Array) && value.all?(FHIR::Model)
-            value.each do |elmt|
-              check_presence_of_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:, errors:)
-            end
-          end
-        end
-      end
-
-      errors
+                                               skip_claim_related: false)
+      traverse_referenced_resources(target_resource, base_url, resources_to_match,
+                                    skip_claim_related:, errors: [])
     end
 
     # ClaimResponse.request is a back-reference to the submitted Claim. The PAS IG response bundle
@@ -112,6 +78,47 @@ module DaVinciPASTestKit
       base_path = path_segments[0...-2].join('/')
 
       "#{uri.scheme}://#{uri.authority}#{base_path}"
+    end
+
+    private
+
+    # Recursive worker for check_presence_of_referenced_resources; errors is threaded through the
+    # recursive calls and is private so callers can't pass in (and so corrupt) their own accumulator.
+    def traverse_referenced_resources(target_resource, base_url, resources_to_match, skip_claim_related:, errors:)
+      return errors if target_resource.blank?
+
+      if target_resource.is_a?(FHIR::Reference) && target_resource.reference.present?
+        ref = target_resource.reference
+        absolute_ref = absolute_url(ref, base_url)
+        matching_resources = resources_to_match.find_all { |res| res.fullUrl == absolute_ref }
+
+        if matching_resources.length != 1
+          errors << resource_shall_appear_once_message(absolute_ref, matching_resources.length)
+        end
+
+        if matching_resources.length.positive?
+          # A resource reached by following a reference is an included resource, not the primary Claim
+          # being validated; if it is itself a Claim Update, its referenced grandparent Claim is omitted.
+          traverse_referenced_resources(matching_resources.first.resource, base_url, resources_to_match,
+                                        skip_claim_related: true, errors:)
+        end
+      else
+        target_resource.source_hash.each_key do |attr|
+          next if claim_response_request_attr?(target_resource, attr)
+          next if skip_claim_related && claim_related_attr?(target_resource, attr)
+
+          value = target_resource.send(attr.to_sym)
+          if value.is_a?(FHIR::Model)
+            traverse_referenced_resources(value, base_url, resources_to_match, skip_claim_related:, errors:)
+          elsif value.is_a?(Array) && value.all?(FHIR::Model)
+            value.each do |elmt|
+              traverse_referenced_resources(elmt, base_url, resources_to_match, skip_claim_related:, errors:)
+            end
+          end
+        end
+      end
+
+      errors
     end
   end
 end

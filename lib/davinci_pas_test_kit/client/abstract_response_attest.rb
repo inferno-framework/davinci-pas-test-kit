@@ -1,6 +1,10 @@
+require_relative 'request_count_gating'
+
 module DaVinciPASTestKit
   # abstract test, needs to be extended to include a version-specific URLs module
   class AbstractResponseAttest < Inferno::Test
+    include RequestCountGating
+
     id :pas_client_response_attest
     title 'PAS client reacts appropriately to the response'
     description %(
@@ -22,14 +26,15 @@ module DaVinciPASTestKit
       config.options[:attest_message]
     end
 
-    def tags_to_load
-      [workflow_tag, operation_tag].compact
+    # workflow_tag may be a single tag or an Array of tags (e.g. the Claim Update attest tests,
+    # which match requests across several update steps); normalized to an Array so callers don't
+    # each need their own is_a?(Array) check.
+    def workflow_tags
+      Array(workflow_tag)
     end
 
     def workflow_name
-      tag = workflow_tag.is_a?(Array) ? workflow_tag.first : workflow_tag
-
-      case tag
+      case workflow_tags.first
       when APPROVAL_WORKFLOW_TAG
         'Approval'
       when DENIAL_WORKFLOW_TAG
@@ -53,12 +58,8 @@ module DaVinciPASTestKit
     end
 
     def target_requests
-      if workflow_tag.is_a?(Array)
-        workflow_tag.flat_map do |one_workflow_tag|
-          load_tagged_requests(*[one_workflow_tag, operation_tag].compact)
-        end
-      else
-        load_tagged_requests(*tags_to_load)
+      workflow_tags.flat_map do |one_workflow_tag|
+        load_tagged_requests(*[one_workflow_tag, operation_tag].compact)
       end
     end
 
@@ -73,7 +74,7 @@ module DaVinciPASTestKit
 
       requests = target_requests
       if requests.empty?
-        if config.options[:no_requests_ok]
+        if no_requests_ok?
           pass 'Attestation not needed: no requests received or required for this group.'
         else
           skip "Skipping attestation: No requests made demonstrating the #{workflow_name} workflow."
@@ -85,7 +86,7 @@ module DaVinciPASTestKit
         elsif !is_success_response && !config.options[:error_status_expected]
           skip 'Skipping attestation: Inferno expected to return a succesful response, but did not.'
         end
-      elsif !config.options[:multiple_requests_ok]
+      elsif !multiple_requests_ok?
         raise Inferno::Exceptions::TestSuiteImplementationException.new(
           'PAS request tagging',
           "multiple requests tagged with workflow tag #{workflow_tag}."

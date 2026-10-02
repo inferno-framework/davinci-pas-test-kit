@@ -1,5 +1,9 @@
+require_relative 'request_count_gating'
+
 module DaVinciPASTestKit
   module ClientBundleValidationHelper
+    include RequestCountGating
+
     ###########################################################################
     # Tags and Request Loading
     ###########################################################################
@@ -43,16 +47,6 @@ module DaVinciPASTestKit
     ###########################################################################
     # Request Count
     ###########################################################################
-
-    # are multiple requests allowed?
-    def multiple_requests_ok?
-      config.options[:multiple_requests_ok]
-    end
-
-    # are no requests allowed?
-    def no_requests_ok?
-      config.options[:no_requests_ok]
-    end
 
     # Raises if there are multiple requests and the test doesn't allow that.
     # Skips if there are no requests and the test doesn't allow that.
@@ -175,25 +169,24 @@ module DaVinciPASTestKit
         messages << { type: 'error',
                       message: "#{message_label} expected a Bundle resource, got Parameters." }
         target_parameter_name = parameters_target_parameter_name
-        bundle_parameter_entries =
-          message_resource.parameter.select { |parameter| parameter.name == target_parameter_name }
+        matching_resources = extract_resources_from_parameters(message_resource, target_parameter_name)
 
-        if bundle_parameter_entries.empty?
+        if matching_resources.empty?
           messages << { type: 'error',
                         message: "#{message_label} Parameters resource had no Bundle " \
                                  "in a '#{target_parameter_name}' entry." }
           []
-        elsif bundle_parameter_entries.length > 1
+        elsif matching_resources.length > 1
           messages << { type: 'error',
                         message: "#{message_label} Parameters resource had multiple '#{target_parameter_name}' " \
                                  'entries, but only one allowed (Bundles not validated).' }
           []
-        elsif bundle_parameter_entries.first.resource.is_a?(FHIR::Bundle)
-          [bundle_parameter_entries.first.resource]
+        elsif matching_resources.first.is_a?(FHIR::Bundle)
+          [matching_resources.first]
         else
           messages << { type: 'error',
                         message: "#{message_label} Parameters resource '#{target_parameter_name}' entry expected to " \
-                                 "contain a Bundle, got #{bundle_parameter_entries.first.resource&.resourceType}" }
+                                 "contain a Bundle, got #{matching_resources.first&.resourceType}" }
           []
         end
 

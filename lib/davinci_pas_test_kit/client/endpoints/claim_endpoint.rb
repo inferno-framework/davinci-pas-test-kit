@@ -32,7 +32,7 @@ module DaVinciPASTestKit
     def tags
       # Requests rejected for an expired token or a rejected $inquire are not treated as
       # submissions of any workflow.
-      return [] if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request) || !operation_enabled?
+      return [] if expired_token? || !operation_enabled?
 
       operation_tag = operation == 'submit' ? SUBMIT_TAG : INQUIRE_TAG
       workflow_tag = WORKFLOW_TAG_MAP[workflow]
@@ -153,7 +153,7 @@ module DaVinciPASTestKit
     end
 
     def update_result
-      if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+      if expired_token?
         UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response, 'Bearer token')
         return
       end
@@ -168,6 +168,14 @@ module DaVinciPASTestKit
     end
 
     private
+
+    # Memoized so the token is only decoded and parsed once per request, even though both
+    # #tags and #update_result/#make_response need to check it.
+    def expired_token?
+      return @expired_token if defined?(@expired_token)
+
+      @expired_token = UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
+    end
 
     # Resolves the user-provided response, using criteria-based selection for must support
     # workflows or the single-response approach for other workflows

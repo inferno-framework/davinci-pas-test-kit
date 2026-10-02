@@ -128,7 +128,7 @@ module DaVinciPASTestKit
                workflow_tag: PENDED_WORKFLOW_TAG,
                operation_tag: INQUIRE_TAG,
                multiple_requests_ok: true,
-               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+               attest_message: 'I attest that the client system did not error when handling the `$inquire` ' \
                                "response and displays the submitted claim as 'approved' meaning that the " \
                                'user can proceed with ordering or providing the requested service.'
              } }

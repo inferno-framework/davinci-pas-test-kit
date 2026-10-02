@@ -98,10 +98,8 @@ module DaVinciPASTestKit
       def generated_claim_response_uuid
         return if pended_json_response.present?
 
-        claim_response_entry = FHIR.from_contents(@pended_submit_request.response_body)&.entry&.find do |entry|
-          entry.resource&.resourceType == 'ClaimResponse'
-        end
-        claim_response_entry&.fullUrl&.delete_prefix('urn:uuid:')
+        response_bundle = FHIR.from_contents(@pended_submit_request.response_body)
+        claim_response_entry_from_response_bundle(response_bundle)&.fullUrl&.delete_prefix('urn:uuid:')
       end
 
       # Helper methods for SubscriptionNotificationTrigger. The job looks up the test run and result once

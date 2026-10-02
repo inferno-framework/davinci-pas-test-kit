@@ -66,16 +66,16 @@ module DaVinciPASTestKit
 
         when FHIR::Parameters
           target_parameter_name = 'return'
-          message_resource.parameter.select { |parameter| parameter.name == target_parameter_name }
-            .map.with_index do |parameter, parameter_index|
-              case parameter.resource
+          extract_resources_from_parameters(message_resource, target_parameter_name)
+            .each_with_index.map do |resource, resource_index|
+              case resource
               when FHIR::Bundle
-                parameter.resource
+                resource
               else
                 messages << { type: 'error',
                               message: "#{message_label} Parameters resource '#{target_parameter_name}' " \
-                                       "entry #{parameter_index + 1} expected to " \
-                                       "contain a Bundle, got #{parameter.resource&.resourceType}" }
+                                       "entry #{resource_index + 1} expected to " \
+                                       "contain a Bundle, got #{resource&.resourceType}" }
                 nil
               end
             end.compact
