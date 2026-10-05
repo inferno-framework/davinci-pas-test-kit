@@ -3,6 +3,7 @@ require_relative '../../client_input_descriptions'
 require_relative '../../user_input_response'
 require_relative '../../../cross_suite/pas_bundle_validation'
 require_relative '../../session_identification'
+require_relative '../../subscription_setup_requirement'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -11,6 +12,7 @@ module DaVinciPASTestKit
       include SessionIdentification
       include UserInputResponse
       include PasBundleValidation
+      include SubscriptionSetupRequirement
 
       id :pas_client_v221_pended_submit_test
       title 'PAS client submits a claim using the $submit operation'
@@ -46,13 +48,7 @@ module DaVinciPASTestKit
       output :confirmation_url
 
       run do
-        load_tagged_requests(SUBSCRIPTION_CREATE_TAG)
-        skip_if requests.empty?, # NOTE: subscription needed ahead of time to support notification generation
-                %(
-                  Pended scenario tests cannot proceed because no Subscription exists to receive notifications
-                  for pended claims. Run the _PAS Subscription Setup_ tests to provide a Subscription for use
-                  in delivering notifications before re-running the pended scenario tests.
-                )
+        require_successful_subscription_create_request
 
         if user_inputted_response? :pended_json_response
           assert_valid_json pended_json_response,

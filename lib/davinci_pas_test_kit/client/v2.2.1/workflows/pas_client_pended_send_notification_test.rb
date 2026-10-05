@@ -2,6 +2,7 @@ require_relative '../urls'
 require_relative '../../client_input_descriptions'
 require_relative '../../user_input_response'
 require_relative '../../subscription_notification_trigger'
+require_relative '../../subscription_setup_requirement'
 require_relative '../../../cross_suite/tags'
 
 module DaVinciPASTestKit
@@ -10,6 +11,7 @@ module DaVinciPASTestKit
       include URLs
       include UserInputResponse
       include SubscriptionNotificationTrigger
+      include SubscriptionSetupRequirement
 
       id :pas_client_v221_pended_notify_and_attest_finalized_test
       title 'Inferno sends a notification that the pended request has been finalized'
@@ -52,13 +54,7 @@ module DaVinciPASTestKit
             )
 
       run do
-        subscription_request = load_tagged_requests(SUBSCRIPTION_CREATE_TAG).find { |req| req.status == 201 }
-        skip_if subscription_request.blank?, # NOTE: subscription needed to support notification generation
-                %(
-                  No Subscription exists to receive the notification. Run the _PAS Subscription Setup_ tests to
-                  provide a Subscription for use in delivering notifications before re-running the pended
-                  scenario tests.
-                )
+        subscription_request = require_successful_subscription_create_request
         @subscription_json = JSON.parse(subscription_request.response_body)
 
         pended_submit_requests = load_tagged_requests(SUBMIT_TAG, PENDED_WORKFLOW_TAG)

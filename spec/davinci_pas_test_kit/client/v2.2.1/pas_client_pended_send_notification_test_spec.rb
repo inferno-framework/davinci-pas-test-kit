@@ -51,7 +51,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
       result = run(described_class)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to include('No Subscription exists')
+      expect(result.result_message).to include('no Subscription exists to receive notifications')
     end
 
     it 'skips when there is no successful pended $submit request' do
