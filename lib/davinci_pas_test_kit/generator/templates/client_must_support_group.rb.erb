@@ -41,12 +41,17 @@ module DaVinciPASTestKit
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)
+        <%- if verifies_requirements -%>
+        verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
+        <%- end -%>
       end
 
 <%- end -%>
 <%- claim_profiles.each do |profile_metadata| -%>
       # Mandatory - the <%= profile_metadata.profile_name %> profile must always be demonstrated.
-      test from: :<%= test_id_for_profile(profile_metadata) %>
+      test from: :<%= test_id_for_profile(profile_metadata) %> <%- if verifies_requirements -%> do
+        verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
+      end<%- end -%>
 
 <%- end -%>
       # All other <%= operation %> request profiles - unobserved must support elements may be
@@ -66,6 +71,9 @@ module DaVinciPASTestKit
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)
+        <%- if verifies_requirements -%>
+        verifies_requirements <%= verifies_requirements.map { |r| "'#{r}'" }.join(', ') %>
+        <%- end -%>
       end
 <%- else -%>
       <%- if operation == 'submit' -%>

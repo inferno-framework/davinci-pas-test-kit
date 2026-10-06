@@ -111,7 +111,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireRequestBundleV
     end
 
     it 'finds any inquire request when no workflow specified' do
-      allow_any_instance_of(described_class).to receive(:validate_pas_bundle_json).and_return(nil)
+      allow_any_instance_of(described_class).to receive(:perform_bundle_validation).and_return([])
       create_submit_request(valid_request_string,
                             [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::INQUIRE_TAG])
       result = run(no_workflow_test)

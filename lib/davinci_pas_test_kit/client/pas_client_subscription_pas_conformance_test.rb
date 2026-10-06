@@ -9,7 +9,7 @@ module DaVinciPASTestKit
     id :pas_client_subscription_pas_conformance_test
     title 'Subscription creation request has the correct structure and content'
     description %(
-      This test verifies that the Subscription created by the client under test
+      This test verifies that the Subscription created by the client system
       is conformant to PAS requirements on the Subscription, including
       - The use of the [PAS-defined Subscription
         Topic](https://hl7.org/fhir/us/davinci-pas/STU2/SubscriptionTopic-PASSubscriptionTopic.html), and

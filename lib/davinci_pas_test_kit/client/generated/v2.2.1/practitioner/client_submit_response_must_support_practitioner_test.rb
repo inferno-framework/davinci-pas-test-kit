@@ -28,6 +28,7 @@ module DaVinciPASTestKit
         * Practitioner.telecom.system
         * Practitioner.telecom.value
       )
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-2'
 
       config(
         options: {

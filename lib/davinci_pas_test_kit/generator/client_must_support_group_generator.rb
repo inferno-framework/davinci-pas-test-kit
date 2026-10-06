@@ -191,13 +191,39 @@ module DaVinciPASTestKit
         target_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
       end
 
-      def verifies_requirements
-        case "#{operation}_#{ig_version}"
-        when 'submit_v2.0.1'
-          return nil if type == 'response'
+      # Requirement verified by the mandatory per-profile tests in response groups
+      # (clients SHALL be capable of receiving must support elements).
+      def response_verifies_requirement
+        case ig_version
+        when 'v2.2.1' then 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        when 'v2.0.1' then "hl7.fhir.us.davinci-pas_2.0.1@#{operation == 'submit' ? '39' : '40'}"
+        end
+      end
 
-          ['hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
-           'hl7.fhir.us.davinci-pas_2.0.1@70', 'hl7.fhir.us.davinci-pas_2.0.1@202']
+      def verifies_requirements
+        case "#{operation}_#{type}_#{ig_version}"
+        when 'submit_request_v2.2.1', 'inquire_request_v2.2.1'
+          ['hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1']
+        end
+      end
+
+      # Names of the profiles that must always be demonstrated, e.g. "PAS Claim Inquiry".
+      def mandatory_profile_names
+        target_profiles = type == 'response' ? profiles : required_profiles
+        target_profiles.select { |profile_metadata| mandatory_profile?(profile_metadata) }
+          .map(&:profile_name).to_sentence
+      end
+
+      # Only v2.2.1 has optional response tests and the request attestation option.
+      def optional_profiles_description
+        return '' unless optional_must_support_enabled?
+
+        if type == 'response'
+          "\nDemonstration of the #{mandatory_profile_names} profile is strictly required\n" \
+            'while all others are optional.'
+        else
+          "\nFor all profiles other than #{mandatory_profile_names}, testers can attest\n" \
+            'that the missing elements are not supported by their system to pass the tests.'
         end
       end
 
@@ -205,10 +231,7 @@ module DaVinciPASTestKit
         if type == 'response'
           <<~DESCRIPTION
             Check that `$#{operation}` responses provided to the client contain
-            all PAS-defined profiles and their must support elements.
-
-            **USER INPUT VALIDATION**: These tests validate responses provided by the tester,
-            not the system under test. Errors will be treated as skips instead of failures.
+            all PAS-defined profiles and their must support elements.#{optional_profiles_description}
 
             For `$#{operation}` responses, this includes the following profiles:
 
@@ -217,7 +240,7 @@ module DaVinciPASTestKit
         else
           <<~DESCRIPTION
             Check that the client can demonstrate `$#{operation}` requests that contain
-            all PAS-defined profiles and their must support elements.
+            all PAS-defined profiles and their must support elements.#{optional_profiles_description}
 
             For `$#{operation}` requests, this includes the following profiles:
 

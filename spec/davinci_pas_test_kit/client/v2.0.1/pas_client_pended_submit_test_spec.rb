@@ -1,5 +1,5 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :request do
-  describe 'responding to requests from the client under tests' do
+  describe 'responding to requests from the client systems' do
     let(:suite_id) { 'davinci_pas_client_suite_v201' }
     let(:session_url_path) { '1234' }
     let(:static_uuid) { 'f015a331-3a86-4566-b72f-b5b85902cdca' }
@@ -44,7 +44,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       inputs = { session_url_path: }
       result = run(test, inputs)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to include('no Subscription')
+      expect(result.result_message).to include('no Subscription exists to receive notifications')
     end
 
     it 'continues after a resume request' do
@@ -364,6 +364,44 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
           expect(result.result).to eq('fail')
           expect(result.result_message).to include('must be valid JSON')
         end
+      end
+    end
+
+    describe 'when receiving Subscription $status requests with an access token' do
+      let(:client_id) { 'status-client' }
+      let(:token_status_url) do
+        "/custom/#{suite_id}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH}"
+          .gsub(':id', subscription_create_response_full_resource['id'])
+      end
+
+      def status_with_token(minutes_from_now)
+        token = UDAPSecurityTestKit::MockUDAPServer.client_id_to_token(client_id, minutes_from_now)
+        header('Authorization', "Bearer #{token}")
+        get token_status_url
+      end
+
+      it 'tags the request when the token is valid' do
+        create_subscription_request
+        result = run(test, client_id:)
+        expect(result.result).to eq('wait')
+
+        status_with_token(5)
+
+        expect(last_response.status).to be(200)
+        requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBSCRIPTION_STATUS_TAG])
+        expect(requests.length).to be(1)
+      end
+
+      it 'returns 401 and assigns no tags when the token has expired' do
+        create_subscription_request
+        result = run(test, client_id:)
+        expect(result.result).to eq('wait')
+
+        status_with_token(-5)
+
+        expect(last_response.status).to be(401)
+        requests = requests_repo.tagged_requests(result.test_session_id, [DaVinciPASTestKit::SUBSCRIPTION_STATUS_TAG])
+        expect(requests).to be_empty
       end
     end
 

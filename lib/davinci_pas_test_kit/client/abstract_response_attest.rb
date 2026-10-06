@@ -1,11 +1,15 @@
+require_relative 'request_count_gating'
+
 module DaVinciPASTestKit
   # abstract test, needs to be extended to include a version-specific URLs module
   class AbstractResponseAttest < Inferno::Test
+    include RequestCountGating
+
     id :pas_client_response_attest
     title 'PAS client reacts appropriately to the response'
     description %(
-      This test provides the tester an opportunity to observe their client following
-      the receipt of response and attest that users are able to see the appropriate
+      During this test, the tester will observe the client system following
+      the receipt of a response and attest that users are able to see the appropriate
       updates to the corresponding prior authorization request in their system.
     )
     attestation
@@ -14,12 +18,23 @@ module DaVinciPASTestKit
       config.options[:workflow_tag]
     end
 
+    def operation_tag
+      config.options[:operation_tag]
+    end
+
     def attest_message
       config.options[:attest_message]
     end
 
+    # workflow_tag may be a single tag or an Array of tags (e.g. the Claim Update attest tests,
+    # which match requests across several update steps); normalized to an Array so callers don't
+    # each need their own is_a?(Array) check.
+    def workflow_tags
+      Array(workflow_tag)
+    end
+
     def workflow_name
-      case workflow_tag
+      case workflow_tags.first
       when APPROVAL_WORKFLOW_TAG
         'Approval'
       when DENIAL_WORKFLOW_TAG
@@ -34,6 +49,33 @@ module DaVinciPASTestKit
         'Operation Failure'
       when PROCESSING_ERROR_WORKFLOW_TAG
         'Processing Error'
+      when CLAIM_UPDATE_INITIAL_TAG
+        'Claim Update'
+      else
+        raise Inferno::Exceptions::TestSuiteImplementationException.new('PAS Display Attestation',
+                                                                        "No name for workflow tag #{workflow_tag}.")
+      end
+    end
+
+    # Tags identifying the requests that gate the attestation, when they aren't the ones tagged with
+    # workflow_tag (+ operation_tag) - e.g., the notification Inferno sends to the client.
+    def request_tags
+      config.options[:request_tags]
+    end
+
+    def target_requests
+      return load_tagged_requests(*request_tags) if request_tags.present?
+
+      workflow_tags.flat_map do |one_workflow_tag|
+        load_tagged_requests(*[one_workflow_tag, operation_tag].compact)
+      end
+    end
+
+    def unexpected_error_status_message(error_responses)
+      if error_responses.any? { |r| r.direction == 'outgoing' }
+        'Skipping attestation: the client system did not return a successful response to Inferno\'s request.'
+      else
+        'Skipping attestation: Inferno expected to return a successful response, but did not.'
       end
     end
 
@@ -41,7 +83,34 @@ module DaVinciPASTestKit
     output :attest_false_url
 
     run do
-      identifier = test_session_id
+      # check that there are actually requests
+      # - skip if none unless there is a config
+      # - raise an implementation error if there are more than 1 unless config set (shouldn't ever)
+      # - skip if no response has the expected HTTP status (success, or error when error_status_expected)
+
+      requests = target_requests
+      if requests.empty?
+        if no_requests_ok?
+          pass 'Attestation not needed: no requests received or required for this group.'
+        else
+          skip "Skipping attestation: No requests made demonstrating the #{workflow_name} scenario."
+        end
+      elsif requests.length > 1 && !multiple_requests_ok?
+        raise Inferno::Exceptions::TestSuiteImplementationException.new(
+          'PAS request tagging',
+          "multiple requests tagged with workflow tag #{workflow_tag}."
+        )
+      else
+        success_responses, error_responses = requests.partition { |r| r.status.to_s.start_with?('2') }
+        if error_responses.blank? && config.options[:error_status_expected]
+          skip 'Skipping attestation: Inferno expected to return a HTTP error response, but did not.'
+        elsif success_responses.blank? && !config.options[:error_status_expected]
+          skip unexpected_error_status_message(error_responses)
+        end
+      end
+
+      # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
+      identifier = SecureRandom.uuid
       attest_true_url = "#{resume_pass_url}?token=#{identifier}"
       output(attest_true_url:)
       attest_false_url = "#{resume_fail_url}?token=#{identifier}"
@@ -50,7 +119,7 @@ module DaVinciPASTestKit
       wait(
         identifier:,
         message: %(
-          **#{workflow_name} Workflow Test**:
+          **#{workflow_name} Scenario Test**:
 
           #{attest_message}
 

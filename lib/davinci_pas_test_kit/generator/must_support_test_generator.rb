@@ -127,6 +127,8 @@ module DaVinciPASTestKit
           ['hl7.fhir.us.davinci-pas_2.0.1@37', 'hl7.fhir.us.davinci-pas_2.0.1@110']
         when 'server_inquire_response_v2.0.1'
           ['hl7.fhir.us.davinci-pas_2.0.1@38']
+        when 'client_inquire_response_v2.2.1', 'client_submit_response_v2.2.1'
+          ['hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-2']
         end
       end
 

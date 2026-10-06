@@ -502,10 +502,16 @@ module DaVinciPASTestKit
       url.sub(%r{/[^/]*/[^/]*(/)?\z}, '')
     end
 
-    def claim_response_full_url_from_submit_response_bundle(submit_response_bundle)
-      submit_response_bundle = submit_response_bundle.parameter[0] if submit_response_bundle.is_a?(FHIR::Parameters)
+    # Finds the Bundle.entry for the ClaimResponse in a $submit response, which may be wrapped in a
+    # FHIR::Parameters resource (v2.2.1). Returns nil if there is no response bundle or no such entry.
+    def claim_response_entry_from_response_bundle(response_bundle)
+      response_bundle = response_bundle.parameter[0]&.resource if response_bundle.is_a?(FHIR::Parameters)
 
-      claim_response_entry = submit_response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
+      response_bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }
+    end
+
+    def claim_response_full_url_from_submit_response_bundle(submit_response_bundle)
+      claim_response_entry = claim_response_entry_from_response_bundle(submit_response_bundle)
 
       if claim_response_entry.present?
         return claim_response_entry.fullUrl unless claim_response_entry.fullUrl.blank?

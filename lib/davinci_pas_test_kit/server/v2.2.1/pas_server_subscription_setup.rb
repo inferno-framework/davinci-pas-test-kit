@@ -9,7 +9,7 @@ module DaVinciPASTestKit
       title 'Subscription Setup'
       description %(
           The Subscription Setup tests verify that the server supports creation of a rest-hook Subscription. The
-          Subscription instance created in these tests will be used for a notification in the pended workflow tests
+          Subscription instance created in these tests will be used for a notification in the pended scenario tests
           later.
         )
       config inputs: { url: { name: :server_endpoint } }

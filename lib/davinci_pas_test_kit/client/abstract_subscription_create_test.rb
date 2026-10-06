@@ -9,7 +9,7 @@ module DaVinciPASTestKit
     id :pas_client_subscription_create_test
     title 'PAS client submits a Subscription creation request'
     description %(
-      Inferno will wait for a Subscription creation request
+      During this test, Inferno will wait for a Subscription creation request
       and then perform a handshake to activate the Subscription.
     )
 
@@ -29,7 +29,7 @@ module DaVinciPASTestKit
           optional: true,
           title: 'Client Notification Access Token',
           description: %(
-            The bearer token that Inferno will send on requests to the client under test's rest-hook notification
+            The bearer token that Inferno will send on requests to the client system's rest-hook notification
             endpoint, including handshake notifications sent after Subscription creation. Not needed if the client
             under test will create a Subscription with an appropriate header value in the `channel.header` element.
             If a value for the `authorization` header is provided in `channel.header`, this value will override it.
@@ -41,16 +41,33 @@ module DaVinciPASTestKit
 
       wait(
         identifier: wait_identifier,
-        message: %(
+        message: <<~MESSAGE
           **Subscription Creation Test**:
 
-          Submit a POST with a Subscription to:
+          Inferno will wait while the tester uses the client system to create a Subscription on
+          Inferno's simulated payer server. Inferno [will not accept all Subscriptions](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
+          but a Subscription does not need to be fully conformant to be accepted.
+
+          After accepting a Subscription, Inferno will send a handshake notification
+          to the specified `channel.endpoint` and continue automatically.
+
+          ### Endpoints
+
+          Submit a POST with a Subscription to
 
           `#{subscription_endpoint}`
 
-          Upon receipt, Inferno will send a handshake request to verify that notifications can be
-          delivered and continue the test with a pass or fail based on the result.
-        )
+          ### Authentication and Identification
+
+          #{auth_description_for_wait(client_id)}
+
+          ### Responses and Handshake Notifications
+
+          The PAS Test Kit wiki contains details on the supported responses and
+          notifications that the client system can expect to receive during these tests:
+          - [Subscription creation responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#creation-response)
+          - [Handshake notification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#handshake-notification)
+        MESSAGE
       )
     end
   end

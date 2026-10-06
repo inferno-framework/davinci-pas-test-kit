@@ -11,10 +11,10 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v221_denial_group
-      title 'Denial Workflow'
+      title 'Denial Response'
       description %(
-        During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a 'denied' decision.
+        During these tests, the client system will initiate a prior authorization
+        request and show it can react appropriately to a 'denied' decision.
       )
       run_as_group
 
@@ -25,23 +25,25 @@ module DaVinciPASTestKit
                   :session_url_path
 
       test from: :pas_client_v221_denial_submit_test
-      test from: :pas_client_v221_request_bundle_validation_test,
-           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
-      test from: :pas_client_v221_response_bundle_validation_test,
-           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
       test from: :pas_client_v221_response_attest,
            title: 'PAS client displays the request as "denied"',
            description: %(
-             This test provides the tester an opportunity to observe their client following
+             During this test, the tester will observe the client system following
              the receipt of the denied response and attest that users are able to determine
              that the response has been denied.
            ),
            config: { options: {
              workflow_tag: DENIAL_WORKFLOW_TAG,
-             attest_message: "I attest that the client system displays the submitted claim as 'denied', meaning " \
+             operation_tag: SUBMIT_TAG,
+             attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+                             "response and displays the submitted claim as 'denied', meaning " \
                              'that the user cannot proceed with ordering or providing the requested service without ' \
-                             'making adjustments and submitting for further approval.'
+                             'making adjustments and submitting for further review.'
            } }
+      test from: :pas_client_v221_request_bundle_validation_test,
+           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
+      test from: :pas_client_v221_response_bundle_validation_test,
+           config: { options: { workflow_tag: DENIAL_WORKFLOW_TAG } }
     end
   end
 end

@@ -15,12 +15,13 @@ module DaVinciPASTestKit
         Errors encountered will be treated as a skip instead of a failure.
 
         This test verifies the conformity of the PAS Response Bundle returned by Inferno during the
-        Processing Error workflow. The bundle is validated against the
+        Processing Error scenario. The bundle is validated against the
         [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
         profile. Additionally, it checks that the ClaimResponse contains at least one error entry,
         as required by the processing error scenario.
 
-        Per IG §7.2.5, business errors that are a part of processing the 278 payload are
+        The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
+        that business errors that are a part of processing the 278 payload are
         represented in the mapping to the response bundle via the ClaimResponse error capability.
       )
       simulation_verification
@@ -33,17 +34,21 @@ module DaVinciPASTestKit
         response_body = request.response_body
         skip_if response_body.blank?, 'The Processing Error response body is empty.'
 
-        validate_pas_bundle_json(
-          response_body,
-          'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle',
-          '2.2.1',
-          'submit',
-          'response_bundle',
-          skips: true,
-          message: "Invalid processing error response bundle provided in 'Processing Error Response Bundle JSON' input:"
-        )
+        message = "Invalid processing error response bundle provided in 'Processing Error Response Bundle JSON' input:"
+        begin
+          JSON.parse(response_body)
+        rescue JSON::ParserError, TypeError
+          skip "#{message} Invalid JSON.".strip
+        end
 
         bundle = FHIR.from_contents(response_body)
+        skip_if !bundle.is_a?(FHIR::Bundle),
+                "#{message} Unexpected resource type: expected Bundle, but received #{bundle&.resourceType}.".strip
+
+        messages.concat(perform_bundle_validation(bundle, 'submit', 'response', '2.2.1'))
+        skip_if error_messages?,
+                "#{message} Bundle and/or entry resources are not conformant. Check messages for issues found.".strip
+
         claim_response = bundle&.entry&.find { |e| e&.resource&.resourceType == 'ClaimResponse' }&.resource
         skip_if claim_response&.error.blank?,
                 'The ClaimResponse in the Processing Error response bundle contains no error entries. ' \

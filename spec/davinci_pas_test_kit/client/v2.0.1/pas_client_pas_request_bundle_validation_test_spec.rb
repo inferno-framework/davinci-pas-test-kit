@@ -32,6 +32,23 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidati
       config({ options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG } })
     end
   end
+  let(:multi_request_test) do
+    Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidationTest) do
+      fhir_resource_validator do
+        url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
+
+        cli_context do
+          txServer nil
+          displayWarnings true
+          disableDefaultResourceFetcher true
+        end
+
+        igs('hl7.fhir.us.davinci-pas#2.0.1')
+      end
+
+      config({ options: { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, multiple_requests_ok: true } })
+    end
+  end
   let(:no_workflow_test) do
     Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidationTest) do
       fhir_resource_validator do
@@ -110,7 +127,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidati
     end
 
     it 'finds any inquire request when no workflow specified' do
-      allow_any_instance_of(described_class).to receive(:validate_pas_bundle_json).and_return(nil)
+      allow_any_instance_of(described_class).to receive(:perform_bundle_validation).and_return([])
       create_submit_request(valid_request_string,
                             [DaVinciPASTestKit::DENIAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
       result = run(no_workflow_test)
@@ -125,5 +142,41 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientRequestBundleValidati
 
       expect(result.result).to eq('fail')
     end
+
+    describe 'when multiple requests are loaded' do
+      before do
+        create_submit_request(valid_request_string,
+                              [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
+        create_submit_request(valid_request_string,
+                              [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
+      end
+
+      it 'errors when the test does not expect more than one' do
+        result = run(approval_test)
+
+        expect(result.result).to eq('error')
+        expect(result.result_message).to include('does not expect more than one')
+      end
+
+      it 'checks every request when the test allows multiple, continuing past an invalid one' do
+        allow_any_instance_of(described_class).to receive(:perform_bundle_validation).and_return([])
+        create_submit_request('NOT JSON', [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
+
+        result = run(multi_request_test)
+
+        expect(result.result).to eq('fail')
+        expect(result.result_message).to include('Request 3')
+        messages = entity_result_messages(multi_request_test)
+        expect(messages.map(&:message)).to include('Request 3: Invalid JSON.')
+        expect(messages.size).to eq(1)
+      end
+    end
+  end
+
+  def entity_result_messages(runnable)
+    Inferno::Repositories::Results.new
+      .current_results_for_test_session_and_runnables(test_session.id, [runnable])
+      .first
+      .messages
   end
 end

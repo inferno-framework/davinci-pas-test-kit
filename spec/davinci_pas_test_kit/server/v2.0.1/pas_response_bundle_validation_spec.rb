@@ -41,7 +41,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
   it 'fails if no requests made' do
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/No successful \$submit requests made during the Approval workflow tests./)
+    expect(result.result_message).to match(/No successful \$submit requests made during the Approval scenario tests./)
   end
 
   it 'fails if no requests made for the right workflow' do
@@ -50,7 +50,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/No successful \$submit requests made during the Approval workflow tests./)
+      .to match(/No successful \$submit requests made during the Approval scenario tests./)
   end
 
   it 'fails if no responses are FHIR Bundles' do
@@ -61,12 +61,11 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/No successful \$submit requests made during the Approval workflow tests./)
+      .to match(/No successful \$submit requests made during the Approval scenario tests./)
   end
 
   it 'passes when valid Bundles were returned' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return([])
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
 
@@ -76,8 +75,7 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
 
   it 'only analyzes duplicate Bundles once' do
     call_count = 0
-    allow_any_instance_of(test).to receive(:perform_bundle_validation) { call_count += 1 }.and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation) { call_count += 1 }.and_return([])
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
     create_submit_request(pa_response_valid_bundle,
@@ -89,9 +87,8 @@ RSpec.describe DaVinciPASTestKit::ServerResponseBundleValidationTest, :runnable 
   end
 
   it 'fails if validation errors found' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages)
-      .and_return(['this is an error', 'this is another error'])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation)
+      .and_return([{ type: 'error', message: 'this is an error' }, { type: 'error', message: 'this is another error' }])
     create_submit_request(pa_response_valid_bundle,
                           [DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG])
 

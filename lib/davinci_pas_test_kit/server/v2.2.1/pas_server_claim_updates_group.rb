@@ -92,7 +92,7 @@ module DaVinciPASTestKit
       group do
         title "Verify the server's responses to the claim updates"
         description %(
-          These tests check the server's responses from the submission sequence and verify that the server
+          The tests in this group check the server's responses from the submission sequence and verify that the server
           returned current results for all submitted items and echoed the submitted item sequences.
         )
 

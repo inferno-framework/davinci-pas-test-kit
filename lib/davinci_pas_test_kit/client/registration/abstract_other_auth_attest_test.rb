@@ -3,8 +3,8 @@ module DaVinciPASTestKit
     id :pas_client_reg_other_auth_attest
     title 'PAS client supports a non-standard approach for authenticating with the PAS server'
     description %(
-      Since a standard auth approach was not chosen for this session, this test provides testers with an
-      opportunity to attest to their client's ability to authenticate itself to a server
+      Since a standard auth approach was not chosen for this session, this test asks testers
+      to attest to the client's ability to authenticate itself to a server
       using a method that this Inferno test suite does not support, such as mutual authentication
       TLS.
     )
@@ -14,7 +14,8 @@ module DaVinciPASTestKit
     output :attest_false_url
 
     run do
-      identifier = test_session_id
+      # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
+      identifier = SecureRandom.uuid
       attest_true_url = "#{resume_pass_url}?token=#{identifier}"
       output(attest_true_url:)
       attest_false_url = "#{resume_fail_url}?token=#{identifier}"
