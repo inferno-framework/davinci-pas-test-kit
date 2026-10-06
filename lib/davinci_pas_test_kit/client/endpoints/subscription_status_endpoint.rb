@@ -21,8 +21,8 @@ module DaVinciPASTestKit
     end
 
     def make_response
-      if UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
-        UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response)
+      if expired_token?
+        UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response, 'Bearer token')
         return
       end
 
@@ -86,7 +86,20 @@ module DaVinciPASTestKit
     end
 
     def tags
+      # Requests rejected for an expired token are not treated as submissions of any workflow.
+      return [] if expired_token?
+
       [SUBSCRIPTION_STATUS_TAG]
+    end
+
+    private
+
+    # Memoized so the token is only decoded and parsed once per request, even though both
+    # #tags and #make_response need to check it.
+    def expired_token?
+      return @expired_token if defined?(@expired_token)
+
+      @expired_token = UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
     end
 
     def not_found

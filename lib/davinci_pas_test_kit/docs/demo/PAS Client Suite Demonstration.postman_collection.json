@@ -41,7 +41,7 @@
 			]
 		},
 		{
-			"name": "Approval Workflow",
+			"name": "Approval Scenario",
 			"item": [
 				{
 					"name": "Prior Auth Request For Approval",
@@ -81,7 +81,7 @@
 			]
 		},
 		{
-			"name": "Denial Workflow",
+			"name": "Denial Scenario",
 			"item": [
 				{
 					"name": "Prior Auth Request For Denial",
@@ -121,7 +121,7 @@
 			]
 		},
 		{
-			"name": "Pended Workflow",
+			"name": "Pended Scenario",
 			"item": [
 				{
 					"name": "Prior Auth Request For Pended",

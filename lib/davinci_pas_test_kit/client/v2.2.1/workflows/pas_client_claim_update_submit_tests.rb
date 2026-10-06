@@ -26,7 +26,7 @@ module DaVinciPASTestKit
 
       id :pas_client_v221_claim_update_submit_base
 
-      config options: { suppress_notifications: true }
+      config options: { suppress_notifications: true, submit_enabled: true }
 
       input :client_id,
             title: 'Client Id',
@@ -40,12 +40,24 @@ module DaVinciPASTestKit
             optional: true,
             locked: true,
             description: INPUT_SESSION_URL_PATH_LOCKED
+      input :prior_submission_failed,
+            default: 'false',
+            hidden: true,
+            optional: true
+
+      output :prior_submission_failed
 
       run do
+        skip_if !config.options[:first_update_submission] && prior_submission_failed == 'true',
+                'Prior step of the update scenario not completed.'
+
+        output prior_submission_failed: 'false' if config.options[:first_update_submission]
         response_input = config.options[:submit_respond_with]
         if response_input.present? && send(response_input).present?
+          output prior_submission_failed: 'true'
           assert_valid_json send(response_input),
                             "Input '#{input_title(response_input)}' must be valid JSON"
+          output prior_submission_failed: 'false'
         elsif response_input.present?
           add_message('info', %(
             No response provided in input '#{input_title(response_input)}'. Inferno will generate an
@@ -64,30 +76,35 @@ module DaVinciPASTestKit
       end
 
       def claim_update_wait_message(submit_endpoint)
-        %(
-          **Claim Update Workflow**
+        <<~MESSAGE
+          **Claim Update Scenario**:
 
-          #{interaction_instructions}
+          Inferno will wait while the tester uses the system to #{interaction_instructions}.
+          The tests will automatically continue once a request has been received.
 
-          Submit the request to
+          ### Endpoints
+
+          Submit a PAS request to
 
           `#{submit_endpoint}`
 
+          ### Authentication and Identification
+
+          #{auth_description_for_wait(client_id)}
+
+          ### Responses
+
           #{response_note}
 
-          Inferno will automatically continue once it receives the request, so no further
-          action is required after submitting.
-        )
+          Inferno will not respond to `$inquire` requests during this test.
+        MESSAGE
       end
 
       def response_note
         response_input = config.options[:submit_respond_with]
-        if response_input.present? && send(response_input).present?
-          "The response provided in the '**#{input_title(response_input)}**' input will be returned, " \
-            'updated with current timestamps.'
-        else
-          'Inferno will generate an approved response from the submitted Claim and return it.'
-        end
+        response_description_for_wait(user_inputted_response?(response_input),
+                                      input_title(response_input),
+                                      '$submit')
       end
 
       # Overridden by subclasses to describe the specific submission the tester should make.
@@ -101,28 +118,31 @@ module DaVinciPASTestKit
       id :pas_client_v221_claim_update_initial_submit_test
       title 'PAS client submits an initial prior authorization request'
       description %(
-        Inferno waits for an initial prior authorization `$submit` request from the client.
+        During this test, Inferno will wait for an initial prior authorization `$submit` request from the client.
         This establishes the original Claim that the subsequent updates will reference and
-        modify. Upon receipt, Inferno returns the configured response (or generates an
-        approved response from the submitted Claim) and continues automatically.
+        modify. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
 
       input :claim_update_initial_response,
             title: 'Initial claim response JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be returned in response to the initial `$submit` request,
-              updated with current timestamps. If not provided, an approved response will be generated
-              from the submitted Claim.
+            description: DaVinciPASTestKit.user_response_input_description_for_update_tests(
+              '$submit',
+              'approved',
+              'PAS client submits an initial prior authorization request'
             )
 
       submit_respond_with :claim_update_initial_response
-      config options: { claim_update_tag: CLAIM_UPDATE_INITIAL_TAG }
+      config options: { claim_update_tag: CLAIM_UPDATE_INITIAL_TAG, first_update_submission: true }
+      inputs.delete(:prior_submission_failed)
 
       def interaction_instructions
-        'Submit an **initial** prior authorization request (a `$submit` containing a Claim with one ' \
-          'or more items and no `Claim.related.claim`).'
+        'submit an **initial** prior authorization request (a `$submit` containing a Claim with one ' \
+          'or more items and no `Claim.related.claim`)'
       end
     end
 
@@ -131,12 +151,14 @@ module DaVinciPASTestKit
       id :pas_client_v221_claim_update_add_item_submit_test
       title 'PAS client submits an update that adds an item'
       description %(
-        Inferno waits for an updated prior authorization `$submit` request that adds a new item to
-        the previously submitted Claim. The update is expected to reference the original Claim in
-        `Claim.related.claim` (and include it in the Bundle), retain all previously submitted item
+        During this test, Inferno will wait for an updated prior authorization `$submit` request that adds a new item to
+        the previously submitted Claim. The update is expected to reference (and include in the Bundle)
+        the original Claim in `Claim.related.claim`, retain all previously submitted item
         and supportingInfo entries with their `sequence` values, and mark the newly added item with
-        an `infoChanged` extension. Upon receipt, Inferno returns the configured response and
-        continues automatically.
+        an `infoChanged` extension. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-63'
 
@@ -144,20 +166,20 @@ module DaVinciPASTestKit
             title: 'Add-item update response JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be returned in response to the add-item update `$submit`
-              request, updated with current timestamps. If not provided, an approved response will be
-              generated from the submitted Claim.
+            description: DaVinciPASTestKit.user_response_input_description_for_update_tests(
+              '$submit',
+              'approved',
+              'PAS client submits an update that adds an item'
             )
 
       submit_respond_with :claim_update_add_item_response
-      config options: { claim_update_tag: CLAIM_UPDATE_ADD_ITEM_TAG }
+      config options: { claim_update_tag: CLAIM_UPDATE_ADD_ITEM_TAG, first_update_submission: false }
 
       def interaction_instructions
-        'Submit an **update that adds a new item** to the prior authorization. Reference the ' \
+        'submit an **update that adds a new item** to the prior authorization. Reference the ' \
           'previously submitted Claim in `Claim.related.claim` and include that Claim in the Bundle, ' \
           'retain all previously submitted items and supportingInfo (preserving their `sequence` ' \
-          'values), and mark the newly added item with an `infoChanged` extension.'
+          'values), and mark the newly added item with an `infoChanged` extension'
       end
     end
 
@@ -166,14 +188,16 @@ module DaVinciPASTestKit
       id :pas_client_v221_claim_update_modify_cancel_submit_test
       title 'PAS client submits an update that modifies an item and cancels an item'
       description %(
-        Inferno waits for a second updated prior authorization `$submit` request that modifies one
+        During this test, Inferno will wait for a second updated prior authorization `$submit` request that modifies one
         existing item and cancels another. Modified entries are expected to carry an `infoChanged`
         extension; the canceled item is expected to carry the `infoCancelled` modifier extension
         (valueBoolean `true`), a `certificationType` extension with code `3` (Cancel) in
         `Claim.item.extension`, and an `infoChanged` extension. All prior item and supportingInfo
         entries are expected to be retained with preserved `sequence` values, referencing the
-        immediately prior Claim update. Upon receipt, Inferno returns the configured response and
-        continues automatically.
+        immediately prior Claim update. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-63'
 
@@ -181,22 +205,22 @@ module DaVinciPASTestKit
             title: 'Modify-and-cancel update response JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be returned in response to the modify-and-cancel update
-              `$submit` request, updated with current timestamps. If not provided, an approved response
-              will be generated from the submitted Claim.
+            description: DaVinciPASTestKit.user_response_input_description_for_update_tests(
+              '$submit',
+              'approved',
+              'PAS client submits an update that modifies an item and cancels an item'
             )
 
       submit_respond_with :claim_update_modify_cancel_response
-      config options: { claim_update_tag: CLAIM_UPDATE_MODIFY_CANCEL_TAG }
+      config options: { claim_update_tag: CLAIM_UPDATE_MODIFY_CANCEL_TAG, first_update_submission: false }
 
       def interaction_instructions
-        'Submit an **update that modifies one item and cancels another**. Mark the modified item ' \
+        'submit an **update that modifies one item and cancels another**. Mark the modified item ' \
           'with an `infoChanged` extension. Mark the canceled item with the `infoCancelled` modifier ' \
           'extension (valueBoolean `true`), a `certificationType` extension with code `3` (Cancel) in ' \
           '`Claim.item.extension`, and an `infoChanged` extension. Retain all prior items and ' \
           'supportingInfo (preserving their `sequence` values) and reference the immediately prior ' \
-          'Claim update in `Claim.related.claim`.'
+          'Claim update in `Claim.related.claim`'
       end
     end
 
@@ -205,12 +229,14 @@ module DaVinciPASTestKit
       id :pas_client_v221_claim_update_cancel_all_submit_test
       title 'PAS client submits an update that cancels the entire request'
       description %(
-        Inferno waits for a third updated prior authorization `$submit` request that cancels the
+        During this test, Inferno will wait for a third updated prior authorization `$submit` request that cancels the
         entire prior authorization. The update is expected to include a `certificationType` extension
         with code `3` (Cancel) in `Claim.extension`; no items are required to cancel the entire
         authorization. The update is expected to reference the immediately prior Claim update in
-        `Claim.related.claim`. Upon receipt, Inferno returns the configured response and continues
-        automatically.
+        `Claim.related.claim`. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+        or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        approval response. Inferno will not respond to `$inquire` operation requests during
+        this test.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-63'
 
@@ -218,20 +244,20 @@ module DaVinciPASTestKit
             title: 'Cancel-entire-request update response JSON',
             type: 'textarea',
             optional: true,
-            description: %(
-              If provided, this JSON will be returned in response to the cancel-entire-request update
-              `$submit` request, updated with current timestamps. If not provided, an approved response
-              will be generated from the submitted Claim.
+            description: DaVinciPASTestKit.user_response_input_description_for_update_tests(
+              '$submit',
+              'approved',
+              'PAS client submits an update that cancels the entire request'
             )
 
       submit_respond_with :claim_update_cancel_all_response
-      config options: { claim_update_tag: CLAIM_UPDATE_CANCEL_ALL_TAG }
+      config options: { claim_update_tag: CLAIM_UPDATE_CANCEL_ALL_TAG, first_update_submission: false }
 
       def interaction_instructions
-        'Submit an **update that cancels the entire prior authorization**. Include a ' \
+        'submit an **update that cancels the entire prior authorization**. Include a ' \
           '`certificationType` extension with code `3` (Cancel) in `Claim.extension`; no items are ' \
           'required to cancel the entire authorization. Reference the immediately prior Claim update ' \
-          'in `Claim.related.claim`.'
+          'in `Claim.related.claim`'
       end
     end
   end

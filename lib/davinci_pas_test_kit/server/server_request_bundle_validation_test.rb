@@ -39,12 +39,12 @@ module DaVinciPASTestKit
     run do
       skip_if bundle_payload.blank?, 'No bundle request input provided.'
       assert_valid_json(bundle_payload,
-                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} workflow.")
+                        "Provide valid json to use for the $#{operation} during the #{use_case.titleize} scenario.")
       bundles_to_verify = bundles
 
       assert bundles_to_verify.present?, 'Provided input is not a Bundle or list of Bundles.'
 
-      bundles_to_verify.each do |bundle|
+      bundle_messages = bundles_to_verify.flat_map do |bundle|
         perform_bundle_validation(
           bundle,
           operation,
@@ -53,11 +53,9 @@ module DaVinciPASTestKit
         )
       end
 
-      validation_error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
+      messages.concat(bundle_messages)
 
-      skip_if validation_error_messages.present?,
+      skip_if bundle_messages.any? { |message| message[:type] == 'error' },
               'Bundle(s) provided are not conformant. Check messages for issues found.'
     end
   end

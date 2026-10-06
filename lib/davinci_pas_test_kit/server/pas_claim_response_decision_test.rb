@@ -7,7 +7,7 @@ module DaVinciPASTestKit
     title 'Server response includes the expected decision code in the ClaimResponse instance'
     description %(
       This test checks that the decision in the returned ClaimResponse matches
-      the decision code required for the workflow under examination.
+      the decision code required for the scenario under examination.
     )
 
     def use_case
@@ -60,7 +60,7 @@ module DaVinciPASTestKit
 
       skip_if bundles_to_check.blank?,
               "No Bundles to check - No $#{operation} requests made during the #{use_case.titleize} " \
-              'workflow tests returned Bundles.'
+              'scenario tests returned Bundles.'
 
       codes_ok = bundles_to_check.all? do |response_bundle|
         response_has_expected_adjudication_code?(response_bundle)

@@ -33,7 +33,7 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
     result = run(test, bundle_payload: 'not json')
     expect(result.result).to eq('fail')
     expect(result.result_message)
-      .to match(/Invalid JSON. Provide valid json to use for the \$submit during the Approval workflow./)
+      .to match(/Invalid JSON. Provide valid json to use for the \$submit during the Approval scenario./)
   end
 
   it 'fails if no inputs are Bundles' do
@@ -43,16 +43,14 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
   end
 
   it 'passes when one valid Bundle is provided' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return([])
 
     result = run(test, bundle_payload: pa_request_valid_bundle)
     expect(result.result).to eq('pass')
   end
 
   it 'passes when multiple valid Bundles are provided' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return([])
 
     result = run(test, bundle_payload: "[#{pa_request_valid_bundle},#{FHIR::Bundle.new.to_json}]")
     expect(result.result).to eq('pass')
@@ -60,8 +58,7 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
 
   it 'only analyzes duplicate Bundles once' do
     call_count = 0
-    allow_any_instance_of(test).to receive(:perform_bundle_validation) { call_count += 1 }.and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages).and_return([])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation) { call_count += 1 }.and_return([])
 
     result = run(test, bundle_payload: "[#{pa_request_valid_bundle},#{pa_request_valid_bundle}]")
     expect(result.result).to eq('pass')
@@ -69,9 +66,8 @@ RSpec.describe DaVinciPASTestKit::ServerRequestBundleValidationTest, :runnable d
   end
 
   it 'skips if validation errors found' do
-    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_return(nil)
-    allow_any_instance_of(test).to receive(:validation_error_messages)
-      .and_return(['this is an error', 'this is another error'])
+    allow_any_instance_of(test).to receive(:perform_bundle_validation)
+      .and_return([{ type: 'error', message: 'this is an error' }, { type: 'error', message: 'this is another error' }])
 
     result = run(test, bundle_payload: pa_request_valid_bundle)
     expect(result.result).to eq('skip')

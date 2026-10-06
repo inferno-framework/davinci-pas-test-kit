@@ -13,10 +13,10 @@ module DaVinciPASTestKit
       include UserInputResponse
 
       id :pas_client_v201_pended_group
-      title 'Pended Workflow'
+      title 'Pended Response'
       description %(
-        During these tests, the client will initiate a prior authorization
-        request and show it can respond appropriately to a 'pended' decision, including
+        During these tests, the client system will initiate a prior authorization
+        request and show it can react appropriately to a 'pended' decision, including
         waiting for a notification that an update has been made
         and making an inquiry request to retrieve the final result.
       )
@@ -31,14 +31,14 @@ module DaVinciPASTestKit
                   :session_url_path
 
       group do
-        title 'Perform the pended workflow'
+        title 'Perform the pended scenario'
         description %(
-          All interactions for the pended prior authorization request workflow
-          between Inferno and the client under test will be performed during this test
+          All interactions for the pended prior authorization request scenario
+          between Inferno and the client system will be performed during this group
           including
           - A `$submit` request from the client to Inferno where Inferno returns a pended response.
           - A notification that the prior authorization decision has been finalized from Inferno
-            to the client under test.
+            to the client system.
           - An `$inquire` request from the client to Inferno where Inferno returns an approved response.
         )
 
@@ -53,17 +53,19 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
-             title: 'Check that the client registers the request as pended (Attestation)',
+             title: 'Check that the client registers the request as pended',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the pended response and attest that users are able to determine
               that the response has been pended and a decision will be forthcoming.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
-                               'claim, the client system indicates to users that a final decision on request ' \
-                               'has not yet been made.'
+               operation_tag: SUBMIT_TAG,
+               multiple_requests_ok: true,
+               attest_message: "I attest that the client system did not error when handling the 'pended' " \
+                               'response to the submitted claim and that it indicated to users that a final decision ' \
+                               'on the request had not yet been made.'
              } }
       end
 
@@ -90,7 +92,7 @@ module DaVinciPASTestKit
                This test checks that the notification Bundle sent to the client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
-               requested in the Subscription provided during the **2.1** "PAS Subscription Setup" tests.
+               requested in the Subscription provided during the "Subscription Setup" tests.
              ),
              simulation_verification: true,
              config: {
@@ -116,15 +118,19 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
-             title: 'Check that the client registers the request as approved (Attestation)',
+             title: 'Check that the client registers the request as approved',
              description: %(
-              This test provides the tester an opportunity to observe their client following
+              During this test, the tester will observe the client system following
               the receipt of the inquiry response with a final decision and attest that users
               are able to determine that the response has been approved in full.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: "I attest that the client system displays the submitted claim as 'approved' meaning that the user can proceed with ordering or providing the requested service." # rubocop:disable Layout/LineLength
+               operation_tag: INQUIRE_TAG,
+               multiple_requests_ok: true,
+               attest_message: 'I attest that the client system did not error when handling the `$inquire` ' \
+                               "response and displays the submitted claim as 'approved' meaning that the " \
+                               'user can proceed with ordering or providing the requested service.'
              } }
       end
     end

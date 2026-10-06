@@ -14,7 +14,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_processing_error_submit_test
       title 'PAS client submits a claim and receives a response containing processing errors'
       description %(
-        Inferno will wait for a prior authorization submission request from the client.
+        During this test, Inferno will wait for a prior authorization submission request from the client.
         Upon receipt, Inferno will return the provided response bundle containing one or
         more ClaimResponse.error entries.
       )
@@ -23,8 +23,10 @@ module DaVinciPASTestKit
             title: 'Processing Error Response Bundle JSON',
             type: 'textarea',
             description: %(
-              Inferno will return this PAS Response Bundle JSON in response to the $submit request
-              during this test. The bundle must contain at least one ClaimResponse.error entry.
+              Inferno will [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
+              this PAS Response Bundle JSON and return it as the response
+              to the `$submit` request received during the *Processing Errors* group.
+              The bundle must contain at least one ClaimResponse.error entry.
             )
       input :client_id,
             title: 'Client Id',
@@ -40,6 +42,7 @@ module DaVinciPASTestKit
             description: INPUT_SESSION_URL_PATH_LOCKED
 
       submit_respond_with :processing_error_response
+      config options: { submit_enabled: true }
 
       run do
         assert_valid_json processing_error_response,
@@ -50,16 +53,24 @@ module DaVinciPASTestKit
 
         wait(
           identifier: wait_identifier,
-          message: %(
-            **Processing Error Workflow Test**:
+          message: <<~MESSAGE
+            **Processing Error Scenario Test**:
+
+            Inferno will wait while the tester uses the client system to submit a PAS request to
+            Inferno. Inferno will [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
+            the provided Processing Error Response Bundle and respond with it.
+            The tests will automatically continue once a request has been received.
+
+            ### Endpoints
 
             Submit a PAS request to
 
             `#{submit_endpoint}`
 
-            Inferno will respond with the provided PAS Response Bundle containing
-            ClaimResponse.error entries.
-          )
+            ### Authentication and Identification
+
+            #{auth_description_for_wait(client_id)}
+          MESSAGE
         )
       end
     end

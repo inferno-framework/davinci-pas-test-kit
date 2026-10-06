@@ -92,6 +92,71 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientProcessingErrorSubmit
     end
   end
 
+  describe 'instantiating the tester-provided bundle' do
+    let(:claim_full_url) do
+      submit_request_json['entry'].find { |e| e['resource']['resourceType'] == 'Claim' }['fullUrl']
+    end
+
+    def submit_with(bundle_json)
+      result = run(described_class, session_url_path:, processing_error_response: bundle_json)
+      expect(result.result).to eq('wait')
+      post_json(submit_url, submit_request_json)
+      result
+    end
+
+    def response_claim_response
+      FHIR.from_contents(last_response.body).entry.first.resource
+    end
+
+    it 'updates timestamps and points the ClaimResponse at the submitted Claim' do
+      submit_with(processing_error_bundle_json)
+
+      expect(last_response.status).to be(200)
+      expect(FHIR.from_contents(last_response.body).timestamp).to_not eq('2024-01-30T13:29:32Z')
+      expect(response_claim_response.created).to_not eq('2024-01-30T13:29:32Z')
+      expect(response_claim_response.request.reference).to eq(claim_full_url)
+      expect(response_claim_response.error).to_not be_empty
+    end
+
+    it 'adds a Bundle identifier when missing' do
+      submit_with(processing_error_bundle_json)
+
+      expect(FHIR.from_contents(last_response.body).identifier).to be_present
+    end
+
+    it 'replaces fhirpath expressions using the request' do
+      stub_request(:post, /#{ENV.fetch('FHIRPATH_URL')}/)
+        .to_return(status: 200, body: [{ type: 'string', element: 'urn:uuid:from-request' }].to_json)
+      bundle = JSON.parse(processing_error_bundle_json)
+      bundle['entry'].first['resource']['patient']['reference'] = '{{Bundle.entry.first().fullUrl}}'
+
+      submit_with(bundle.to_json)
+
+      expect(response_claim_response.patient.reference).to eq('urn:uuid:from-request')
+    end
+
+    it 'returns a 400 OperationOutcome when instantiation fails' do
+      stub_request(:post, /#{ENV.fetch('FHIRPATH_URL')}/).to_return(status: 500, body: 'boom')
+      bundle = JSON.parse(processing_error_bundle_json)
+      bundle['entry'].first['resource']['patient']['reference'] = '{{Bundle.entry.first().fullUrl}}'
+
+      result = submit_with(bundle.to_json)
+
+      expect(last_response.status).to be(400)
+      expect(FHIR.from_contents(last_response.body)).to be_a(FHIR::OperationOutcome)
+      expect(last_response.body).to include('could not be instantiated')
+      messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+      expect(messages.map(&:message).join).to include('Unable to instantiate')
+    end
+
+    it 'returns a 400 OperationOutcome when the request is not a FHIR resource' do
+      run(described_class, session_url_path:, processing_error_response: processing_error_bundle_json)
+      post_json(submit_url, { not_fhir: true })
+
+      expect(last_response.status).to be(400)
+    end
+  end
+
   describe 'when processing_error_response input is absent' do
     it 'skips before waiting' do
       inputs = { session_url_path: }

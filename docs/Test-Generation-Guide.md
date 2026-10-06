@@ -101,7 +101,7 @@ The following sections contain high-level descriptions of the purpose for each f
 *   **`must_support_test_generator.rb` and `templates/must_support.rb.erb`**: Generates individual must support test instances. A unique instances gets created for each profile and system (`client` and `server`) used by each combination of operation (`$submit` and `$inquire`) and direction (`request` and `response`).
 *   **`client_must_support_group_generator.rb` and `templates/client_must_support_group.rb.erb`**: Generates must support test groups for the client. Separate classes are generated for the `$submit` and `$inquire` groups.
 *   **`server_must_support_group_generator.rb` and `templates/server_must_support_group.rb.erb`**: Generates must support test groups for the server. A single class is generated which contains sub-groups for the `$submit` and `$inquire` tests.
-*   **`use_case_group_generator.rb` and `templates/use_case_group.rb.erb`**: Generates classes for the server workflow groups (`approval`, `denial`, `pended`).
+*   **`use_case_group_generator.rb` and `templates/use_case_group.rb.erb`**: Generates classes for the server scenario groups (`approval`, `denial`, `pended`).
 *   **`server_suite_generator.rb` and `templates/userver_suite.rb.erb`**: Generates a class for the server suite, referencing all necessary generated imports for the suite to operate.
 
 ### Shared Generator Components
