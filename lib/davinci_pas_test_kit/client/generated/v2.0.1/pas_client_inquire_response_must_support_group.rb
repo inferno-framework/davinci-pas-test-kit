@@ -33,35 +33,35 @@ module DaVinciPASTestKit
       run_as_group
 
       test from: :pas_client_v201_inquire_response_must_support_pas_inquiry_response_bundle do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_claiminquiryresponse do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_insurer do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_requestor do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_beneficiary do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_practitioner do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_practitioner_role do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_task do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
     end

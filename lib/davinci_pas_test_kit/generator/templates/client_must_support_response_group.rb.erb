@@ -20,7 +20,7 @@ module DaVinciPASTestKit
       end
       <%- else -%>
       test from: :<%= profile_test[:id] %> do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements '<%= response_verifies_requirement %>'
         simulation_verification
       end
       <%- end -%>

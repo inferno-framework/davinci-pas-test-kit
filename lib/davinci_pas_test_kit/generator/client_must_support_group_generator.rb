@@ -191,6 +191,15 @@ module DaVinciPASTestKit
         target_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
       end
 
+      # Requirement verified by the mandatory per-profile tests in response groups
+      # (clients SHALL be capable of receiving must support elements).
+      def response_verifies_requirement
+        case ig_version
+        when 'v2.2.1' then 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        when 'v2.0.1' then "hl7.fhir.us.davinci-pas_2.0.1@#{operation == 'submit' ? '39' : '40'}"
+        end
+      end
+
       def verifies_requirements
         case "#{operation}_#{type}_#{ig_version}"
         when 'submit_request_v2.2.1', 'inquire_request_v2.2.1'
