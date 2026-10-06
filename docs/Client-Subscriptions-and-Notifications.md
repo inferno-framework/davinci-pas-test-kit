@@ -50,7 +50,7 @@ waiting for a successful Subscription creation request in the following cases:
 - A valid Subscription has already been created for this session: Returned when
   Inferno has already received a successful Subscription creation request for this
   session as Inferno does not support sending multiple notifications. If the
-  original Subscription does not work, you can re-run the Subscription Creation
+  original Subscription does not work, you can re-run the Subscription Setup
   group (requests from the prior run will not be considered).
 
 #### Success

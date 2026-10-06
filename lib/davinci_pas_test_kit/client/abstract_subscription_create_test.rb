@@ -66,8 +66,7 @@ module DaVinciPASTestKit
           The PAS Test Kit wiki contains details on the supported responses and
           notifications that the client system can expect to receive during these tests:
           - [Subscription creation responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#creation-response)
-          - [Handshake Notification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#creation-response)
-
+          - [Handshake notification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#handshake-notification)
         MESSAGE
       )
     end
