@@ -10,12 +10,12 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::ClientBundleValidationHelper
 
       id :pas_client_v201_response_bundle_validation_test
-      title 'Submit Response Bundle is valid'
+      title '$submit response Bundles have the correct structure and content'
       description %(
         This test verifies input provided by the tester instead of the system under test.
         Errors encountered will be treated as a skip instead of a failure.
 
-        This test verifies the conformity of the submit response sent by Inferno, which will have been
+        This test verifies the conformity of each `$submit` response sent by Inferno, which will have been
         either:
         - the response body provided by the tester in the corresponding input, or
         - created by Inferno from the $submit Bundle.

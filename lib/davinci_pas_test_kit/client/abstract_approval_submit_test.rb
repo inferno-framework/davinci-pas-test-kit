@@ -23,7 +23,7 @@ module DaVinciPASTestKit
           title: 'Claim approved response JSON',
           type: 'textarea',
           optional: true,
-          description: DaVinciPASTestKit.user_response_input_description('$submit', 'approved', 'Approval Scenario')
+          description: DaVinciPASTestKit.user_response_input_description('$submit', 'approved', 'Approval Response')
     input :client_id,
           title: 'Client Id',
           type: 'text',

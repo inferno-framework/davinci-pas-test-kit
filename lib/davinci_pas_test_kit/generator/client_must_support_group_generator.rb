@@ -198,13 +198,31 @@ module DaVinciPASTestKit
         end
       end
 
+      # Names of the profiles that must always be demonstrated, e.g. "PAS Claim Inquiry".
+      def mandatory_profile_names
+        target_profiles = type == 'response' ? profiles : required_profiles
+        target_profiles.select { |profile_metadata| mandatory_profile?(profile_metadata) }
+          .map(&:profile_name).to_sentence
+      end
+
+      # Only v2.2.1 has optional response tests and the request attestation option.
+      def optional_profiles_description
+        return '' unless optional_must_support_enabled?
+
+        if type == 'response'
+          "\nDemonstration of the #{mandatory_profile_names} profile is strictly required\n" \
+            'while all others are optional.'
+        else
+          "\nFor all profiles other than #{mandatory_profile_names}, testers can attest\n" \
+            'that the missing elements are not supported by their system to pass the tests.'
+        end
+      end
+
       def description
         if type == 'response'
           <<~DESCRIPTION
             Check that `$#{operation}` responses provided to the client contain
-            all PAS-defined profiles and their must support elements. Demonstration
-            of the PAS ClaimResponse profile is strictly required while all others
-            are optional.
+            all PAS-defined profiles and their must support elements.#{optional_profiles_description}
 
             For `$#{operation}` responses, this includes the following profiles:
 
@@ -213,9 +231,7 @@ module DaVinciPASTestKit
         else
           <<~DESCRIPTION
             Check that the client can demonstrate `$#{operation}` requests that contain
-            all PAS-defined profiles and their must support elements. For all profiles
-            other than PAS Claim Update, testers can attest that the missing elements
-            are not supported by their system to pass the tests.
+            all PAS-defined profiles and their must support elements.#{optional_profiles_description}
 
             For `$#{operation}` requests, this includes the following profiles:
 

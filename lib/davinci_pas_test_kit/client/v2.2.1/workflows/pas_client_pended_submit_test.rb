@@ -29,7 +29,7 @@ module DaVinciPASTestKit
             title: 'Claim pended response JSON',
             type: 'textarea',
             optional: true,
-            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Scenario')
+            description: DaVinciPASTestKit.user_response_input_description('$submit', 'pended', 'Pended Response')
       input :client_id,
             title: 'Client Id',
             type: 'text',
@@ -45,7 +45,6 @@ module DaVinciPASTestKit
 
       submit_respond_with :pended_json_response
       config options: { submit_enabled: true, suppress_notifications: true } # handling notification separately
-      output :confirmation_url
 
       run do
         require_successful_subscription_create_request
@@ -62,8 +61,6 @@ module DaVinciPASTestKit
 
         wait_identifier = session_wait_identifier(client_id, session_url_path)
         submit_endpoint = session_endpoint_url(:submit, client_id, session_url_path)
-        confirmation_url = "#{resume_pass_url}?token=#{wait_identifier}"
-        output(confirmation_url:)
 
         wait(
           identifier: wait_identifier,

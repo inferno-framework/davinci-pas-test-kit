@@ -1,7 +1,6 @@
 <%- profile_test_files.each do |file_name| -%>
 require_relative '<%= file_name %>'
 <%- end -%>
-require_relative '../../<%= ig_version %>/workflows/pas_client_response_attest'
 
 module DaVinciPASTestKit
   module <%= module_name %>

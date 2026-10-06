@@ -59,7 +59,7 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 The following groups and inputs can be used to expand the process described in the
 [Quick Start](#quick-start) section into a complete set of tests.
 
-### Testing the Denial, Claim Update, and Payer Mofidication Scenarios
+### Testing the Denial, Claim Update, and Payer Modification Scenarios
 
 The "Denial Response", "Claim Updates" and "Payer Modification" groups can be run in the same manner as
 described above. Testers may specify the responses for Inferno to return, but Inferno is also able
@@ -75,6 +75,11 @@ Once that group has been run, proceed to execute the "Pended Response" group and
 instructions in the "User Action Required" dialogs that appear. Inferno can
 generate a [mocked pended response and a notification with the rendered decision](Controlling-Simulated-Responses#mocked-responses).
 
+### Testing Error Responses
+
+To run the "Operation Failure" and "Processing Errors" groups under "PAS Scenarios", the tester will need
+to provide the response bodies for Inferno to return as Inferno is not currently able to generate these responses.
+
 ### Testing Must Support Elements
 
 During the "Must Support Elements" group, the client system will submit multiple $submit and $inquire requests
@@ -83,10 +88,7 @@ These tests can be run without providing custom responses, but because Inferno's
 will not populate all ClaimResponse must support elements, [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 will be needed to pass the group.
 
-### Testing Error Responses
 
-To run the "Error Handling" groups, the tester will need to provide the response bodies for Inferno to return
-as Inferno is not currently able to generate these responses.
 
 ### Testing Authentication Interactions
 

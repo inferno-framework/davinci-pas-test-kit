@@ -57,9 +57,25 @@ module DaVinciPASTestKit
       end
     end
 
+    # Tags identifying the requests that gate the attestation, when they aren't the ones tagged with
+    # workflow_tag (+ operation_tag) - e.g., the notification Inferno sends to the client.
+    def request_tags
+      config.options[:request_tags]
+    end
+
     def target_requests
+      return load_tagged_requests(*request_tags) if request_tags.present?
+
       workflow_tags.flat_map do |one_workflow_tag|
         load_tagged_requests(*[one_workflow_tag, operation_tag].compact)
+      end
+    end
+
+    def unexpected_error_status_message(error_responses)
+      if error_responses.any? { |r| r.direction == 'outgoing' }
+        'Skipping attestation: the client system did not return a successful response to Inferno\'s request.'
+      else
+        'Skipping attestation: Inferno expected to return a successful response, but did not.'
       end
     end
 
@@ -70,14 +86,14 @@ module DaVinciPASTestKit
       # check that there are actually requests
       # - skip if none unless there is a config
       # - raise an implementation error if there are more than 1 unless config set (shouldn't ever)
-      # - skip if one that is a failure HTTP status unless config set
+      # - skip if no response has the expected HTTP status (success, or error when error_status_expected)
 
       requests = target_requests
       if requests.empty?
         if no_requests_ok?
           pass 'Attestation not needed: no requests received or required for this group.'
         else
-          skip "Skipping attestation: No requests made demonstrating the #{workflow_name} workflow."
+          skip "Skipping attestation: No requests made demonstrating the #{workflow_name} scenario."
         end
       elsif requests.length > 1 && !multiple_requests_ok?
         raise Inferno::Exceptions::TestSuiteImplementationException.new(
@@ -86,14 +102,15 @@ module DaVinciPASTestKit
         )
       else
         success_responses, error_responses = requests.partition { |r| r.status.to_s.start_with?('2') }
-        if success_responses.present? && config.options[:error_status_expected]
+        if error_responses.blank? && config.options[:error_status_expected]
           skip 'Skipping attestation: Inferno expected to return a HTTP error response, but did not.'
-        elsif error_responses.present? && !config.options[:error_status_expected]
-          skip 'Skipping attestation: Inferno expected to return a succesful response, but did not.'
+        elsif success_responses.blank? && !config.options[:error_status_expected]
+          skip unexpected_error_status_message(error_responses)
         end
       end
 
-      identifier = test_session_id
+      # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
+      identifier = SecureRandom.uuid
       attest_true_url = "#{resume_pass_url}?token=#{identifier}"
       output(attest_true_url:)
       attest_false_url = "#{resume_fail_url}?token=#{identifier}"
@@ -102,7 +119,7 @@ module DaVinciPASTestKit
       wait(
         identifier:,
         message: %(
-          **#{workflow_name} Workflow Test**:
+          **#{workflow_name} Scenario Test**:
 
           #{attest_message}
 

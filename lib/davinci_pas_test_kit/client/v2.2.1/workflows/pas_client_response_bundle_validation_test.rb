@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_response_bundle_validation_test
       title '$submit response Bundles have the correct structure and content'
       description %(
-        This test verifies the conformity of the submit response sent by Inferno, which will have been
+        This test verifies the conformity of each `$submit` response sent by Inferno, which will have been
         either:
         - the response body provided by the tester in the corresponding input, or
         - created by Inferno from the $submit Bundle.

@@ -14,7 +14,8 @@ module DaVinciPASTestKit
     output :attest_false_url
 
     run do
-      identifier = test_session_id
+      # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
+      identifier = SecureRandom.uuid
       attest_true_url = "#{resume_pass_url}?token=#{identifier}"
       output(attest_true_url:)
       attest_false_url = "#{resume_fail_url}?token=#{identifier}"

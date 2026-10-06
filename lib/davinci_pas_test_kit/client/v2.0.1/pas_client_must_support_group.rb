@@ -15,13 +15,13 @@ module DaVinciPASTestKit
       id :pas_client_v201_must_support
       title 'Must Support Elements'
       run_as_group
-      description DaVinciPASTestKit.must_support_group_description('v2.0.1', 'da-vinci-pas-v2-0-1')
+      description DaVinciPASTestKit.must_support_group_description('v2.0.1', 'da-vinci-pas-v201')
 
       # The must support response inputs already belong to pas_client_v201_gather_must_support
-      # (the wait test below); declaring them here too, before it and the Bundle Conformance
-      # groups further down are defined, propagates them onto the bundle validation test slots
-      # in those groups as well, so they can tell whether a tester-provided response was used
-      # - see PasClientResponseBundleValidationTest/PasClientInquireResponseBundleValidationTest
+      # (the wait test below); declaring them here too, before the receive group is defined,
+      # propagates them onto the bundle validation tests in that group as well, so they can tell
+      # whether a tester-provided response was used - see
+      # PasClientResponseBundleValidationTest/PasClientInquireResponseBundleValidationTest
       # #failed_entities_description.
       input :ms_submit_responses, optional: true
       input :ms_inquire_responses, optional: true

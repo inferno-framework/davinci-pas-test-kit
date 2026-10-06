@@ -76,8 +76,8 @@ module DaVinciPASTestKit
                                resume_test: true)
 
         wait(
-          identifier: test_session_id,
-          timeout: 300,
+          identifier: test_run_identifier,
+          timeout: Jobs::SendPASSubscriptionNotification::TEST_WAIT_TIMEOUT_SECONDS,
           message: <<~MESSAGE
             **Pended Scenario Test**:
 
@@ -125,9 +125,10 @@ module DaVinciPASTestKit
         @subscription_json
       end
 
-      # the job ends the wait using this token
+      # Only the job continues this wait, so it uses a fresh random identifier - see SessionIdentification.
+      # Memoized because start_notification_job passes it to the job before wait registers it.
       def test_run_identifier
-        test_session_id
+        @test_run_identifier ||= SecureRandom.uuid
       end
 
       def ig_version

@@ -2,14 +2,20 @@ require_relative '../../../../lib/davinci_pas_test_kit/client/v2.0.1/urls'
 
 RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
   let(:suite_id) { 'davinci_pas_client_suite_v201' }
-  let(:random_id) { test_session.id }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{random_id}" }
-  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{random_id}" }
+  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{wait_token}" }
+  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{wait_token}" }
   let(:base_options) do
     { workflow_tag: DaVinciPASTestKit::APPROVAL_WORKFLOW_TAG, attest_message: 'blah blah' }
   end
   let(:approval_attest_test) { attest_test_with(base_options) }
+
+  # The test waits on a fresh random identifier, which it puts in the attestation URLs it outputs.
+  def wait_token
+    attest_true_url = Inferno::Repositories::SessionData.new.load(test_session_id: test_session.id,
+                                                                  name: :attest_true_url)
+    Rack::Utils.parse_query(URI(attest_true_url).query)['token']
+  end
 
   def attest_test_with(options)
     Class.new(described_class) do
@@ -47,6 +53,14 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
       expect(result.result).to eq('pass')
     end
 
+    it 'waits on a random identifier rather than the test session id' do
+      result = run(approval_attest_test)
+
+      expect(wait_token).to match(/\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/)
+      get "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{test_session.id}"
+      expect(results_repo.find(result.id).result).to eq('wait')
+    end
+
     it 'passes when responding false' do
       result = run(approval_attest_test)
       expect(result.result).to eq('wait')
@@ -69,7 +83,7 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
         result = run_attest
 
         expect(result.result).to eq('skip')
-        expect(result.result_message).to include('No requests made demonstrating the Approval workflow')
+        expect(result.result_message).to include('No requests made demonstrating the Approval scenario')
       end
 
       it 'passes without waiting when no requests are ok' do
@@ -98,7 +112,7 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
         result = run_attest
 
         expect(result.result).to eq('skip')
-        expect(result.result_message).to include('expected to return a succesful response')
+        expect(result.result_message).to include('expected to return a successful response')
       end
 
       it 'waits for the attestation when the response was an error and an error is expected' do
@@ -134,18 +148,43 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
       end
     end
 
-    describe 'when multiple requests were received and one of them errored' do
+    describe 'when multiple requests were received with mixed response statuses' do
       before do
         shared_result = repo_create(:result, test_session_id: test_session.id)
         create_tagged_request(tags: [approval_tag], status: 200, result: shared_result)
         create_tagged_request(tags: [approval_tag], status: 400, result: shared_result)
       end
 
-      it 'skips instead of waiting for the attestation' do
+      # e.g., one bad $submit among many good ones in the Must Support gather session
+      it 'waits for the attestation when a success is expected and at least one response was successful' do
+        expect(run_attest(multiple_requests_ok: true).result).to eq('wait')
+      end
+
+      it 'waits for the attestation when an error is expected and at least one response was an error' do
+        expect(run_attest(multiple_requests_ok: true, error_status_expected: true).result).to eq('wait')
+      end
+    end
+
+    describe 'when multiple requests were received with the same response status' do
+      def create_requests(status)
+        shared_result = repo_create(:result, test_session_id: test_session.id)
+        2.times { create_tagged_request(tags: [approval_tag], status:, result: shared_result) }
+      end
+
+      it 'skips when a success is expected but every response was an error' do
+        create_requests(400)
         result = run_attest(multiple_requests_ok: true)
 
         expect(result.result).to eq('skip')
-        expect(result.result_message).to include('expected to return a succesful response')
+        expect(result.result_message).to include('expected to return a successful response')
+      end
+
+      it 'skips when an error is expected but every response was successful' do
+        create_requests(200)
+        result = run_attest(multiple_requests_ok: true, error_status_expected: true)
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('expected to return a HTTP error response')
       end
     end
 
@@ -162,6 +201,37 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
         create_tagged_request(tags: [approval_tag, DaVinciPASTestKit::INQUIRE_TAG])
 
         expect(run_attest(operation_tag: DaVinciPASTestKit::INQUIRE_TAG).result).to eq('wait')
+      end
+    end
+
+    describe 'with request tags' do
+      let(:notification_tag) { DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG }
+
+      def create_notification(status:)
+        repo_create(:request, direction: 'outgoing', url: 'http://client.example.com/notify',
+                              test_session_id: test_session.id,
+                              result: repo_create(:result, test_session_id: test_session.id), status:,
+                              tags: [notification_tag])
+      end
+
+      it 'skips when no request has the request tags, even if workflow requests exist' do
+        create_tagged_request(tags: [approval_tag])
+
+        expect(run_attest(request_tags: [notification_tag]).result).to eq('skip')
+      end
+
+      it 'waits when the client accepted the tagged request' do
+        create_notification(status: 200)
+
+        expect(run_attest(request_tags: [notification_tag]).result).to eq('wait')
+      end
+
+      it 'skips when the client returned an error for the tagged request' do
+        create_notification(status: 500)
+        result = run_attest(request_tags: [notification_tag])
+
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to include('client system did not return a successful response')
       end
     end
 

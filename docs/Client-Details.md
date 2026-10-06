@@ -176,6 +176,8 @@ test session, which may require testers to re-initialize previously-created Subs
 of these tests may relax this requirement and feedback on whether this would reduce burden and how this
 might look are welcome.
 
+See the ["Simulated Subscriptions and Notifications" section](Client-Subscriptions-and-Notifications) for details.
+
 ### Future Details
 
 The PAS IG places additional requirements on clients that are not currently tested by either or both

@@ -36,7 +36,8 @@ module DaVinciPASTestKit
              workflow_tag: OPERATION_FAILURE_WORKFLOW_TAG,
              operation_tag: SUBMIT_TAG,
              error_status_expected: true,
-             attest_message: 'I attest that the client system handles the operation failure response ' \
+             attest_message: 'I attest that the client system did not error when receiving the operation ' \
+                             'failure response and handles it ' \
                              'appropriately: the OperationOutcome details are available to technical staff ' \
                              'for review and the clinical end user is informed that the submission could ' \
                              'not be processed.'

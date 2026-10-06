@@ -87,8 +87,8 @@ module DaVinciPASTestKit
       check_presence_of_referenced_resources(first_entry, base_url, bundle.entry)
         .each { |msg| add_validation_error(msg) }
 
-      # request_type is 'submit' from client tests, or the compound 'submit_request' from
-      # perform_bundle_validation (server tests) - start_with? matches both, consistent with
+      # request_type is the compound 'submit_request' / 'inquire_request' built by
+      # perform_bundle_validation - start_with? also accepts a bare 'submit', consistent with
       # find_profile_url and validate_resources_conformance_against_profile below.
       if request_type.start_with?('submit')
         unless first_entry.is_a?(FHIR::Claim)
@@ -98,7 +98,7 @@ module DaVinciPASTestKit
         validate_uniqueness_of_supporting_info_sequences(first_entry)
         validate_bundle_entries_full_url(bundle)
       else
-        claim_resource = bundle_entry_resources.find { |resource| resource.resourceType == 'Claim' }
+        claim_resource = bundle_entry_resources.find { |resource| resource&.resourceType == 'Claim' }
         if claim_resource.blank?
           add_validation_error("[Bundle/#{bundle.id}]: Claim must be present for inquiry request")
         end
@@ -216,7 +216,7 @@ module DaVinciPASTestKit
       bundle_entry = bundle.entry
 
       root_entry = bundle_entry.find do |entry|
-        ['Claim', 'ClaimResponse'].include?(entry.resource.resourceType)
+        ['Claim', 'ClaimResponse'].include?(entry.resource&.resourceType)
       end
 
       if root_entry.present?
@@ -710,38 +710,6 @@ module DaVinciPASTestKit
       urn_uuid_regex = /\Aurn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/i
 
       string&.match?(url_regex) || string&.match?(urn_uuid_regex)
-    end
-
-    # Extracts resources from a bundle while following "next" links.
-    #
-    # @param bundle [FHIR::Bundle] The initial FHIR bundle to extract resources from.
-    # @param response [Object] The HTTP response object for the bundle retrieval.
-    # @param reply_handler [Proc] A callback function to handle responses.
-    # @param max_pages [Integer] The maximum number of pages to process.
-    #
-    # This method extracts resources from a FHIR bundle, following "next" links in the bundle
-    # until the specified maximum number of pages is reached. It collects resources and
-    # invokes the reply_handler for each response.
-    def extract_resources_from_bundle(
-      bundle: nil,
-      response: nil,
-      reply_handler: nil,
-      max_pages: 20
-    )
-      page_count = 1
-      resources = []
-
-      until bundle.nil? || page_count == max_pages
-        resources += bundle&.entry&.map { |entry| entry&.resource }
-        next_bundle_link = bundle&.link&.find { |link| link.relation == 'next' }&.url
-        reply_handler&.call(response)
-
-        break if next_bundle_link.blank?
-
-        page_count += 1
-      end
-
-      resources
     end
 
     # Generates a message for a resource present in both the PA request and response bundles.

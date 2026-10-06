@@ -11,6 +11,24 @@ RSpec.describe DaVinciPASTestKit::ReferencedResourcePresenceValidation do
 
     it 'returns an empty string when the url has no scheme or host' do
       expect(test_instance.extract_base_url('/Claim/123')).to eq('')
+      expect(test_instance.extract_base_url('Claim/123')).to eq('')
+    end
+
+    it 'returns an empty string for a urn:uuid fullUrl' do
+      expect(test_instance.extract_base_url('urn:uuid:3fdc72f4-a11d-4a9d-9260-a9f745779e1d')).to eq('')
+    end
+
+    it 'returns an empty string instead of raising for an invalid url' do
+      expect(test_instance.extract_base_url('https://example.com/fhir/Claim/has space')).to eq('')
+      expect(test_instance.extract_base_url('not a url at all')).to eq('')
+    end
+
+    it 'returns just the scheme and authority when the server base is the root' do
+      expect(test_instance.extract_base_url('https://example.com/Claim/123')).to eq('https://example.com')
+    end
+
+    it 'ignores a trailing slash' do
+      expect(test_instance.extract_base_url('https://example.com/fhir/Claim/123/')).to eq('https://example.com/fhir')
     end
 
     it 'strips the resource type and id from an absolute url' do
@@ -23,7 +41,7 @@ RSpec.describe DaVinciPASTestKit::ReferencedResourcePresenceValidation do
       expect(test_instance.extract_base_url(url)).to eq('https://example.com/fhir/r4')
     end
 
-    it 'preserves an explicit port by using uri.authority instead of uri.host' do
+    it 'preserves an explicit port' do
       url = 'http://example.com:8080/fhir/Claim/123'
       expect(test_instance.extract_base_url(url)).to eq('http://example.com:8080/fhir')
     end
@@ -31,6 +49,28 @@ RSpec.describe DaVinciPASTestKit::ReferencedResourcePresenceValidation do
     it 'preserves an explicit port on https urls as well' do
       url = 'https://example.com:8443/fhir/Claim/123'
       expect(test_instance.extract_base_url(url)).to eq('https://example.com:8443/fhir')
+    end
+
+    it 'keeps an explicit default port exactly as sent' do
+      expect(test_instance.extract_base_url('https://example.com:443/fhir/Claim/123'))
+        .to eq('https://example.com:443/fhir')
+      expect(test_instance.extract_base_url('http://example.com:80/fhir/Claim/123'))
+        .to eq('http://example.com:80/fhir')
+    end
+
+    it 'keeps userinfo and host case exactly as sent' do
+      expect(test_instance.extract_base_url('http://user@Example.com:8080/fhir/Claim/123'))
+        .to eq('http://user@Example.com:8080/fhir')
+    end
+
+    it 'keeps an IPv6 host' do
+      expect(test_instance.extract_base_url('http://[::1]:8080/fhir/Claim/123')).to eq('http://[::1]:8080/fhir')
+    end
+
+    it 'handles a non-http scheme with a host' do
+      expect(test_instance.extract_base_url('foo://example.com/fhir/Claim/1')).to eq('foo://example.com/fhir')
+      expect(test_instance.extract_base_url('foo://example.com:9000/fhir/Claim/1'))
+        .to eq('foo://example.com:9000/fhir')
     end
   end
 
@@ -62,6 +102,10 @@ RSpec.describe DaVinciPASTestKit::ReferencedResourcePresenceValidation do
       expect(test_instance.absolute_url('Patient/1', 'http://example.com:8080/fhir'))
         .to eq('http://example.com:8080/fhir/Patient/1')
     end
+
+    it 'returns an invalid reference unchanged instead of raising' do
+      expect(test_instance.absolute_url('Patient/has space', 'http://example.com/fhir')).to eq('Patient/has space')
+    end
   end
 
   describe '#check_presence_of_referenced_resources' do
@@ -84,6 +128,28 @@ RSpec.describe DaVinciPASTestKit::ReferencedResourcePresenceValidation do
       errors = test_instance.check_presence_of_referenced_resources(claim, base_url, [claim_entry, patient_entry])
 
       expect(errors).to be_empty
+    end
+
+    it 'resolves relative references against fullUrls that include an explicit default port' do
+      default_port_base = 'https://example.com:443/fhir'
+      patient_entry = entry("#{default_port_base}/Patient/pat-1", FHIR::Patient.new(id: 'pat-1'))
+      claim = FHIR::Claim.new(id: 'claim-1', patient: { reference: 'Patient/pat-1' })
+      claim_entry = entry("#{default_port_base}/Claim/claim-1", claim)
+      extracted_base = test_instance.extract_base_url(claim_entry.fullUrl)
+
+      errors = test_instance.check_presence_of_referenced_resources(claim, extracted_base,
+                                                                    [claim_entry, patient_entry])
+
+      expect(errors).to be_empty
+    end
+
+    it 'reports an invalid reference as missing instead of raising' do
+      claim = FHIR::Claim.new(id: 'claim-1', patient: { reference: 'Patient/has space' })
+      claim_entry = entry("#{base_url}/Claim/claim-1", claim)
+
+      errors = test_instance.check_presence_of_referenced_resources(claim, base_url, [claim_entry])
+
+      expect(errors.join).to include('Patient/has space resource SHALL appear exactly once in the Bundle, but found 0')
     end
 
     it 'returns an error when a referenced resource is missing from the bundle' do

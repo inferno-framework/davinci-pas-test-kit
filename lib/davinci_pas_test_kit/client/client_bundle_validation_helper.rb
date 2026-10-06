@@ -121,16 +121,20 @@ module DaVinciPASTestKit
       message_resource = resource_from_message_contents(contents, message_label)
       return if message_resource.blank?
 
-      # extraction varies - provided by test class if not using the default
+      # extraction varies - provided by test class if not using the default. May contain nil
+      # placeholders for positions that held something other than a Bundle (already reported),
+      # so Bundle labels keep their original position.
       bundles = bundles_from_message_resource(message_resource, message_label)
 
       if bundles.length > 1
         bundles.each_with_index do |bundle, bundle_index|
+          next if bundle.nil?
+
           bundle_label = entity_label("#{message_label.delete_suffix(':')} Bundle #{bundle_index + 1}")
           bundle_has_errors?(bundle, bundle_label)
         end
       else
-        bundles.each { |bundle| bundle_has_errors?(bundle, message_label) }
+        bundles.compact.each { |bundle| bundle_has_errors?(bundle, message_label) }
       end
     end
 
@@ -191,6 +195,11 @@ module DaVinciPASTestKit
       bundle_messages = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version)
       bundle_messages.each { |m| messages << { type: m[:type], message: "#{label} #{m[:message]}" } }
       bundle_messages.any? { |m| m[:type] == 'error' }
+    rescue NoMethodError, TypeError, ArgumentError => e
+      # a malformed Bundle (e.g., an entry with no resource) shouldn't stop the remaining
+      # requests/Bundles from being validated
+      messages << { type: 'error', message: "#{label} could not be validated: #{e.message}" }
+      true
     end
   end
 end

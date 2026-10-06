@@ -73,8 +73,9 @@ module DaVinciPASTestKit
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
-               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
-                               "response and displays the submitted claim as 'approved' meaning that the " \
+               request_tags: [REST_HOOK_EVENT_NOTIFICATION_TAG],
+               attest_message: 'I attest that the client system did not error when handling the notification ' \
+                               "and displays the submitted claim as 'approved' meaning that the " \
                                'user can proceed with ordering or providing the requested service.'
              } }
       end

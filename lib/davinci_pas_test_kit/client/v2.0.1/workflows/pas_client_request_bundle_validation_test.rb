@@ -8,9 +8,9 @@ module DaVinciPASTestKit
       include DaVinciPASTestKit::ClientBundleValidationHelper
 
       id :pas_client_v201_request_bundle_validation_test
-      title 'Submit Request Bundle is valid'
+      title '$submit request Bundles have the correct structure and content'
       description %(
-        This test verifies the conformity of the client's submit request body to the
+        This test verifies the conformity of each of the client's `$submit` request bodies to the
         [PAS Request Bundle](http://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-pas-request-bundle.html)
         structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/STU2/specification.html),

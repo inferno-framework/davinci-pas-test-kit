@@ -94,6 +94,34 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientInquireResponseBundle
     expect(messages.map(&:message).join).to include('Response 1 Bundle 2: Stubbed non-conformance error')
   end
 
+  it 'labels Bundles by their original position when other return entries are not Bundles' do
+    patient = FHIR::Patient.new(id: 'pat-1')
+    result = run_test(parameters_json(valid_bundle, patient, invalid_bundle))
+
+    expect(result.result).to eq('skip')
+    message_text = entity_result_messages(test).map(&:message).join("\n")
+    expect(message_text).to include("'return' entry 2 expected to contain a Bundle, got Patient")
+    expect(message_text).to include('Response 1 Bundle 3: Stubbed non-conformance error')
+    expect(message_text).to_not include('Bundle 2:')
+  end
+
+  it 'reports a Bundle that errors during validation and still validates the remaining Bundles' do
+    call_count = 0
+    allow_any_instance_of(test).to receive(:perform_bundle_validation).and_wrap_original do |original, *args|
+      call_count += 1
+      raise NoMethodError, "undefined method 'resourceType' for nil" if call_count == 1
+
+      original.call(*args)
+    end
+
+    result = run_test(parameters_json(valid_bundle, invalid_bundle))
+
+    expect(result.result).to eq('skip')
+    message_text = entity_result_messages(test).map(&:message).join("\n")
+    expect(message_text).to include('Response 1 Bundle 1: could not be validated')
+    expect(message_text).to include('Response 1 Bundle 2: Stubbed non-conformance error')
+  end
+
   it 'skips but still validates a bare Bundle received instead of Parameters' do
     result = run_test(valid_bundle_json)
 

@@ -20,6 +20,11 @@ module DaVinciPASTestKit
 
       sidekiq_options retry: false
 
+      # How long an Inferno test that starts this job waits for it to send the notification. The job polls for
+      # the test to start waiting for up to this long, since there is no point sending once the wait has timed out.
+      TEST_WAIT_TIMEOUT_SECONDS = 300
+      TEST_WAITING_POLL_INTERVAL_SECONDS = 0.5
+
       # test_run_id and result_id may be nil when the job is started by an Inferno test, which does not know
       # them until it is waiting. They are then looked up from the test session once the test waits.
       # When resume_test_after_notification is true, the job ends the wait with the resume_token after
@@ -38,7 +43,14 @@ module DaVinciPASTestKit
         @resume_test_after_notification = resume_test_after_notification
 
         await_subscription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
-        await_test_waiting if @result_id.nil?
+        if @result_id.nil? && !test_starts_waiting?
+          # the test can't be resumed because it isn't waiting, so just explain why no notification was sent
+          Inferno::Application['logger'].error(
+            "Subscription notification not sent: no test started waiting on '#{@resume_token}' " \
+            "within #{TEST_WAIT_TIMEOUT_SECONDS} seconds."
+          )
+          return
+        end
         sleep 1
         return unless test_still_waiting?
 
@@ -131,13 +143,16 @@ module DaVinciPASTestKit
         waiting_result.present?
       end
 
-      # Inferno tests start the job before they begin waiting
-      def await_test_waiting
-        40.times do
-          break if test_still_waiting?
+      # Inferno tests start the job before they begin waiting, so poll until the test is waiting, giving up
+      # once the test's own wait would have timed out.
+      # @return [Boolean] whether the test is waiting
+      def test_starts_waiting?
+        (TEST_WAIT_TIMEOUT_SECONDS / TEST_WAITING_POLL_INTERVAL_SECONDS).to_i.times do
+          return true if test_still_waiting?
 
-          sleep 0.5
+          sleep TEST_WAITING_POLL_INTERVAL_SECONDS
         end
+        test_still_waiting?
       end
 
       def resume_test(path)

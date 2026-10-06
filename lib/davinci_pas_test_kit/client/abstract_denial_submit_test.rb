@@ -23,7 +23,7 @@ module DaVinciPASTestKit
           title: 'Claim denied response JSON',
           type: 'textarea',
           optional: true,
-          description: DaVinciPASTestKit.user_response_input_description('$submit', 'denied', 'Denial Scenario')
+          description: DaVinciPASTestKit.user_response_input_description('$submit', 'denied', 'Denial Response')
     input :client_id,
           title: 'Client Id',
           type: 'text',

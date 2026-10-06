@@ -121,6 +121,52 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
   end
 
+  # perform_bundle_validation (used by the server suites, and now the client suites too) passes the compound
+  # '<operation>_<type>' form, so 'submit_request' must get the $submit structure checks.
+  describe '#validate_pa_request_payload_structure with the server submit_request type' do
+    let(:validator) { Class.new { include DaVinciPASTestKit::PasBundleValidation }.new }
+    let(:bundle) { FHIR.from_contents(pa_request_valid_bundle) }
+    let(:claim) { bundle.entry.first.resource }
+
+    def validation_message_text(request_type = 'submit_request')
+      validator.validate_pa_request_payload_structure(bundle, request_type)
+      validator.validation_messages.map { |m| m[:message] }.join("\n")
+    end
+
+    it 'reports no errors for a conformant $submit request Bundle' do
+      validator.validate_pa_request_payload_structure(bundle, 'submit_request')
+
+      expect(validator.validation_messages).to be_empty
+    end
+
+    it 'requires the first entry to be a Claim' do
+      bundle.entry.rotate!
+
+      expect(validation_message_text).to include('The first bundle entry must be a Claim')
+    end
+
+    it 'requires supportingInfo sequences to be unique' do
+      claim.supportingInfo = [1, 1].map do |sequence|
+        FHIR::Claim::SupportingInfo.new(sequence:, category: { text: 'info' })
+      end
+
+      expect(validation_message_text).to include('The sequence element for each supportingInfo entry SHALL be unique')
+    end
+
+    it 'requires entry fullUrls to be a url or urn:uuid' do
+      bundle.entry.last.fullUrl = 'not-a-valid-full-url'
+
+      expect(validation_message_text).to include('Bundle.entry.fullUrl values SHALL be a valid url')
+    end
+
+    it 'does not apply the $inquire structure checks' do
+      claim.patient = nil
+
+      expect(validation_message_text).to_not include('for inquiry operation must reference a patient')
+      expect(validation_message_text('inquire_request')).to include('for inquiry operation must reference a patient')
+    end
+  end
+
   describe '#validate_pa_response_body_structure' do
     let(:test) do
       Class.new(Inferno::Test) do

@@ -66,22 +66,33 @@ module DaVinciPASTestKit
       return reference if base_url.blank? || reference.starts_with?('urn:uuid:') || URI(reference).absolute?
 
       "#{base_url}/#{reference}"
+    rescue URI::InvalidURIError
+      # left as-is so it is reported as not found in the Bundle rather than erroring the validation
+      reference
     end
 
     # Extracts the base URL from an absolute URL by removing the resource type and ID.
+    # Expects a non-versioned [base]/[type]/[id] url, as Bundle fullUrls must be (bdl-8).
     # @param absolute_url [String] The absolute URL.
-    # @return [String] The base URL, or an empty string if the URL format is not as expected.
+    # @return [String] The base URL, or an empty string if the url is not an absolute url with a host
+    #   (e.g., a urn:uuid, a relative url, or an invalid url - reported separately by the fullUrl checks).
     def extract_base_url(absolute_url)
       return '' if absolute_url.blank?
 
-      uri = URI(absolute_url)
-      return '' unless uri.scheme && uri.host
+      # Use the raw components rather than URI#authority, which drops an explicit default port (e.g., :443)
+      # and userinfo, so that the base URL is exactly what the client sent and relative references resolved
+      # against it match the Bundle's fullUrls.
+      scheme, userinfo, host, port, _registry, path = URI::RFC3986_PARSER.split(absolute_url)
+      return '' if scheme.blank? || host.blank?
+
+      authority = "#{"#{userinfo}@" if userinfo.present?}#{host}#{":#{port}" if port.present?}"
 
       # Split the path segments and remove the last two segments (resource type and id)
-      path_segments = uri.path.split('/')
-      base_path = path_segments[0...-2].join('/')
+      base_path = path.split('/')[0...-2].join('/')
 
-      "#{uri.scheme}://#{uri.authority}#{base_path}"
+      "#{scheme}://#{authority}#{base_path}"
+    rescue URI::InvalidURIError
+      ''
     end
 
     private

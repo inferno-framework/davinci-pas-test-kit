@@ -6,7 +6,7 @@ including a variety of scenarios (e.g., different decisions) and coverage
 of must support elements within response profiles. Inferno allows testers
 to provide the responses for Inferno to make because:
 1. Requiring systems to handle specific responses could require additional setup
-   (e.g., configuration of certain order codes) that could inadvertantly place
+   (e.g., configuration of certain order codes) that could inadvertently place
    requirements on systems beyond what is required by the PAS specification.
 2. Inferno does not have the expertise or capability to produce sensical responses
    to all systems that also cover all must support elements
@@ -40,7 +40,7 @@ These responses are created mostly from the incoming request. Specific details i
 
 - The Patient, insurer Organization, and requestor entity instances are pulled into the response
   Bundle and referenced in the `patient`, `insurer`, and `requestor` elements respectively.
-  Note that get found by following references found in the submitted Claim instance. If relative
+  Note that these are found by following references in the submitted Claim instance. If relative
   references are used in the Claim, the Claim entry `fullUrl` needs to be a absolute reference
   and not a UUID, else the entries won't get pulled in correctly.
 - In the ClaimResponse, the `identifier`, `type`, `status`, and `use` elements are pulled
@@ -55,7 +55,7 @@ These responses are created mostly from the incoming request. Specific details i
   `A3` ("Not Certified") for denial, `A4` ("Pending") for pending, and `A6` ("Modified") for
   modified. For the claim updates scenario, `A1` ("Certified in total") will be used.
 - In the Payer Modification scenario, a `ClaimResponse.addItem` entry is added for each
-  `item` entry in the Claim respresenting the modification. The `reviewActionCode` for these
+  `item` entry in the Claim representing the modification. The `reviewActionCode` for these
   entries will be `A1` ("Certified in total"), but all other elements will be the same
   making it a vacuous update.
 
@@ -80,7 +80,7 @@ Inferno supports mocking both `id-only` and `full-resource` notifications. The f
 
 ## Tester-directed Custom Responses
 
-All PAS tests include the option for Inferno to return tester-provide responses.
+All PAS tests include the option for Inferno to return tester-provided responses.
 
 ### Response Selection
 

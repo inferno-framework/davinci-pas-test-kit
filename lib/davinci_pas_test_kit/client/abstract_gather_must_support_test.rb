@@ -1,5 +1,6 @@
 require_relative 'client_input_descriptions'
 require_relative 'session_identification'
+require_relative 'user_input_response'
 
 module DaVinciPASTestKit
   # abstract test, needs to be extended to include a version-specific URLs module
@@ -102,7 +103,7 @@ module DaVinciPASTestKit
 
           ### Endpoints
 
-          Submit a PAS requests to
+          Submit PAS requests to
 
           - $submit: `#{submit_endpoint}`
           - $inquire: `#{inquire_endpoint}`
@@ -117,7 +118,7 @@ module DaVinciPASTestKit
                                           input_title(:ms_submit_responses),
                                           '$submit')}
 
-          ### Inquire Resposnes
+          ### Inquire Responses
 
           #{response_description_for_wait(user_inputted_response?(:ms_inquire_responses),
                                           input_title(:ms_inquire_responses),

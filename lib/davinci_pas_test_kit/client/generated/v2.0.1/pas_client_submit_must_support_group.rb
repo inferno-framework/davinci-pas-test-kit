@@ -17,9 +17,7 @@ module DaVinciPASTestKit
       title '$submit Request Must Support Coverage'
       description %(
         Check that the client can demonstrate `$submit` requests that contain
-        all PAS-defined profiles and their must support elements. For all profiles
-        other than PAS Claim Update, testers can attest that the missing elements
-        are not supported by their system to pass the tests.
+        all PAS-defined profiles and their must support elements.
         
         For `$submit` requests, this includes the following profiles:
         

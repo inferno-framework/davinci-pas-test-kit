@@ -12,7 +12,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_inquire_response_bundle_validation_test
       title '$inquire response Bundles have the correct structure and content'
       description %(
-        This test verifies the conformity of the inquire response sent by Inferno, which will have been
+        This test verifies the conformity of each `$inquire` response sent by Inferno, which will have been
         either:
         - the response body provided by the tester in the corresponding input, or
         - created by Inferno from the $inquire Bundle.
@@ -56,7 +56,8 @@ module DaVinciPASTestKit
         end
       end
 
-      # v2.2.1 inquire response is a Parameters with one or more Bundles
+      # v2.2.1 inquire response is a Parameters with one or more Bundles. Non-Bundle 'return'
+      # entries are reported and left as nil so the remaining Bundles keep their position in labels.
       def bundles_from_message_resource(message_resource, message_label)
         case message_resource
         when FHIR::Bundle
@@ -78,7 +79,7 @@ module DaVinciPASTestKit
                                        "contain a Bundle, got #{resource&.resourceType}" }
                 nil
               end
-            end.compact
+            end
         else
           messages << { type: 'error',
                         message: "#{message_label} expected a Parameters resource, " \

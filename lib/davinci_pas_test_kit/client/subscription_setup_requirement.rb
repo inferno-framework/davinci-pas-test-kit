@@ -13,7 +13,7 @@ module DaVinciPASTestKit
       skip_if subscription_request.blank?,
               %(
                 This test cannot proceed because no Subscription exists to receive notifications
-                for pended claims. Run the _PAS Subscription Setup_ tests to provide a Subscription
+                for pended claims. Run the _Subscription Setup_ tests to provide a Subscription
                 for use in delivering notifications before re-running the pended scenario tests.
               )
       subscription_request

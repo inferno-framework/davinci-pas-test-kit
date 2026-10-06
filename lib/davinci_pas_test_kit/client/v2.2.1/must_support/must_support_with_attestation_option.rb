@@ -97,7 +97,8 @@ module DaVinciPASTestKit
         pass 'All must support elements were observed in the requests made by the client.' if
           unobserved_by_profile.empty?
 
-        identifier = test_session_id
+        # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
+        identifier = SecureRandom.uuid
         output attest_true_url: "#{resume_pass_url}?token=#{identifier}",
                attest_false_url: "#{resume_fail_url}?token=#{identifier}"
 

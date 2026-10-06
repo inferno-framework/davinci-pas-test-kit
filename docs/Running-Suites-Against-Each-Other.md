@@ -66,9 +66,9 @@ dedicated hostname.
     *   Once execution completes, select the "**4** Demonstrate Error Handling" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
-    *   Inferno will send additional PAS $submit and #inquire requests and evaluate the responses.
+    *   Inferno will send additional PAS $submit and $inquire requests and evaluate the responses.
     *   Once the server suite tests have completed, return to the client suite session and click the link in the current "User Action Dialog" to indicate that additional submit requests have been made.
-    *   A second "User Action Required" dialog will appear asking for confirmation that the $submit and #inquire responses were handled without error. Complete the attestation to complete the tests.
+    *   A second "User Action Required" dialog will appear asking for confirmation that the $submit and $inquire responses were handled without error. Complete the attestation to complete the tests.
 8.  **Review Results**:
     *   All tests have now been completed, so Inferno will display the results in the respective sessions.
     *   **Note**: Not all simulation inputs are fully conformant. Therefore, some failures or warnings will be included in the results.
@@ -143,7 +143,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a series of PAS request to the client suite session. Wait for the server tests to complete.
-    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the testser to attest that the client handled the responses without error. Completing the attestation will finish the run.
+    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error. Completing the attestation will finish the run.
 9.  **Payer Modifications Execution**:
     *   In the client session, select the "**9.5** Payer Modifications" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -154,7 +154,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session. Wait for the server tests to complete. Server test "**2.1.1.04** Server response includes the 'Approval' decision code in the ClaimResponse instance" should fail because "A6" (Modified) should be returned instead of "A1" (Certified in Total).
-    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the testser to attest that the client handled the responses without error and displayed the modifications. Completing the attestation will finish the run.
+    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error and displayed the modifications. Completing the attestation will finish the run.
 10. **Operation Failure Execution**:
     *   In the client session, select the "**9.6** Operation Failure" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -176,7 +176,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session. Wait for the server tests to complete. Server test "**2.1.1.04** Server response includes the 'Approval' decision code in the ClaimResponse instance" should fail because the client suites will return errors instead of items in the ClaimResponse.
-    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the testser to attest that the client handled the responses without error and displayed the errors to the appropriate users. Completing the attestation will finish the run.
+    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error and displayed the errors to the appropriate users. Completing the attestation will finish the run.
 12.  **Must Support Elements Execution**:
     *   In the client session, select the "**10** Must Support Elements" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).

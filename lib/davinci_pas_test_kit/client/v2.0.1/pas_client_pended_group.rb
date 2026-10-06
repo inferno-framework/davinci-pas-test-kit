@@ -63,9 +63,9 @@ module DaVinciPASTestKit
                workflow_tag: PENDED_WORKFLOW_TAG,
                operation_tag: SUBMIT_TAG,
                multiple_requests_ok: true,
-               attest_message: "I attest that following the receipt of the 'pended' response to the submitted " \
-                               'claim, the client system indicates to users that a final decision on request ' \
-                               'has not yet been made.'
+               attest_message: "I attest that the client system did not error when handling the 'pended' " \
+                               'response to the submitted claim and that it indicated to users that a final decision ' \
+                               'on the request had not yet been made.'
              } }
       end
 

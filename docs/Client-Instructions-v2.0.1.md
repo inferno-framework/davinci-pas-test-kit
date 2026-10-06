@@ -94,11 +94,11 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
 1. The next two attestations ask whether the system displayed the claim as pended and approved at the
    appropriate points in the scenario. Attest based on whether the correct strings were found in the
    responses in the previous steps.
-1. Two additional "User Action" dialogs will appear requesting additional `$submit` and `$inquire`
+1. A "User Action Required" dialog will appear requesting additional `$submit` and `$inquire`
    requests to demonstrate must support elements. This demo does not have any additional requests
    and does not attempt to demonstrate all must support elements, so click the link to indicate
-   you are done submitting requests for each. Note that requests submitted during the scenario section
-   will be evaluated and you can inspect the results under the Demonstrate Element Support test
+   you are done submitting requests. Note that requests submitted during the scenario groups
+   will be evaluated and you can inspect the results under the must support coverage groups
    to see both passing and failing tests.
 1. Once Inferno finishes evaluating the requests, the test will complete allowing you to review the
    results, including warning and error messages as well as requests associated with each test.

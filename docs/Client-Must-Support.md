@@ -55,7 +55,7 @@ During testing, Inferno and the client system pass many requests and responses b
 and forth. These are the messages that Inferno will consider when looking for
 demonstration of must support elements. The "Must Support Elements" group allows
 testers to make additional requests covering must support elements not yet demonstrated,
-but elements previously demonstrated during previoiusly-executed scenario groups
+but elements previously demonstrated during previously executed scenario groups
 do not need to be demonstrated again.
 
 However, Inferno will only consider requests and responses exchanged during the most

@@ -3,10 +3,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
-  # The attestation test waits on its test_session_id; the resume token must match it.
-  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{test_session.id}" }
-  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{test_session.id}" }
-
+  let(:continue_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{wait_token}" }
+  let(:continue_fail_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_FAIL_PATH}?token=#{wait_token}" }
   let(:coverage_test) do
     Class.new(described_class) do
       config(
@@ -20,7 +18,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       )
     end
   end
-
   # Same as coverage_test but for the $inquire operation, to check the operation-aware message.
   let(:inquire_coverage_test) do
     Class.new(described_class) do
@@ -35,7 +32,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       )
     end
   end
-
   let(:require_one_of_test) do
     Class.new(described_class) do
       config(
@@ -51,7 +47,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       )
     end
   end
-
   # require_one_of with the full set of submit request profiles, as the real submit group configures it.
   let(:multi_request_profiles_test) do
     Class.new(described_class) do
@@ -71,7 +66,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       )
     end
   end
-
   # Two profiles that share a single resource type (Organization), as in the real submit group.
   let(:shared_org_test) do
     Class.new(described_class) do
@@ -88,6 +82,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
         }
       )
     end
+  end
+
+  # The test waits on a fresh random identifier, which it puts in the attestation URLs it outputs.
+  def wait_token
+    attest_true_url = Inferno::Repositories::SessionData.new.load(test_session_id: test_session.id,
+                                                                  name: :attest_true_url)
+    Rack::Utils.parse_query(URI(attest_true_url).query)['token']
   end
 
   # A PAS Coverage with all of its must support elements present. The X12Code slice is only satisfied when an

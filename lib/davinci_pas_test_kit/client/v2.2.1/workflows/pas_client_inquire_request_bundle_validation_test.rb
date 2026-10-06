@@ -10,7 +10,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_inquire_request_bundle_validation_test
       title '$inquire request Bundles have the correct structure and content'
       description %(
-        This test verifies the conformity of the client's request body to the
+        This test verifies the conformity of each of the client's `$inquire` request bodies to the
         [PAS Inquiry Request Bundle](http://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-inquiry-request-bundle.html)
         structure. It also checks that other conformance requirements defined in the [PAS Formal
         Specification](https://hl7.org/fhir/us/davinci-pas/2.2.1/specification.html),

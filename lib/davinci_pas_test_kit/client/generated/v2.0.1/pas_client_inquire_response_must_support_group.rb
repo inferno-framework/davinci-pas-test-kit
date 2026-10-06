@@ -6,7 +6,6 @@ require_relative 'beneficiary/client_inquire_response_must_support_beneficiary_t
 require_relative 'practitioner/client_inquire_response_must_support_practitioner_test'
 require_relative 'practitioner_role/client_inquire_response_must_support_practitioner_role_test'
 require_relative 'task/client_inquire_response_must_support_task_test'
-require_relative '../../v2.0.1/workflows/pas_client_response_attest'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -15,9 +14,7 @@ module DaVinciPASTestKit
       title '$inquire Response Must Support Coverage'
       description %(
         Check that `$inquire` responses provided to the client contain
-        all PAS-defined profiles and their must support elements. Demonstration
-        of the PAS ClaimResponse profile is strictly required while all others
-        are optional.
+        all PAS-defined profiles and their must support elements.
         
         For `$inquire` responses, this includes the following profiles:
         
