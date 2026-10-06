@@ -33,7 +33,7 @@ module DaVinciPASTestKit
             default: '400',
             description: %(
               The HTTP status code Inferno will use when returning the Operation Failure
-              OperationOutcome to the client. If provided, the value ust be in the 4XX or
+              OperationOutcome to the client. If provided, the value must be in the 4XX or
               5XX range. Inferno will return 400 if this input is not provided or the
               provided value is outside that range.
             )

@@ -45,7 +45,7 @@ module DaVinciPASTestKit
           **Subscription Creation Test**:
 
           Inferno will wait while the tester uses the client system to create a Subscription on
-          Inferno's simulated payer server. Inferno [will not accept all Subscriptiona](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
+          Inferno's simulated payer server. Inferno [will not accept all Subscriptions](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
           but a Subscription does not need to be fully conformant to be accepted.
 
           After accepting a Subscription, Inferno will send a handshake notification
@@ -63,7 +63,7 @@ module DaVinciPASTestKit
 
           ### Responses and Handshake Notifications
 
-          The PAS Tet Kit wiki contains details on the supported responses and
+          The PAS Test Kit wiki contains details on the supported responses and
           notifications that the client system can expect to receive during these tests:
           - [Subscription creation responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#creation-response)
           - [Handshake Notification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#creation-response)

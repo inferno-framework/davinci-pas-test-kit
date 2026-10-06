@@ -3,7 +3,7 @@
 ## Background
 
 PAS requires that servers use Subscription notifications to alert clients when
-a pended prioar authorization request has been updated. When simulating
+a pended prior authorization request has been updated. When simulating
 a PAS server, Inferno will accept Subscriptions and use them to deliver
 notifications to the client at appropriate times. This page describes
 how Inferno's simulation of a Subscription server works, including
@@ -18,7 +18,7 @@ step performed when connecting a client system to a new payer. Therefore, Infern
 asks testers to perform this step up-front as a part of the "Subscription Setup"
 group. Testers must perform this step while Inferno is waiting during the
 execution of this group. Otherwise, the pended scenario tests will not execute
-and notifications will never be sent. Tester must perform this step for each
+and notifications will never be sent. Testers must perform this step for each
 Inferno session they create as Inferno does not support sharing Subscription
 details between sessions.
 
@@ -68,7 +68,7 @@ It will subsequently trigger a job to send a handshake notification.
 ### Handshake Notification
 
 Inferno will send a basic handshake notification using the [Parameters format](https://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition-backport-subscription-status-r4.html).
-Unless the request timesout or otherwise Inferno doesn't receive a respons, the tests
+Unless the request times out or otherwise Inferno doesn't receive a response, the tests
 will continue automatically regardless of the details of the client's response to
 the handshake.
 
