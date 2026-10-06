@@ -28,6 +28,20 @@ RSpec.describe DaVinciPASTestKit::ClaimEndpoint, :request do
     end
   end
 
+  describe DaVinciPASTestKit::SubscriptionReadEndpoint do
+    it 'returns a 500 OperationOutcome' do
+      get "/custom/davinci_pas_client_suite_v201#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}/abc"
+
+      expect(last_response.status).to eq(500)
+      expect(last_response.headers['Content-Type']).to eq('application/fhir+json')
+
+      outcome = FHIR.from_contents(last_response.body)
+      expect(outcome).to be_a(FHIR::OperationOutcome)
+      expect(outcome.issue.first.code).to eq('not-found')
+      expect(outcome.issue.first.details.text).to include('Unable to find test run')
+    end
+  end
+
   describe DaVinciPASTestKit::SubscriptionStatusEndpoint do
     it_behaves_like 'a no-session OperationOutcome response' do
       let(:request_path) do
