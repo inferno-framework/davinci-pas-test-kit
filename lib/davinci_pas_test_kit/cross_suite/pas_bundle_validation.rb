@@ -21,8 +21,11 @@ module DaVinciPASTestKit
     #   bundle, each a { type:, message: } hash. Callers that only care about failure should
     #   check for a message with type: 'error' rather than just whether this is present -
     #   see validation_messages.
-    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil)
+    # @param validator [Symbol] the name of the FHIR resource validator to use for profile
+    #   validation, e.g., :no_custom_extensions when validating responses sent by Inferno.
+    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil, validator: :default)
       @validation_messages = []
+      @profile_validator = validator
       target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
       request_type = "#{operation}_#{type}"
       if type == 'request'
@@ -52,6 +55,12 @@ module DaVinciPASTestKit
     # validator and concats them directly).
     def add_validation_error(message)
       validation_messages << { type: 'error', message: }
+    end
+
+    # The name of the FHIR resource validator used for profile validation of the current
+    # bundle - see perform_bundle_validation.
+    def profile_validator
+      @profile_validator || :default
     end
 
     def perform_request_validation(bundle, profile_url, version, request_type)
@@ -423,7 +432,7 @@ module DaVinciPASTestKit
     # @return [Array<Hash>] Message hashes for the issues found.
     def collect_resource_profile_messages(resource, profile_url = nil)
       response_details = []
-      resource_is_valid?(resource:, profile_url:,
+      resource_is_valid?(resource:, profile_url:, validator: profile_validator,
                          add_messages_to_runnable: false,
                          validator_response_details: response_details)
       validator_issues_to_messages(response_details.reject(&:filtered))
@@ -437,7 +446,7 @@ module DaVinciPASTestKit
     # @return [Array<Hash>] Message hashes for the Bundle-structural issues found.
     def collect_bundle_profile_messages(bundle, profile_url)
       response_details = []
-      resource_is_valid?(resource: bundle, profile_url:,
+      resource_is_valid?(resource: bundle, profile_url:, validator: profile_validator,
                          add_messages_to_runnable: false,
                          validator_response_details: response_details)
       validator_issues_to_messages(reject_entry_resource_issues(response_details))

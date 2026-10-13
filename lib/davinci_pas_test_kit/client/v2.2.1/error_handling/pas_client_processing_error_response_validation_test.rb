@@ -20,6 +20,9 @@ module DaVinciPASTestKit
         profile. Additionally, it checks that the ClaimResponse contains at least one error entry,
         as required by the processing error scenario.
 
+        To ensure that the PAS client is driving its behavior only based on standard
+        PAS information, custom extensions are not allowed within the response.
+
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
         that business errors that are a part of processing the 278 payload are
         represented in the mapping to the response bundle via the ClaimResponse error capability.
@@ -45,7 +48,8 @@ module DaVinciPASTestKit
         skip_if !bundle.is_a?(FHIR::Bundle),
                 "#{message} Unexpected resource type: expected Bundle, but received #{bundle&.resourceType}.".strip
 
-        messages.concat(perform_bundle_validation(bundle, 'submit', 'response', '2.2.1'))
+        messages.concat(perform_bundle_validation(bundle, 'submit', 'response', '2.2.1',
+                                                  validator: :no_custom_extensions))
         skip_if error_messages?,
                 "#{message} Bundle and/or entry resources are not conformant. Check messages for issues found.".strip
 

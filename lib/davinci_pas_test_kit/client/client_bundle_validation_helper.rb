@@ -191,8 +191,15 @@ module DaVinciPASTestKit
       end
     end
 
+    # Responses are sent by Inferno and may be tester-provided, so they are not allowed
+    # to contain extensions beyond those defined in the PAS IG and its dependencies.
+    def profile_validator_name
+      message_direction_name == 'response' ? :no_custom_extensions : :default
+    end
+
     def bundle_has_errors?(bundle, label)
-      bundle_messages = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version)
+      bundle_messages = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version,
+                                                  validator: profile_validator_name)
       bundle_messages.each { |m| messages << { type: m[:type], message: "#{label} #{m[:message]}" } }
       bundle_messages.any? { |m| m[:type] == 'error' }
     rescue NoMethodError, TypeError, ArgumentError => e

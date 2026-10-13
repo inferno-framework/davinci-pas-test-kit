@@ -437,6 +437,70 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
   end
 
+  describe '#perform_bundle_validation validator selection' do
+    let(:test_instance) do
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def evaluate_fhirpath(**)
+          []
+        end
+
+        def messages
+          @messages ||= []
+        end
+
+        def resource_is_valid?(**)
+          true
+        end
+      end.new
+    end
+
+    let(:bundle) do
+      FHIR.from_contents({
+        resourceType: 'Bundle', type: 'collection',
+        entry: [
+          { fullUrl: 'urn:uuid:claim-response', resource: {
+            resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+            use: 'preauthorization', outcome: 'complete'
+          } }
+        ]
+      }.to_json)
+    end
+
+    before do
+      allow(test_instance).to receive(:validate_pa_response_body_structure)
+      allow(test_instance).to receive(:resource_is_valid?).and_call_original
+    end
+
+    it 'uses the default validator when none is specified' do
+      test_instance.perform_bundle_validation(bundle, 'inquire', 'response', 'v2.2.1')
+
+      expect(test_instance).to have_received(:resource_is_valid?).at_least(:once)
+      expect(test_instance).to have_received(:resource_is_valid?).with(hash_including(validator: :default))
+        .at_least(:once)
+      expect(test_instance).to_not have_received(:resource_is_valid?)
+        .with(hash_including(validator: :no_custom_extensions))
+    end
+
+    it 'uses the specified validator for every profile validation' do
+      test_instance.perform_bundle_validation(bundle, 'inquire', 'response', 'v2.2.1',
+                                              validator: :no_custom_extensions)
+
+      expect(test_instance).to have_received(:resource_is_valid?).at_least(:once)
+      expect(test_instance).to_not have_received(:resource_is_valid?).with(hash_including(validator: :default))
+    end
+
+    it 'does not carry the validator over to a later validation' do
+      test_instance.perform_bundle_validation(bundle, 'inquire', 'response', 'v2.2.1',
+                                              validator: :no_custom_extensions)
+      test_instance.perform_bundle_validation(bundle, 'inquire', 'request', 'v2.2.1')
+
+      expect(test_instance).to have_received(:resource_is_valid?).with(hash_including(validator: :default))
+        .at_least(:once)
+    end
+  end
+
   describe 'US Core profile fallback' do
     let(:test_instance) do
       Class.new do
@@ -918,14 +982,14 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       )
 
       allow(test_instance).to receive(:resource_is_valid?)
-        .with(resource: nutrition_order, profile_url: nil, add_messages_to_runnable: false,
+        .with(resource: nutrition_order, profile_url: nil, validator: :default, add_messages_to_runnable: false,
               validator_response_details: anything)
         .and_return(true)
 
       test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
       expect(test_instance).to have_received(:resource_is_valid?)
-        .with(resource: nutrition_order, profile_url: nil, add_messages_to_runnable: false,
+        .with(resource: nutrition_order, profile_url: nil, validator: :default, add_messages_to_runnable: false,
               validator_response_details: anything)
       expect(test_instance.validation_messages).to be_empty
     end

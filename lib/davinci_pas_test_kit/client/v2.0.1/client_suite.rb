@@ -106,6 +106,21 @@ module DaVinciPASTestKit
         end
       end
 
+      # Used to verify responses sent by Inferno, which may be tester-provided, to
+      # ensure they don't contain extensions not defined in the PAS IG or its dependencies.
+      fhir_resource_validator :no_custom_extensions do
+        igs 'hl7.fhir.us.davinci-pas#2.0.1'
+
+        exclude_message do |message|
+          V201_SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, ''))
+        end
+
+        validation_context do
+          snomedCT '731000124108'
+          extensions [] # no extensions not in the spec
+        end
+      end
+
       suite_option :client_type,
                    title: 'Client Security Type',
                    list_options: [

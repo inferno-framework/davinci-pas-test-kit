@@ -17,7 +17,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
   end
   let(:approval_test) do
     Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest) do
-      fhir_resource_validator do
+      fhir_resource_validator :no_custom_extensions do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
         cli_context do
@@ -37,7 +37,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidat
 
   let(:multi_request_test) do
     Class.new(DaVinciPASTestKit::DaVinciPASV201::PasClientResponseBundleValidationTest) do
-      fhir_resource_validator do
+      fhir_resource_validator :no_custom_extensions do
         url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL')
 
         cli_context do
