@@ -6,6 +6,7 @@ require_relative '../../cross_suite/tags'
 require_relative '../endpoints/claim_endpoint'
 require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
+require_relative '../endpoints/subscription_read_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
 require_relative '../pas_client_options'
 require_relative 'pas_client_workflows_group'
@@ -140,8 +141,8 @@ module DaVinciPASTestKit
       suite_endpoint :post, SESSION_INQUIRE_PATH, ClaimEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
-      suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
-      suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
+      suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
+      suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
