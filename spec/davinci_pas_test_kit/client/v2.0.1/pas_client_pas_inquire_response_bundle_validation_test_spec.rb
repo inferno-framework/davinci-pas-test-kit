@@ -24,6 +24,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PasClientInquireResponseBundle
           txServer nil
           displayWarnings true
           disableDefaultResourceFetcher true
+          extensions []
         end
 
         igs('hl7.fhir.us.davinci-pas#2.0.1')

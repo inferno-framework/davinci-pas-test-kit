@@ -1,4 +1,5 @@
 require_relative '../../../cross_suite/tags'
+require_relative '../../../cross_suite/validator_configuration'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -33,9 +34,10 @@ module DaVinciPASTestKit
         skip_if !operation_outcome.is_a?(FHIR::OperationOutcome),
                 "Expected an OperationOutcome but received #{operation_outcome.resourceType}."
 
-        skip_if !resource_is_valid?(resource: operation_outcome, validator: :no_custom_extensions),
+        skip_if !resource_is_valid?(resource: operation_outcome, validator: NO_CUSTOM_EXTENSIONS_VALIDATOR),
                 'The OperationOutcome returned during the Operation Failure scenario is not conformant ' \
-                'with the base FHIR R4 OperationOutcome resource definition.'
+                'with the base FHIR R4 OperationOutcome resource definition or contains custom extensions. ' \
+                'See Messages for details.'
       end
     end
   end

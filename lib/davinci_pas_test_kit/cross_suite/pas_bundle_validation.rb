@@ -5,6 +5,7 @@ require_relative 'validation_test'
 require_relative 'pas_constants'
 require_relative 'pas_datatype_constraints'
 require_relative 'referenced_resource_presence_validation'
+require_relative 'validator_configuration'
 
 module DaVinciPASTestKit
   module PasBundleValidation
@@ -22,10 +23,16 @@ module DaVinciPASTestKit
     #   check for a message with type: 'error' rather than just whether this is present -
     #   see validation_messages.
     # @param validator [Symbol] the name of the FHIR resource validator to use for profile
-    #   validation, e.g., :no_custom_extensions when validating responses sent by Inferno.
-    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil, validator: :default)
+    #   validation. Use perform_no_custom_extensions_validation for Bundles Inferno sends.
+    # @param echoed_from [FHIR::Bundle, String, nil] the request Bundle the response answers. When
+    #   given, entry resources echoed back from it that carry no extensions beyond those they had in
+    #   it are validated with the :default validator rather than `validator`, since the extensions
+    #   came from the system under test.
+    def perform_bundle_validation(bundle, operation, type, ig_version, request_bundle = nil, validator: :default,
+                                  echoed_from: nil)
       @validation_messages = []
       @profile_validator = validator
+      @echoed_from_bundle = parse_bundle(echoed_from)
       target_profile = PASConstants.bundle_profile_url_for_operation_and_type(operation, type)
       request_type = "#{operation}_#{type}"
       if type == 'request'
@@ -34,6 +41,19 @@ module DaVinciPASTestKit
         perform_response_validation(bundle, target_profile, ig_version.delete_prefix('v'), request_type, request_bundle)
       end
       validation_messages
+    end
+
+    # Validates a Bundle that Inferno sends to the system under test, which may be tester-provided,
+    # using NO_CUSTOM_EXTENSIONS_VALIDATOR so that custom extensions aren't allowed. Resources echoed
+    # back from the system under test's Bundle may keep the extensions they had in it.
+    # @param type [String] 'request' or 'response' - see perform_bundle_validation.
+    # @param echoed_from [FHIR::Bundle, String, nil] the Bundle from the system under test that this
+    #   one answers, e.g. the request for a response, or nil if there is none - see
+    #   perform_bundle_validation.
+    # @return [Array<Hash>] see perform_bundle_validation.
+    def perform_no_custom_extensions_validation(bundle, operation, type, ig_version, echoed_from:)
+      perform_bundle_validation(bundle, operation, type, ig_version,
+                                validator: NO_CUSTOM_EXTENSIONS_VALIDATOR, echoed_from:)
     end
 
     ###########################################################################
@@ -61,6 +81,76 @@ module DaVinciPASTestKit
     # bundle - see perform_bundle_validation.
     def profile_validator
       @profile_validator || :default
+    end
+
+    # The name of the FHIR resource validator used for profile validation of one entry resource
+    # in the current bundle. Resources echoed back from the request (see perform_bundle_validation's
+    # echoed_from) that add no extensions of their own use the :default validator so that extensions
+    # from the system under test are allowed.
+    # @param full_url [String] the fullUrl of the entry containing the resource.
+    # @param resource [FHIR::Model] the entry resource.
+    def profile_validator_for_entry(full_url, resource)
+      return profile_validator if profile_validator == :default
+
+      request_entry = echoed_request_entry(full_url, resource)
+      return profile_validator if request_entry.blank?
+
+      extensions_echoed?(resource, request_entry.resource) ? :default : profile_validator
+    end
+
+    def echoed_request_entry(full_url, resource)
+      return if @echoed_from_bundle.blank?
+
+      response_entry = FHIR::Bundle::Entry.new(fullUrl: full_url, resource:)
+      @echoed_from_bundle.entry.find { |entry| echoed_resource?(entry, response_entry) }
+    end
+
+    # True if every extension (at any depth, including modifierExtensions) in the resource also
+    # appears, with the same content and at the same element path, in the request resource it
+    # echoes. Paths leave out array indexes so reordered repeating elements still match. Reference
+    # values are ignored because Inferno rewrites them when it echoes resources in responses it
+    # generates.
+    def extensions_echoed?(resource, request_resource)
+      request_extensions = extensions_in(request_resource.to_hash)
+      extensions_in(resource.to_hash).all? { |extension| request_extensions.include?(extension) }
+    end
+
+    # @return [Array<Array(String, Hash)>] [element path, extension] pairs for every extension in the value.
+    def extensions_in(value, path = '')
+      case value
+      when Hash
+        value.flat_map do |key, child|
+          child_path = path.empty? ? key : "#{path}.#{key}"
+          own = if %w[extension modifierExtension].include?(key)
+                  Array(child).map { |extension| [child_path, without_references(extension)] }
+                else
+                  []
+                end
+          own + extensions_in(child, child_path)
+        end
+      when Array
+        value.flat_map { |child| extensions_in(child, path) }
+      else
+        []
+      end
+    end
+
+    def without_references(value)
+      case value
+      when Hash
+        value.except('reference').transform_values { |child| without_references(child) }
+      when Array
+        value.map { |child| without_references(child) }
+      else
+        value
+      end
+    end
+
+    def parse_bundle(bundle)
+      bundle = FHIR.from_contents(bundle) if bundle.is_a?(String)
+      bundle if bundle.is_a?(FHIR::Bundle)
+    rescue StandardError
+      nil
     end
 
     def perform_request_validation(bundle, profile_url, version, request_type)
@@ -283,9 +373,10 @@ module DaVinciPASTestKit
             if key == 'bundle'
               collect_bundle_profile_messages(resource, profile_url_for_validation(url, base_profile, version))
             elsif url == BASE_R4_PROFILE
-              collect_resource_profile_messages(resource)
+              collect_resource_profile_messages(resource, validator: profile_validator_for_entry(key, resource))
             else
-              collect_resource_profile_messages(resource, profile_url_for_validation(url, base_profile, version)) +
+              collect_resource_profile_messages(resource, profile_url_for_validation(url, base_profile, version),
+                                                validator: profile_validator_for_entry(key, resource)) +
                 datatype_constraint_messages(resource, profile_url_without_version(url), version)
             end
           messages_by_profile[url] = profile_messages
@@ -429,10 +520,11 @@ module DaVinciPASTestKit
     # @param resource [FHIR::Model] The resource to validate.
     # @param profile_url [String, nil] The profile URL (with version) to validate against,
     #   or nil to validate against the base resource definition.
+    # @param validator [Symbol] The name of the FHIR resource validator to use.
     # @return [Array<Hash>] Message hashes for the issues found.
-    def collect_resource_profile_messages(resource, profile_url = nil)
+    def collect_resource_profile_messages(resource, profile_url = nil, validator: profile_validator)
       response_details = []
-      resource_is_valid?(resource:, profile_url:, validator: profile_validator,
+      resource_is_valid?(resource:, profile_url:, validator:,
                          add_messages_to_runnable: false,
                          validator_response_details: response_details)
       validator_issues_to_messages(response_details.reject(&:filtered))

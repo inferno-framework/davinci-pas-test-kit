@@ -125,16 +125,17 @@ module DaVinciPASTestKit
       # placeholders for positions that held something other than a Bundle (already reported),
       # so Bundle labels keep their original position.
       bundles = bundles_from_message_resource(message_resource, message_label)
+      echoed_from = echo_source_bundle(request)
 
       if bundles.length > 1
         bundles.each_with_index do |bundle, bundle_index|
           next if bundle.nil?
 
           bundle_label = entity_label("#{message_label.delete_suffix(':')} Bundle #{bundle_index + 1}")
-          bundle_has_errors?(bundle, bundle_label)
+          bundle_has_errors?(bundle, bundle_label, echoed_from)
         end
       else
-        bundles.compact.each { |bundle| bundle_has_errors?(bundle, message_label) }
+        bundles.compact.each { |bundle| bundle_has_errors?(bundle, message_label, echoed_from) }
       end
     end
 
@@ -191,15 +192,31 @@ module DaVinciPASTestKit
       end
     end
 
-    # Responses are sent by Inferno and may be tester-provided, so they are not allowed
-    # to contain extensions beyond those defined in the PAS IG and its dependencies.
-    def profile_validator_name
-      message_direction_name == 'response' ? :no_custom_extensions : :default
+    # The request Bundle a response answers, so resources the response echoes back from it may keep
+    # the extensions they had in it - see PasBundleValidation#perform_no_custom_extensions_validation. Unwraps
+    # Parameters-wrapped requests (v2.2.1 $inquire). Nil when validating requests, or when the
+    # request has no Bundle.
+    def echo_source_bundle(request)
+      return unless message_direction_name == 'response'
+
+      request_resource = FHIR.from_contents(request.request_body)
+      if request_resource.is_a?(FHIR::Parameters)
+        request_resource = extract_resources_from_parameters(request_resource, 'resource').first
+      end
+      request_resource if request_resource.is_a?(FHIR::Bundle)
+    rescue StandardError
+      nil
     end
 
-    def bundle_has_errors?(bundle, label)
-      bundle_messages = perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version,
-                                                  validator: profile_validator_name)
+    def bundle_has_errors?(bundle, label, echoed_from = nil)
+      # Responses are sent by Inferno and may be tester-provided, so custom extensions aren't allowed.
+      bundle_messages =
+        if message_direction_name == 'response'
+          perform_no_custom_extensions_validation(bundle, operation_name, message_direction_name, ig_version,
+                                                  echoed_from:)
+        else
+          perform_bundle_validation(bundle, operation_name, message_direction_name, ig_version)
+        end
       bundle_messages.each { |m| messages << { type: m[:type], message: "#{label} #{m[:message]}" } }
       bundle_messages.any? { |m| m[:type] == 'error' }
     rescue NoMethodError, TypeError, ArgumentError => e

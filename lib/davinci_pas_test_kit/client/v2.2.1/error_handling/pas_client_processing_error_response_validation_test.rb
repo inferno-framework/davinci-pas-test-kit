@@ -48,8 +48,8 @@ module DaVinciPASTestKit
         skip_if !bundle.is_a?(FHIR::Bundle),
                 "#{message} Unexpected resource type: expected Bundle, but received #{bundle&.resourceType}.".strip
 
-        messages.concat(perform_bundle_validation(bundle, 'submit', 'response', '2.2.1',
-                                                  validator: :no_custom_extensions))
+        messages.concat(perform_no_custom_extensions_validation(bundle, 'submit', 'response', '2.2.1',
+                                                                echoed_from: request.request_body))
         skip_if error_messages?,
                 "#{message} Bundle and/or entry resources are not conformant. Check messages for issues found.".strip
 

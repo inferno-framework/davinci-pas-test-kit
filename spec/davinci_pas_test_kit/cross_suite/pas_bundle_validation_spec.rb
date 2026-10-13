@@ -501,6 +501,184 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     end
   end
 
+  describe '#perform_bundle_validation with echoed resources' do
+    let(:test_instance) do
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def evaluate_fhirpath(**)
+          []
+        end
+
+        def messages
+          @messages ||= []
+        end
+
+        def resource_is_valid?(**)
+          true
+        end
+      end.new
+    end
+
+    let(:custom_extension) { { url: 'http://example.org/fhir/StructureDefinition/custom', valueString: 'custom' } }
+    let(:other_extension) { { url: 'http://example.org/fhir/StructureDefinition/other', valueString: 'other' } }
+
+    let(:claim_response_entry) do
+      { fullUrl: 'urn:uuid:claim-response', resource: {
+        resourceType: 'ClaimResponse', id: 'claim-response', status: 'active',
+        use: 'preauthorization', outcome: 'complete', extension: [custom_extension]
+      } }
+    end
+
+    def patient_entry(extension: [], name_extension: [])
+      { fullUrl: 'urn:uuid:patient', resource: {
+        resourceType: 'Patient', id: 'patient', extension:,
+        name: [{ family: 'Example', extension: name_extension }]
+      } }
+    end
+
+    def bundle_with(*entries)
+      FHIR.from_contents({ resourceType: 'Bundle', type: 'collection', entry: entries }.to_json)
+    end
+
+    before do
+      allow(test_instance).to receive(:validate_pa_response_body_structure)
+      allow(test_instance).to receive(:resource_is_valid?).and_call_original
+    end
+
+    def validators_used_for(resource_type)
+      validators = []
+      expect(test_instance).to have_received(:resource_is_valid?).at_least(:once) do |**args|
+        validators << args[:validator] if args[:resource].resourceType == resource_type
+      end
+      validators.uniq
+    end
+
+    # v2.2.1 so the US Core fallback validates the (unreferenced) Patient entry on its own.
+    def validate(response_bundle, request_bundle)
+      test_instance.perform_bundle_validation(response_bundle, 'submit', 'response', 'v2.2.1',
+                                              validator: :no_custom_extensions, echoed_from: request_bundle)
+    end
+
+    it 'uses the default validator for a resource echoed with the extensions it had in the request' do
+      request_bundle = bundle_with(patient_entry(extension: [custom_extension], name_extension: [other_extension]))
+      response_bundle = bundle_with(claim_response_entry,
+                                    patient_entry(extension: [custom_extension], name_extension: [other_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:default])
+      expect(validators_used_for('ClaimResponse')).to eq([:no_custom_extensions])
+      expect(validators_used_for('Bundle')).to eq([:no_custom_extensions])
+    end
+
+    it 'accepts the request Bundle as JSON' do
+      request_json = bundle_with(patient_entry(extension: [custom_extension])).to_json
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+
+      validate(response_bundle, request_json)
+
+      expect(validators_used_for('Patient')).to eq([:default])
+    end
+
+    it 'uses the specified validator for an echoed resource with an extension not in the request' do
+      request_bundle = bundle_with(patient_entry(extension: [custom_extension]))
+      response_bundle = bundle_with(claim_response_entry,
+                                    patient_entry(extension: [custom_extension], name_extension: [other_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the specified validator for an echoed resource whose extension value was changed' do
+      request_bundle = bundle_with(patient_entry(extension: [custom_extension]))
+      response_bundle = bundle_with(claim_response_entry,
+                                    patient_entry(extension: [custom_extension.merge(valueString: 'changed')]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the specified validator for an echoed resource with an extension moved to a different element' do
+      request_bundle = bundle_with(patient_entry(extension: [custom_extension]))
+      response_bundle = bundle_with(claim_response_entry, patient_entry(name_extension: [custom_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the default validator for an echoed resource whose repeating elements were reordered' do
+      names = [{ family: 'First', extension: [custom_extension] }, { family: 'Second' }]
+      request_bundle = bundle_with({ fullUrl: 'urn:uuid:patient',
+                                     resource: { resourceType: 'Patient', id: 'patient', name: names } })
+      response_bundle = bundle_with(claim_response_entry,
+                                    { fullUrl: 'urn:uuid:patient',
+                                      resource: { resourceType: 'Patient', id: 'patient', name: names.reverse } })
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:default])
+    end
+
+    it 'ignores reference values within echoed extensions' do
+      reference_extension = { url: 'http://example.org/fhir/StructureDefinition/custom-reference',
+                              valueReference: { reference: 'Practitioner/example', display: 'Example' } }
+      rewritten_extension = reference_extension.deep_merge(valueReference: { reference: 'urn:uuid:practitioner' })
+      request_bundle = bundle_with(patient_entry(extension: [reference_extension]))
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [rewritten_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:default])
+    end
+
+    it 'uses the specified validator for an echoed extension whose non-reference content changed' do
+      reference_extension = { url: 'http://example.org/fhir/StructureDefinition/custom-reference',
+                              valueReference: { reference: 'Practitioner/example', display: 'Example' } }
+      changed_extension = reference_extension.deep_merge(valueReference: { display: 'Changed' })
+      request_bundle = bundle_with(patient_entry(extension: [reference_extension]))
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [changed_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the specified validator for a resource not in the request' do
+      request_bundle = bundle_with(
+        { fullUrl: 'urn:uuid:other-patient',
+          resource: { resourceType: 'Patient', id: 'other-patient', extension: [custom_extension] } }
+      )
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the specified validator for every resource when no request Bundle is given' do
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+
+      validate(response_bundle, nil)
+
+      expect(test_instance).to_not have_received(:resource_is_valid?).with(hash_including(validator: :default))
+    end
+
+    it 'uses the default validator for every resource when the default validator is specified' do
+      request_bundle = bundle_with(patient_entry)
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+
+      test_instance.perform_bundle_validation(response_bundle, 'submit', 'response', 'v2.2.1',
+                                              echoed_from: request_bundle)
+
+      expect(test_instance).to_not have_received(:resource_is_valid?)
+        .with(hash_including(validator: :no_custom_extensions))
+    end
+  end
+
   describe 'US Core profile fallback' do
     let(:test_instance) do
       Class.new do
