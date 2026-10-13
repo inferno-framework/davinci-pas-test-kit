@@ -530,10 +530,12 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       } }
     end
 
-    def patient_entry(extension: [], name_extension: [])
+    def patient_entry(extension: [], name_extension: [], birth_date_extension: [], given_extension: [])
       { fullUrl: 'urn:uuid:patient', resource: {
         resourceType: 'Patient', id: 'patient', extension:,
-        name: [{ family: 'Example', extension: name_extension }]
+        name: [{ family: 'Example', extension: name_extension,
+                 given: %w[First Middle], _given: [nil, { extension: given_extension }] }],
+        birthDate: '2000-01-01', _birthDate: { extension: birth_date_extension }
       } }
     end
 
@@ -608,6 +610,27 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       validate(response_bundle, request_bundle)
 
       expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the specified validator for an echoed resource with a primitive extension not in the request' do
+      request_bundle = bundle_with(patient_entry)
+      response_bundle = bundle_with(claim_response_entry, patient_entry(birth_date_extension: [custom_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+    end
+
+    it 'uses the default validator for an echoed resource with the primitive extensions it had in the request' do
+      request_bundle = bundle_with(patient_entry(birth_date_extension: [custom_extension],
+                                                 given_extension: [other_extension]))
+      response_bundle = bundle_with(claim_response_entry,
+                                    patient_entry(birth_date_extension: [custom_extension],
+                                                  given_extension: [other_extension]))
+
+      validate(response_bundle, request_bundle)
+
+      expect(validators_used_for('Patient')).to eq([:default])
     end
 
     it 'uses the default validator for an echoed resource whose repeating elements were reordered' do
@@ -721,6 +744,21 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         expect(messages).to include(a_string_starting_with('Patient.name[0].extension[0]: '))
         expect(messages).to_not include(a_string_starting_with('Patient.extension['))
+        expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+      end
+
+      it 'reports only the primitive extensions that were not echoed' do
+        request_bundle = bundle_with(patient_entry(birth_date_extension: [custom_extension]))
+        response_bundle = bundle_with(claim_response_entry,
+                                      patient_entry(birth_date_extension: [custom_extension],
+                                                    given_extension: [custom_extension]))
+        stub_patient_issues(unknown_extension_issue('Patient.birthDate.extension[0]', custom_extension[:url]),
+                            unknown_extension_issue('Patient.name[0].given[1].extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include(a_string_starting_with('Patient.name[0].given[1].extension[0]: '))
+        expect(messages).to_not include(a_string_starting_with('Patient.birthDate.extension[0]: '))
         expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
       end
 

@@ -114,8 +114,8 @@ module DaVinciPASTestKit
       request_entry = echoed_request_entry(full_url, resource)
       return [profile_validator, []] if request_entry.blank?
 
-      echoed_extensions = extensions_in(request_entry.resource.to_hash)
-      all_echoed = extensions_in(resource.to_hash).all? { |extension| echoed_extensions.include?(extension) }
+      echoed_extensions = extensions_in(validated_hash(request_entry.resource))
+      all_echoed = extensions_in(validated_hash(resource)).all? { |extension| echoed_extensions.include?(extension) }
       [all_echoed ? :default : profile_validator, echoed_extensions]
     end
 
@@ -124,6 +124,14 @@ module DaVinciPASTestKit
 
       response_entry = FHIR::Bundle::Entry.new(fullUrl: full_url, resource:)
       @echoed_from_bundle.entry.find { |entry| echoed_resource?(entry, response_entry) }
+    end
+
+    # The resource as the validator receives it (Inferno sends its source_contents), as a hash. Unlike
+    # to_hash, this keeps the extensions on primitive elements (e.g., `_birthDate`).
+    def validated_hash(resource)
+      JSON.parse(resource.source_contents)
+    rescue StandardError
+      resource.to_hash
     end
 
     # An extension is echoed if it appears, with the same content and at the same element path, in the
@@ -174,6 +182,8 @@ module DaVinciPASTestKit
     end
 
     # Resolves a validator issue location such as `Patient.name[0].extension[1]` against the resource.
+    # Extensions on primitive elements are located by the element's name (e.g.,
+    # `Patient.birthDate.extension[0]`) but held in its `_` sibling (e.g., `_birthDate`) in JSON.
     # @return [Array(String, Hash), nil] the extension's index-free element path (as in extensions_in)
     #   and the extension, or nil if the location isn't an extension in the resource.
     def extension_at_location(resource_hash, location)
@@ -182,6 +192,7 @@ module DaVinciPASTestKit
         name, index = segment.match(/\A(\w+)(?:\[(\d+)\])?\z/)&.captures
         return nil if name.nil? || !value.is_a?(Hash)
 
+        name = "_#{name}" if primitive_element?(value, name)
         value = value[name]
         value = value[index.to_i] if index.present? && value.is_a?(Array)
         name
@@ -189,6 +200,12 @@ module DaVinciPASTestKit
       return unless %w[extension modifierExtension].include?(names.last) && value.is_a?(Hash)
 
       [names.join('.'), value]
+    end
+
+    # True if the element is a primitive (or repeating primitive) with a `_` sibling holding its
+    # extensions, in the JSON object `parent`.
+    def primitive_element?(parent, name)
+      parent.key?("_#{name}") && Array.wrap(parent[name]).none?(Hash)
     end
 
     def parse_bundle(bundle)
@@ -584,7 +601,7 @@ module DaVinciPASTestKit
                          validator_response_details: response_details)
       issues = response_details.reject(&:filtered)
       if echoed_extensions.present?
-        resource_hash = resource.to_hash
+        resource_hash = validated_hash(resource)
         issues = issues.reject { |issue| echoed_extension_issue?(issue, resource_hash, echoed_extensions) }
       end
       validator_issues_to_messages(issues)
