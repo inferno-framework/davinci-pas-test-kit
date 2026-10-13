@@ -51,15 +51,51 @@ RSpec.describe DaVinciPASTestKit::ClaimEndpoint, :request do
   end
 
   describe DaVinciPASTestKit::MockUdapSmartServer::TokenEndpoint do
-    it 'returns a 401 response with an OAuth-style JSON error body' do
-      post "/custom/davinci_pas_client_suite_v201#{UDAPSecurityTestKit::TOKEN_PATH}"
+    let(:token_path) { "/custom/davinci_pas_client_suite_v201#{UDAPSecurityTestKit::TOKEN_PATH}" }
 
+    def expect_invalid_client_response
       expect(last_response.status).to eq(401)
       expect(last_response.headers['Content-Type']).to include('application/json')
 
       body = JSON.parse(last_response.body)
       expect(body['error']).to eq('invalid_client')
       expect(body['error_description']).to include('Unable to find test run')
+    end
+
+    it 'returns a 401 response with an OAuth-style JSON error body' do
+      post token_path
+
+      expect_invalid_client_response
+    end
+
+    it 'returns a 401 response when the client assertion is not a valid JWT' do
+      post token_path, { client_assertion: 'not-a-jwt' }
+
+      expect_invalid_client_response
+    end
+
+    it 'returns a 401 response when the client assertion identifies a client with no waiting test run' do
+      client_assertion = JWT.encode({ iss: 'unknown-client-id' }, nil, 'none')
+      post token_path, { client_assertion: }
+
+      expect_invalid_client_response
+    end
+
+    context 'when a test run is waiting for a different client' do
+      include_context 'when testing a runnable'
+
+      let(:suite_id) { 'davinci_pas_client_suite_v201' }
+
+      it "returns a 401 response when the client assertion's iss does not match the waiting client id" do
+        waiting_result = run(DaVinciPASTestKit::DaVinciPASV201::PASClientApprovalSubmitTest,
+                             client_id: 'waiting-client-id')
+        expect(waiting_result.result).to eq('wait')
+
+        client_assertion = JWT.encode({ iss: 'other-client-id' }, nil, 'none')
+        post token_path, { client_assertion: }
+
+        expect_invalid_client_response
+      end
     end
   end
 end

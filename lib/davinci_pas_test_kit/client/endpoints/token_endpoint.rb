@@ -12,6 +12,8 @@ module DaVinciPASTestKit
 
       def test_run_identifier
         UDAPSecurityTestKit::MockUDAPServer.client_id_from_client_assertion(request.params[:client_assertion])
+      rescue JWT::DecodeError
+        nil
       end
 
       def test_run_identifier_location_description

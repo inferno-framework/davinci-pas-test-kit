@@ -1,4 +1,5 @@
 require_relative '../../cross_suite/tags'
+require_relative 'endpoint_constants'
 require_relative '../jobs/send_subscription_handshake'
 require 'subscriptions_test_kit'
 
@@ -9,7 +10,7 @@ module DaVinciPASTestKit
     error_response_format :operation_outcome
 
     def test_run_identifier_location_description
-      'the path or embedded within the bearer token in the Authorization header'
+      SESSION_PATH_OR_BEARER_TOKEN_LOCATION_DESCRIPTION
     end
 
     def test_run_identifier
