@@ -295,7 +295,7 @@ module DaVinciPASTestKit
     def profile_url_for_validation(url, base_profile, version)
       url = url.to_s
       return url if url.include?('|') || profile_url_without_version(url) == base_profile
-      return "#{url}|#{US_CORE_VERSION}" if us_core_profile_url?(url)
+      return "#{url}|#{us_core_version}" if us_core_profile_url?(url)
 
       "#{url}|#{version}"
     end
@@ -334,6 +334,12 @@ module DaVinciPASTestKit
       version.to_s.delete_prefix('v').match?(/\A2\.2(\.|\z)/)
     end
 
+    # The US Core version whose profiles the fallback validates against: the session's
+    # US Core Version suite option when the suite offers it, otherwise 6.1.0.
+    def us_core_version
+      suite_options[:us_core_version].presence || PASConstants::DEFAULT_US_CORE_VERSION
+    end
+
     def us_core_profile_urls_for_resource(resource)
       profile_ids =
         case resource.resourceType
@@ -347,10 +353,13 @@ module DaVinciPASTestKit
           Array(US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE[resource.resourceType])
         end
 
-      us_core_profile_urls(profile_ids)
+      us_core_profile_urls(profile_ids.select { |profile_id| us_core_profile_available?(profile_id) })
     end
 
     def us_core_condition_profile_ids(resource)
+      # US Core 3.1.1 has a single Condition profile; later versions split it by category.
+      return [US_CORE_CONDITION_PROFILE_ID] if us_core_version == PASConstants::US_CORE_VERSION_3_1_1
+
       if category_code_present?(resource, 'encounter-diagnosis', system: TERMINOLOGY_CONDITION_CATEGORY_SYSTEM)
         [US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID]
       else
@@ -367,8 +376,9 @@ module DaVinciPASTestKit
     end
 
     def us_core_observation_profile_ids(resource)
-      code_profile_id = US_CORE_OBSERVATION_CODE_PROFILE_IDS.find do |code, _profile_id|
-        codeable_concept_has_code?(resource.code, code, system: LOINC_SYSTEM)
+      code_profile_id = US_CORE_OBSERVATION_CODE_PROFILE_IDS.find do |code, profile_id|
+        us_core_profile_available?(profile_id) &&
+          codeable_concept_has_code?(resource.code, code, system: LOINC_SYSTEM)
       end&.last
       return [code_profile_id] if code_profile_id.present?
 
@@ -391,7 +401,13 @@ module DaVinciPASTestKit
     end
 
     def us_core_profile_urls(profile_ids)
-      Array(profile_ids).map { |profile_id| "#{US_CORE_PROFILE_BASE}/#{profile_id}|#{US_CORE_VERSION}" }
+      Array(profile_ids).map { |profile_id| "#{US_CORE_PROFILE_BASE}/#{profile_id}|#{us_core_version}" }
+    end
+
+    # Whether the selected US Core version defines the profile.
+    def us_core_profile_available?(profile_id)
+      added_in = US_CORE_PROFILE_IDS_ADDED_IN_VERSION.find { |_, profile_ids| profile_ids.include?(profile_id) }&.first
+      added_in.nil? || Gem::Version.new(us_core_version) >= Gem::Version.new(added_in)
     end
 
     def profile_url_without_version(url)
@@ -724,10 +740,9 @@ module DaVinciPASTestKit
     end
 
     ###########################################################################
-    # US Core Version Constants
+    # US Core Profile Constants
     ###########################################################################
 
-    US_CORE_VERSION = '6.1.0'
     US_CORE_PROFILE_BASE = 'http://hl7.org/fhir/us/core/StructureDefinition'
     BASE_R4_PROFILE = :base_r4
     CLAIM_ENCOUNTER_EXTENSION_URL = 'http://hl7.org/fhir/5.0/StructureDefinition/extension-Claim.encounter'
@@ -762,6 +777,7 @@ module DaVinciPASTestKit
       'Specimen' => 'us-core-specimen'
     }.freeze
 
+    US_CORE_CONDITION_PROFILE_ID = 'us-core-condition'
     US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID = 'us-core-condition-encounter-diagnosis'
     US_CORE_CONDITION_PROBLEMS_HEALTH_CONCERNS_PROFILE_ID = 'us-core-condition-problems-health-concerns'
     US_CORE_DIAGNOSTIC_REPORT_LAB_PROFILE_ID = 'us-core-diagnosticreport-lab'
@@ -778,10 +794,13 @@ module DaVinciPASTestKit
       '86645-9' => 'us-core-observation-pregnancyintent',
       '82810-3' => 'us-core-observation-pregnancystatus',
       '76690-7' => 'us-core-observation-sexual-orientation',
+      '95541-9' => 'us-core-care-experience-preference',
+      '75773-2' => 'us-core-treatment-intervention-preference',
       '8289-1' => 'head-occipital-frontal-circumference-percentile',
       '59576-9' => 'pediatric-bmi-for-age',
       '77606-2' => 'pediatric-weight-for-height',
       '85354-9' => 'us-core-blood-pressure',
+      '96607-7' => 'us-core-average-blood-pressure',
       '39156-5' => 'us-core-bmi',
       '8302-2' => 'us-core-body-height',
       '8310-5' => 'us-core-body-temperature',
@@ -792,6 +811,42 @@ module DaVinciPASTestKit
       '2708-6' => 'us-core-pulse-oximetry',
       '9279-1' => 'us-core-respiratory-rate',
       '72166-2' => 'us-core-smokingstatus'
+    }.freeze
+
+    # Fallback profiles that US Core 3.1.1 does not define, keyed by the earliest supported
+    # version that does. Profiles not listed here exist in every supported version.
+    US_CORE_PROFILE_IDS_ADDED_IN_VERSION = {
+      PASConstants::US_CORE_VERSION_6_1_0 => [
+        'us-core-blood-pressure',
+        'us-core-bmi',
+        'us-core-body-height',
+        'us-core-body-temperature',
+        'us-core-body-weight',
+        'us-core-condition-encounter-diagnosis',
+        'us-core-condition-problems-health-concerns',
+        'us-core-coverage',
+        'us-core-head-circumference',
+        'us-core-heart-rate',
+        'us-core-medicationdispense',
+        'us-core-observation-clinical-result',
+        'us-core-observation-occupation',
+        'us-core-observation-pregnancyintent',
+        'us-core-observation-pregnancystatus',
+        'us-core-observation-screening-assessment',
+        'us-core-observation-sexual-orientation',
+        'us-core-questionnaireresponse',
+        'us-core-relatedperson',
+        'us-core-respiratory-rate',
+        'us-core-servicerequest',
+        'us-core-simple-observation',
+        'us-core-specimen',
+        'us-core-vital-signs'
+      ],
+      PASConstants::US_CORE_VERSION_7_0_0 => [
+        'us-core-average-blood-pressure',
+        'us-core-care-experience-preference',
+        'us-core-treatment-intervention-preference'
+      ]
     }.freeze
   end
 end

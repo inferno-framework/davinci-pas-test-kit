@@ -3,6 +3,7 @@ require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
 require_relative '../../cross_suite/validator_suppressions'
 require_relative '../../cross_suite/tags'
+require_relative '../../cross_suite/pas_constants'
 require_relative '../endpoints/claim_endpoint'
 require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
@@ -105,6 +106,26 @@ module DaVinciPASTestKit
                      {
                        label: 'Other Authentication',
                        value: PASClientOptions::OTHER_AUTH
+                     }
+                   ]
+
+      # Inferno selects the first listed option by default.
+      suite_option :us_core_version,
+                   title: 'US Core Version',
+                   description: 'The US Core version whose profiles are used to validate supporting ' \
+                                'information resources that have no PAS profile.',
+                   list_options: [
+                     {
+                       label: 'US Core 3.1.1',
+                       value: PASConstants::US_CORE_VERSION_3_1_1
+                     },
+                     {
+                       label: 'US Core 6.1.0',
+                       value: PASConstants::US_CORE_VERSION_6_1_0
+                     },
+                     {
+                       label: 'US Core 7.0.0',
+                       value: PASConstants::US_CORE_VERSION_7_0_0
                      }
                    ]
 
