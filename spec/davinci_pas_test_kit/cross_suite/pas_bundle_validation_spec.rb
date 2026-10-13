@@ -647,6 +647,34 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
     end
 
+    it 'handles resource types without an identifier element' do
+      binary = lambda do |id|
+        { fullUrl: "urn:uuid:#{id}", resource: { resourceType: 'Binary', id:, contentType: 'text/plain' } }
+      end
+      request_bundle = bundle_with(binary.call('request-binary'))
+      response_bundle = bundle_with(claim_response_entry, binary.call('response-binary'))
+
+      expect { validate(response_bundle, request_bundle) }.to_not raise_error
+      expect(validators_used_for('Binary')).to eq([:no_custom_extensions])
+    end
+
+    it 'determines the validator for a resource once, however many profiles it is validated against' do
+      request_bundle = bundle_with(patient_entry(extension: [custom_extension]))
+      response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+      allow(test_instance).to receive(:profile_validator_for_entry).and_call_original
+      allow(test_instance).to receive(:us_core_profile_urls_for_resource)
+        .and_return(['http://example.org/profile-a', 'http://example.org/profile-b'])
+      allow(test_instance).to receive(:resource_is_valid?) do |**args|
+        args[:resource].resourceType != 'Patient'
+      end
+
+      validate(response_bundle, request_bundle)
+
+      expect(test_instance).to have_received(:profile_validator_for_entry)
+        .with('urn:uuid:patient', an_instance_of(FHIR::Patient)).once
+      expect(validators_used_for('Patient')).to eq([:default])
+    end
+
     it 'uses the specified validator for a resource not in the request' do
       request_bundle = bundle_with(
         { fullUrl: 'urn:uuid:other-patient',

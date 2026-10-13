@@ -282,7 +282,8 @@ module DaVinciPASTestKit
       # do not have all matching identifiers. Blank fields do not identify echoed resources.
       (request_entry.fullUrl.present? && request_entry.fullUrl == response_entry.fullUrl) ||
         (request_resource.id.present? && request_resource.id == response_resource.id) ||
-        (request_resource.identifier.present? && request_resource.identifier == response_resource.identifier)
+        (identifiers_of(request_resource).present? &&
+          identifiers_of(request_resource) == identifiers_of(response_resource))
     end
 
     def echoed_resource_identifiers_match?(request_entry, response_entry)
@@ -291,7 +292,12 @@ module DaVinciPASTestKit
 
       request_entry.fullUrl == response_entry.fullUrl &&
         request_resource.id == response_resource.id &&
-        request_resource.identifier == response_resource.identifier
+        identifiers_of(request_resource) == identifiers_of(response_resource)
+    end
+
+    # Nil for resource types without an identifier element (e.g., Binary, Parameters).
+    def identifiers_of(resource)
+      resource.identifier if resource.respond_to?(:identifier)
     end
 
     ###########################################################################
@@ -366,6 +372,7 @@ module DaVinciPASTestKit
       bundle_resources_target_profile_map.each do |key, item|
         resource = item[:resource]
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
+        validator = profile_validator_for_entry(key, resource) unless key == 'bundle'
         messages_by_profile = {}
 
         success_profile = item[:profile_urls].find do |url|
@@ -373,10 +380,10 @@ module DaVinciPASTestKit
             if key == 'bundle'
               collect_bundle_profile_messages(resource, profile_url_for_validation(url, base_profile, version))
             elsif url == BASE_R4_PROFILE
-              collect_resource_profile_messages(resource, validator: profile_validator_for_entry(key, resource))
+              collect_resource_profile_messages(resource, validator:)
             else
               collect_resource_profile_messages(resource, profile_url_for_validation(url, base_profile, version),
-                                                validator: profile_validator_for_entry(key, resource)) +
+                                                validator:) +
                 datatype_constraint_messages(resource, profile_url_without_version(url), version)
             end
           messages_by_profile[url] = profile_messages
