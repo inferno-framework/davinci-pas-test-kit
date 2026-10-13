@@ -33,6 +33,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientInquireResponseBundle
         instance.validation_messages << { type: 'error', message: 'Stubbed non-conformance error' }
       end
     end
+    # Likewise for the Parameters wrapper, which is checked separately for custom extensions.
+    allow_any_instance_of(test).to receive(:perform_no_custom_extensions_parameters_validation).and_return([])
   end
 
   def create_inquire_response(body, tags_list)
@@ -84,6 +86,19 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientInquireResponseBundle
     result = run_test(parameters_json)
 
     expect(result.result).to eq('pass')
+  end
+
+  it 'skips when the Parameters wrapper is not conformant, labeling the response' do
+    parameters_error = { type: 'error', message: 'Parameters.extension[0]: The extension is not allowed here' }
+    allow_any_instance_of(test).to receive(:perform_no_custom_extensions_parameters_validation)
+      .with(an_instance_of(FHIR::Parameters)).and_return([parameters_error])
+
+    result = run_test(parameters_json(valid_bundle))
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('Response 1')
+    expect(entity_result_messages(test).map(&:message))
+      .to include("Response 1: #{parameters_error[:message]}")
   end
 
   it 'skips and labels the failing Bundle when one of several is not conformant' do

@@ -125,6 +125,7 @@ module DaVinciPASTestKit
       # placeholders for positions that held something other than a Bundle (already reported),
       # so Bundle labels keep their original position.
       bundles = bundles_from_message_resource(message_resource, message_label)
+      parameters_has_errors?(message_resource, message_label) if response_parameters?(message_resource)
       echoed_from = echo_source_bundle(request)
 
       if bundles.length > 1
@@ -206,6 +207,21 @@ module DaVinciPASTestKit
       request_resource if request_resource.is_a?(FHIR::Bundle)
     rescue StandardError
       nil
+    end
+
+    # A Parameters wrapper Inferno sends around the response Bundles (v2.2.1 $inquire), which may be
+    # tester-provided, so it is checked for custom extensions too.
+    def response_parameters?(message_resource)
+      message_direction_name == 'response' && message_resource.is_a?(FHIR::Parameters)
+    end
+
+    def parameters_has_errors?(parameters, label)
+      parameters_messages = perform_no_custom_extensions_parameters_validation(parameters)
+      parameters_messages.each { |m| messages << { type: m[:type], message: "#{label} #{m[:message]}" } }
+      parameters_messages.any? { |m| m[:type] == 'error' }
+    rescue NoMethodError, TypeError, ArgumentError => e
+      messages << { type: 'error', message: "#{label} Parameters could not be validated: #{e.message}" }
+      true
     end
 
     def bundle_has_errors?(bundle, label, echoed_from = nil)

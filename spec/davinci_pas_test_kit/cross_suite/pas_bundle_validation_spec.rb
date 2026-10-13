@@ -661,7 +661,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
     it 'determines the validator for a resource once, however many profiles it is validated against' do
       request_bundle = bundle_with(patient_entry(extension: [custom_extension]))
       response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
-      allow(test_instance).to receive(:profile_validator_for_entry).and_call_original
+      allow(test_instance).to receive(:entry_validation_settings).and_call_original
       allow(test_instance).to receive(:us_core_profile_urls_for_resource)
         .and_return(['http://example.org/profile-a', 'http://example.org/profile-b'])
       allow(test_instance).to receive(:resource_is_valid?) do |**args|
@@ -670,9 +670,78 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       validate(response_bundle, request_bundle)
 
-      expect(test_instance).to have_received(:profile_validator_for_entry)
+      expect(test_instance).to have_received(:entry_validation_settings)
         .with('urn:uuid:patient', an_instance_of(FHIR::Patient)).once
       expect(validators_used_for('Patient')).to eq([:default])
+    end
+
+    describe 'when an echoed resource adds extensions' do
+      def unknown_extension_issue(location, url)
+        Inferno::DSL::FHIRResourceValidation::ValidatorIssue.new(
+          raw_issue: { 'location' => location, 'level' => 'ERROR',
+                       'message' => "The extension #{url} could not be found so is not allowed here" },
+          target: {},
+          filtered: false
+        )
+      end
+
+      def other_issue(location)
+        Inferno::DSL::FHIRResourceValidation::ValidatorIssue.new(
+          raw_issue: { 'location' => location, 'level' => 'ERROR', 'message' => 'some other problem' },
+          target: {},
+          filtered: false
+        )
+      end
+
+      # Reports the given issues for the Patient, as the strict validator would.
+      def stub_patient_issues(*issues)
+        allow(test_instance).to receive(:resource_is_valid?) do |**args|
+          next true unless args[:resource].resourceType == 'Patient'
+
+          args[:validator_response_details]&.concat(issues)
+          false
+        end
+      end
+
+      let(:request_bundle) do
+        bundle_with(patient_entry(extension: [other_extension, custom_extension]))
+      end
+      let(:response_bundle) do
+        bundle_with(claim_response_entry,
+                    patient_entry(extension: [custom_extension, other_extension],
+                                  name_extension: [custom_extension]))
+      end
+
+      it 'reports only the extensions that were not echoed' do
+        stub_patient_issues(unknown_extension_issue('Patient.extension[0]', custom_extension[:url]),
+                            unknown_extension_issue('Patient.extension[1]', other_extension[:url]),
+                            unknown_extension_issue('Patient.name[0].extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include(a_string_starting_with('Patient.name[0].extension[0]: '))
+        expect(messages).to_not include(a_string_starting_with('Patient.extension['))
+        expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
+      end
+
+      it 'keeps issues at echoed extensions that are not about the extension itself' do
+        stub_patient_issues(other_issue('Patient.extension[0]'),
+                            unknown_extension_issue('Patient.name[0].extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include('Patient.extension[0]: some other problem')
+      end
+
+      it 'keeps issues whose location is not an extension in the resource' do
+        stub_patient_issues(unknown_extension_issue('Patient.extension[5]', custom_extension[:url]),
+                            unknown_extension_issue('Patient.name[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include(a_string_starting_with('Patient.extension[5]: '),
+                                    a_string_starting_with('Patient.name[0]: '))
+      end
     end
 
     it 'uses the specified validator for a resource not in the request' do
@@ -704,6 +773,58 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       expect(test_instance).to_not have_received(:resource_is_valid?)
         .with(hash_including(validator: :no_custom_extensions))
+    end
+  end
+
+  describe '#perform_no_custom_extensions_parameters_validation' do
+    let(:test_instance) do
+      Class.new do
+        include DaVinciPASTestKit::PasBundleValidation
+
+        def resource_is_valid?(**)
+          true
+        end
+      end.new
+    end
+    let(:parameters) do
+      FHIR::Parameters.new(parameter: [{ name: 'return', resource: FHIR::Bundle.new(type: 'collection') }])
+    end
+
+    def issue(location, message)
+      Inferno::DSL::FHIRResourceValidation::ValidatorIssue.new(
+        raw_issue: { 'location' => location, 'level' => 'ERROR', 'message' => message },
+        target: {},
+        filtered: false
+      )
+    end
+
+    it 'validates against the base Parameters definition with the no custom extensions validator' do
+      allow(test_instance).to receive(:resource_is_valid?).and_call_original
+
+      test_instance.perform_no_custom_extensions_parameters_validation(parameters)
+
+      expect(test_instance).to have_received(:resource_is_valid?)
+        .with(hash_including(resource: parameters, validator: :no_custom_extensions)).once
+      expect(test_instance).to_not have_received(:resource_is_valid?).with(hash_including(:profile_url))
+    end
+
+    it 'reports issues with the wrapper but not within the wrapped resources' do
+      allow(test_instance).to receive(:resource_is_valid?) do |**args|
+        args[:validator_response_details].push(
+          issue('Parameters.extension[0]', 'wrapper extension not allowed'),
+          issue('Parameters.parameter[0].extension[0]', 'parameter extension not allowed'),
+          issue('Parameters.parameter[0].resource.entry[0]', 'wrapped Bundle issue'),
+          issue('Parameters.parameter[1].part[0].resource', 'wrapped part resource issue')
+        )
+        false
+      end
+
+      messages = test_instance.perform_no_custom_extensions_parameters_validation(parameters)
+
+      expect(messages).to contain_exactly(
+        { type: 'error', message: 'Parameters.extension[0]: wrapper extension not allowed' },
+        { type: 'error', message: 'Parameters.parameter[0].extension[0]: parameter extension not allowed' }
+      )
     end
   end
 

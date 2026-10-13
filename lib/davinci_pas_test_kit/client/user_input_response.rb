@@ -1,3 +1,5 @@
+require_relative '../cross_suite/response_selection_utils'
+
 module DaVinciPASTestKit
   module UserInputResponse
     # Raised when a tester-provided response input is present but cannot be used. The
@@ -25,9 +27,9 @@ module DaVinciPASTestKit
 
     # Returns the tester-provided response candidates for the must support workflow
     # as a list of parsed JSON hashes. The input value may be a single entry or a
-    # JSON array of entries, where each entry is either a bare FHIR Bundle or a
-    # wrapper object holding the response Bundle under "bundle" alongside optional
-    # selection "criteria".
+    # JSON array of entries, where each entry is either a bare FHIR Bundle or Parameters
+    # or a wrapper object holding the response resource under "bundle" alongside optional
+    # selection "criteria" - see ResponseSelectionUtils.
     # Returns nil if the input has no value and raises InvalidInputError if the value
     # is present but unusable. The configurable (the waiting test) supplies the input
     # title so that the error names the input as the tester sees it.
@@ -41,8 +43,8 @@ module DaVinciPASTestKit
       invalid_index = candidates.index { |candidate| !valid_candidate?(candidate) }
       if invalid_index.present?
         raise InvalidInputError,
-              "Entry #{invalid_index + 1} of the '#{input_title(configurable, input_name)}' input is neither " \
-              'a FHIR Bundle nor a wrapper object with a FHIR Bundle in the "bundle" key.'
+              "Entry #{invalid_index + 1} of the '#{input_title(configurable, input_name)}' input is not " \
+              'a FHIR Bundle or Parameters resource, or a wrapper object with one in the "bundle" key.'
       end
 
       candidates
@@ -59,7 +61,8 @@ module DaVinciPASTestKit
     def self.valid_candidate?(candidate)
       return false unless candidate.is_a?(Hash)
 
-      candidate['resourceType'] == 'Bundle' || candidate['bundle'].is_a?(Hash)
+      ResponseSelectionUtils::RESPONSE_RESOURCE_TYPES.include?(candidate['resourceType']) ||
+        candidate[ResponseSelectionUtils::BUNDLE_KEY].is_a?(Hash)
     end
 
     def user_inputted_response?(input_key)

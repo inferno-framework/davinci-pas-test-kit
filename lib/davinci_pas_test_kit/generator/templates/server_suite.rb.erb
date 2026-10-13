@@ -84,7 +84,7 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs <%= validator_igs_expression %>
+        igs(*<%= validator_igs_constant %>)
         
         exclude_message do |message|
           <%= suppressed_messages_constant %>.match?(message.message.sub(VALIDATOR_MESSAGE_LOCATION_PREFIX, ''))

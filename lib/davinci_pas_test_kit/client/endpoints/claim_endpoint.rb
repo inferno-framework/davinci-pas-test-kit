@@ -224,7 +224,7 @@ module DaVinciPASTestKit
         "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
         "for #{operation_url_suffix} request ##{request_number}."
       )
-      entity_bundle(candidates[selected_index])
+      entity_response(candidates[selected_index])
     rescue UserInputResponse::InvalidInputError, FhirpathUtils::FhirpathServiceError => e
       add_result_warning(
         'Unable to select a tester-provided response, so Inferno will generate a default response: ' \

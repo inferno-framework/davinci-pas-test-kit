@@ -110,10 +110,15 @@ Each entry uses the following format:
 
 ```
 
+The `bundle` key holds the response resource. This is normally a Bundle, but it may also be a
+Parameters resource wrapping the response Bundles, such as for v2.2.1 `$inquire` responses. When
+a Bundle is provided for a v2.2.1 `$inquire` response, Inferno wraps it in a Parameters resource.
+An entry may also be a bare Bundle or Parameters resource with no criteria.
+
 #### Response Option Evaluation
 
-For each request, Inferno will respond with the Bundle of the first entry whose criteria are all met.
-An entry with no criteria (including a bare Bundle) matches any request, and an entry with multiple
+For each request, Inferno will respond with the response resource of the first entry whose criteria
+are all met. An entry with no criteria (including a bare Bundle or Parameters) matches any request, and an entry with multiple
 criteria must meet all of them. If no entry matches, or none are provided, Inferno will generate a
 default response. Supported fields within the "criteria" object include:
 

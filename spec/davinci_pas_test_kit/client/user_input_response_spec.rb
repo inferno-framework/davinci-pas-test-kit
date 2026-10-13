@@ -68,7 +68,22 @@ RSpec.describe DaVinciPASTestKit::UserInputResponse do
 
       expect { described_class.response_candidates(configurable, 'submit', result) }
         .to raise_error(described_class::InvalidInputError,
-                        /Entry 1 .*neither a FHIR Bundle nor a wrapper object with a FHIR Bundle in the "bundle" key\./)
+                        /Entry 1 .*not a FHIR Bundle or Parameters resource, or a wrapper object with one/)
+    end
+
+    it 'accepts bare Parameters entries and wrappers holding Parameters' do
+      parameters = { 'resourceType' => 'Parameters', 'parameter' => [{ 'name' => 'return', 'resource' => bundle_a }] }
+      wrapped = { 'criteria' => { 'requestRange' => '2' }, 'bundle' => parameters }
+      result = result_with_input('ms_inquire_responses', [parameters, wrapped].to_json)
+
+      expect(described_class.response_candidates(configurable, 'inquire', result)).to eq([parameters, wrapped])
+    end
+
+    it 'raises an InvalidInputError for a bare resource that is neither a Bundle nor Parameters' do
+      result = result_with_input('ms_submit_responses', [{ 'resourceType' => 'Patient' }].to_json)
+
+      expect { described_class.response_candidates(configurable, 'submit', result) }
+        .to raise_error(described_class::InvalidInputError, /Entry 1 /)
     end
 
     it 'falls back to the input name when the configurable does not define a title' do

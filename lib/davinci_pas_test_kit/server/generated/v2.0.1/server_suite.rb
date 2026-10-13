@@ -86,7 +86,7 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs "hl7.fhir.us.davinci-pas#2.0.1"
+        igs(*V201_VALIDATOR_IGS)
         
         exclude_message do |message|
           V201_SUPPRESSED_MESSAGES.match?(message.message.sub(VALIDATOR_MESSAGE_LOCATION_PREFIX, ''))
