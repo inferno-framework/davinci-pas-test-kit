@@ -24,11 +24,14 @@ module DaVinciPASTestKit
         - Only requests for the Subscription created during the most recent
           run of the "Subscription Setup" group in this session will
           be accepted.
+        - Once the Subscription has been deleted, Inferno will respond to
+          further update and read requests for it with a `404 Not Found`
+          until this group is re-run.
         - If this group is re-run, Inferno will forget about the previous
-          update and delete interactions sent by the PAS client.
-          The PAS client can interact with the Subscription as it was after
-          it was created. If the PAS client cannot reactivate
-          the deleted Subscription and make updates to it again, re-run
+          update and delete interactions sent by the PAS client, including
+          deletion. The PAS client can interact with the Subscription as it
+          was after it was created. If the PAS client cannot resume
+          interacting with a Subscription that it has deleted, re-run
           the *Subscription Setup* group to create a new Subscription.
       )
       run_as_group

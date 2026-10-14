@@ -109,6 +109,22 @@ RSpec.describe DaVinciPASTestKit::SubscriptionStatusEndpoint, :request do
     expect(reported_status).to eq('active')
   end
 
+  it 'reflects update and delete requests sent to the PAS Subscription endpoints' do
+    put "#{subscription_url}/#{subscription_id}", subscription_json.merge('status' => 'off').to_json,
+        'CONTENT_TYPE' => 'application/fhir+json'
+    expect(last_response.status).to eq(200)
+
+    get instance_status_url
+    expect(last_response.status).to eq(200)
+    expect(reported_status).to eq('off')
+
+    delete "#{subscription_url}/#{subscription_id}"
+    expect(last_response.status).to eq(204)
+
+    get instance_status_url
+    expect(last_response.status).to eq(404)
+  end
+
   it 'matches resource-level status parameters against the updated status' do
     create_update_request(status: 200, subscription_status: 'off')
 

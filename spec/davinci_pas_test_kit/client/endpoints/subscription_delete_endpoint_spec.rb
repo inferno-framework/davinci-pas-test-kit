@@ -73,6 +73,15 @@ RSpec.describe DaVinciPASTestKit::SubscriptionDeleteEndpoint, :request do
       expect(last_response.status).to eq(404)
     end
 
+    it 'rejects a later update with a 404 since a deleted Subscription cannot be updated in the same run' do
+      delete session_instance_url
+
+      put session_instance_url, subscription_json.to_json, 'CONTENT_TYPE' => 'application/fhir+json'
+
+      expect(last_response.status).to eq(404)
+      expect(response_resource.issue.first.code).to eq('not-found')
+    end
+
     it 'tags the request as a delete of the Subscription' do
       delete session_instance_url
 
