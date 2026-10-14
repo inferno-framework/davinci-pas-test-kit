@@ -43,8 +43,7 @@ module DaVinciPASTestKit
     config options: { accepts_subscription_changes: true }
 
     run do
-      subscription_request = require_successful_subscription_create_request(skip_message: UPDATE_DELETE_SKIP_MESSAGE)
-      subscription_id = JSON.parse(subscription_request.response_body)['id']
+      subscription_id = require_created_subscription(skip_message: UPDATE_DELETE_SKIP_MESSAGE)['id']
 
       wait_identifier = session_wait_identifier(client_id, session_url_path)
       subscription_endpoint = session_endpoint_url(:subscription, client_id, session_url_path)
@@ -59,7 +58,7 @@ module DaVinciPASTestKit
           Inferno will wait while the tester uses the client system to update and delete the PAS
           Subscription created earlier in these tests. Updated Subscriptions must continue to meet
           [Inferno](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
-          and PAS Subscription requirements, but Inferno will not the updated Subscription to deliver
+          and PAS Subscription requirements, but Inferno will not use the updated Subscription to deliver
           notifications.
 
           [Click here](#{confirmation_url}) when all requests have been submitted.

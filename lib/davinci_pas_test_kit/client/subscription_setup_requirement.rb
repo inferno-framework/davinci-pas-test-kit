@@ -23,28 +23,26 @@ module DaVinciPASTestKit
     ).freeze
 
     # Skips the test unless a successful (201) Subscription-create request was made during this
-    # session, returning that request so a caller that also needs the Subscription itself doesn't
-    # have to look it up again.
+    # session.
     # @param skip_message [String] explanation shown when the test is skipped.
-    # @return [Inferno::Entities::Request] the successful Subscription-create request.
-    def require_successful_subscription_create_request(skip_message: PENDED_SCENARIO_SKIP_MESSAGE)
+    # @return [Hash] the created Subscription as returned to the client, parsed from the response body.
+    def require_created_subscription(skip_message: PENDED_SCENARIO_SKIP_MESSAGE)
       subscription_request = load_tagged_requests(SUBSCRIPTION_CREATE_TAG).find { |req| req.status == 201 }
       skip_if subscription_request.blank?, skip_message
-      subscription_request
+      JSON.parse(subscription_request.response_body)
     end
 
-    # Like require_successful_subscription_create_request, but also skips if the client has successfully
-    # updated or deleted the created Subscription. Notifications are generated from the Subscription as
-    # created, so the pended scenario must not run against one the client has since changed or removed.
+    # Like require_created_subscription, but also skips if the client has successfully updated or
+    # deleted the created Subscription. Notifications are generated from the Subscription as created,
+    # so the pended scenario must not run against one the client has since changed or removed.
     # Rejected update and delete requests leave the Subscription unchanged and so are ignored.
-    # @return [Inferno::Entities::Request] the successful Subscription-create request.
-    def require_unmodified_subscription_create_request
-      subscription_request = require_successful_subscription_create_request
+    # @return [Hash] the created Subscription as returned to the client, parsed from the response body.
+    def require_unmodified_subscription
+      subscription = require_created_subscription
       # Only update and delete requests are tagged with the Subscription id, which is new for each create
-      subscription_id = JSON.parse(subscription_request.response_body)['id']
-      skip_if load_tagged_requests(subscription_id).any? { |req| subscription_change_succeeded?(req) },
+      skip_if load_tagged_requests(subscription['id']).any? { |req| subscription_change_succeeded?(req) },
               PENDED_SCENARIO_MODIFIED_SUBSCRIPTION_SKIP_MESSAGE
-      subscription_request
+      subscription
     end
 
     private

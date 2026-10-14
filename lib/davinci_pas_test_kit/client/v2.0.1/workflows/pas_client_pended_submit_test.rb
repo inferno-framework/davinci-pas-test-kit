@@ -94,7 +94,7 @@ module DaVinciPASTestKit
       inquire_respond_with :inquire_json_response
 
       run do
-        require_unmodified_subscription_create_request
+        require_unmodified_subscription
 
         if user_inputted_response? :pended_json_response
           assert_valid_json pended_json_response,
