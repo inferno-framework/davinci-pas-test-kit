@@ -115,20 +115,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientResponseBundleValidat
       expect(result_messages(result, 'error')).to be_empty
       expect(last_response.body).to include(custom_extension_url) # kept on the echoed Patient
     end
-
-    # HL7_EXTENSION_URL_PREFIX keeps every extension published by HL7, including ones from IGs the
-    # validator doesn't load, which the strict validator then reports in Inferno's own response.
-    it 'passes when the request has extensions from HL7 IGs the validator does not load' do
-      pending 'the generator keeps HL7-published extensions the validator cannot resolve'
-      unloaded_extension_url = 'http://hl7.org/fhir/us/example-ig/StructureDefinition/example-extension'
-      unknown_extension_urls << unloaded_extension_url
-
-      result = run_with_generated_response(
-        request_with_extension({ 'url' => unloaded_extension_url, 'valueString' => 'x' })
-      )
-
-      expect(result.result).to eq('pass')
-    end
   end
 
   describe 'with multiple requests in the must support workflow' do

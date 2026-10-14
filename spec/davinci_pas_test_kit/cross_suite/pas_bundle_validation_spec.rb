@@ -506,6 +506,10 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       Class.new do
         include DaVinciPASTestKit::PasBundleValidation
 
+        def suite_options
+          {}
+        end
+
         def evaluate_fhirpath(**)
           []
         end
@@ -1149,7 +1153,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         test_instance.validate_bundle_entries_against_profiles('2.2.1')
 
         expect(test_instance).to have_received(:resource_is_valid?)
-          .with(resource: coverage, profile_url: url, add_messages_to_runnable: false,
+          .with(resource: coverage, profile_url: url, add_messages_to_runnable: false, validator: :default,
                 validator_response_details: anything)
       end
 
