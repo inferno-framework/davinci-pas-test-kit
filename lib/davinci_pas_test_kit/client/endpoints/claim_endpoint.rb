@@ -1,5 +1,6 @@
 require_relative '../user_input_response'
-require_relative 'endpoint_constants'
+require_relative 'session_identification'
+require_relative 'expired_token'
 require_relative '../response_generator'
 require_relative '../subscription_notification_trigger'
 require_relative '../client_urls'
@@ -16,6 +17,8 @@ module DaVinciPASTestKit
     include ClientURLs
     include FhirpathUtils
     include ResponseSelectionUtils
+    include SessionIdentification
+    include ExpiredToken
 
     # override the one from URLs to make it version specific
     def suite_id
@@ -23,18 +26,6 @@ module DaVinciPASTestKit
     end
 
     error_response_format :operation_outcome
-
-    def test_run_identifier_location_description
-      SESSION_PATH_OR_BEARER_TOKEN_LOCATION_DESCRIPTION
-    end
-
-    def test_run_identifier
-      return request.params[:session_path] if request.params[:session_path].present?
-
-      UDAPSecurityTestKit::MockUDAPServer.issued_token_to_client_id(
-        request.headers['authorization']&.delete_prefix('Bearer ')
-      )
-    end
 
     def tags
       # Requests rejected for an expired token or a rejected $inquire are not treated as
@@ -175,14 +166,6 @@ module DaVinciPASTestKit
     end
 
     private
-
-    # Memoized so the token is only decoded and parsed once per request, even though both
-    # #tags and #update_result/#make_response need to check it.
-    def expired_token?
-      return @expired_token if defined?(@expired_token)
-
-      @expired_token = UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
-    end
 
     # Resolves the user-provided response, using criteria-based selection for must support
     # workflows or the single-response approach for other workflows

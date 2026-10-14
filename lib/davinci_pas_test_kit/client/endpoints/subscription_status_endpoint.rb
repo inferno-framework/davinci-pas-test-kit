@@ -1,32 +1,18 @@
 require_relative '../../cross_suite/tags'
-require_relative 'endpoint_constants'
+require_relative 'session_identification'
+require_relative 'expired_token'
 require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
   class SubscriptionStatusEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
     include ResponseGenerator
+    include SessionIdentification
+    prepend ExpiredTokenRejection
 
     error_response_format :operation_outcome
 
-    def test_run_identifier_location_description
-      SESSION_PATH_OR_BEARER_TOKEN_LOCATION_DESCRIPTION
-    end
-
-    def test_run_identifier
-      return request.params[:session_path] if request.params[:session_path].present?
-
-      UDAPSecurityTestKit::MockUDAPServer.issued_token_to_client_id(
-        request.headers['authorization']&.delete_prefix('Bearer ')
-      )
-    end
-
     def make_response
-      if expired_token?
-        UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response, 'Bearer token')
-        return
-      end
-
       response.format = :json
       # Reflects any updates or deletion of the Subscription by the client
       subscription = find_current_subscription(test_run.test_session_id)
@@ -87,21 +73,10 @@ module DaVinciPASTestKit
     end
 
     def tags
-      # Requests rejected for an expired token are not treated as submissions of any workflow.
-      return [] if expired_token?
-
       [SUBSCRIPTION_STATUS_TAG]
     end
 
     private
-
-    # Memoized so the token is only decoded and parsed once per request, even though both
-    # #tags and #make_response need to check it.
-    def expired_token?
-      return @expired_token if defined?(@expired_token)
-
-      @expired_token = UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
-    end
 
     def not_found
       response.status = 404
