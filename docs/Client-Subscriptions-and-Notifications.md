@@ -133,9 +133,8 @@ following cases:
 
 #### Success
 
-When the Subscription is accepted, Inferno will return a 200 ACCEPTED status 
+When the Subscription is accepted, Inferno will return a 200 OK status 
 with the requested Subscription echoed in the body with the following changes:
-- Assign a fresh `id` value
 - Unless the provided `status` is "off", return the current status recorded in
   Inferno based on handshake acceptance.
 - If the provided `channel.payload` value is not either "application/fhir+json" or

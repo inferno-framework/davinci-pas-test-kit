@@ -59,7 +59,7 @@ module DaVinciPASTestKit
           Subscription created earlier in these tests. Updated Subscriptions must continue to meet
           [Inferno](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
           and PAS Subscription requirements, but Inferno will not use the updated Subscription to deliver
-          notifications.
+          notifications, including updated handshakes.
 
           [Click here](#{confirmation_url}) when all requests have been submitted.
 
@@ -78,7 +78,7 @@ module DaVinciPASTestKit
 
           #{auth_description_for_wait(client_id)}
 
-          ### Responses and Handshake Notifications
+          ### Responses
 
           The PAS Test Kit wiki contains details on the supported responses
           that the PAS client can expect to receive during these tests:

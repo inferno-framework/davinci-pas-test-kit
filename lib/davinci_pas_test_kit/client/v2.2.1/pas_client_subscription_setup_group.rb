@@ -20,7 +20,7 @@ module DaVinciPASTestKit
       test from: :subscriptions_r4_client_subscription_verification,
            title: 'Subscription creation request has the correct structure and content'
       test from: :pas_client_subscription_pas_conformance_test,
-           title: 'Subscription creation request meet PAS Subscription requirements',
+           title: 'Subscription creation request meets PAS Subscription requirements',
            description: %(
              This test verifies that the Subscription created by the client system
              is conformant to PAS requirements on the Subscription, including
