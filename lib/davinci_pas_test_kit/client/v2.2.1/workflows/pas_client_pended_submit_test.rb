@@ -47,7 +47,7 @@ module DaVinciPASTestKit
       config options: { submit_enabled: true, suppress_notifications: true } # handling notification separately
 
       run do
-        require_successful_subscription_create_request
+        require_unmodified_subscription_create_request
 
         if user_inputted_response? :pended_json_response
           assert_valid_json pended_json_response,

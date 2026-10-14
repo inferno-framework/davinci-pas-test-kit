@@ -88,3 +88,26 @@ Depending on which suite is in use, the notification will be sent either
 
 In either case, Inferno will either [mock a notification based on the `$submit` request](Controlling-Simulated-Responses#notification-bundle) or return a [tester-provided
 notification with some updates](Controlling-Simulated-Responses#inferno-modifications-of-tester-provided-responses-and-notifications).
+
+## Subscription Updates and Deletions
+
+(Currently only applicable to the Client v2.2.1 Suite)
+
+The PAS client CapabilityStatement ([EHR PAS Capabilities v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/CapabilityStatement-EHRCapabilities.html))
+requires support for the `update` and `delete` FHIR interactions on the
+Subscription resource. The PAS Client suite tests client support for these
+interactions in the "Subscription Update and Deletion" group. That group
+must run at the end of the session after all other tests have been performed.
+Critical notes:
+
+1. Update and delete interactions will not be accepted by Inferno except while
+   it is waiting during the "Subscription Update and Deletion" group. Only
+   requests for the current active Subscription created for the session during
+   the last run of the "Subscription Setup" group will be accepted.
+1. Re-running the "Subscription Update and Deletion" group will cause Inferno
+   to forget any updates or deletions it received during the previous run,
+   effectively re-setting the Subscription back to its original state.
+1. Once update or delete requests have been sent for the current Subscription, 
+   Inferno will not allow testers to run the "Pended Response" scenario and
+   will not otherwise send notifications until a new Subscription is created
+   by running the "Subscription Setup" group.

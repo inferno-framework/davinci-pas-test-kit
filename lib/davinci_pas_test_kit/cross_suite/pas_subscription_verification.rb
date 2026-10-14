@@ -7,16 +7,20 @@ module DaVinciPASTestKit
 
     def verify_pas_subscription(subscription_json_str, ig_version: 'v2.0.1')
       assert_valid_json(subscription_json_str)
-      subscription = JSON.parse(subscription_json_str)
+      add_pas_subscription_messages(JSON.parse(subscription_json_str), ig_version:)
 
+      assert messages.none? { |msg| msg[:type] == 'error' },
+             'The Subscription does not conform to PAS requirements - see messages for details.'
+    end
+
+    # Adds a message for each PAS requirement that the parsed Subscription does not meet without failing the
+    # test, so that callers checking several Subscriptions can report on all of them.
+    def add_pas_subscription_messages(subscription, ig_version: 'v2.0.1')
       if ig_version == 'v2.0.1'
         verify_pas_subscription_v201(subscription)
       else
         verify_pas_subscription_v221(subscription)
       end
-
-      assert messages.none? { |msg| msg[:type] == 'error' },
-             'The Subscription does not conform to PAS requirements - see messages for details.'
     end
 
     private
