@@ -49,7 +49,7 @@ Two configurations of the validator are used that differ only in their approach 
   the PAS IG or its dependencies trigger errors when found within responses. This ensures that
   the client system drives its behavior only from standard PAS information. Inferno
   makes exceptions for resources that are echoed from the request in the response
-  as described below
+  as described below.
 
 #### Resources Echoed from the Request
 
@@ -57,11 +57,11 @@ PAS responses include resources from the request, such as the Patient. These res
 the extensions, including custom extensions, that they had in the request, as long as they are
 unchanged. A resource in a response is treated as echoed from the request when the request
 contains a resource of the same type with the same `fullUrl`, `id`, or `identifier` elements.
-For ddebugging purposes, Inferno logs details about entries that it determines to be echoed
+For debugging purposes, Inferno logs details about entries that it determines to be echoed
 within `info` Message entries.
 
 When comparing extensions, values of references within them are ignored, since Inferno may
-udpate references when it echoes resources in the responses it generates.
+update references when it echoes resources in the responses it generates.
 
 #### Validation Limitations
 
