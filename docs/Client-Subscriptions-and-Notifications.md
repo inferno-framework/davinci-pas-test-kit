@@ -97,8 +97,8 @@ The PAS client CapabilityStatement ([EHR PAS Capabilities v2.2.1](https://hl7.or
 requires support for the `update` and `delete` FHIR interactions on the
 Subscription resource. The PAS Client suite tests client support for these
 interactions in the "Subscription Update and Deletion" group. That group
-must run at the end of the session after all other tests have been performed.
-Critical notes:
+must run at the end of the session after all scenario and must support tests
+have been performed. Critical notes:
 
 1. Update and delete interactions will not be accepted by Inferno except while
    it is waiting during the "Subscription Update and Deletion" group. Only
@@ -111,3 +111,54 @@ Critical notes:
    Inferno will not allow testers to run the "Pended Response" scenario and
    will not otherwise send notifications until a new Subscription is created
    by running the "Subscription Setup" group.
+
+### Update Response
+
+#### Failure
+
+Inferno will respond with an OperationOutcome describing the problem in the
+following cases:
+- No session found: Returned when the submission endpoint URL or bearer token
+  do not identify an actively waiting PAS client session.
+- Expired Token: Returned when the bearer token provided with the request has
+  expired.
+- Invalid or unsupported Subscription: Returned when the requested Subscription
+  is not valid JSON or does not meet Inferno's [acceptance requirements](#subscription-validation).
+- If Inferno is waiting for requests during any group other than the "Subscription
+  Update and Deletion" group.
+- The id in the URL is not the Subscription created during the last run of the
+  "Subscription Setup" group, or that Subscription has already been deleted
+  during the current test run.
+- The `id` of the provided Subscription does not match the id in the URL.
+
+#### Success
+
+When the Subscription is accepted, Inferno will return a 200 ACCEPTED status 
+with the requested Subscription echoed in the body with the following changes:
+- Assign a fresh `id` value
+- Unless the provided `status` is "off", return the current status recorded in
+  Inferno based on handshake acceptance.
+- If the provided `channel.payload` value is not either "application/fhir+json" or
+  "application/json", update it to be "application/fhir+json" (Inferno only supports
+  sending notifications in the JSON format)
+
+A handshake will never be triggered based on an update request.
+
+### Deletion Response
+
+#### Failure
+
+Inferno will respond with an OperationOutcome describing the problem in the
+following cases:
+- No session found: Returned when the submission endpoint URL or bearer token
+  do not identify an actively waiting PAS client session.
+- Expired Token: Returned when the bearer token provided with the request has
+  expired.
+- If Inferno is waiting for requests during any group other than the "Subscription
+  Update and Deletion" group.
+- The id in the URL is not the Subscription created during the last run of the
+  "Subscription Setup" group.
+
+#### Success
+
+Inferno will always return a 204 NO CONTENT with no response body.

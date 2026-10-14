@@ -58,7 +58,9 @@ module DaVinciPASTestKit
 
           Inferno will wait while the tester uses the client system to update and delete the PAS
           Subscription created earlier in these tests. Updated Subscriptions must continue to meet
-          the PAS Subscription requirements, but Inferno will not use them to deliver notifications.
+          [Inferno](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
+          and PAS Subscription requirements, but Inferno will not the updated Subscription to deliver
+          notifications.
 
           [Click here](#{confirmation_url}) when all requests have been submitted.
 
@@ -70,10 +72,19 @@ module DaVinciPASTestKit
 
           `#{subscription_endpoint}/#{subscription_id}`
 
+          Inferno will also respond to [read](https://hl7.org/fhir/R4/http.html#read) (GET)
+          interactions and `$status` operation calls for this Subscription.
+
           ### Authentication and Identification
 
           #{auth_description_for_wait(client_id)}
 
+          ### Responses and Handshake Notifications
+
+          The PAS Test Kit wiki contains details on the supported responses
+          that the PAS client can expect to receive during these tests:
+          - [Subscription update responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#update-response)
+          - [Subscription deletion responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#deletion-response)
         MESSAGE
       )
     end
