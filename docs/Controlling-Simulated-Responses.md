@@ -22,11 +22,13 @@ server conformant to the PAS specification and not going beyond it. Each respons
   for PAS interop
 - Cannot contain data that goes beyond the PAS standard: this prevents the client
   system from relying on custom data. Inferno enforces this requirement by failing when
-  a custom extension not defined within PAS is found within a response returned by Inferno.
-  While client requests are typically allowed to have custom extensions, custom extensions on
-  portions of the request that are echoed back in Inferno responses (e.g., the Patient resource),
-  will cause failures on the responses. This may be relaxed in the future and testers are
-  welcome to provide feedback on the current behavior via github issues.
+  a custom extension, i.e., one not defined within PAS or the IGs it depends on, is found
+  within a response returned by Inferno. Client requests are allowed to have custom extensions,
+  so resources echoed back from the request in Inferno responses (e.g., the Patient resource)
+  may keep the extensions they had in the request, as long as they are unchanged. See
+  [Validation](Client-Details#validation) for details on how echoed resources are identified
+  and the messages reported. Testers are welcome to provide feedback on the current behavior
+  via GitHub issues.
 
 ## Mocked Responses
 
@@ -42,9 +44,14 @@ These responses are created mostly from the incoming request. Specific details i
   Bundle and referenced in the `patient`, `insurer`, and `requestor` elements respectively.
   Note that these are found by following references in the submitted Claim instance. If relative
   references are used in the Claim, the Claim entry `fullUrl` needs to be a absolute reference
-  and not a UUID, else the entries won't get pulled in correctly.
+  and not a UUID, else the entries won't get pulled in correctly. These entries are echoed as
+  they appear in the request, including any extensions.
 - In the ClaimResponse, the `identifier`, `type`, `status`, and `use` elements are pulled
-  in from the Claim in the request.
+  in from the Claim in the request. Extensions not published by HL7 (i.e., with urls not
+  starting with `http://hl7.org/fhir/`) are removed from the elements copied from the Claim,
+  including the `patient`, `insurer`, and `requestor` references and, in the Payer Modification
+  scenario, `addItem.productOrService`, since Inferno, acting as the payer, doesn't send custom
+  extensions.
 - The `Bundle.timestamp` and `ClaimResponse.created` timestamps are populated using the current time.
 - The `ClaimResponse.outcome` is hardcoded to `complete`.
 - For each `item` entry in the request Claim, a `ClaimResponse.item` entry is created with the
@@ -212,6 +219,9 @@ fall into two categories:
 
 If the tester provides an input that is malformed in some way such that Inferno cannot get the details
 that it needs to make the modifications, then the raw input will be used.
+
+Note that extensions on primitive elements (e.g., `_birthDate` in JSON) are not currently supported
+and will be removed from tester-provided responses before they are sent.
 
 ### Response and Notification Correspondence Requirements
 
