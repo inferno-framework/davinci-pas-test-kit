@@ -102,21 +102,23 @@ module DaVinciPASTestKit
     # How to validate one entry resource in the current bundle. Resources echoed back from the request
     # (see perform_bundle_validation's echoed_from) may keep the extensions they had in it: those that
     # add no extensions of their own use the :default validator, and the others use the specified
-    # validator with the issues it reports about their echoed extensions dropped - see
-    # echoed_extension_issue?.
+    # validator with the issues it reports about their extensions explained or dropped - see
+    # echoed_extension_issue_messages.
     # @param full_url [String] the fullUrl of the entry containing the resource.
     # @param resource [FHIR::Model] the entry resource.
-    # @return [Array(Symbol, Array)] the name of the validator to use, and the [element path, extension]
-    #   pairs (see extensions_in) of the request resource the resource echoes, if any.
+    # @return [Array(Symbol, Array, FHIR::Bundle::Entry)] the name of the validator to use, the
+    #   [element path, extension] pairs (see extensions_in) of the request resource the resource echoes,
+    #   and the request entry it echoes. The last two are nil if it doesn't echo one (or the validator is
+    #   :default, which allows any extension).
     def entry_validation_settings(full_url, resource)
-      return [profile_validator, []] if profile_validator == :default
+      return [profile_validator, nil, nil] if profile_validator == :default
 
       request_entry = echoed_request_entry(full_url, resource)
-      return [profile_validator, []] if request_entry.blank?
+      return [profile_validator, nil, nil] if request_entry.blank?
 
       echoed_extensions = extensions_in(validated_hash(request_entry.resource))
       all_echoed = extensions_in(validated_hash(resource)).all? { |extension| echoed_extensions.include?(extension) }
-      [all_echoed ? :default : profile_validator, echoed_extensions]
+      [all_echoed ? :default : profile_validator, echoed_extensions, request_entry]
     end
 
     def echoed_request_entry(full_url, resource)
@@ -170,15 +172,78 @@ module DaVinciPASTestKit
       end
     end
 
-    # True if the validator issue is about an echoed extension, i.e., it is located at an extension that
-    # is in echoed_extensions and its message names the extension's url, as the validator's message for
-    # an extension not allowed by the strict validator does.
-    # @param resource_hash [Hash] the validated resource, as a hash.
-    def echoed_extension_issue?(issue, resource_hash, echoed_extensions)
-      path, extension = extension_at_location(resource_hash, issue.location)
-      return false if extension.blank? || extension['url'].blank?
+    # An info message identifying an echoed resource, which of its identifying fields matched the request
+    # entry it echoes (see echoed_resource?), and the extensions it is allowed to keep because they are
+    # unchanged from the request - see entry_validation_settings.
+    def echoed_resource_message(full_url, resource, echoed_extensions, request_entry)
+      kept_urls = extensions_in(validated_hash(resource))
+        .select { |extension| echoed_extensions.include?(extension) }
+        .map { |_path, extension| extension['url'] }.uniq
+      message = "#{resource.resourceType} #{full_url} echoes the #{resource.resourceType} in the request " \
+                "(#{echo_match_details(full_url, resource, request_entry)})"
+      message += if kept_urls.present?
+                   ", so these extensions unchanged from the request are allowed in it: #{kept_urls.join(', ')}."
+                 else
+                   '.'
+                 end
+      { type: 'info', message: }
+    end
 
-      echoed_extensions.include?([path, without_references(extension)]) && issue.message.to_s.include?(extension['url'])
+    # Which identifying fields of an echoed resource match the request entry it echoes and which differ,
+    # e.g., "matched by id; fullUrl differs". Fields blank in both are left out.
+    def echo_match_details(full_url, resource, request_entry)
+      fields = {
+        'fullUrl' => [request_entry.fullUrl, full_url],
+        'id' => [request_entry.resource.id, resource.id],
+        'identifiers' => [identifiers_of(request_entry.resource), identifiers_of(resource)]
+      }.reject { |_name, values| values.all?(&:blank?) }
+      matched, differing = fields.keys.partition do |name|
+        request_value, response_value = fields[name]
+        request_value == response_value
+      end
+      details = "matched by #{matched.to_sentence}"
+      details += "; #{differing.to_sentence} #{differing.one? ? 'differs' : 'differ'}" if differing.present?
+      details
+    end
+
+    # Messages for the validator issues about an echoed resource. An issue that an extension isn't allowed
+    # (see unknown_extension_issue?) is:
+    # - dropped if the extension is echoed, i.e., in echoed_extensions.
+    # - reworded otherwise, to say whether the request resource has an extension with that url at the
+    #   same element, but with different content, or doesn't.
+    # Other issues are kept as is.
+    # @param resource_hash [Hash] the validated resource, as a hash.
+    def echoed_extension_issue_messages(issues, resource_hash, echoed_extensions)
+      issues.filter_map do |issue|
+        path, extension = extension_at_location(resource_hash, issue.location)
+        url = extension&.dig('url')
+        next validator_issue_message(issue) unless unknown_extension_issue?(issue, url)
+        next if echoed_extensions.include?([path, without_references(extension)])
+
+        details =
+          if echoed_extensions.any? { |echoed_path, echoed| echoed_path == path && echoed['url'] == url }
+            "echoed extension #{url} contained a different value than in the source resource."
+          else
+            "extension #{url} in an echoed resource is not in the source resource at this element."
+          end
+        validator_issue_message(issue, details:)
+      end
+    end
+
+    # True if the issue is the validator's error for an extension it doesn't know, so doesn't allow
+    # (Extension_EXT_Unknown_NotHere), as the strict validator reports for custom extensions. Other
+    # issues about extensions, e.g., known extensions with invalid values, are reported as is.
+    def unknown_extension_issue?(issue, url)
+      url.present? && issue.raw_issue['message'] == "The extension #{url} could not be found so is not allowed here"
+    end
+
+    # True if the issue is the :default validator's note that an echoed extension is unknown
+    # (Extension_EXT_Unknown) - see echoed_resource_message.
+    def echoed_unknown_extension_note?(issue, resource_hash, echoed_extensions)
+      path, extension = extension_at_location(resource_hash, issue.location)
+      url = extension&.dig('url')
+      url.present? && issue.raw_issue['message'] == "Unknown extension #{url}" &&
+        echoed_extensions.include?([path, without_references(extension)])
     end
 
     # Resolves a validator issue location such as `Patient.name[0].extension[1]` against the resource.
@@ -434,7 +499,12 @@ module DaVinciPASTestKit
       bundle_resources_target_profile_map.each do |key, item|
         resource = item[:resource]
         base_profile = FHIR::Definitions.resource_definition(resource.resourceType).url
-        validator, echoed_extensions = entry_validation_settings(key, resource) unless key == 'bundle'
+        unless key == 'bundle'
+          validator, echoed_extensions, request_entry = entry_validation_settings(key, resource)
+          if request_entry.present?
+            validation_messages << echoed_resource_message(key, resource, echoed_extensions, request_entry)
+          end
+        end
         messages_by_profile = {}
 
         success_profile = item[:profile_urls].find do |url|
@@ -590,21 +660,28 @@ module DaVinciPASTestKit
     # @param profile_url [String, nil] The profile URL (with version) to validate against,
     #   or nil to validate against the base resource definition.
     # @param validator [Symbol] The name of the FHIR resource validator to use.
-    # @param echoed_extensions [Array] Extensions echoed from the request, whose issues are dropped - see
-    #   entry_validation_settings.
+    # @param echoed_extensions [Array, nil] Extensions of the request resource the resource echoes, or
+    #   nil if it doesn't echo one - see entry_validation_settings and echoed_extension_issue_messages.
     # @return [Array<Hash>] Message hashes for the issues found.
     def collect_resource_profile_messages(resource, profile_url = nil, validator: profile_validator,
-                                          echoed_extensions: [])
+                                          echoed_extensions: nil)
       response_details = []
       resource_is_valid?(resource:, profile_url:, validator:,
                          add_messages_to_runnable: false,
                          validator_response_details: response_details)
       issues = response_details.reject(&:filtered)
-      if echoed_extensions.present?
-        resource_hash = validated_hash(resource)
-        issues = issues.reject { |issue| echoed_extension_issue?(issue, resource_hash, echoed_extensions) }
+      return validator_issues_to_messages(issues) if echoed_extensions.nil?
+
+      resource_hash = validated_hash(resource)
+      if validator == :default
+        # The :default validator allows every extension, so its only issues to drop are its notes that
+        # echoed extensions are unknown, which the echoed resource message already covers.
+        return validator_issues_to_messages(issues.reject do |issue|
+          echoed_unknown_extension_note?(issue, resource_hash, echoed_extensions)
+        end)
       end
-      validator_issues_to_messages(issues)
+
+      echoed_extension_issue_messages(issues, resource_hash, echoed_extensions)
     end
 
     # Same as collect_resource_profile_messages for a Bundle, additionally dropping
@@ -622,7 +699,14 @@ module DaVinciPASTestKit
     end
 
     def validator_issues_to_messages(issues)
-      issues.map { |issue| { type: issue.severity, message: issue.message } }
+      issues.map { |issue| validator_issue_message(issue) }
+    end
+
+    # @param details [String, nil] replaces the validator's text, keeping the location the message starts with.
+    def validator_issue_message(issue, details: nil)
+      message = issue.message
+      message = message.delete_suffix(issue.raw_issue['message'].to_s) + details if details.present?
+      { type: issue.severity, message: }
     end
 
     # Rejects validator issues that are already filtered or are located at/below

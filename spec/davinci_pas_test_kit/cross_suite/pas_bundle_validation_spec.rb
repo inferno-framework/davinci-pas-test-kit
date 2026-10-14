@@ -708,9 +708,9 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         )
       end
 
-      def other_issue(location)
+      def other_issue(location, message = 'some other problem')
         Inferno::DSL::FHIRResourceValidation::ValidatorIssue.new(
-          raw_issue: { 'location' => location, 'level' => 'ERROR', 'message' => 'some other problem' },
+          raw_issue: { 'location' => location, 'level' => 'ERROR', 'message' => message },
           target: {},
           filtered: false
         )
@@ -747,6 +747,48 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(validators_used_for('Patient')).to eq([:no_custom_extensions])
       end
 
+      it 'explains an extension that is at a different element in the request' do
+        stub_patient_issues(unknown_extension_issue('Patient.name[0].extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include(
+          "Patient.name[0].extension[0]: extension #{custom_extension[:url]} in an echoed resource is not in the " \
+          'source resource at this element.'
+        )
+      end
+
+      it 'explains an extension whose content is different in the request' do
+        response_bundle = bundle_with(claim_response_entry,
+                                      patient_entry(extension: [custom_extension.merge(valueString: 'changed')]))
+        stub_patient_issues(unknown_extension_issue('Patient.extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include(
+          "Patient.extension[0]: echoed extension #{custom_extension[:url]} contained a different value than in " \
+          'the source resource.'
+        )
+      end
+
+      it 'explains extensions on an echoed resource that had none in the request' do
+        response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+        stub_patient_issues(unknown_extension_issue('Patient.extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, bundle_with(patient_entry)).map { |message| message[:message] }
+
+        expect(messages).to include(a_string_including('is not in the source resource at this element'))
+      end
+
+      it 'does not explain extensions on a resource that is not echoed' do
+        response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+        stub_patient_issues(unknown_extension_issue('Patient.extension[0]', custom_extension[:url]))
+
+        messages = validate(response_bundle, nil).map { |message| message[:message] }
+
+        expect(messages).to include(a_string_ending_with('could not be found so is not allowed here'))
+      end
+
       it 'reports only the primitive extensions that were not echoed' do
         request_bundle = bundle_with(patient_entry(birth_date_extension: [custom_extension]))
         response_bundle = bundle_with(claim_response_entry,
@@ -771,6 +813,41 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(messages).to include('Patient.extension[0]: some other problem')
       end
 
+      it 'keeps other issues that name an extension, whether or not it was echoed' do
+        response_bundle = bundle_with(claim_response_entry,
+                                      patient_entry(extension: [other_extension, custom_extension],
+                                                    name_extension: [custom_extension]))
+        wrong_type = ->(url) { "The Extension '#{url}' definition allows for the types [string] but found type x" }
+        stub_patient_issues(other_issue('Patient.extension[0]', wrong_type.call(other_extension[:url])),
+                            other_issue('Patient.name[0].extension[0]', wrong_type.call(custom_extension[:url])))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(messages).to include("Patient.extension[0]: #{wrong_type.call(other_extension[:url])}",
+                                    "Patient.name[0].extension[0]: #{wrong_type.call(custom_extension[:url])}")
+      end
+
+      it 'drops the default validator notes that echoed extensions are unknown' do
+        response_bundle = bundle_with(claim_response_entry,
+                                      patient_entry(extension: [other_extension, custom_extension]))
+        unknown_note = lambda do |location, url|
+          Inferno::DSL::FHIRResourceValidation::ValidatorIssue.new(
+            raw_issue: { 'location' => location, 'level' => 'INFORMATION', 'message' => "Unknown extension #{url}" },
+            target: {},
+            filtered: false
+          )
+        end
+        stub_patient_issues(unknown_note.call('Patient.extension[0]', other_extension[:url]),
+                            unknown_note.call('Patient.extension[1]', custom_extension[:url]),
+                            other_issue('Patient.extension[1]'))
+
+        messages = validate(response_bundle, request_bundle).map { |message| message[:message] }
+
+        expect(validators_used_for('Patient')).to eq([:default])
+        expect(messages).to_not include(a_string_including('Unknown extension'))
+        expect(messages).to include('Patient.extension[1]: some other problem')
+      end
+
       it 'keeps issues whose location is not an extension in the resource' do
         stub_patient_issues(unknown_extension_issue('Patient.extension[5]', custom_extension[:url]),
                             unknown_extension_issue('Patient.name[0]', custom_extension[:url]))
@@ -779,6 +856,66 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
         expect(messages).to include(a_string_starting_with('Patient.extension[5]: '),
                                     a_string_starting_with('Patient.name[0]: '))
+      end
+    end
+
+    describe 'echoed resource info message' do
+      def info_messages(response_bundle, request_bundle)
+        validate(response_bundle, request_bundle).select { |message| message[:type] == 'info' }
+          .pluck(:message)
+      end
+
+      it 'names an echoed resource and the extensions it keeps from the request' do
+        request_bundle = bundle_with(patient_entry(extension: [custom_extension], name_extension: [other_extension]))
+        response_bundle = bundle_with(claim_response_entry,
+                                      patient_entry(extension: [custom_extension], name_extension: [custom_extension]))
+
+        expect(info_messages(response_bundle, request_bundle)).to eq(
+          ['Patient urn:uuid:patient echoes the Patient in the request (matched by fullUrl and id), so these ' \
+           "extensions unchanged from the request are allowed in it: #{custom_extension[:url]}."]
+        )
+      end
+
+      it 'names an echoed resource that keeps no extensions from the request' do
+        request_bundle = bundle_with(patient_entry)
+        response_bundle = bundle_with(claim_response_entry, patient_entry)
+
+        expect(info_messages(response_bundle, request_bundle))
+          .to eq(['Patient urn:uuid:patient echoes the Patient in the request (matched by fullUrl and id).'])
+      end
+
+      it 'notes the identifying fields that differ from the request' do
+        identifier = ->(value) { [{ system: 'http://example.org/ids', value: }] }
+        request_bundle = bundle_with(
+          { fullUrl: 'urn:uuid:request-patient',
+            resource: { resourceType: 'Patient', id: 'patient', identifier: identifier.call('1') } }
+        )
+        response_bundle = bundle_with(
+          claim_response_entry,
+          { fullUrl: 'urn:uuid:patient',
+            resource: { resourceType: 'Patient', id: 'patient', identifier: identifier.call('2') } }
+        )
+
+        expect(info_messages(response_bundle, request_bundle)).to eq(
+          ['Patient urn:uuid:patient echoes the Patient in the request (matched by id; fullUrl and identifiers ' \
+           'differ).']
+        )
+      end
+
+      it 'is not added for resources that are not echoed' do
+        response_bundle = bundle_with(claim_response_entry, patient_entry(extension: [custom_extension]))
+
+        expect(info_messages(response_bundle, nil)).to be_empty
+      end
+
+      it 'is not added when the default validator is specified' do
+        request_bundle = bundle_with(patient_entry)
+        response_bundle = bundle_with(claim_response_entry, patient_entry)
+
+        messages = test_instance.perform_bundle_validation(response_bundle, 'submit', 'response', 'v2.2.1',
+                                                           echoed_from: request_bundle)
+
+        expect(messages.pluck(:type)).to_not include('info')
       end
     end
 
