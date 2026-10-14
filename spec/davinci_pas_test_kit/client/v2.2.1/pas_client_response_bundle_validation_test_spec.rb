@@ -1,55 +1,23 @@
 require_relative '../../../../lib/davinci_pas_test_kit/client/v2.2.1/workflows/' \
                  'pas_client_response_bundle_validation_test'
+require_relative '../../../support/custom_extension_validator_stub'
+require_relative '../../../support/client_suite_test_lookup'
 
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientResponseBundleValidationTest, :request do
+  include ClientSuiteTestLookup
+
+  include_context 'with custom extension validator stub'
+
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   # The validators are defined on the suite, so run the copy of the test within it.
-  let(:test) do
-    DaVinciPASTestKit::DaVinciPASV221::ClientSuite
-      .groups.flat_map(&:groups)
-      .find { |group| group.id.to_s.end_with?('pas_client_v221_approval_group') }
-      .tests.find { |child| child.id.to_s.end_with?(described_class.id.to_s) }
-  end
+  let(:test) { v221_client_workflow_test(:pas_client_v221_approval_group, described_class.id) }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
-  let(:custom_extension_url) { 'urn:inferno-custom' }
-  let(:custom_extension) { { 'url' => custom_extension_url, 'valueString' => 'x' } }
   let(:request_bundle_hash) do
     JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
   end
-  # The fixture's authorized quantity has no unit, which the v2.2.1 datatype constraints require (prof-2).
   let(:response_bundle_hash) do
-    JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json'))).tap do |bundle|
-      authorized_detail = bundle['entry'].first['resource']['item'].first['extension']
-        .find { |extension| extension['url'].end_with?('extension-itemAuthorizedDetail') }
-      quantity = authorized_detail['extension'].find { |extension| extension['url'] == 'quantity' }
-      quantity['valueQuantity']['unit'] = 'unit'
-    end
-  end
-
-  # Inferno's validator stub: the strict :no_custom_extensions validator (sent extensions: []) reports
-  # the HL7 validator's unknown extension error for each custom extension on the validated resource,
-  # and the :default validator (extensions: ['any']) allows them. Everything else is valid.
-  before do
-    # Reference-following FHIRPath lookups aren't needed for these resources.
-    stub_request(:post, %r{/fhirpath/evaluate}).to_return(status: 200, body: '[]')
-    stub_request(:post, validation_url).to_return do |request|
-      body = JSON.parse(request.body)
-      context = body['validationContext'] || body['cliContext']
-      resource = JSON.parse(body['filesToValidate'].first['fileContent'])
-      issues =
-        if context['extensions'] == []
-          Array(resource['extension']).each_with_index.filter_map do |extension, index|
-            next unless extension['url'] == custom_extension_url
-
-            { level: 'ERROR', location: "#{resource['resourceType']}.extension[#{index}]",
-              message: "The extension #{custom_extension_url} could not be found so is not allowed here" }
-          end
-        else
-          []
-        end
-      { status: 200, body: { outcomes: [{ issues: }] }.to_json }
-    end
+    JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'valid_pa_response_bundle.json')))
   end
 
   # Adds the custom extension to the bundle's first entry of the resource type.
@@ -105,5 +73,105 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientResponseBundleValidat
       a_string_including("Patient #{request_patient_entry['fullUrl']} echoes the Patient in the request")
         .and(a_string_including(custom_extension_url))
     )
+  end
+
+  describe 'with a response Inferno generated from the request' do
+    let(:session_url_path) { '1234' }
+    let(:approval_submit_test) do
+      v221_client_workflow_test(:pas_client_v221_approval_group, :pas_client_v221_approval_submit_test)
+    end
+
+    # The request with the extension added to the elements of the Claim that Inferno copies into the
+    # ClaimResponse it generates, and to the Patient, which it echoes.
+    def request_with_extension(extension)
+      request_bundle_hash.deep_dup.tap do |bundle|
+        claim = bundle['entry'].first['resource']
+        claim['extension'] << extension
+        claim['identifier'].first['extension'] << extension
+        claim['type']['extension'] = [extension]
+        claim['type']['coding'].first['extension'] = [extension]
+        claim['patient']['extension'] = [extension]
+        claim['item'].first['productOrService']['extension'] = [extension]
+        patient = bundle['entry'].find { |entry| entry['resource']['resourceType'] == 'Patient' }['resource']
+        patient['extension'] << extension
+        patient['_gender'] = { 'extension' => [extension] }
+      end
+    end
+
+    # Has Inferno generate the response to the request, then validates it.
+    def run_with_generated_response(request_bundle)
+      submit_result = run(approval_submit_test, session_url_path:)
+      expect(submit_result.result).to eq('wait')
+      post_json("/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::SUBMIT_PATH}", request_bundle)
+      expect(last_response.status).to eq(200)
+
+      run(test)
+    end
+
+    it 'passes when the request has custom extensions' do
+      result = run_with_generated_response(request_with_extension(custom_extension))
+
+      expect(result.result).to eq('pass')
+      expect(result_messages(result, 'error')).to be_empty
+      expect(last_response.body).to include(custom_extension_url) # kept on the echoed Patient
+    end
+
+    # HL7_EXTENSION_URL_PREFIX keeps every extension published by HL7, including ones from IGs the
+    # validator doesn't load, which the strict validator then reports in Inferno's own response.
+    it 'passes when the request has extensions from HL7 IGs the validator does not load' do
+      pending 'the generator keeps HL7-published extensions the validator cannot resolve'
+      unloaded_extension_url = 'http://hl7.org/fhir/us/example-ig/StructureDefinition/example-extension'
+      unknown_extension_urls << unloaded_extension_url
+
+      result = run_with_generated_response(
+        request_with_extension({ 'url' => unloaded_extension_url, 'valueString' => 'x' })
+      )
+
+      expect(result.result).to eq('pass')
+    end
+  end
+
+  describe 'with multiple requests in the must support workflow' do
+    let(:must_support_test) do
+      v221_client_suite_test(:pas_client_v221_must_support_no_auth, :pas_client_v221_must_support_receive,
+                             described_class.id)
+    end
+
+    def create_must_support_request(request_bundle, response_bundle)
+      repo_create(
+        :request,
+        direction: 'incoming',
+        url: submit_url,
+        test_session_id: test_session.id,
+        result:,
+        request_body: request_bundle.to_json,
+        response_body: response_bundle.to_json,
+        tags: [DaVinciPASTestKit::MUST_SUPPORT_WORKFLOW_TAG, DaVinciPASTestKit::SUBMIT_TAG],
+        status: 200
+      )
+    end
+
+    # Each response may only echo the extensions in its own request.
+    it 'does not allow an echoed extension from a different request' do
+      request_with_extension = with_custom_extension(request_bundle_hash, 'Patient')
+      patient_with_extension = request_with_extension['entry']
+        .find { |entry| entry['resource']['resourceType'] == 'Patient' }
+      response_with_extension = response_bundle_hash.merge(
+        'entry' => response_bundle_hash['entry'].map do |entry|
+          entry['resource']['resourceType'] == 'Patient' ? patient_with_extension : entry
+        end
+      )
+      create_must_support_request(request_with_extension, response_with_extension)
+      create_must_support_request(request_bundle_hash, response_with_extension)
+
+      result = run(must_support_test)
+
+      expect(result.result).to eq('skip')
+      errors = result_messages(result, 'error')
+      expect(errors).to include(a_string_starting_with('Response 2:')
+        .and(a_string_including("extension #{custom_extension_url} in an echoed resource is not in the source " \
+                                'resource at this element')))
+      expect(errors).to_not include(a_string_starting_with('Response 1:'))
+    end
   end
 end

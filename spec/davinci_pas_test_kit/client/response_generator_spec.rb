@@ -544,6 +544,19 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
         end
       end
 
+      it 'includes referenced entries that have extensions on primitive elements' do
+        request_bundle = JSON.parse(submit_request_multiple_items_string)
+        patient = request_bundle['entry'].find { |entry| entry['resource']['resourceType'] == 'Patient' }['resource']
+        patient['_gender'] = { 'extension' => [{ 'url' => 'http://example.org/custom', 'valueString' => 'x' }] }
+
+        returned_response_string = module_instance.mock_response_bundle(
+          FHIR.from_contents(request_bundle.to_json), 'submit', :approval, nil
+        )
+
+        response_bundle = FHIR.from_contents(returned_response_string)
+        expect(response_bundle.entry.map { |entry| entry.resource.resourceType }).to include('Patient')
+      end
+
       it 'all entries included when using uuid references' do
         returned_response_string = module_instance.mock_response_bundle(
           FHIR.from_contents(submit_request_claim_uuid_string),

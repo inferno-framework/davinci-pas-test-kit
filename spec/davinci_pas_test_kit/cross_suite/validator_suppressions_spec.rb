@@ -162,11 +162,14 @@ RSpec.describe DaVinciPASTestKit do
   end
 
   [
-    DaVinciPASTestKit::DaVinciPASV221::ServerSuite,
-    DaVinciPASTestKit::DaVinciPASV221::ClientSuite
-  ].each do |suite|
-    describe "#{suite.title} validator message exclusions" do
-      let(:exclude_message) { suite.fhir_validators[:default].first.exclude_message }
+    [DaVinciPASTestKit::DaVinciPASV221::ServerSuite, :default],
+    [DaVinciPASTestKit::DaVinciPASV221::ClientSuite, :default],
+    # Must suppress the same messages as the default validator, so tester-provided responses
+    # aren't held to a stricter standard than requests for anything but custom extensions.
+    [DaVinciPASTestKit::DaVinciPASV221::ClientSuite, DaVinciPASTestKit::NO_CUSTOM_EXTENSIONS_VALIDATOR]
+  ].each do |suite, validator_name|
+    describe "#{suite.title} #{validator_name} validator message exclusions" do
+      let(:exclude_message) { suite.fhir_validators[validator_name].first.exclude_message }
 
       it 'excludes unresolvable X12 value set messages at every severity' do
         %w[error warning info].each do |type|
@@ -234,11 +237,14 @@ RSpec.describe DaVinciPASTestKit do
   end
 
   [
-    DaVinciPASTestKit::DaVinciPASV201::ServerSuite,
-    DaVinciPASTestKit::DaVinciPASV201::ClientSuite
-  ].each do |suite|
-    describe "#{suite.title} validator message exclusions" do
-      let(:exclude_message) { suite.fhir_validators[:default].first.exclude_message }
+    [DaVinciPASTestKit::DaVinciPASV201::ServerSuite, :default],
+    [DaVinciPASTestKit::DaVinciPASV201::ClientSuite, :default],
+    # Must suppress the same messages as the default validator, so tester-provided responses
+    # aren't held to a stricter standard than requests for anything but custom extensions.
+    [DaVinciPASTestKit::DaVinciPASV201::ClientSuite, DaVinciPASTestKit::NO_CUSTOM_EXTENSIONS_VALIDATOR]
+  ].each do |suite, validator_name|
+    describe "#{suite.title} #{validator_name} validator message exclusions" do
+      let(:exclude_message) { suite.fhir_validators[validator_name].first.exclude_message }
 
       it 'excludes the targeted X12 patterns at every severity' do
         %w[error warning info].each do |type|

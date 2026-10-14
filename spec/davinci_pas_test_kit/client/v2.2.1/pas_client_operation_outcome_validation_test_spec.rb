@@ -1,16 +1,14 @@
 require_relative '../../../../lib/davinci_pas_test_kit/client/v2.2.1/error_handling/' \
                  'pas_client_operation_outcome_validation_test'
+require_relative '../../../support/client_suite_test_lookup'
 
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientOperationOutcomeValidationTest, :request do
+  include ClientSuiteTestLookup
+
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   # The validators are defined on the suite, so run the copy of the test within it.
-  let(:test) do
-    DaVinciPASTestKit::DaVinciPASV221::ClientSuite
-      .groups.flat_map(&:groups)
-      .find { |group| group.id.to_s.end_with?('pas_client_v221_operation_failure_group') }
-      .tests.find { |child| child.id.to_s.end_with?(described_class.id.to_s) }
-  end
+  let(:test) { v221_client_workflow_test(:pas_client_v221_operation_failure_group, described_class.id) }
   let(:submit_url) { "/custom/#{suite_id}/1234#{DaVinciPASTestKit::SUBMIT_PATH}" }
   let(:custom_extension_url) { 'urn:inferno-custom' }
   let(:conformant_operation_outcome) do

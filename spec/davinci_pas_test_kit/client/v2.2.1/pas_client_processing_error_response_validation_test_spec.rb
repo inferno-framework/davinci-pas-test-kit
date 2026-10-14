@@ -1,19 +1,18 @@
 require_relative '../../../../lib/davinci_pas_test_kit/client/v2.2.1/error_handling/' \
                  'pas_client_processing_error_response_validation_test'
+require_relative '../../../support/custom_extension_validator_stub'
+require_relative '../../../support/client_suite_test_lookup'
 
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientProcessingErrorResponseValidationTest, :request do
+  include ClientSuiteTestLookup
+
+  include_context 'with custom extension validator stub'
+
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   # The validators are defined on the suite, so run the copy of the test within it.
-  let(:test) do
-    DaVinciPASTestKit::DaVinciPASV221::ClientSuite
-      .groups.flat_map(&:groups)
-      .find { |group| group.id.to_s.end_with?('pas_client_v221_processing_error_group') }
-      .tests.find { |child| child.id.to_s.end_with?(described_class.id.to_s) }
-  end
+  let(:test) { v221_client_workflow_test(:pas_client_v221_processing_error_group, described_class.id) }
   let(:submit_url) { "/custom/#{suite_id}/1234#{DaVinciPASTestKit::SUBMIT_PATH}" }
-  let(:custom_extension_url) { 'urn:inferno-custom' }
-  let(:custom_extension) { { 'url' => custom_extension_url, 'valueString' => 'x' } }
   let(:request_bundle_hash) do
     JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_bundle_v110.json')))
   end
@@ -38,31 +37,6 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientProcessingErrorRespon
         }]
       }
     }
-  end
-
-  # Inferno's validator stub: the strict :no_custom_extensions validator (sent extensions: []) reports
-  # the HL7 validator's unknown extension error for each custom extension on the validated resource,
-  # and the :default validator (extensions: ['any']) allows them. Everything else is valid.
-  before do
-    # Reference-following FHIRPath lookups aren't needed for these resources.
-    stub_request(:post, %r{/fhirpath/evaluate}).to_return(status: 200, body: '[]')
-    stub_request(:post, validation_url).to_return do |request|
-      body = JSON.parse(request.body)
-      context = body['validationContext'] || body['cliContext']
-      resource = JSON.parse(body['filesToValidate'].first['fileContent'])
-      issues =
-        if context['extensions'] == []
-          Array(resource['extension']).each_with_index.filter_map do |extension, index|
-            next unless extension['url'] == custom_extension_url
-
-            { level: 'ERROR', location: "#{resource['resourceType']}.extension[#{index}]",
-              message: "The extension #{custom_extension_url} could not be found so is not allowed here" }
-          end
-        else
-          []
-        end
-      { status: 200, body: { outcomes: [{ issues: }] }.to_json }
-    end
   end
 
   def with_extension(entry, extension)

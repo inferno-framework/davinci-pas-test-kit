@@ -1,3 +1,6 @@
+require_relative '../../../support/client_suite_test_lookup'
+require_relative '../../../support/custom_extension_validator_stub'
+
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientInquireResponseBundleValidationTest, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:access_token) { '1234' }
@@ -166,5 +169,101 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientInquireResponseBundle
       .current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
       .messages
+  end
+
+  # Validates through the suite's validators rather than stubbing the validation methods, so
+  # covers checking for custom extensions within the Parameters and echoing from the request.
+  describe 'with custom extensions' do
+    include ClientSuiteTestLookup
+
+    include_context 'with custom extension validator stub'
+
+    let(:suite_test) do
+      v221_client_suite_test(:pas_client_v221_must_support_no_auth, :pas_client_v221_must_support_receive,
+                             described_class.id)
+    end
+    let(:request_bundle_hash) do
+      JSON.parse(File.read(File.join(__dir__, '../../..', 'fixtures', 'conformant_pas_inquire_bundle_v110.json')))
+    end
+    let(:response_bundle_hash) { JSON.parse(valid_bundle_json) }
+
+    def patient_entry(bundle_hash)
+      bundle_hash['entry'].find { |entry| entry['resource']['resourceType'] == 'Patient' }
+    end
+
+    def with_patient_extension(bundle_hash)
+      bundle_hash.deep_dup.tap do |bundle|
+        patient = patient_entry(bundle)['resource']
+        patient['extension'] = Array(patient['extension']) + [custom_extension]
+      end
+    end
+
+    def wrap_in_parameters(bundle_hash, parameter_name)
+      { 'resourceType' => 'Parameters', 'parameter' => [{ 'name' => parameter_name, 'resource' => bundle_hash }] }
+    end
+
+    def run_suite_test(request_parameters, response_parameters)
+      repo_create(
+        :request,
+        direction: 'incoming',
+        url: inquire_url,
+        test_session_id: test_session.id,
+        result:,
+        request_body: request_parameters.to_json,
+        response_body: response_parameters.to_json,
+        tags: [DaVinciPASTestKit::MUST_SUPPORT_WORKFLOW_TAG, DaVinciPASTestKit::INQUIRE_TAG],
+        status: 200
+      )
+      run(suite_test)
+    end
+
+    def suite_result_messages(result, type)
+      Inferno::Repositories::Messages.new.messages_for_result(result.id).select { |m| m.type == type }.map(&:message)
+    end
+
+    it 'passes for a conformant response' do
+      result = run_suite_test(wrap_in_parameters(request_bundle_hash, 'resource'),
+                              wrap_in_parameters(response_bundle_hash, 'return'))
+
+      expect(result.result).to eq('pass')
+      expect(suite_result_messages(result, 'error')).to be_empty
+    end
+
+    it 'skips for a custom extension in a Bundle within the Parameters' do
+      result = run_suite_test(wrap_in_parameters(request_bundle_hash, 'resource'),
+                              wrap_in_parameters(with_patient_extension(response_bundle_hash), 'return'))
+
+      expect(result.result).to eq('skip')
+      expect(suite_result_messages(result, 'error'))
+        .to include(a_string_including("#{custom_extension_url} in an echoed resource is not in the source resource"))
+    end
+
+    it 'skips for a custom extension on the Parameters' do
+      response_parameters = wrap_in_parameters(response_bundle_hash, 'return').merge('extension' => [custom_extension])
+
+      result = run_suite_test(wrap_in_parameters(request_bundle_hash, 'resource'), response_parameters)
+
+      expect(result.result).to eq('skip')
+      expect(suite_result_messages(result, 'error'))
+        .to include(a_string_including("The extension #{custom_extension_url} could not be found"))
+    end
+
+    it 'allows a custom extension on a resource echoed from the Parameters-wrapped request' do
+      request_bundle = with_patient_extension(request_bundle_hash)
+      response_bundle = response_bundle_hash.merge(
+        'entry' => response_bundle_hash['entry'].map do |entry|
+          entry['resource']['resourceType'] == 'Patient' ? patient_entry(request_bundle) : entry
+        end
+      )
+
+      result = run_suite_test(wrap_in_parameters(request_bundle, 'resource'),
+                              wrap_in_parameters(response_bundle, 'return'))
+
+      expect(result.result).to eq('pass')
+      expect(suite_result_messages(result, 'error')).to be_empty
+      expect(suite_result_messages(result, 'info')).to include(
+        a_string_including('echoes the Patient in the request').and(a_string_including(custom_extension_url))
+      )
+    end
   end
 end
