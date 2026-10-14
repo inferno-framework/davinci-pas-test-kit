@@ -119,13 +119,23 @@ RSpec.describe DaVinciPASTestKit::ResponseSelectionUtils do
     end
   end
 
-  describe '#entity_bundle' do
+  describe '#entity_response' do
+    let(:parameters) { { 'resourceType' => 'Parameters', 'parameter' => [{ 'name' => 'return' }] } }
+
     it 'returns a bare bundle unchanged' do
-      expect(utils.entity_bundle(inner_bundle)).to eq(inner_bundle)
+      expect(utils.entity_response(inner_bundle)).to eq(inner_bundle)
+    end
+
+    it 'returns bare Parameters unchanged' do
+      expect(utils.entity_response(parameters)).to eq(parameters)
     end
 
     it 'returns the inner bundle of a wrapper' do
-      expect(utils.entity_bundle(wrapper({ 'requestRange' => '1' }))).to eq(inner_bundle)
+      expect(utils.entity_response(wrapper({ 'requestRange' => '1' }))).to eq(inner_bundle)
+    end
+
+    it 'returns the inner Parameters of a wrapper' do
+      expect(utils.entity_response({ 'criteria' => {}, 'bundle' => parameters })).to eq(parameters)
     end
   end
 

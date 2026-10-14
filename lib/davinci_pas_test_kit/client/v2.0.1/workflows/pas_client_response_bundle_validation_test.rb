@@ -33,8 +33,11 @@ module DaVinciPASTestKit
         to the bound ValueSet. Quantity, Coding, and code element bindings will
         fail if their code/system are not found in the valueset.
 
-        Note that because X12 value sets are not public, elements bound to value
-        sets containing X12 codes are not validated.
+        Note that:
+        - To ensure that the PAS client is driving its behavior only based on standard
+          PAS information, custom extensions are not allowed within the responses.
+        - Because X12 value sets are not public, elements bound to value
+          sets containing X12 codes are not validated.
 
         **Limitations**
 

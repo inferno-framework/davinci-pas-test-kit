@@ -46,15 +46,10 @@ module DaVinciPASTestKit
         "Da Vinci PAS Server Suite #{ig_metadata.ig_version}"
       end
 
-      def ig_identifier
-        version = ig_metadata.ig_version[1..] # Remove leading 'v'
-        "hl7.fhir.us.davinci-pas##{version}"
-      end
-
-      def validator_igs_expression
-        identifiers = [ig_identifier]
-        identifiers << 'hl7.fhir.us.core#6.1.0' if ig_metadata.ig_version.start_with?('v2.2')
-        identifiers.map(&:inspect).join(', ')
+      # The validator_configuration.rb constant listing the IGs for this version, e.g. V221_VALIDATOR_IGS.
+      # A version without one fails when the generated suite loads.
+      def validator_igs_constant
+        "V#{ig_metadata.ig_version.delete('v.')}_VALIDATOR_IGS"
       end
 
       # v2.2+ suites use the targeted suppression list; v2.0.1 keeps the legacy list plus the

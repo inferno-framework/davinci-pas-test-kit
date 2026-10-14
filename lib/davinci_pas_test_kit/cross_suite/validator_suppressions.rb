@@ -222,6 +222,10 @@ module DaVinciPASTestKit
   ].freeze
   # rubocop:enable Layout/LineLength
 
+  # Validator messages are of the form `<ResourceType>: <FHIRPath>: <message>`. This prefix is
+  # stripped before matching messages against the suppressions.
+  VALIDATOR_MESSAGE_LOCATION_PREFIX = /\A\S+: \S+: /
+
   V221_SUPPRESSED_MESSAGES = Regexp.union(V221_SUPPRESSIONS)
   V201_SUPPRESSED_MESSAGES = Regexp.union(LEGACY_SUPPRESSIONS + V221_SUPPRESSIONS)
 end

@@ -79,6 +79,8 @@ generate a [mocked pended response and a notification with the rendered decision
 
 To run the "Operation Failure" and "Processing Errors" groups under "PAS Scenarios", the tester will need
 to provide the response bodies for Inferno to return as Inferno is not currently able to generate these responses.
+Like other responses Inferno sends, these cannot contain custom extensions, except within resources echoed
+unchanged from the request - see [Validation](Client-Details#validation).
 
 ### Testing Must Support Elements
 

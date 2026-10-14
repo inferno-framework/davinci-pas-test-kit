@@ -346,6 +346,28 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       expect(last_response.status).to be(200)
       expect(returned_claim_response.id).to eq('inquire-bundle')
     end
+
+    it 'serves tester-provided Parameters for inquire requests, keeping their content' do
+      parameter_extension = { 'url' => 'http://example.org/fhir/StructureDefinition/custom', 'valueString' => 'test' }
+      parameters = {
+        'resourceType' => 'Parameters',
+        'parameter' => [{ 'name' => 'return', 'extension' => [parameter_extension],
+                          'resource' => response_bundle(id: 'inquire-parameters',
+                                                        fixture: 'valid_pa_inquire_response_bundle.json') }]
+      }
+      inputs = { session_url_path:, ms_inquire_responses: [parameters].to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(inquire_url, inquire_request_json)
+
+      expect(last_response.status).to be(200)
+      returned = FHIR.from_contents(last_response.body)
+      expect(returned).to be_a(FHIR::Parameters)
+      expect(returned.parameter.first.extension.map(&:url)).to eq([parameter_extension['url']])
+      expect(returned.parameter.first.resource.entry[0].resource.id).to eq('inquire-parameters')
+      expect(result_warnings(result)).to be_empty
+    end
   end
 
   describe 'single tester-provided response (non must support workflow)' do

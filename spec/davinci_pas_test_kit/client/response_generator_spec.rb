@@ -471,6 +471,54 @@ RSpec.describe DaVinciPASTestKit::ResponseGenerator, :runnable do
       end
     end
 
+    describe 'and copying elements from the Claim' do
+      let(:custom_extension) do
+        { 'url' => 'http://example.org/fhir/StructureDefinition/custom', 'valueString' => 'custom' }
+      end
+      let(:pas_extension) do
+        { 'url' => 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction',
+          'valueCodeableConcept' => { 'coding' => [{ 'system' => 'https://www.usps.com/', 'code' => 'MA' }] } }
+      end
+      let(:request_bundle) do
+        bundle = JSON.parse(submit_request_string)
+        claim = bundle['entry'].find { |entry| entry['resource']['resourceType'] == 'Claim' }['resource']
+        claim['identifier'] = [{ 'system' => 'http://example.org/claims', 'value' => '123',
+                                 'extension' => [custom_extension, pas_extension] }]
+        claim['type']['extension'] = [custom_extension]
+        claim['type']['coding'].first['extension'] = [custom_extension]
+        claim['patient']['extension'] = [custom_extension]
+        claim['item'].first['productOrService']['extension'] = [custom_extension]
+        FHIR.from_contents(bundle.to_json)
+      end
+
+      def claim_response_from(response_string)
+        FHIR.from_contents(response_string).entry.find { |entry| entry.resource.is_a?(FHIR::ClaimResponse) }.resource
+      end
+
+      it 'drops custom extensions but keeps HL7-published ones' do
+        claim_response = claim_response_from(module_instance.mock_response_bundle(request_bundle, 'submit',
+                                                                                  :modification, nil))
+
+        expect(claim_response.identifier.first.extension.map(&:url)).to eq([pas_extension['url']])
+        expect(claim_response.identifier.first.value).to eq('123')
+        expect(claim_response.type.extension).to be_empty
+        expect(claim_response.type.coding.first.extension).to be_empty
+        expect(claim_response.type.coding.first.code).to be_present
+        expect(claim_response.patient.extension).to be_empty
+        expect(claim_response.patient.reference).to be_present
+        expect(claim_response.addItem.first.productOrService.extension).to be_empty
+        expect(claim_response.to_json).to_not include(custom_extension['url'])
+      end
+
+      it 'leaves the extensions on the request Claim in place' do
+        module_instance.mock_response_bundle(request_bundle, 'submit', :modification, nil)
+
+        claim = request_bundle.entry.find { |entry| entry.resource.is_a?(FHIR::Claim) }.resource
+        expect(claim.type.extension.map(&:url)).to eq([custom_extension['url']])
+        expect(claim.identifier.first.extension.length).to eq(2)
+      end
+    end
+
     describe 'and including referenced entries' do
       it 'all entries included when using absolute url references' do
         returned_response_string = module_instance.mock_response_bundle(
