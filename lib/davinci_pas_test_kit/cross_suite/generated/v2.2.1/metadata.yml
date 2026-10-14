@@ -4861,7 +4861,6 @@
     - :path: content.attachment
     - :path: content.attachment.contentType
     - :path: content.attachment.data
-    - :path: content.attachment.url
     - :path: content.format
     - :path: context
     - :path: context.encounter
