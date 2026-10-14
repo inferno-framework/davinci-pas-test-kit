@@ -92,7 +92,8 @@
           {
             "url" : "quantity",
             "valueQuantity" : {
-              "value" : 1
+              "value" : 1,
+              "unit" : "unit"
             }
           }],
           "url" : "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemAuthorizedDetail"

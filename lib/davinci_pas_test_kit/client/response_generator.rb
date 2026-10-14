@@ -499,6 +499,8 @@ module DaVinciPASTestKit
         if attr.to_s == 'request' && resource.respond_to?(:resourceType) && resource.resourceType == 'ClaimResponse'
           next
         end
+        # JSON keys without a matching attribute, e.g., the `_gender` holding a primitive's extensions
+        next unless resource.respond_to?(attr.to_sym)
 
         value = resource.send(attr.to_sym)
         if value.is_a?(FHIR::Reference) && value.reference.present?
