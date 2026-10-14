@@ -1,7 +1,7 @@
 # Runs the conformance tests of the Subscription Update and Deletion group, including those reused from the
 # subscriptions test kit, against update and delete requests sent to the PAS client suite's endpoints. This
 # checks that the reused tests find the Subscription created and the requests tagged by the PAS suite.
-RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientUpdateDeleteWorkflowGroup, :request do
+RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientSubscriptionUpdateDeleteGroup, :request do
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:session_url_path) { '1234' }
   let(:subscription_json) do
