@@ -1,3 +1,4 @@
+require_relative '../../../cross_suite/validator_configuration'
 require_relative '../../../cross_suite/validator_suppressions'
 require_relative '../../v2.0.1/pas_error_group'
 require_relative '../../v2.0.1/pas_server_subscription_setup'
@@ -85,16 +86,14 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs "hl7.fhir.us.davinci-pas#2.0.1"
+        igs(*V201_VALIDATOR_IGS)
         
         exclude_message do |message|
-          # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
-          # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching
-          V201_SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, ''))
+          V201_SUPPRESSED_MESSAGES.match?(message.message.sub(VALIDATOR_MESSAGE_LOCATION_PREFIX, ''))
         end
 
         validation_context do
-          snomedCT '731000124108'
+          snomedCT SNOMED_CT_US_EDITION
         end
       end
 

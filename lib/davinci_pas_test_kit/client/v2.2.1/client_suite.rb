@@ -1,6 +1,7 @@
 require 'subscriptions_test_kit'
 require 'udap_security_test_kit'
 require 'smart_app_launch_test_kit'
+require_relative '../../cross_suite/validator_configuration'
 require_relative '../../cross_suite/validator_suppressions'
 require_relative '../../cross_suite/tags'
 require_relative '../../cross_suite/pas_constants'
@@ -84,12 +85,29 @@ module DaVinciPASTestKit
       )
 
       fhir_resource_validator do
-        igs('hl7.fhir.us.davinci-pas#2.2.1', 'hl7.fhir.us.core#6.1.0')
+        igs(*V221_VALIDATOR_IGS)
 
         exclude_message do |message|
-          # Messages expected of the form `<ResourceType>: <FHIRPath>: <message>`
-          # We strip `<ResourceType>: <FHIRPath>: ` for the sake of matching
-          V221_SUPPRESSED_MESSAGES.match?(message.message.sub(/\A\S+: \S+: /, ''))
+          V221_SUPPRESSED_MESSAGES.match?(message.message.sub(VALIDATOR_MESSAGE_LOCATION_PREFIX, ''))
+        end
+
+        validation_context do
+          snomedCT SNOMED_CT_US_EDITION
+        end
+      end
+
+      # Used to verify responses sent by Inferno, which may be tester-provided, to
+      # ensure they don't contain extensions not defined in the PAS IG or its dependencies.
+      fhir_resource_validator NO_CUSTOM_EXTENSIONS_VALIDATOR do
+        igs(*V221_VALIDATOR_IGS)
+
+        exclude_message do |message|
+          V221_SUPPRESSED_MESSAGES.match?(message.message.sub(VALIDATOR_MESSAGE_LOCATION_PREFIX, ''))
+        end
+
+        validation_context do
+          snomedCT SNOMED_CT_US_EDITION
+          extensions [] # no extensions not in the spec
         end
       end
 

@@ -4,6 +4,11 @@ module DaVinciPASTestKit
   module ResponseGenerator
     include ParametersHelper
 
+    # Extensions on elements of the request Claim that Inferno copies into the ClaimResponse it generates
+    # are kept only if they are published by HL7 (e.g., the PAS identifier extensions), since Inferno,
+    # acting as the payer, doesn't send custom extensions - see NO_CUSTOM_EXTENSIONS_VALIDATOR.
+    HL7_EXTENSION_URL_PREFIX = 'http://hl7.org/fhir/'.freeze
+
     def mock_id_only_notification_bundle(submit_response, subscription_reference, subscription_topic,
                                          ig_version = 'v2.0.1')
       notification_timestamp = Time.now.utc
@@ -240,14 +245,14 @@ module DaVinciPASTestKit
                                       else
                                         "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse|#{ig_version.delete('v')}"
                                       end),
-        identifier: claim.identifier,
-        type: claim.type,
+        identifier: copy_without_custom_extensions(claim.identifier),
+        type: copy_without_custom_extensions(claim.type),
         status: claim.status,
         use: claim.use,
-        patient: absolute_reference(claim.patient, request_bundle.entry, root_url),
+        patient: copy_without_custom_extensions(absolute_reference(claim.patient, request_bundle.entry, root_url)),
         created: timestamp.iso8601,
-        insurer: absolute_reference(claim.insurer, request_bundle.entry, root_url),
-        requestor: absolute_reference(claim.provider, request_bundle.entry, root_url),
+        insurer: copy_without_custom_extensions(absolute_reference(claim.insurer, request_bundle.entry, root_url)),
+        requestor: copy_without_custom_extensions(absolute_reference(claim.provider, request_bundle.entry, root_url)),
         request: claim_full_url.present? ? FHIR::Reference.new(reference: claim_full_url) : nil,
         # v2.2.1 removed 'queued' from ClaimResponseOutcome ValueSet; pended status is
         # conveyed via item.extension:reviewActionCode instead.
@@ -303,13 +308,41 @@ module DaVinciPASTestKit
       claim_response
     end
 
+    # @param element [FHIR::Model, Array<FHIR::Model>, nil] an element of the request Claim.
+    # @return a copy of the element without extensions (at any depth) that aren't published by HL7.
+    def copy_without_custom_extensions(element)
+      return element.map { |child| copy_without_custom_extensions(child) } if element.is_a?(Array)
+      return element if element.nil?
+
+      element.class.new(without_custom_extensions(element.to_hash))
+    end
+
+    # Kept extensions are left whole, since complex extensions' sub-extensions use relative urls.
+    def without_custom_extensions(value)
+      case value
+      when Hash
+        value.each_with_object({}) do |(key, child), result|
+          if %w[extension modifierExtension].include?(key)
+            kept = child.select { |extension| extension['url'].to_s.start_with?(HL7_EXTENSION_URL_PREFIX) }
+            result[key] = kept if kept.present?
+          else
+            result[key] = without_custom_extensions(child)
+          end
+        end
+      when Array
+        value.map { |child| without_custom_extensions(child) }
+      else
+        value
+      end
+    end
+
     # Pairs each modified item (already marked A6 above) with a ClaimResponse.addItem, referenced by
     # the same itemSequence, conveying what the payer authorized (marked A1, 'Certified in total').
     def add_modified_items(claim_response, claim)
       claim_response.addItem = claim.item.map do |item|
         FHIR::ClaimResponse::AddItem.new(
           itemSequence: [item.sequence],
-          productOrService: item.productOrService,
+          productOrService: copy_without_custom_extensions(item.productOrService),
           adjudication: [
             FHIR::ClaimResponse::Item::Adjudication.new(
               extension: [
@@ -466,6 +499,8 @@ module DaVinciPASTestKit
         if attr.to_s == 'request' && resource.respond_to?(:resourceType) && resource.resourceType == 'ClaimResponse'
           next
         end
+        # JSON keys without a matching attribute, e.g., the `_gender` holding a primitive's extensions
+        next unless resource.respond_to?(attr.to_sym)
 
         value = resource.send(attr.to_sym)
         if value.is_a?(FHIR::Reference) && value.reference.present?

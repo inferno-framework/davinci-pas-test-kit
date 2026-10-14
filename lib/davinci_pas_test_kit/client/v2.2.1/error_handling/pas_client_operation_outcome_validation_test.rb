@@ -1,4 +1,5 @@
 require_relative '../../../cross_suite/tags'
+require_relative '../../../cross_suite/validator_configuration'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -9,6 +10,9 @@ module DaVinciPASTestKit
         This test verifies the validity of the OperationOutcome returned by Inferno during the
         Operation Failure scenario. The OperationOutcome is validated against the base FHIR R4
         OperationOutcome resource definition — no PAS-specific profile is required.
+
+        To ensure that the PAS client is driving its behavior only based on standard
+        PAS information, custom extensions are not allowed within the response.
 
         The PAS IG [requires](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/specification.html#prior-authorization-transaction-error-handling)
         that when a 4XX response is returned, an OperationOutcome **SHALL** be included
@@ -30,9 +34,10 @@ module DaVinciPASTestKit
         skip_if !operation_outcome.is_a?(FHIR::OperationOutcome),
                 "Expected an OperationOutcome but received #{operation_outcome.resourceType}."
 
-        skip_if !resource_is_valid?(resource: operation_outcome),
+        skip_if !resource_is_valid?(resource: operation_outcome, validator: NO_CUSTOM_EXTENSIONS_VALIDATOR),
                 'The OperationOutcome returned during the Operation Failure scenario is not conformant ' \
-                'with the base FHIR R4 OperationOutcome resource definition.'
+                'with the base FHIR R4 OperationOutcome resource definition or contains custom extensions. ' \
+                'See Messages for details.'
       end
     end
   end

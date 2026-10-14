@@ -2,16 +2,18 @@ require_relative 'fhirpath_utils'
 
 module DaVinciPASTestKit
   # Selection of a response from a tester-provided list of candidates. Each candidate
-  # is either a bare FHIR Bundle or a plain JSON wrapper object pairing the response
-  # Bundle ("bundle") with the selection criteria ("criteria") that the incoming
-  # request must meet for that Bundle to be returned. The wrapper is plain JSON
-  # rather than FHIR because Bundle resources cannot carry top-level extensions.
-  # Candidates are handled as parsed JSON hashes; the inner Bundle is a clean FHIR
-  # resource and needs no modification before use.
+  # is either a bare response resource - a FHIR Bundle, or a Parameters wrapping Bundles
+  # (e.g., a v2.2.1 $inquire response) - or a plain JSON wrapper object pairing the
+  # response resource ("bundle") with the selection criteria ("criteria") that the
+  # incoming request must meet for that response to be returned. The wrapper is plain
+  # JSON rather than FHIR because Bundle resources cannot carry top-level extensions.
+  # Candidates are handled as parsed JSON hashes; the inner response resource is a clean
+  # FHIR resource and needs no modification before use.
   # Requires FhirpathUtils and access to `result` (Inferno::Entities::Result).
   module ResponseSelectionUtils
     CRITERIA_KEY = 'criteria'.freeze
     BUNDLE_KEY = 'bundle'.freeze
+    RESPONSE_RESOURCE_TYPES = %w[Bundle Parameters].freeze
     REQUEST_RANGE_KEY = 'requestRange'.freeze
     FHIRPATH_KEY = 'fhirpath'.freeze
 
@@ -19,16 +21,16 @@ module DaVinciPASTestKit
     # Candidate handling
     # ***********************************************************************
 
-    def bare_bundle?(entity)
-      entity.is_a?(Hash) && entity['resourceType'] == 'Bundle'
+    def bare_response?(entity)
+      entity.is_a?(Hash) && RESPONSE_RESOURCE_TYPES.include?(entity['resourceType'])
     end
 
-    def entity_bundle(entity)
-      bare_bundle?(entity) ? entity : entity[BUNDLE_KEY]
+    def entity_response(entity)
+      bare_response?(entity) ? entity : entity[BUNDLE_KEY]
     end
 
     def entity_criteria(entity)
-      criteria = bare_bundle?(entity) ? nil : entity[CRITERIA_KEY]
+      criteria = bare_response?(entity) ? nil : entity[CRITERIA_KEY]
       criteria.is_a?(Hash) ? criteria : {}
     end
 
