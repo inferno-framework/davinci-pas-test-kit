@@ -4,9 +4,11 @@ require 'smart_app_launch_test_kit'
 require_relative '../../cross_suite/validator_configuration'
 require_relative '../../cross_suite/validator_suppressions'
 require_relative '../../cross_suite/tags'
+require_relative '../../cross_suite/pas_constants'
 require_relative '../endpoints/claim_endpoint'
 require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
+require_relative '../endpoints/subscription_read_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
 require_relative '../metadata/mock_pas_server'
 require_relative '../pas_client_options'
@@ -126,6 +128,26 @@ module DaVinciPASTestKit
                      }
                    ]
 
+      # Inferno selects the first listed option by default.
+      suite_option :us_core_version,
+                   title: 'US Core Version',
+                   description: 'The US Core version whose profiles are used to validate supporting ' \
+                                'information resources that have no PAS profile.',
+                   list_options: [
+                     {
+                       label: 'US Core 3.1.1',
+                       value: PASConstants::US_CORE_VERSION_3_1_1
+                     },
+                     {
+                       label: 'US Core 6.1.0',
+                       value: PASConstants::US_CORE_VERSION_6_1_0
+                     },
+                     {
+                       label: 'US Core 7.0.0',
+                       value: PASConstants::US_CORE_VERSION_7_0_0
+                     }
+                   ]
+
       route(:get, UDAPSecurityTestKit::UDAP_DISCOVERY_PATH, lambda { |_env|
         UDAPSecurityTestKit::MockUDAPServer.udap_server_metadata(id)
       })
@@ -152,8 +174,8 @@ module DaVinciPASTestKit
       suite_endpoint :post, SESSION_INQUIRE_PATH, ClaimEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
-      suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
-      suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionsTestKit::SubscriptionReadEndpoint
+      suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
+      suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint

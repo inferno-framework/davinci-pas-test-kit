@@ -1,4 +1,5 @@
 require_relative '../user_input_response'
+require_relative 'endpoint_constants'
 require_relative '../response_generator'
 require_relative '../subscription_notification_trigger'
 require_relative '../client_urls'
@@ -19,6 +20,12 @@ module DaVinciPASTestKit
     # override the one from URLs to make it version specific
     def suite_id
       request.path.split('/custom/')[1].split('/')[0] # request.path = {base inferno path}/custom/{suite_id}/...
+    end
+
+    error_response_format :operation_outcome
+
+    def test_run_identifier_location_description
+      SESSION_PATH_OR_BEARER_TOKEN_LOCATION_DESCRIPTION
     end
 
     def test_run_identifier

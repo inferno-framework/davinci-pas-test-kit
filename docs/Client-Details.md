@@ -70,6 +70,11 @@ update references when it echoes resources in the responses it generates.
   Inferno sends, including tester-provided responses, so they are neither sent to the client nor
   validated.
 
+The v2.2.1 suite validates resources against the PAS 2.2.1 implementation guide. Supporting
+information resources that have no PAS profile are validated against the US Core profiles of
+the version chosen for the **US Core Version** suite option when the session is created
+(3.1.1, 6.1.0, or 7.0.0, with 3.1.1 as the default), since PAS allows any of them.
+
 ### Responses
 
 Inferno contains basic logic to generate approval, denial, and pended responses, along with a

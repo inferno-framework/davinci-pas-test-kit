@@ -90,7 +90,12 @@ These tests can be run without providing custom responses, but because Inferno's
 will not populate all ClaimResponse must support elements, [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 will be needed to pass the group.
 
+### Selecting a US Core Version
 
+PAS allows supporting information resources to conform to US Core 3.1.1, 6.1.0, or 7.0.0. Inferno
+validates resources that have no PAS profile against the version chosen for the **US Core Version**
+suite option when the session is created, which defaults to 3.1.1. Create a new session to test
+against a different version.
 
 ### Testing Authentication Interactions
 

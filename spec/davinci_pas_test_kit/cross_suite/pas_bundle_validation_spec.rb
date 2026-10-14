@@ -1008,6 +1008,13 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       Class.new do
         include DaVinciPASTestKit::PasBundleValidation
 
+        # Stands in for the runnable's suite option selections, read by us_core_version.
+        attr_writer :suite_options
+
+        def suite_options
+          @suite_options ||= {}
+        end
+
         def evaluate_fhirpath(**)
           []
         end
@@ -1022,8 +1029,12 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end.new
     end
 
-    def us_core_profile_url(profile_id)
-      "#{described_class::US_CORE_PROFILE_BASE}/#{profile_id}|#{described_class::US_CORE_VERSION}"
+    def us_core_profile_url(profile_id, version = test_instance.us_core_version)
+      "#{described_class::US_CORE_PROFILE_BASE}/#{profile_id}|#{version}"
+    end
+
+    def select_us_core_version(version)
+      test_instance.suite_options = { us_core_version: version }
     end
 
     def us_core_unversioned_profile_url(profile_id)
@@ -1062,6 +1073,194 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
 
       it 'returns false for PAS v2.0.1' do
         expect(test_instance.send(:us_core_profile_fallback_enabled?, '2.0.1')).to be(false)
+      end
+    end
+
+    describe '#us_core_version' do
+      it 'falls back to 6.1.0 when the suite offers no US Core Version option' do
+        expect(test_instance.us_core_version).to eq(DaVinciPASTestKit::PASConstants::DEFAULT_US_CORE_VERSION)
+        expect(test_instance.us_core_version).to eq('6.1.0')
+      end
+
+      it 'uses the selected US Core Version suite option' do
+        select_us_core_version('3.1.1')
+        expect(test_instance.us_core_version).to eq('3.1.1')
+      end
+    end
+
+    describe 'with a selected US Core version' do
+      let(:us_core_versions) { ['3.1.1', '6.1.0', '7.0.0'] }
+
+      def fallback_profile_urls(resource)
+        entry = bundle_entry(resource, "urn:uuid:#{resource.id}")
+        test_instance.send(:reset_bundle_profile_inference_state)
+        test_instance.send(:add_us_core_profiles_to_unprofiled_entries, [entry], '2.2.1')
+        test_instance.bundle_resources_target_profile_map["urn:uuid:#{resource.id}"][:profile_urls]
+      end
+
+      it 'versions fallback profile URLs with the selected version' do
+        us_core_versions.each do |version|
+          select_us_core_version(version)
+
+          expect(fallback_profile_urls(FHIR::Patient.new(id: 'patient-1')))
+            .to contain_exactly(us_core_profile_url('us-core-patient', version))
+        end
+      end
+
+      it 'appends the selected version to unversioned US Core profile URLs' do
+        select_us_core_version('7.0.0')
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter"
+        base_profile = 'http://hl7.org/fhir/StructureDefinition/Encounter'
+
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|7.0.0")
+      end
+
+      it 'leaves a declared US Core profile URL unversioned when the selected version does not define it' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-coverage"
+        base_profile = 'http://hl7.org/fhir/StructureDefinition/Coverage'
+
+        select_us_core_version('3.1.1')
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq(url)
+
+        select_us_core_version('6.1.0')
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|6.1.0")
+      end
+
+      it 'validates a declared US Core Condition profile against 3.1.1, the only version that defines it' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/#{described_class::US_CORE_CONDITION_PROFILE_ID}"
+        base_profile = 'http://hl7.org/fhir/StructureDefinition/Condition'
+
+        us_core_versions.each do |version|
+          select_us_core_version(version)
+
+          expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|3.1.1")
+          expect(test_instance.send(:us_core_profile_available?, described_class::US_CORE_CONDITION_PROFILE_ID))
+            .to be(version == '3.1.1')
+        end
+      end
+
+      it 'validates a declared US Core profile unversioned when the selected version does not define it' do
+        select_us_core_version('3.1.1')
+        coverage = FHIR::Coverage.new(id: 'coverage-1')
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-coverage"
+        test_instance.add_resource_target_profile_to_map('urn:uuid:coverage-1', coverage, url)
+        allow(test_instance).to receive(:resource_is_valid?).and_return(true)
+
+        test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+        expect(test_instance).to have_received(:resource_is_valid?)
+          .with(resource: coverage, profile_url: url, add_messages_to_runnable: false,
+                validator_response_details: anything)
+      end
+
+      it 'uses the base R4 sentinel for resource types that US Core 3.1.1 has no profile for' do
+        select_us_core_version('3.1.1')
+
+        expect(fallback_profile_urls(FHIR::Coverage.new(id: 'coverage-1')))
+          .to contain_exactly(described_class::BASE_R4_PROFILE)
+      end
+
+      it 'uses the US Core Coverage profile for 6.1.0 and 7.0.0' do
+        ['6.1.0', '7.0.0'].each do |version|
+          select_us_core_version(version)
+
+          expect(fallback_profile_urls(FHIR::Coverage.new(id: 'coverage-1')))
+            .to contain_exactly(us_core_profile_url('us-core-coverage', version))
+        end
+      end
+
+      it 'uses the single US Core 3.1.1 Condition profile regardless of category' do
+        select_us_core_version('3.1.1')
+        condition = FHIR::Condition.new(
+          id: 'condition-1',
+          category: [codeable_concept(described_class::TERMINOLOGY_CONDITION_CATEGORY_SYSTEM, 'encounter-diagnosis')]
+        )
+
+        expect(fallback_profile_urls(condition))
+          .to contain_exactly(us_core_profile_url(described_class::US_CORE_CONDITION_PROFILE_ID, '3.1.1'))
+      end
+
+      it 'splits Condition by category for 6.1.0 and 7.0.0' do
+        condition = FHIR::Condition.new(
+          id: 'condition-1',
+          category: [codeable_concept(described_class::TERMINOLOGY_CONDITION_CATEGORY_SYSTEM, 'encounter-diagnosis')]
+        )
+
+        ['6.1.0', '7.0.0'].each do |version|
+          select_us_core_version(version)
+
+          expect(fallback_profile_urls(condition))
+            .to contain_exactly(us_core_profile_url(described_class::US_CORE_CONDITION_ENCOUNTER_DIAGNOSIS_PROFILE_ID,
+                                                    version))
+        end
+      end
+
+      it 'uses the base R4 sentinel for an Observation whose candidate profiles postdate US Core 3.1.1' do
+        select_us_core_version('3.1.1')
+        # heart rate, vital signs, clinical result, and simple observation were all added after 3.1.1
+        observation = FHIR::Observation.new(
+          id: 'observation-1',
+          code: codeable_concept(described_class::LOINC_SYSTEM, '8867-4'),
+          category: [codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'vital-signs')]
+        )
+
+        expect(fallback_profile_urls(observation)).to contain_exactly(described_class::BASE_R4_PROFILE)
+      end
+
+      it 'keeps the Observation profiles that US Core 3.1.1 defines' do
+        select_us_core_version('3.1.1')
+        lab = FHIR::Observation.new(
+          id: 'lab-1',
+          code: codeable_concept(described_class::LOINC_SYSTEM, '99999-9'),
+          category: [codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'laboratory')]
+        )
+        pulse_oximetry = FHIR::Observation.new(
+          id: 'pulse-ox-1',
+          code: codeable_concept(described_class::LOINC_SYSTEM, '59408-5')
+        )
+
+        expect(fallback_profile_urls(lab))
+          .to eq([us_core_profile_url(described_class::US_CORE_OBSERVATION_LAB_PROFILE_ID, '3.1.1'),
+                  described_class::BASE_R4_PROFILE])
+        # code-specific profiles are the only candidate in every version, so no catch-all follows
+        expect(fallback_profile_urls(pulse_oximetry))
+          .to contain_exactly(us_core_profile_url('us-core-pulse-oximetry', '3.1.1'))
+      end
+
+      it 'ends the category-based Observation candidates with the base R4 sentinel for US Core 3.1.1' do
+        select_us_core_version('3.1.1')
+        # Simple Observation is the catch-all from 6.1.0 on; the base resource plays that role in 3.1.1.
+        observation = FHIR::Observation.new(
+          id: 'observation-1',
+          category: [codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'social-history')]
+        )
+        expected_profile_urls = [
+          us_core_profile_url(described_class::US_CORE_SMOKING_STATUS_PROFILE_ID, '3.1.1'),
+          described_class::BASE_R4_PROFILE
+        ]
+
+        expect(fallback_profile_urls(observation)).to eq(expected_profile_urls)
+      end
+
+      it 'uses the code-specific Observation profiles added in US Core 7.0.0 only when 7.0.0 is selected' do
+        observation = FHIR::Observation.new(
+          id: 'observation-1',
+          code: codeable_concept(described_class::LOINC_SYSTEM, '96607-7'),
+          category: [codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'vital-signs')]
+        )
+
+        select_us_core_version('7.0.0')
+        expect(fallback_profile_urls(observation))
+          .to contain_exactly(us_core_profile_url('us-core-average-blood-pressure', '7.0.0'))
+
+        # without the average blood pressure profile, the category-based candidates apply
+        select_us_core_version('6.1.0')
+        category_profile_urls = [
+          described_class::US_CORE_VITAL_SIGNS_PROFILE_ID,
+          described_class::US_CORE_OBSERVATION_CLINICAL_RESULT_PROFILE_ID,
+          described_class::US_CORE_SIMPLE_OBSERVATION_PROFILE_ID
+        ].map { |profile_id| us_core_profile_url(profile_id, '6.1.0') }
+        expect(fallback_profile_urls(observation)).to eq(category_profile_urls)
       end
     end
 
@@ -1285,7 +1484,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       end
 
       it 'returns true for a versioned US Core profile URL' do
-        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter|#{described_class::US_CORE_VERSION}"
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter|#{test_instance.us_core_version}"
         expect(test_instance.send(:us_core_profile_url?, url)).to be(true)
       end
 
@@ -1306,7 +1505,7 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
       it 'appends the US Core version to an unversioned US Core URL' do
         url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-encounter"
         expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1'))
-          .to eq("#{url}|#{described_class::US_CORE_VERSION}")
+          .to eq("#{url}|#{test_instance.us_core_version}")
       end
 
       it 'returns a base R4 profile URL unchanged when it matches the base profile' do

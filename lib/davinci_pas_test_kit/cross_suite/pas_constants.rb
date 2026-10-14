@@ -7,6 +7,13 @@ module DaVinciPASTestKit
     CLAIM_INQUIRY_RESPONSE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claiminquiryresponse'.freeze
     DATA_ABSENT_REASON_EXTENSION_URL = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason'.freeze
 
+    # US Core versions that PAS v2.2 lets supporting information resources conform to
+    US_CORE_VERSION_3_1_1 = '3.1.1'.freeze
+    US_CORE_VERSION_6_1_0 = '6.1.0'.freeze
+    US_CORE_VERSION_7_0_0 = '7.0.0'.freeze
+    # Validated against by suites that do not offer the US Core Version option (the v2.2 server suite)
+    DEFAULT_US_CORE_VERSION = US_CORE_VERSION_6_1_0
+
     BUNDLE_PROFILES_FOR_OPERATION_TYPE = {
       submit_request: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-request-bundle',
       submit_response: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle',
