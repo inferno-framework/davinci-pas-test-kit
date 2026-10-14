@@ -10,6 +10,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientSubscriptionUpdateDel
   let(:session_instance_url) do
     "/custom/#{suite_id}/#{session_url_path}#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}/#{subscription_id}"
   end
+  let(:resume_pass_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{session_url_path}" }
 
   def create_subscription_request
     repo_create(
@@ -83,6 +84,33 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientSubscriptionUpdateDel
       get "/custom/#{suite_id}#{DaVinciPASTestKit::RESUME_PASS_PATH}?token=#{session_url_path}"
 
       expect(run(described_class, session_url_path:).result).to eq('wait')
+    end
+
+    it 'starts again from the created Subscription when re-run after an earlier run deleted it' do
+      run(described_class, session_url_path:)
+      delete session_instance_url
+      get resume_pass_url
+      run(described_class, session_url_path:)
+
+      get session_instance_url
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)['id']).to eq(subscription_id)
+
+      put session_instance_url, subscription_json.to_json, 'CONTENT_TYPE' => 'application/fhir+json'
+      expect(last_response.status).to eq(200)
+    end
+
+    it 'no longer blocks the pended scenario when re-run without changes after an earlier run deleted it' do
+      pended_submit_test = DaVinciPASTestKit::DaVinciPASV221::PASClientPendedSubmitTest
+      run(described_class, session_url_path:)
+      delete session_instance_url
+      get resume_pass_url
+      expect(run(pended_submit_test, session_url_path:).result).to eq('skip')
+
+      run(described_class, session_url_path:)
+      get resume_pass_url
+
+      expect(run(pended_submit_test, session_url_path:).result).to eq('wait')
     end
   end
 end

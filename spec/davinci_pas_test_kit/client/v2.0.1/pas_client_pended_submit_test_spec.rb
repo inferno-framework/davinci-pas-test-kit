@@ -47,6 +47,17 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       expect(result.result_message).to include('no Subscription exists to receive notifications')
     end
 
+    it 'skips if the client has deleted the subscription' do
+      create_subscription_request
+      subscription_id = subscription_create_response_full_resource['id']
+      repo_create(:request, direction: 'incoming', url: "#{subscription_url}/#{subscription_id}",
+                            test_session_id: test_session.id, result:, status: 204,
+                            tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id])
+      result = run(test, session_url_path:)
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('submitted update or delete requests')
+    end
+
     it 'continues after a resume request' do
       create_subscription_request
       inputs = { session_url_path: }
