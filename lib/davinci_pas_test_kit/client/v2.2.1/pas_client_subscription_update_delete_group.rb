@@ -12,7 +12,10 @@ module DaVinciPASTestKit
       description %(
         During this group, the tester will demonstrate the ability of the PAS client
         to update and delete the PAS Subscription instance that it created
-        during the "Subscription Setup" group.
+        during the "Subscription Setup" group. This group must be run after
+        all other tests have been run as Inferno will not support notifications
+        once the Subscription created during the "Subscription Setup" group
+        has been modified or deleted during this group.
 
         Inferno will wait for the client to send update and delete requests and
         will then verify that the requests are conformant. Note that
