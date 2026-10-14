@@ -28,14 +28,16 @@ module DaVinciPASTestKit
       end
 
       response.format = :json
-      subscription = find_subscription(test_run.test_session_id)
+      # Reflects any updates or deletion of the Subscription by the client
+      subscription = find_current_subscription(test_run.test_session_id)
 
-      unless subscription.present?
+      subscription_id = request.params[:id]
+      if subscription.blank? || (subscription_id.present? && subscription_id != subscription.id)
         not_found
         return
       end
 
-      subscription_id = request.params[:id]
+      status_code = current_subscription_status_code(subscription)
 
       # Handle resource-level status params
       unless subscription_id.present?
@@ -47,7 +49,7 @@ module DaVinciPASTestKit
           return
         end
 
-        unless subscription_params_match?(params, subscription)
+        unless subscription_params_match?(params, subscription, status_code)
           not_found
           return
         end
@@ -55,7 +57,6 @@ module DaVinciPASTestKit
 
       subscription_url = "#{base_subscription_url}/#{subscription.id}"
       subscription_topic = subscription.criteria
-      status_code = determine_subscription_status_code(subscription_id)
       event_count = determine_event_count(test_run.test_session_id)
 
       notification_json = notification_bundle_input(result)
@@ -76,14 +77,13 @@ module DaVinciPASTestKit
       response.status = 200
     end
 
-    def subscription_params_match?(params, subscription)
+    def subscription_params_match?(params, subscription, status_code)
       id_params = find_params(params, 'id')
 
       return false if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
 
       status_params = find_params(params, 'status')
-      subscription_status = determine_subscription_status_code(subscription.id)
-      status_params.blank? || status_params.any? { |p| p.valueString == subscription_status }
+      status_params.blank? || status_params.any? { |p| p.valueString == status_code }
     end
 
     def tags
