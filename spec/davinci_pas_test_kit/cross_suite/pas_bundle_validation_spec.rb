@@ -560,6 +560,19 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|6.1.0")
       end
 
+      it 'validates a declared US Core Condition profile against 3.1.1, the only version that defines it' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/#{described_class::US_CORE_CONDITION_PROFILE_ID}"
+        base_profile = 'http://hl7.org/fhir/StructureDefinition/Condition'
+
+        us_core_versions.each do |version|
+          select_us_core_version(version)
+
+          expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|3.1.1")
+          expect(test_instance.send(:us_core_profile_available?, described_class::US_CORE_CONDITION_PROFILE_ID))
+            .to be(version == '3.1.1')
+        end
+      end
+
       it 'validates a declared US Core profile unversioned when the selected version does not define it' do
         select_us_core_version('3.1.1')
         coverage = FHIR::Coverage.new(id: 'coverage-1')

@@ -297,9 +297,13 @@ module DaVinciPASTestKit
       return url if url.include?('|') || profile_url_without_version(url) == base_profile
 
       if us_core_profile_url?(url)
+        profile_id = url.delete_prefix("#{US_CORE_PROFILE_BASE}/")
+        # US Core 3.1.1's single Condition profile was split by category in later versions,
+        # so only 3.1.1 defines it.
+        return "#{url}|#{PASConstants::US_CORE_VERSION_3_1_1}" if profile_id == US_CORE_CONDITION_PROFILE_ID
+
         # A declared US Core profile gets the selected version only when that version defines it;
         # otherwise it stays unversioned so the validator resolves it to a version that does.
-        profile_id = url.delete_prefix("#{US_CORE_PROFILE_BASE}/")
         return us_core_profile_available?(profile_id) ? "#{url}|#{us_core_version}" : url
       end
 
@@ -419,6 +423,9 @@ module DaVinciPASTestKit
 
     # Whether the selected US Core version defines the profile.
     def us_core_profile_available?(profile_id)
+      # The only profile a later supported version dropped; see profile_url_for_validation.
+      return us_core_version == PASConstants::US_CORE_VERSION_3_1_1 if profile_id == US_CORE_CONDITION_PROFILE_ID
+
       added_in = US_CORE_PROFILE_IDS_ADDED_IN_VERSION.find { |_, profile_ids| profile_ids.include?(profile_id) }&.first
       added_in.nil? || Gem::Version.new(us_core_version) >= Gem::Version.new(added_in)
     end
