@@ -5,7 +5,7 @@ require 'udap_security_test_kit'
 module DaVinciPASTestKit
   # Identifies the test session for the claim and Subscription endpoints, using either the session
   # path or the client id embedded in the bearer token.
-  module SessionIdentification
+  module EndpointSessionIdentification
     # Where the session identifier is expected. Used in responses when no session is found.
     LOCATION_DESCRIPTION = 'the path or embedded within the bearer token in the Authorization header'
 

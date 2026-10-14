@@ -1,5 +1,5 @@
 require_relative '../../cross_suite/tags'
-require_relative 'session_identification'
+require_relative 'endpoint_session_identification'
 require_relative 'expired_token'
 require_relative '../jobs/send_subscription_handshake'
 require 'subscriptions_test_kit'
@@ -7,7 +7,7 @@ require 'subscriptions_test_kit'
 module DaVinciPASTestKit
   class SubscriptionCreateEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
-    include SessionIdentification
+    include EndpointSessionIdentification
     prepend ExpiredTokenRejection
 
     error_response_format :operation_outcome

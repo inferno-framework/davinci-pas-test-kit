@@ -1,5 +1,5 @@
 require_relative '../user_input_response'
-require_relative 'session_identification'
+require_relative 'endpoint_session_identification'
 require_relative 'expired_token'
 require_relative '../response_generator'
 require_relative '../subscription_notification_trigger'
@@ -17,7 +17,7 @@ module DaVinciPASTestKit
     include ClientURLs
     include FhirpathUtils
     include ResponseSelectionUtils
-    include SessionIdentification
+    include EndpointSessionIdentification
     include ExpiredToken
 
     # override the one from URLs to make it version specific

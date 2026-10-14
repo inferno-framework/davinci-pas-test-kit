@@ -14,7 +14,7 @@ RSpec.shared_examples 'a no-session OperationOutcome response' do |http_method =
     expect(outcome).to be_a(FHIR::OperationOutcome)
     expect(outcome.issue.first.code).to eq('not-found')
     expect(outcome.issue.first.details.text).to include('Unable to find test run')
-    expect(outcome.issue.first.details.text).to include(DaVinciPASTestKit::SessionIdentification::LOCATION_DESCRIPTION)
+    expect(outcome.issue.first.details.text).to include(DaVinciPASTestKit::EndpointSessionIdentification::LOCATION_DESCRIPTION)
   end
 end
 
