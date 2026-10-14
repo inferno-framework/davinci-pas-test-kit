@@ -28,7 +28,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientSubscriptionPutUpdate
     repo_create(:request, verb:, direction: 'incoming', url: "#{subscription_url}/#{id}",
                           test_session_id: test_session.id, result:, request_body: subscription.to_json,
                           response_body: subscription.to_json,
-                          tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, id], status:)
+                          tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, id], status:)
   end
 
   def error_messages(result)

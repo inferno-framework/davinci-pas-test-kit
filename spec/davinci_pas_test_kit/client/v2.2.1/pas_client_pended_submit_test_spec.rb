@@ -35,7 +35,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedSubmitTest, :re
     end
 
     it 'skips when the client has updated the Subscription' do
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status: 200,
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status: 200,
                      response_body: subscription_json.to_json)
       result = run(described_class, session_url_path:)
 
@@ -44,7 +44,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedSubmitTest, :re
     end
 
     it 'skips when the client has deleted the Subscription' do
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id], status: 204)
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id], status: 204)
       result = run(described_class, session_url_path:)
 
       expect(result.result).to eq('skip')
@@ -52,8 +52,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedSubmitTest, :re
     end
 
     it 'waits when the client\'s update and delete requests were rejected' do
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status: 400)
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id], status: 404)
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status: 400)
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id], status: 404)
 
       expect(run(described_class, session_url_path:).result).to eq('wait')
     end

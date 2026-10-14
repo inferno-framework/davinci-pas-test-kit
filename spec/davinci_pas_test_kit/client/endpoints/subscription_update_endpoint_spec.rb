@@ -56,7 +56,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionUpdateEndpoint, :request do
   end
 
   def update_requests
-    requests_repo.tagged_requests(test_session.id, [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id])
+    requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id])
   end
 
   describe 'when the session is identified by the URL path' do

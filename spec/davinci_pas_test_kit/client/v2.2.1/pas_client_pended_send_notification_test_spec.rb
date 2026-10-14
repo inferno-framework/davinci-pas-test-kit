@@ -56,7 +56,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
 
     it 'skips when the client has updated the Subscription' do
       create_subscription_request
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 200,
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 200,
                      response_body: subscription_json.to_json)
       create_pended_submit_request
       result = run(described_class)
@@ -67,7 +67,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
 
     it 'skips when the client has deleted the Subscription' do
       create_subscription_request
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 200,
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 200,
                      response_body: nil)
       create_pended_submit_request
       result = run(described_class)
@@ -78,7 +78,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
 
     it 'does not skip for update or delete requests made against an earlier Subscription' do
       create_subscription_request
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, 'earlier-subscription-id'], status: 200,
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, 'earlier-subscription-id'], status: 200,
                      response_body: nil)
       create_pended_submit_request
       result, _args = run_capturing_job_args
@@ -88,9 +88,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
 
     it 'does not skip for rejected update or delete requests' do
       create_subscription_request
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 400,
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 400,
                      response_body: nil)
-      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 404,
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 404,
                      response_body: nil)
       create_pended_submit_request
       result, _args = run_capturing_job_args

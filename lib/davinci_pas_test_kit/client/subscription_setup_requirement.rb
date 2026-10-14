@@ -51,7 +51,7 @@ module DaVinciPASTestKit
 
     # Successful updates respond with 200 and successful deletes with a 2xx status
     def subscription_change_succeeded?(request)
-      if request.tags.include?(SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG)
+      if request.tags.include?(SUBSCRIPTION_DELETE_TAG)
         request.status.between?(200, 299)
       else
         request.status == 200

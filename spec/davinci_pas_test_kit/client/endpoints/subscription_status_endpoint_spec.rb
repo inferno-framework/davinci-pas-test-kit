@@ -36,12 +36,12 @@ RSpec.describe DaVinciPASTestKit::SubscriptionStatusEndpoint, :request do
 
   def create_update_request(status:, subscription_status:)
     updated_subscription = subscription_json.merge('status' => subscription_status)
-    create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status:,
+    create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status:,
                    response_body: updated_subscription.to_json)
   end
 
   def create_delete_request(status:)
-    create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id], status:,
+    create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id], status:,
                    response_body: nil)
   end
 

@@ -53,7 +53,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionDeleteEndpoint, :request do
   end
 
   def delete_requests
-    requests_repo.tagged_requests(test_session.id, [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id])
+    requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id])
   end
 
   describe 'when the session is identified by the URL path' do

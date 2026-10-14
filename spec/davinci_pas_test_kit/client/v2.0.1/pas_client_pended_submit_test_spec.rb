@@ -52,7 +52,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV201::PASClientPendedSubmitTest, :re
       subscription_id = subscription_create_response_full_resource['id']
       repo_create(:request, direction: 'incoming', url: "#{subscription_url}/#{subscription_id}",
                             test_session_id: test_session.id, result:, status: 204,
-                            tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id])
+                            tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_id])
       result = run(test, session_url_path:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to include('submitted update or delete requests')
