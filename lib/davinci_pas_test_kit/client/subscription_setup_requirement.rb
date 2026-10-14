@@ -33,17 +33,29 @@ module DaVinciPASTestKit
       subscription_request
     end
 
-    # Like require_successful_subscription_create_request, but also skips if the client has submitted
-    # any update or delete requests for the created Subscription. Notifications are generated from the
-    # Subscription as created, so the pended scenario must not run against one the client has since
-    # changed or removed.
+    # Like require_successful_subscription_create_request, but also skips if the client has successfully
+    # updated or deleted the created Subscription. Notifications are generated from the Subscription as
+    # created, so the pended scenario must not run against one the client has since changed or removed.
+    # Rejected update and delete requests leave the Subscription unchanged and so are ignored.
     # @return [Inferno::Entities::Request] the successful Subscription-create request.
     def require_unmodified_subscription_create_request
       subscription_request = require_successful_subscription_create_request
       # Only update and delete requests are tagged with the Subscription id, which is new for each create
       subscription_id = JSON.parse(subscription_request.response_body)['id']
-      skip_if load_tagged_requests(subscription_id).present?, PENDED_SCENARIO_MODIFIED_SUBSCRIPTION_SKIP_MESSAGE
+      skip_if load_tagged_requests(subscription_id).any? { |req| subscription_change_succeeded?(req) },
+              PENDED_SCENARIO_MODIFIED_SUBSCRIPTION_SKIP_MESSAGE
       subscription_request
+    end
+
+    private
+
+    # Successful updates respond with 200 and successful deletes with a 2xx status
+    def subscription_change_succeeded?(request)
+      if request.tags.include?(SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG)
+        request.status.between?(200, 299)
+      else
+        request.status == 200
+      end
     end
   end
 end

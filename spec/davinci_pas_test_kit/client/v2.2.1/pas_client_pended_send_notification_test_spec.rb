@@ -86,6 +86,18 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
       expect(result.result).to eq('wait')
     end
 
+    it 'does not skip for rejected update or delete requests' do
+      create_subscription_request
+      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 400,
+                     response_body: nil)
+      create_request(tags: [SubscriptionsTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 404,
+                     response_body: nil)
+      create_pended_submit_request
+      result, _args = run_capturing_job_args
+
+      expect(result.result).to eq('wait')
+    end
+
     it 'skips when there is no successful pended $submit request' do
       create_subscription_request
       create_pended_submit_request(status: 400)
