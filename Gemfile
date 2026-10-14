@@ -4,8 +4,6 @@ source "https://rubygems.org"
 
 gemspec
 
-gem 'subscriptions_test_kit', git: 'https://github.com/inferno-framework/subscriptions-test-kit.git', branch: 'release-0.13.0'
-
 gem "rubocop"
 gem 'rubocop-rspec', require: false
 
