@@ -549,6 +549,31 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|7.0.0")
       end
 
+      it 'leaves a declared US Core profile URL unversioned when the selected version does not define it' do
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-coverage"
+        base_profile = 'http://hl7.org/fhir/StructureDefinition/Coverage'
+
+        select_us_core_version('3.1.1')
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq(url)
+
+        select_us_core_version('6.1.0')
+        expect(test_instance.send(:profile_url_for_validation, url, base_profile, '2.2.1')).to eq("#{url}|6.1.0")
+      end
+
+      it 'validates a declared US Core profile unversioned when the selected version does not define it' do
+        select_us_core_version('3.1.1')
+        coverage = FHIR::Coverage.new(id: 'coverage-1')
+        url = "#{described_class::US_CORE_PROFILE_BASE}/us-core-coverage"
+        test_instance.add_resource_target_profile_to_map('urn:uuid:coverage-1', coverage, url)
+        allow(test_instance).to receive(:resource_is_valid?).and_return(true)
+
+        test_instance.validate_bundle_entries_against_profiles('2.2.1')
+
+        expect(test_instance).to have_received(:resource_is_valid?)
+          .with(resource: coverage, profile_url: url, add_messages_to_runnable: false,
+                validator_response_details: anything)
+      end
+
       it 'uses the base R4 sentinel for resource types that US Core 3.1.1 has no profile for' do
         select_us_core_version('3.1.1')
 
@@ -616,9 +641,26 @@ RSpec.describe DaVinciPASTestKit::PasBundleValidation, :runnable do
         )
 
         expect(fallback_profile_urls(lab))
-          .to contain_exactly(us_core_profile_url(described_class::US_CORE_OBSERVATION_LAB_PROFILE_ID, '3.1.1'))
+          .to eq([us_core_profile_url(described_class::US_CORE_OBSERVATION_LAB_PROFILE_ID, '3.1.1'),
+                  described_class::BASE_R4_PROFILE])
+        # code-specific profiles are the only candidate in every version, so no catch-all follows
         expect(fallback_profile_urls(pulse_oximetry))
           .to contain_exactly(us_core_profile_url('us-core-pulse-oximetry', '3.1.1'))
+      end
+
+      it 'ends the category-based Observation candidates with the base R4 sentinel for US Core 3.1.1' do
+        select_us_core_version('3.1.1')
+        # Simple Observation is the catch-all from 6.1.0 on; the base resource plays that role in 3.1.1.
+        observation = FHIR::Observation.new(
+          id: 'observation-1',
+          category: [codeable_concept(described_class::OBSERVATION_CATEGORY_SYSTEM, 'social-history')]
+        )
+        expected_profile_urls = [
+          us_core_profile_url(described_class::US_CORE_SMOKING_STATUS_PROFILE_ID, '3.1.1'),
+          described_class::BASE_R4_PROFILE
+        ]
+
+        expect(fallback_profile_urls(observation)).to eq(expected_profile_urls)
       end
 
       it 'uses the code-specific Observation profiles added in US Core 7.0.0 only when 7.0.0 is selected' do

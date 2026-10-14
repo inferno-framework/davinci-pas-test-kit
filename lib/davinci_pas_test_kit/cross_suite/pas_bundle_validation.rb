@@ -295,7 +295,13 @@ module DaVinciPASTestKit
     def profile_url_for_validation(url, base_profile, version)
       url = url.to_s
       return url if url.include?('|') || profile_url_without_version(url) == base_profile
-      return "#{url}|#{us_core_version}" if us_core_profile_url?(url)
+
+      if us_core_profile_url?(url)
+        # A declared US Core profile gets the selected version only when that version defines it;
+        # otherwise it stays unversioned so the validator resolves it to a version that does.
+        profile_id = url.delete_prefix("#{US_CORE_PROFILE_BASE}/")
+        return us_core_profile_available?(profile_id) ? "#{url}|#{us_core_version}" : url
+      end
 
       "#{url}|#{version}"
     end
@@ -353,7 +359,14 @@ module DaVinciPASTestKit
           Array(US_CORE_SINGLE_PROFILE_IDS_BY_RESOURCE[resource.resourceType])
         end
 
-      us_core_profile_urls(profile_ids.select { |profile_id| us_core_profile_available?(profile_id) })
+      profile_urls = us_core_profile_urls(profile_ids.select { |profile_id| us_core_profile_available?(profile_id) })
+      # US Core 3.1.1 has no Simple Observation profile, so the base resource takes its place as the
+      # catch-all at the end of the Observation candidates.
+      if profile_ids.include?(US_CORE_SIMPLE_OBSERVATION_PROFILE_ID) &&
+         !us_core_profile_available?(US_CORE_SIMPLE_OBSERVATION_PROFILE_ID)
+        profile_urls << BASE_R4_PROFILE
+      end
+      profile_urls
     end
 
     def us_core_condition_profile_ids(resource)
