@@ -24,8 +24,8 @@ including when acting as a:
 - **Data Source**: PAS clients act as a data source when they send information to
   the payer via the `$submit` and `$inquire` operations. HRex [requires data sources](https://hl7.org/fhir/us/davinci-hrex/1.2.0/en/conformance.html#ci-c-conf-1)
   to "be capable of populating the data element when sharing resources compliant
-  with the profile." Taken together, this means that the PAS IG requires that PAS
-  clients demonstrate the ability to populate all must support elements defined on
+  with the profile." Taken together, this means that the PAS IG requires that
+  PAS clients demonstrate the ability to populate all must support elements defined on
   PAS profiles that can appear within `$submit` and `$inquire` operation requests.
 - **Data Consumer**: PAS clients act as a data consumer when they receive Bundles
   including a ClaimResponse and related details in `$submit` and `$inquire` operation
