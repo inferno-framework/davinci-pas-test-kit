@@ -2,10 +2,10 @@
 
 ## Background
 
-PAS requires that servers use Subscription notifications to alert clients when
+PAS requires that servers use Subscription notifications to alert PAS clients when
 a pended prior authorization request has been updated. When simulating
 a PAS server, Inferno will accept Subscriptions and use them to deliver
-notifications to the client at appropriate times. This page describes
+notifications to the PAS client at appropriate times. This page describes
 how Inferno's simulation of a Subscription server works, including
 - How and when Inferno responds to Subscription creation requests.
 - How and when Inferno generates Notifications.
@@ -13,8 +13,8 @@ how Inferno's simulation of a Subscription server works, including
 ## Subscription Creation Requests
 
 In order to participate in a pended workflow, Inferno must know where to send
-a notification to a client system. Subscription creation is expected to be a
-step performed when connecting a client system to a new payer. Therefore, Inferno
+a notification to a PAS client. Subscription creation is expected to be a
+step performed when connecting a PAS client to a new payer. Therefore, Inferno
 asks testers to perform this step up-front as a part of the "Subscription Setup"
 group. Testers must perform this step while Inferno is waiting during the
 execution of this group. Otherwise, the pended scenario tests will not execute
@@ -69,7 +69,7 @@ It will subsequently trigger a job to send a handshake notification.
 
 Inferno will send a basic handshake notification using the [Parameters format](https://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition-backport-subscription-status-r4.html).
 Unless the request times out or otherwise Inferno doesn't receive a response, the tests
-will continue automatically regardless of the details of the client's response to
+will continue automatically regardless of the details of the PAS client's response to
 the handshake.
 
 Additional conformance validation is performed as a part of the Inferno

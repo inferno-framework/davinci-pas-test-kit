@@ -7,7 +7,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_inquire_must_support
       title '$inquire Request Must Support Coverage'
       description %(
-        Check that the client can demonstrate `$inquire` requests that contain
+        Check that the PAS client demonstrated `$inquire` requests that contain
         all PAS-defined profiles and their must support elements.
         
         For `$inquire` requests, this includes the following profiles:

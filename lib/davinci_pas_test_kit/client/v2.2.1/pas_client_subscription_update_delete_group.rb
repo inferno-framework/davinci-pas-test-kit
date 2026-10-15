@@ -18,7 +18,7 @@ module DaVinciPASTestKit
         "Subscription Setup" group has been modified or deleted during this
         group.
 
-        Inferno will wait for the client to send update and delete requests and
+        Inferno will wait for the PAS client to send update and delete requests and
         will then verify that the requests are conformant. Note that
         - Update and delete requests are only accepted by Inferno while
           this group is waiting.

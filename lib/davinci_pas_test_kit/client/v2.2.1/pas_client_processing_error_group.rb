@@ -10,7 +10,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_processing_error_group
       title 'Processing Errors'
       description %(
-        During these tests, the client system will initiate a prior authorization
+        During these tests, the PAS client will initiate a prior authorization
         request and show it can react appropriately to a response containing
         one or more ClaimResponse.error entries.
       )
@@ -26,14 +26,14 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_response_attest,
            title: 'PAS client handles the processing errors appropriately',
            description: %(
-             During this test, the tester will observe the client system following
+             During this test, the tester will observe the PAS client following
              the receipt of the response containing ClaimResponse.error entries and attest
              that the processing error details were made available to the appropriate users.
            ),
            config: { options: {
              workflow_tag: PROCESSING_ERROR_WORKFLOW_TAG,
              operation_tag: SUBMIT_TAG,
-             attest_message: 'I attest that the client system did not error when receiving the processing ' \
+             attest_message: 'I attest that the PAS client did not error when receiving the processing ' \
                              'error response and handles it ' \
                              'appropriately: the ClaimResponse error details are surfaced to the ' \
                              'appropriate users so that corrective action can be taken.'

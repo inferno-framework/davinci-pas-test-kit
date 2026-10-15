@@ -7,13 +7,13 @@ module DaVinciPASTestKit
       id :pas_client_v221_auth_udap
       title 'Review UDAP Authentication Interactions'
       description %(
-        During these tests, Inferno will verify that the client interacted with Inferno's
+        During these tests, Inferno will verify that the PAS client interacted with Inferno's
         simulated UDAP authorization server in a conformant manner when requesting access tokens
-        and that the client system was able to use provided access tokens to make PAS
+        and that the PAS client was able to use provided access tokens to make PAS
         requests.
 
         Before running these tests, execute the tests for at least one "PAS Scenarios" sub-group
-        so that the client system will request an access token and use it on a PAS request.
+        so that the PAS client will request an access token and use it on a PAS request.
       )
       run_as_group
 

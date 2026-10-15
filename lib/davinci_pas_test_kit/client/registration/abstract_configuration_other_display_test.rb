@@ -3,11 +3,11 @@ module DaVinciPASTestKit
     id :pas_client_reg_config_other_display
     title 'PAS client registers Inferno as a PAS server'
     description %(
-      During this test, Inferno will wait while the tester configures the client
-      system to communicate with Inferno's simulated PAS server using dedicated
+      During this test, Inferno will wait while the tester configures the PAS client
+      to communicate with Inferno's simulated PAS server using dedicated
       endpoints. The "User Action Required" dialog that appears during the test
-      will provide all the information needed for testers to configure the client
-      under test, including the FHIR base URL.
+      will provide all the information needed for testers to configure the PAS client,
+      including the FHIR base URL.
     )
     attestation
 
@@ -39,7 +39,7 @@ module DaVinciPASTestKit
           FHIR Base URL: `#{session_fhir_base_url(wait_identifier)}`
 
           [Click here](#{confirmation_url}) once you have configured
-          the client to send PAS requests to Inferno at the above endpoint.
+          the PAS client to send PAS requests to Inferno at the above endpoint.
         )
       )
     end

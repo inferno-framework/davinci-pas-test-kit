@@ -3,12 +3,12 @@ module DaVinciPASTestKit
     id :pas_client_reg_config_udap_display
     title 'PAS client registers Inferno as a PAS server'
     description %(
-      During this test, Inferno will wait while the tester configures the client
-      system to communicate with Inferno's simulated PAS server using
+      During this test, Inferno will wait while the tester configures the PAS client
+      to communicate with Inferno's simulated PAS server using
       endpoints authenticated using the UDAP Client Credentials flow.
       The "User Action Required" dialog that appears during the test will provide
-      all the information needed for testers to configure the client system,
-      including the FHIR base URL, the token endpoint, and the system's
+      all the information needed for testers to configure the PAS client,
+      including the FHIR base URL, the token endpoint, and the
       assigned client id.
     )
     attestation
@@ -33,7 +33,7 @@ module DaVinciPASTestKit
           - Token endpoint: `#{token_url}`
 
           [Click here](#{confirmation_url}) once you have configured
-          the client to authenticate with Inferno and send PAS requests
+          the PAS client to authenticate with Inferno and send PAS requests
           to Inferno at the above endpoint.
         )
       )

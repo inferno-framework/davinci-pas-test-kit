@@ -16,10 +16,10 @@ module DaVinciPASTestKit
       id :pas_client_v221_pended_notify_and_attest_finalized_test
       title 'Inferno sends a notification that the pended request has been finalized'
       description %(
-        During this test, Inferno will send a full-resource notification to the client's Subscription
+        During this test, Inferno will send a full-resource notification to the PAS client's Subscription
         endpoint to tell it that a final decision has been made on the pended prior authorization request
-        that the client submitted earlier. The notification is generated from the pended `$submit` response
-        that Inferno returned to the client, unless one is provided.
+        that the PAS client submitted earlier. The notification is generated from the pended `$submit` response
+        that Inferno returned to the PAS client, unless one is provided.
       )
 
       input :notification_bundle,
@@ -28,7 +28,7 @@ module DaVinciPASTestKit
             optional: true,
             description: %(
               If provided, this JSON will be sent as the notification for the
-              PAS Subscription to tell the client that a decision has been made on the pended claim.
+              PAS Subscription to tell the PAS client that a decision has been made on the pended claim.
               Before sending, Inferno will update the provided notification with details that the tester cannot
               know ahead of time, including timestamps corresponding to the notification trigger time, and the id of
               the triggering ClaimResponse if Inferno mocks that ClaimResponse because it is not provided by the
@@ -47,8 +47,8 @@ module DaVinciPASTestKit
             optional: true,
             title: 'Client Notification Access Token',
             description: %(
-              The bearer token that Inferno will send on requests to the client system's rest-hook notification
-              endpoint. Not needed if the client system will create a Subscription with an appropriate header value
+              The bearer token that Inferno will send on requests to the PAS client's rest-hook notification
+              endpoint. Not needed if the PAS client will create a Subscription with an appropriate header value
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
@@ -59,7 +59,7 @@ module DaVinciPASTestKit
         pended_submit_requests = load_tagged_requests(SUBMIT_TAG, PENDED_WORKFLOW_TAG)
         @pended_submit_request = pended_submit_requests.select { |req| req.status == 200 }.max_by(&:index)
         skip_if @pended_submit_request.blank?,
-                'The client made no successful $submit request during the pended scenario, so there is no pended ' \
+                'The PAS client made no successful $submit request during the pended scenario, so there is no pended ' \
                 'response to send a notification about.'
 
         if notification_bundle.present?
@@ -80,7 +80,7 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Pended Scenario Test**:
 
-            Inferno will shortly send a full-resource notification to the endpoint specified in the client's
+            Inferno will shortly send a full-resource notification to the endpoint specified in the PAS client's
             Subscription to tell it that a final decision has been made on the pended prior authorization
             request. The tests will continue automatically once the notification has been sent.
           MESSAGE

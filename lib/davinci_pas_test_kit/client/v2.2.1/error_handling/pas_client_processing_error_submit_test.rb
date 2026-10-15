@@ -14,7 +14,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_processing_error_submit_test
       title 'PAS client submits a claim and receives a response containing processing errors'
       description %(
-        During this test, Inferno will wait for a prior authorization submission request from the client.
+        During this test, Inferno will wait for a prior authorization submission request from the PAS client.
         Upon receipt, Inferno will return the provided response bundle containing one or
         more ClaimResponse.error entries.
       )
@@ -56,7 +56,7 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Processing Error Scenario Test**:
 
-            Inferno will wait while the tester uses the client system to submit a PAS request to
+            Inferno will wait while the tester uses the PAS client to submit a PAS request to
             Inferno. Inferno will [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
             the provided Processing Error Response Bundle and respond with it.
             The tests will automatically continue once a request has been received.

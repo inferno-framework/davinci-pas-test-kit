@@ -8,9 +8,9 @@ module DaVinciPASTestKit
     id :pas_client_response_attest
     title 'PAS client reacts appropriately to the response'
     description %(
-      During this test, the tester will observe the client system following
+      During this test, the tester will observe the PAS client following
       the receipt of a response and attest that users are able to see the appropriate
-      updates to the corresponding prior authorization request in their system.
+      updates to the corresponding prior authorization request.
     )
     attestation
 
@@ -73,7 +73,7 @@ module DaVinciPASTestKit
 
     def unexpected_error_status_message(error_responses)
       if error_responses.any? { |r| r.direction == 'outgoing' }
-        'Skipping attestation: the client system did not return a successful response to Inferno\'s request.'
+        'Skipping attestation: the PAS client did not return a successful response to Inferno\'s request.'
       else
         'Skipping attestation: Inferno expected to return a successful response, but did not.'
       end

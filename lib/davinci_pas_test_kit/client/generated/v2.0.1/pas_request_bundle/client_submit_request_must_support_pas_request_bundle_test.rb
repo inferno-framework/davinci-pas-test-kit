@@ -7,11 +7,11 @@ module DaVinciPASTestKit
       title 'All must support elements for profile PAS Request Bundle are observed on $submit requests'
       description %(
         
-        PAS client systems are required to be able to populate all
+        PAS clients are required to be able to populate all
         must support elements on instances of all profiles included in 
         requests, including instances of the PAS Request Bundle Profile.
         This test checks all identified instances of the PAS Request Bundle
-        Profile on requests sent by the client to ensure that the following
+        Profile on requests sent by the PAS client to ensure that the following
         must support elements are observed: 
 
         * Bundle.entry

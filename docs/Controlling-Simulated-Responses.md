@@ -1,6 +1,6 @@
 # Controlling Responses from Inferno's Simulated PAS Server
 
-During the PAS client tests, testers must demonstrate that their system
+During the PAS client tests, testers must demonstrate that their PAS client
 can handle a wide variety of conformant PAS responses and notifications,
 including a variety of scenarios (e.g., different decisions) and coverage
 of must support elements within response profiles. Inferno allows testers
@@ -14,13 +14,13 @@ to provide the responses for Inferno to make because:
 Additionally, because the specification of responses for Inferno to use can be complex,
 Inferno can mock simple responses without tester input. While these response
 can be useful for a basic demonstration, to fully pass the tests testers will need
-to provide some responses for Inferno to return to their system.
+to provide some responses for Inferno to return to their PAS client.
 
 However they are determined, Inferno's responses must appear as if sent by a generic
 server conformant to the PAS specification and not going beyond it. Each response:
 - Must be conformant: because only handling of conformant responses demonstrate support
   for PAS interop
-- Cannot contain data that goes beyond the PAS standard: this prevents the client
+- Cannot contain data that goes beyond the PAS standard: this prevents the PAS client
   system from relying on custom data. Inferno enforces this requirement by failing when
   a custom extension, i.e., one not defined within PAS or the IGs it depends on, is found
   within a response returned by Inferno. Client requests are allowed to have custom extensions,
@@ -229,7 +229,7 @@ Beyond the minor modifications described above, Inferno does not modify provided
 they are consistent with each other or the time they are executed. For example, in the pended
 scenario, it is up to the tester to ensure that if they provide responses for the `$submit` operation and
 for the `$inquire` operation (v2.0.1) or notification body (v2.2.1) that both messages share whatever details,
-such as identifiers, needed to connect them together and drive the workflow in their system. Timestamps
+such as identifiers, needed to connect them together and drive the workflow in the PAS client. Timestamps
 not associated with messaging time such as when a prior authorization response is valid are also not modified
 by Inferno. Unlike details that Inferno modifies as described above, testers should have control over and/or
 knowledge of the necessary details and values to construct consistent and working messages for Inferno to use.

@@ -4,7 +4,7 @@ module DaVinciPASTestKit
     title 'PAS client supports a non-standard approach for authenticating with the PAS server'
     description %(
       Since a standard auth approach was not chosen for this session, this test asks testers
-      to attest to the client's ability to authenticate itself to a server
+      to attest to the PAS client's ability to authenticate itself to a server
       using a method that this Inferno test suite does not support, such as mutual authentication
       TLS.
     )
@@ -26,7 +26,7 @@ module DaVinciPASTestKit
         message: %(
           **Other Authentication Attestation**:
 
-          I attest that the client system can authenticate itself with a PAS server using
+          I attest that the PAS client can authenticate itself with a PAS server using
           a mechanism other than the SMART Backend Services or UDAP B2B client credentials
           flows.
 

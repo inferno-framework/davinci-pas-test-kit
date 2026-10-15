@@ -16,7 +16,7 @@ module DaVinciPASTestKit
       id :pas_client_v201_submit_must_support
       title '$submit Request Must Support Coverage'
       description %(
-        Check that the client can demonstrate `$submit` requests that contain
+        Check that the PAS client demonstrated `$submit` requests that contain
         all PAS-defined profiles and their must support elements.
         
         For `$submit` requests, this includes the following profiles:

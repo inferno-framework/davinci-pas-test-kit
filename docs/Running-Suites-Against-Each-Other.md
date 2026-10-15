@@ -40,14 +40,14 @@ dedicated hostname.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
-    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved. Click the statement indicating that it was.
+    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the PAS client indicated that the submitted prior authorization request was approved. Click the statement indicating that it was.
     *   A new "User Action Required" dialog will appear asking for an PAS request for a denial scenario. These will be sent by the server tests in the next step.
 6.  **Denial Scenario Execution**:
     *   In the server suite session, select the "**2.2** Successful Denial Scenario" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
-    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was denied. Click the statement indicating that it was.
+    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the PAS client indicated that the submitted prior authorization request was denied. Click the statement indicating that it was.
     *   A new "User Action Required" dialog will appear asking for an PAS request for a pended scenario. These will be sent by the server tests in the next step.
 7.  **Pended Scenario Execution**:
     *   In the server suite session, select the "**2.3** Successful Pended Scenario" group from the sidebar (typically found on the left side).
@@ -55,8 +55,8 @@ dedicated hostname.
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response. A "User Action Required" dialog will appear indicating that the server suite session is waiting for a Subscription notification indicating that the pended claim has been finalized. 5-10 seconds later, the client suite session will send the notification and the server suite test run will complete automatically.
     *   Once the server suite tests have completed, return to the client suite session and click the link in the current "User Action Dialog" to indicate that the scenario has completed.
-    *   A second "User Action Required" dialog will appear asking for an attestation that the client system initially indicated that the submitted prior authorization request was pended. Click the statement indicating that it was.
-    *   A third "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved once the notification was received. Click the statement indicating that it was.
+    *   A second "User Action Required" dialog will appear asking for an attestation that the PAS client initially indicated that the submitted prior authorization request was pended. Click the statement indicating that it was.
+    *   A third "User Action Required" dialog will appear asking for an attestation that the PAS client indicated that the submitted prior authorization request was approved once the notification was received. Click the statement indicating that it was.
     *   A fourth "User Action Required" dialog will appear asking for additional PAS requests to be made to evaluate must support element coverage. These will be sent by the server tests in the next step.
 7.  **Must Support and Error Handling Execution**:
     *   In the server suite session, select the "**3** Demonstrate Element Support" group from the sidebar (typically found on the left side).
@@ -119,7 +119,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
-    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved. Click the statement indicating that it was to complete the tests.
+    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the PAS client indicated that the submitted prior authorization request was approved. Click the statement indicating that it was to complete the tests.
 6.  **Denial Scenario Execution**: Repeat the same steps as in 5. for client group "**9.2** Denial Response" and server group "**2.2** Successful Denial Scenario".
 7.  **Pended Scenario Execution**:
     *   In the client session, select the "**9.3** Pended Response" group from the sidebar (typically found on the left side).
@@ -131,8 +131,8 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and then wait for a notification to be sent by the client suite. Once the server tests are waiting for a notification, return to the client session
-    *   In the client suite session, a new "User Action Required" dialog will be present asking for an attestation that the client displays the Claim as pended. Confirm that it has.
-    *   A third "User Action Required" dialog will appear indicating that Inferno will shortly send a notification. It will disappear within 10 seconds replaced by a fourth "User Action Required" dialog asking for confirmation that the client received the notification and displays the Claim as approved. Check the server session, the tests should have completed due to the receipt of the notification. Confirm in the client session that the Claim was approved and the run will complete.
+    *   In the client suite session, a new "User Action Required" dialog will be present asking for an attestation that the PAS client displays the Claim as pended. Confirm that it has.
+    *   A third "User Action Required" dialog will appear indicating that Inferno will shortly send a notification. It will disappear within 10 seconds replaced by a fourth "User Action Required" dialog asking for confirmation that the PAS client received the notification and displays the Claim as approved. Check the server session, the tests should have completed due to the receipt of the notification. Confirm in the client session that the Claim was approved and the run will complete.
 8.  **Claim Updates Execution**:
     *   In the client session, select the "**9.4** Claim Updates" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -143,7 +143,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a series of PAS request to the client suite session. Wait for the server tests to complete.
-    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error. Completing the attestation will finish the run.
+    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the PAS client handled the responses without error. Completing the attestation will finish the run.
 9.  **Payer Modifications Execution**:
     *   In the client session, select the "**9.5** Payer Modifications" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -154,7 +154,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session. Wait for the server tests to complete. Server test "**2.1.1.04** Server response includes the 'Approval' decision code in the ClaimResponse instance" should fail because "A6" (Modified) should be returned instead of "A1" (Certified in Total).
-    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error and displayed the modifications. Completing the attestation will finish the run.
+    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the PAS client handled the responses without error and displayed the modifications. Completing the attestation will finish the run.
 10. **Operation Failure Execution**:
     *   In the client session, select the "**9.6** Operation Failure" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -164,8 +164,8 @@ in progress, so some tests do not fully align yet.
     *   In the server suite session, select the "**4** Demonstrate Error Handling" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
-    *   Inferno will submit two PAS requests to the client suite session and evaluate the responses. The first will succeed as the client returns the expected OperationOutcome. The second will fail as Inferno will no longer be listening for requests.
-    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that there was an error appropriately. Click the statement indicating that it was to complete the tests.
+    *   Inferno will submit two PAS requests to the client suite session and evaluate the responses. The first will succeed as the client suite returns the expected OperationOutcome. The second will fail as Inferno will no longer be listening for requests.
+    *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the PAS client indicated that there was an error appropriately. Click the statement indicating that it was to complete the tests.
 11.  **Processing Errors Execution**:
     *   In the client session, select the "**9.7** Processing Errors" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -176,7 +176,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session. Wait for the server tests to complete. Server test "**2.1.1.04** Server response includes the 'Approval' decision code in the ClaimResponse instance" should fail because the client suites will return errors instead of items in the ClaimResponse.
-    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error and displayed the errors to the appropriate users. Completing the attestation will finish the run.
+    *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the PAS client handled the responses without error and displayed the errors to the appropriate users. Completing the attestation will finish the run.
 12.  **Must Support Elements Execution**:
     *   In the client session, select the "**10** Must Support Elements" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
@@ -187,7 +187,7 @@ in progress, so some tests do not fully align yet.
     *   Click the "Run All Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a series of PAS request to the client suite session and then verify that the requests and responses demonstrate all must support elements. Wait for the server tests to complete.
-    *   Once the server suite tests have completed, return to the client suite session. Click the link to indicate that all requests have been sent. A new "User Action Required" dialog will appear asking for an attestation that the client system handled the $submit and $inquire responses appropriately, displaying the results without error.
+    *   Once the server suite tests have completed, return to the client suite session. Click the link to indicate that all requests have been sent. A new "User Action Required" dialog will appear asking for an attestation that the PAS client handled the $submit and $inquire responses appropriately, displaying the results without error.
 13.  **Visual Inspection and Attestation Execution**:
     *   In the client session, select the "**13** Visual Inspection and Attestation" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).

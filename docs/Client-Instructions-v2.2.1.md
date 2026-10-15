@@ -1,6 +1,6 @@
 # Da Vinci PAS Test Kit: Client Testing v2.2.1 Instructions
 
-This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **client system**
+This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **PAS client**
 against v2.2.1 of the IG. In this scenario, Inferno acts as the PAS server.
 
 ## Pre-execution Setup and Required Information
@@ -49,7 +49,7 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
 1. Submit a PAS prior authorization request to the endpoint shown in the "User Action Required"
    dialog that appears.
-1. When another "User Action Required" dialog appears, check your system to see whether Inferno's response
+1. When another "User Action Required" dialog appears, check the PAS client to see whether Inferno's response
    was interpreted as an approval or not and click the appropriate link in the dialog.
 1. Review the results including any errors or warnings found when checking the conformance
    of the request or the generated response.
@@ -69,7 +69,7 @@ for these scenarios.
 ### Testing the Pended Response
 
 To run the "Pended Response" group, first run the "Subscription Setup" group, during which the
-client system will submit a Subscription so that Inferno knows how and where to send a
+PAS client will submit a Subscription so that Inferno knows how and where to send a
 notification that a decision has been rendered on a pended prior authorization request.
 Once that group has been run, proceed to execute the "Pended Response" group and follow the
 instructions in the "User Action Required" dialogs that appear. Inferno can
@@ -84,7 +84,7 @@ unchanged from the request - see [Validation](Client-Details#validation).
 
 ### Testing Must Support Elements
 
-During the "Must Support Elements" group, the client system will submit multiple $submit and $inquire requests
+During the "Must Support Elements" group, the PAS client will submit multiple $submit and $inquire requests
 to demonstrate all required must support elements, including on both the requests and response.
 These tests can be run without providing custom responses, but because Inferno's mocked responses
 will not populate all ClaimResponse must support elements, [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
@@ -99,7 +99,7 @@ against a different version.
 
 ### Testing Authentication Interactions
 
-When using a standard OAuth-based authentication approach, client systems will need to make requests
+When using a standard OAuth-based authentication approach, PAS clients will need to make requests
 against Inferno to receive tokens and provide them on their PAS requests. Some of these details will
 be verified as a part of the registration process. Others will require a set of tests to be run
 after all other tests have been run.
@@ -127,7 +127,7 @@ If you would like to try out the order-sign hook invocation tests against
 [the Da Vinci BR Provider reference implementation](https://br-provider.davinci.hl7.org/),
 use the following steps. While these tests are not expected to fully
 pass, they can give you a sense for how to execute the Inferno tests
-against a real client system using SMART Backend Services for authentication.
+against a real PAS client using SMART Backend Services for authentication.
 
 1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "SMART Backend Services"
    option for the Client Security Type suite option.
@@ -136,7 +136,7 @@ against a real client system using SMART Backend Services for authentication.
    for the value of the "SMART Confidential Asymmetric JSON Web Key Set (JWKS)" input.
 1. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
    click the "Submit" button to start the tests.
-1. When the "User Action Required" dialog appears asking for confirmation that the client is setup
+1. When the "User Action Required" dialog appears asking for confirmation that the PAS client is setup
    to hit Inferno's PAS FHIR server, navigate to https://br-provider.davinci.hl7.org/ in a
    separate tab and login (no password needed) as a practitioner (any).
 1. Configure the reference implementation's connection to Inferno's simulated PAS server by:
@@ -184,14 +184,14 @@ If you would like to try out the PAS Approval Response tests against
 you can do so using the following steps. Note that this reference implementation has
 not been updated for the 2.2.1 version of the PAS IG so many failures are expected during this
 execution. However, it can give you a sense for what executing the Inferno tests against a 
-client system will look like.
+PAS client will look like.
 
 1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "Other Authentication"
    option for the Client Security Type suite option.
 2. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
    click the "Submit" button to start the tests.
 3. When "User Action Required" dialog appears asking for an attestation, click a link to attest.
-4. When a new "User Action Required" dialog appears asking for confirmation that the client is setup
+4. When a new "User Action Required" dialog appears asking for confirmation that the PAS client is setup
    to hit Inferno's PAS FHIR server, copy the FHIR base URL provided for later use and confirm configuration.
 5. In a new browser tab, navigate to `https://crd-request-generator.davinci.hl7.org/`.
 6. If needed because you've used this tool before and reconfigured it, reset to the default configuration
@@ -215,7 +215,7 @@ client system will look like.
     - NOTE: currently the RI does not pull in the added `fullURL` value so it will indicate a failure.
       Inferno will still verify the request.
 14. In the Inferno session, once the interaction has been checked for conformance a "User Action Required"
-    dialog will appear asking for confirmation that the client displayed the submitted Claim as "approved".
+    dialog will appear asking for confirmation that the PAS client displayed the submitted Claim as "approved".
     Click the appropriate link to complete the demonstration.
 
 ## Inferno Client vs Server Execution

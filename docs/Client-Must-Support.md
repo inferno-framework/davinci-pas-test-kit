@@ -18,7 +18,7 @@ lest once.
 
 PAS, in both the [v2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/background.html#must-support)
 and [v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformance.html#mustsupport)
-versions that Inferno current has suites for, requires that clients follow the
+versions that Inferno current has suites for, requires that PAS clients follow the
 [must support requirements defined in the Da Vinci HRex IG](https://hl7.org/fhir/us/davinci-hrex/1.2.0/en/conformance.html#mustsupport),
 including when acting as a:
 - **Data Source**: PAS clients act as a data source when they send information to
@@ -45,13 +45,13 @@ including when acting as a:
 There are active discussions within the Da Vinci Burden Reduction community about
 relaxing PAS must support requirements. Specifically, as of September 2026, there
 is an [open ticket](https://jira.hl7.org/browse/FHIR-57903) that proposes to require
-client systems to support only those elements which they collect and maintain within
-their system. However, at this time, no final decision has been made and it is unclear
+PAS clients to support only those elements which are collected and surfaced to users.
+However, at this time, no final decision has been made and it is unclear
 if the change would be applied to prior versions of the IG.
 
 ## Evaluated Messages
 
-During testing, Inferno and the client system pass many requests and responses back
+During testing, Inferno and the PAS client pass many requests and responses back
 and forth. These are the messages that Inferno will consider when looking for
 demonstration of must support elements. The "Must Support Elements" group allows
 testers to make additional requests covering must support elements not yet demonstrated,
@@ -70,13 +70,13 @@ examples of all must support elements to pass these tests.
 ## Passing Inferno PAS Client Must Support Tests
 
 To pass the client must support tests for the PAS Client suites defined in this repository,
-Inferno requires that testers use the client system to
+Inferno requires that testers use the PAS client to
 - Send `$submit` and `$inquire` requests that demonstrate the full scope of PAS profiles
   that can appear in those requests and their must support elements.
 - Receive `$submit` and `$inquire` responses and notifications that demonstrate the full
   scope of PAS profiles that can appear in those responses and their must support elements.
-  Additionally, confirm that the client system handled them without erroring as Inferno
-  cannot directly observe how the client reacts. These attestations are performed immediately
+  Additionally, confirm that the PAS client handled them without erroring as Inferno
+  cannot directly observe how the PAS client reacts. These attestations are performed immediately
   following each interaction.
 
 The following sections detail what this means specifically in each supported PAS IG version.

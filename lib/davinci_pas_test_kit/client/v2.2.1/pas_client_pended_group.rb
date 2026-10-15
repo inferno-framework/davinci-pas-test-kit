@@ -15,7 +15,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_pended_group
       title 'Pended Response'
       description %(
-        During these tests, the client system will initiate a prior authorization
+        During these tests, the PAS client will initiate a prior authorization
         request and show it can react appropriately to a 'pended' decision, including
         waiting for a full-resource notification that contains the final decision.
         In PAS v2.2.1, the notification includes all details so no follow-up `$inquire`
@@ -35,13 +35,13 @@ module DaVinciPASTestKit
         title 'Interaction and Response Handling'
         description %(
           All interactions for the pended prior authorization request scenario
-          between Inferno and the client system will be performed during this group
+          between Inferno and the PAS client will be performed during this group
           including
-          - A `$submit` request from the client system to Inferno where Inferno returns a pended response.
+          - A `$submit` request from the PAS client to Inferno where Inferno returns a pended response.
           - A full-resource notification that the prior authorization decision has been finalized
-            from Inferno to the client system.
+            from Inferno to the PAS client.
 
-          In between these requests, testers will confirm that the system registers
+          In between these requests, testers will confirm that the PAS client registers
           the request as pended and that it is updated with the final response
           after the notification is received.
         )
@@ -51,14 +51,14 @@ module DaVinciPASTestKit
              id: :pas_client_v221_pended_response_attest,
              title: 'PAS client displays the request as "pended"',
              description: %(
-              During this test, the tester will observe the client system following
+              During this test, the tester will observe the PAS client following
               the receipt of the pended response and attest that users are able to determine
               that the response has been pended and a decision will be forthcoming.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
                operation_tag: SUBMIT_TAG,
-               attest_message: 'I attest that the client system did not error when handling the `$submit` ' \
+               attest_message: 'I attest that the PAS client did not error when handling the `$submit` ' \
                                "response and displays the submitted claim as 'pended' meaning " \
                                'that a final decision on prior authorization of the service has not been made.'
              } }
@@ -67,14 +67,14 @@ module DaVinciPASTestKit
              id: :pas_client_v221_pended_finalized_response_attest,
              title: 'PAS client displays the final decision as "approved"',
              description: %(
-              During this test, the tester will observe the client system following
+              During this test, the tester will observe the PAS client following
               the receipt of the full-resource notification containing the approved final decision
               and attest that users are able to determine that the request has been approved.
              ),
              config: { options: {
                workflow_tag: PENDED_WORKFLOW_TAG,
                request_tags: [REST_HOOK_EVENT_NOTIFICATION_TAG],
-               attest_message: 'I attest that the client system did not error when handling the notification ' \
+               attest_message: 'I attest that the PAS client did not error when handling the notification ' \
                                "and displays the submitted claim as 'approved' meaning that the " \
                                'user can proceed with ordering or providing the requested service.'
              } }
@@ -95,7 +95,7 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_notification_input_verification,
              title: 'Inferno\'s event notification Bundle is conformant',
              description: %(
-               This test checks that the notification Bundle sent to the client, which will be either
+               This test checks that the notification Bundle sent to the PAS client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, is conformant
                to Subscription Backport IG requirements.
@@ -109,7 +109,7 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_notification_input_payload_verification,
              title: 'Inferno\'s event notification Bundle matches the Subscription',
              description: %(
-               This test checks that the notification Bundle sent to the client, which will be either
+               This test checks that the notification Bundle sent to the PAS client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
                requested in the Subscription provided during the "Subscription Setup" tests.
@@ -126,7 +126,7 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_event_notification_verification,
              title: 'PAS client accepts the "claim updated" event notification',
              description: %(
-               This test checks that the client responds appropriately to the event notification request.
+               This test checks that the PAS client responds appropriately to the event notification request.
              ) do
                verifies_requirements(*SubscriptionsTestKit::SubscriptionsR5BackportR4Client::EventNotificationVerificationTest.verifies_requirements,
                                      'hl7.fhir.us.davinci-pas_2.2.1@spec-8')

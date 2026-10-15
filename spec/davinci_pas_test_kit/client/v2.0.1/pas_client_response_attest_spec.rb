@@ -231,7 +231,7 @@ RSpec.describe DaVinciPASTestKit::AbstractResponseAttest, :request, :runnable do
         result = run_attest(request_tags: [notification_tag])
 
         expect(result.result).to eq('skip')
-        expect(result.result_message).to include('client system did not return a successful response')
+        expect(result.result_message).to include('PAS client did not return a successful response')
       end
     end
 

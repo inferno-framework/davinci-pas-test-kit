@@ -9,7 +9,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_operation_failure_group
       title 'Operation Failure'
       description %(
-        During these tests, the client system will initiate a prior authorization
+        During these tests, the PAS client will initiate a prior authorization
         request and show it can react appropriately to an operation failure response —
         a non-2XX HTTP status code accompanied by an OperationOutcome resource.
       )
@@ -27,7 +27,7 @@ module DaVinciPASTestKit
       test from: :pas_client_v221_response_attest,
            title: 'PAS client handles the operation failure appropriately',
            description: %(
-             During this test, the tester will observe the client system following
+             During this test, the tester will observe the PAS client following
              the receipt of the operation failure response and attest that the error details
              from the OperationOutcome were made available to the appropriate users (e.g.,
              technical staff, not the clinical end user).
@@ -36,7 +36,7 @@ module DaVinciPASTestKit
              workflow_tag: OPERATION_FAILURE_WORKFLOW_TAG,
              operation_tag: SUBMIT_TAG,
              error_status_expected: true,
-             attest_message: 'I attest that the client system did not error when receiving the operation ' \
+             attest_message: 'I attest that the PAS client did not error when receiving the operation ' \
                              'failure response and handles it ' \
                              'appropriately: the OperationOutcome details are available to technical staff ' \
                              'for review and the clinical end user is informed that the submission could ' \

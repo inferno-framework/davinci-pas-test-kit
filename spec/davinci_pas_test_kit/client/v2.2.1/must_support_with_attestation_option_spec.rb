@@ -194,7 +194,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(result.result).to eq('pass')
       expect(result.result_message).to eq(
         'All must support elements for the following profiles were observed in the requests made by the ' \
-        'client: PAS Coverage.'
+        'PAS client: PAS Coverage.'
       )
     end
 
@@ -215,7 +215,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(result.result).to eq('pass')
       expect(result.result_message).to eq(
         'All must support elements for the following profiles were observed in the requests made by the ' \
-        'client: PAS Coverage.'
+        'PAS client: PAS Coverage.'
       )
     end
   end
@@ -390,7 +390,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       description = described_class.build_description(options)
       expect(description).to include('### PAS Coverage')
       expect(description).to match(/^\* Coverage\./) # at least one must support element listed
-      expect(description).to include('PAS client systems are required') # other-profiles intro
+      expect(description).to include('PAS clients are required') # other-profiles intro
       expect(description).to include('testers can attest that they are not supported') # attestation option
     end
 
@@ -402,7 +402,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       description = described_class.build_description(options)
       expect(description).to include('must support at least one of them')
-      expect(description).to include('as long as that data is collected within')
+      expect(description).to include('PAS clients are allowed to support only the request profiles')
       expect(description).to include('testers can attest that they are not supported') # attestation option
       expect(description).to include('### PAS Device Request')
     end

@@ -18,7 +18,7 @@ module DaVinciPASTestKit
       title 'PAS client submits a claim using the $submit operation'
       description %(
         During this test, Inferno will wait for a prior authorization submission request
-        from the client using the `$submit` operation. Upon receipt, Inferno will respond
+        from the PAS client using the `$submit` operation. Upon receipt, Inferno will respond
         with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
         or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
         pended response. Inferno will not respond to `$inquire` operation requests during
@@ -67,7 +67,7 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Pended Scenario Test**:
 
-            Inferno will wait while the tester uses the client system to submit a PAS request to
+            Inferno will wait while the tester uses the PAS client to submit a PAS request to
             Inferno. The tests will automatically continue once a request has been received.
 
             ### Endpoints

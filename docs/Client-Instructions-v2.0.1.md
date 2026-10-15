@@ -1,7 +1,7 @@
 # Da Vinci PAS Test Kit: Client Testing v2.0.1 Instructions
 
-This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **client system**
-against v2.0.1 of the IG. When testing a client, Inferno acts as the PAS server.
+This document provides a step-by-step guide for running the Da Vinci PAS Test Kit to test a **PAS client**
+against v2.0.1 of the IG. When testing a PAS client, Inferno acts as the PAS server.
 
 ## Quick Start
 
@@ -23,13 +23,13 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
 1. Submit a PAS prior authorization request to the endpoint shown in the "User Action Required"
    dialog that appears.
-1. When another "User Action Required" dialog appears, check your system to see whether Inferno's response
+1. When another "User Action Required" dialog appears, check the PAS client to see whether Inferno's response
    was interpreted as an approval or not and click the appropriate link in the dialog.
 1. Review the results including any errors or warnings found when checking the conformance
    of the request or the generated response.
 
 The "Denial Response" group can be run in the same manner. To run the "Pended Response" group,
-first run the "Subscription Setup" group, during which the client system will submit a
+first run the "Subscription Setup" group, during which the PAS client will submit a
 Subscription so that Inferno knows how and where to send a notification that a decision has
 been rendered on a pended prior authorization request. Then proceed to execute the 
 "Pended Response" group and follow the instructions in the dialogs that appear.
@@ -61,14 +61,14 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
 1. In Postman, select the *Prior Auth Request For Approval* in the *Approval Scenario* folder
    and click the "Send" button in the upper right.
 1. Back in Inferno, the "User Action Required" dialog should disappear and a new attestation "User Action Required" dialog will
-   appear asking to confirm the system's interpretation of the "Approved" response. Check that
+   appear asking to confirm the PAS client's interpretation of the "Approved" response. Check that
    the response from the last step in Postman contains the string "Certified in total" and respond
    to the attestation. The "User Action Required" dialog should disappear and a new **Denial Scenario Test** "User Action Required"
    dialog will appear.
 1. In Postman, select the *Prior Auth Request For Denial* in the *Denial Scenario* folder
    and click the "Send" button in the upper right.
 1. Back in Inferno, the "User Action Required" dialog should disappear and a new attestation "User Action Required" dialog will
-   appear asking to confirm the system's interpretation of the "Denied" response. Check that
+   appear asking to confirm the PAS client's interpretation of the "Denied" response. Check that
    the response from the last step in Postman contains the string "Not Certified" and respond
    to the attestation. The "User Action Required" dialog should disappear and a new **Pended Scenario Test** "User Action Required"
    dialog will appear.
@@ -91,7 +91,7 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    auth request was approved. You'll use this information in a later attestation.
 1. Back in Inferno, scroll down in "User Action Required" dialog and click the "click here to complete the test"
    link to allow Inferno to evaluate the pended scenario.
-1. The next two attestations ask whether the system displayed the claim as pended and approved at the
+1. The next two attestations ask whether the PAS client displayed the claim as pended and approved at the
    appropriate points in the scenario. Attest based on whether the correct strings were found in the
    responses in the previous steps.
 1. A "User Action Required" dialog will appear requesting additional `$submit` and `$inquire`
@@ -120,7 +120,7 @@ option and replace the 3. Client Registration steps above with the following:
 - In the **SMART JSON Web Key Set (JWKS)** input, put `https://inferno.healthit.gov/suites/custom/smart_stu2_2/.well-known/jwks.json`
 - In the **Client Id** input, put `pas_demo_smart`
 - Click the **SUBMIT** button
-- A "User Action Required" dialog will display asking the tester to confirm configuration of the client. Note the
+- A "User Action Required" dialog will display asking the tester to confirm configuration of the PAS client. Note the
   FHIR endpoint and client id details
 - Start an instance of the SMART App Launch STU2.2 test suite.
 - Select the **3** Backend Services group from the list at the left and the click the "RUN TESTS"

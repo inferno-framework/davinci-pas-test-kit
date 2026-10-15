@@ -23,7 +23,7 @@ module DaVinciPASTestKit
       title 'Must support elements are observed across requests'
       description %(
         During this test, Inferno will check that all must support elements defined in the listed
-        profiles were observed in the requests made by the client.
+        profiles were observed in the requests made by the PAS client.
       )
 
       # config.options:
@@ -169,7 +169,7 @@ module DaVinciPASTestKit
       # Names the profiles with instances in the requests so testers can tell which were assessed.
       def all_observed_message
         'All must support elements for the following profiles were observed ' \
-          "in the requests made by the client: #{observed_profile_titles.join(', ')}."
+          "in the requests made by the PAS client: #{observed_profile_titles.join(', ')}."
       end
 
       def attestation_message(unobserved_by_profile)
@@ -181,11 +181,11 @@ module DaVinciPASTestKit
 
         <<~MESSAGE
           The following #{operation} request must support elements were not observed in the
-          requests made by the client:
+          requests made by the PAS client:
 
           #{unobserved_list}
 
-          Attest that the client system does **not** collect the data for these unobserved
+          Attest that the PAS client does **not** collect the data for these unobserved
           must support elements (and is not required to under the PAS implementation guide).
 
           [Click here](#{attest_true_url}) if the above statement is **true**.
@@ -216,7 +216,7 @@ module DaVinciPASTestKit
         if require_one_of
           attestation_note = if attestation_allowed
                                ' For must support elements not observed on an included request profile, ' \
-                                 'testers can attest that they are not supported by the client system.'
+                                 'testers can attest that they are not supported by the PAS client.'
                              end
           <<~INTRO.chomp
             The PAS IG includes four profiles for providing the specifics of the service or product requested
@@ -228,29 +228,28 @@ module DaVinciPASTestKit
             * PAS Device Request
             * PAS Nutrition Order
 
-            System are allowed to support only the request profiles that fit their use cases. However,
+            PAS clients are allowed to support only the request profiles that fit their use cases. However,
             they must support at least one of them (because `Claim.item.extension:requestedService` is a
             must support element) and for any request profiles they support, they must be able to
-            populate all of the defined must support elements as long as that data is collected within
-            and displayed by the system.
+            populate all of the defined must support elements.
 
             This test ensures that the submitted request bundles include at least one instance of a
             profile listed above. Then for each profile observed, it checks for the presence of
             each must support element defined in that profile.#{attestation_note}
 
-            The test will look through the instances included in submissions made by the client
+            The test will look through the instances included in submissions made by the PAS client
             for the following must support elements:
           INTRO
         else
           attestation_note = if attestation_allowed
                                ' For those not observed, testers can attest that they are not supported ' \
-                                 'by the client system.'
+                                 'by the PAS client.'
                              end
           <<~INTRO.chomp
-            PAS client systems are required to be able to populate must support elements representing
+            PAS clients are required to be able to populate must support elements representing
             data collected and displayed to users on instances of all profiles included in requests.
             This test checks all identified instances of the profiles listed below within requests sent
-            by the client to ensure that the must support elements are observed.#{attestation_note}
+            by the PAS client to ensure that the must support elements are observed.#{attestation_note}
           INTRO
         end
       end

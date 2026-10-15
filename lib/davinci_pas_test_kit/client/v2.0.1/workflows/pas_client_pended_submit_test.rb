@@ -15,13 +15,13 @@ module DaVinciPASTestKit
       include SubscriptionSetupRequirement
 
       id :pas_client_v201_pended_submit_test
-      title 'Client submits a claim and reacts to a pended response'
+      title 'PAS client submits a claim and reacts to a pended response'
       description %(
         During this test, Inferno will wait for a prior authorization submission request
-        from the client. Upon receipt, Inferno will respond with the
+        from the PAS client. Upon receipt, Inferno will respond with the
         provided pended response. Subsequently, Inferno will send a
         notification that the claim has been finalized and expect the
-        client system to send a follow-up inquiry.
+        PAS client to send a follow-up inquiry.
       )
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@58', 'hl7.fhir.us.davinci-pas_2.0.1@62',
                             'hl7.fhir.us.davinci-pas_2.0.1@67', 'hl7.fhir.us.davinci-pas_2.0.1@70',
@@ -36,7 +36,7 @@ module DaVinciPASTestKit
             optional: true,
             description: %(
               If provided, this JSON will be sent as the notification for the
-              PAS Subscription to tell the client that a decision has been made on the pended claim.
+              PAS Subscription to tell the PAS client that a decision has been made on the pended claim.
               Before sending, Inferno will update the provided notification with details that the tester cannot
               know ahead of time, including timestamps corresponding to the notification trigger time, and the id of
               the triggering ClaimResponse if Inferno mocks that ClaimResponse because it is not provided by the
@@ -71,8 +71,8 @@ module DaVinciPASTestKit
             optional: true,
             title: 'Client Notification Access Token',
             description: %(
-              The bearer token that Inferno will send on requests to the client system's rest-hook notification
-              endpoint. Not needed if the client system will create a Subscription with an appropriate header value
+              The bearer token that Inferno will send on requests to the PAS client's rest-hook notification
+              endpoint. Not needed if the PAS client will create a Subscription with an appropriate header value
               in the `channel.header` element. If a value for the `authorization` header is provided in
               `channel.header`, this value will override it.
             )
@@ -140,7 +140,7 @@ module DaVinciPASTestKit
           message: <<~MESSAGE
             **Pended Scenario Test**:
 
-            Inferno will wait while the tester uses the client system to complete the following steps:
+            Inferno will wait while the tester uses the PAS client to complete the following steps:
 
             1. Submit a PAS request to Inferno's `$submit` endpoint. Inferno will return a pended response.
             2. Within 5-10 seconds, Inferno will send a notification indicating that the ClaimResponse has
@@ -148,11 +148,11 @@ module DaVinciPASTestKit
             3. Once the notification has been received, submit a PAS inquiry request to Inferno's `$inquire`
                endpoint. Inferno will return an approval response.
 
-            Inferno will later ask testers to attest that the system marked the request as pended after
-            step 1 (submit) and before step 2 (notification), so testers should check their system state
+            Inferno will later ask testers to attest that the PAS client marked the request as pended after
+            step 1 (submit) and before step 2 (notification), so testers should check their PAS client's state
             between these steps in order to faithfully answer the attestation.
 
-            [Click here](#{confirmation_url}) once the client has completed these steps.
+            [Click here](#{confirmation_url}) once the PAS client has completed these steps.
 
             ### Endpoints
 

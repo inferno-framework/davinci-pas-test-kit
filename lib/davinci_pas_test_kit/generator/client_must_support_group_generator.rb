@@ -231,14 +231,14 @@ module DaVinciPASTestKit
             'while all others are optional.'
         else
           "\nFor all profiles other than #{mandatory_profile_names}, testers can attest\n" \
-            'that the missing elements are not supported by their system to pass the tests.'
+            'that the missing elements are not supported by their PAS client to pass the tests.'
         end
       end
 
       def description
         if type == 'response'
           <<~DESCRIPTION
-            Check that `$#{operation}` responses provided to the client contain
+            Check that `$#{operation}` responses provided to the PAS client contain
             all PAS-defined profiles and their must support elements.#{optional_profiles_description}
 
             For `$#{operation}` responses, this includes the following profiles:
@@ -247,7 +247,7 @@ module DaVinciPASTestKit
           DESCRIPTION
         else
           <<~DESCRIPTION
-            Check that the client can demonstrate `$#{operation}` requests that contain
+            Check that the PAS client demonstrated `$#{operation}` requests that contain
             all PAS-defined profiles and their must support elements.#{optional_profiles_description}
 
             For `$#{operation}` requests, this includes the following profiles:
