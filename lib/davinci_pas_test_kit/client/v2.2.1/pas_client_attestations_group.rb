@@ -1,6 +1,8 @@
 require_relative 'attestations/attestation_instructions'
+require_relative 'attestations/client_security_attestation_test'
 require_relative 'attestations/client_data_element_expectations_attestation_test'
 require_relative 'attestations/client_provider_review_attestation_test'
+require_relative 'attestations/client_subscription_error_recovery_attestation_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -21,8 +23,10 @@ module DaVinciPASTestKit
       )
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
+      test from: :pas_client_v221_security_attestation
       test from: :pas_client_v221_data_element_expectations_attestation
       test from: :pas_client_v221_provider_review_attestation
+      test from: :pas_client_v221_subscription_error_recovery_attestation
     end
   end
 end

@@ -14,7 +14,8 @@ module DaVinciPASTestKit
         test.
       )
       attestation
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@priv-1', 'hl7.fhir.us.davinci-pas_2.2.1@use-5'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@priv-1-A', 'hl7.fhir.us.davinci-pas_2.2.1@priv-1-B',
+                            'hl7.fhir.us.davinci-pas_2.2.1@use-5'
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :provider_review_attestation,

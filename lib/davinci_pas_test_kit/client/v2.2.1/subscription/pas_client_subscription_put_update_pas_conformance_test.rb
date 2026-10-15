@@ -20,7 +20,8 @@ module DaVinciPASTestKit
         - Filter criteria for the client's organization in the format `org-identifier=<identifier>`.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-62'
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-62', 'hl7.fhir.uv.subscriptions_1.1.0@64',
+                            'hl7.fhir.uv.subscriptions_1.1.0@96', 'hl7.fhir.uv.subscriptions_1.1.0@116'
 
       run do
         load_update_requests('put')

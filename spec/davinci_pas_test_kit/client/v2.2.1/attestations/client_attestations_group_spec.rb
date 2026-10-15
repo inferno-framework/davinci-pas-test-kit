@@ -7,11 +7,15 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientAttestationsGroup, :r
   # The following list of requirements is derived from the requirements verified by each test in the group.
   let(:expected_requirements) do
     [
+      'hl7.fhir.us.davinci-pas_2.2.1@spec-4',
       'hl7.fhir.us.davinci-pas_2.2.1@conf-14',
       'hl7.fhir.us.davinci-pas_2.2.1@conf-15',
-      'hl7.fhir.us.davinci-pas_2.2.1@conf-16',
-      'hl7.fhir.us.davinci-pas_2.2.1@priv-1',
-      'hl7.fhir.us.davinci-pas_2.2.1@use-5'
+      'hl7.fhir.us.davinci-pas_2.2.1@conf-16-A',
+      'hl7.fhir.us.davinci-pas_2.2.1@priv-1-A',
+      'hl7.fhir.us.davinci-pas_2.2.1@priv-1-B',
+      'hl7.fhir.us.davinci-pas_2.2.1@use-5',
+      'hl7.fhir.uv.subscriptions_1.1.0@81',
+      'hl7.fhir.uv.subscriptions_1.1.0@82'
     ]
   end
 
@@ -24,8 +28,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientAttestationsGroup, :r
   end
 
   it 'has one test per unique attestation title' do
-    expect(group.tests.length).to eq(2)
-    expect(group.tests.map(&:title).uniq.length).to eq(2)
+    expect(group.tests.length).to eq(4)
+    expect(group.tests.map(&:title).uniq.length).to eq(4)
   end
 
   it 'covers each attestation requirement exactly once' do
