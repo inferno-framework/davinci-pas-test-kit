@@ -4,10 +4,10 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ClientSubscriptionErrorRecoveryAttestationTest < Inferno::Test
       id :pas_client_v221_subscription_error_recovery_attestation
-      ATTESTATION_TITLE = 'Health IT module can recover from Subscription errors'.freeze
+      ATTESTATION_TITLE = 'PAS client can recover from Subscription errors'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module can detect and recover
+        During this test, the tester will confirm that the PAS client can detect and recover
         from Subscription errors and take steps to restore notification delivery. To see the specifics
         of the attested requirements, click the "View Specification Requirements" link for this test.
       )
@@ -18,7 +18,7 @@ module DaVinciPASTestKit
       input :subscription_error_recovery_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module can detect and recover
+              I attest that the PAS client can detect and recover
               from Subscription errors and take steps to restore notification delivery.
             ),
             type: 'radio',
