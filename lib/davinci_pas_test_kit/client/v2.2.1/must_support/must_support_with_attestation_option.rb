@@ -24,13 +24,16 @@ module DaVinciPASTestKit
       )
 
       # config.options:
-      #   profiles:        Array of { resource_type:, profile_key:, title: } describing the profiles
-      #                    to assess.
-      #   require_one_of:  Boolean. When true, at least one of the listed resource types must be
-      #                    present (a hard requirement) and only the profiles that are actually
-      #                    present are assessed - used for the "at least one request profile" case.
-      #                    When false, every listed profile is assessed.
-      #   ig_version:, type: ('request'), operation: ('submit' / 'inquire')
+      #   profiles:             Array of { resource_type:, profile_key:, title: } describing the profiles
+      #                         to assess.
+      #   require_one_of:       Boolean. When true, at least one of the listed resource types must be
+      #                         present (a hard requirement) and only the profiles that are actually
+      #                         present are assessed - used for the "at least one request profile" case.
+      #                         When false, every listed profile is assessed.
+      #   ig_version:           version of the id
+      #   type:                 'request', or 'response'
+      #   operation:            'submit', or 'inquire'
+      #   disable_attestation:  boolean indicating whether attestation is allowed (default: false)
       def profiles
         config.options[:profiles]
       end
@@ -49,6 +52,10 @@ module DaVinciPASTestKit
 
       def operation
         config.options[:operation]
+      end
+
+      def attestation_disabled?
+        config.options[:disable_attestation]
       end
 
       def target_resource_types
@@ -93,9 +100,10 @@ module DaVinciPASTestKit
         end
 
         # If nothing was unobserved, the test passes immediately without requiring any attestation.
-        # Otherwise, the tester can attest that the client system does not collect
+        # Otherwise, the tester can attest that the client system does not collect, unless disabled
         pass 'All must support elements were observed in the requests made by the client.' if
           unobserved_by_profile.empty?
+        assert false, missing_elements_error_string(unobserved_by_profile) if attestation_disabled?
 
         # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
         identifier = SecureRandom.uuid
@@ -128,6 +136,12 @@ module DaVinciPASTestKit
 
           result[profile_title] = missing if missing.present?
         end
+      end
+
+      def missing_elements_error_string(unobserved_by_profile)
+        unobserved_by_profile.flat_map do |profile_title, elements|
+          "Could not find #{elements.join(', ')}} in the provided #{profile_title} resource(s)."
+        end.join(' ')
       end
 
       def attestation_message(unobserved_by_profile)
