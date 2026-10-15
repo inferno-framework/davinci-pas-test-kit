@@ -19,7 +19,7 @@ Guide. The following documentation provides information on how to use and contri
 ## Contributing to this Test Kit
 
 *   **[Technical Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
-*   **[Server Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide)**: Information on how server tests are generated and how to maintain this process.
+*   **[Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide)**: Information on how client and server tests are generated and how to maintain this process.
 *   **[Running the Client and Server Suites Against Each Other](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Running-Suites-Against-Each-Other)**: Step-by-step guide for using the Client and Server suites to demonstrate the test execution without a separate PAS implementation, which can be useful
 for demonstration as well as debugging.
 

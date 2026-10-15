@@ -10,14 +10,14 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 
 1. Create a Da Vinci PAS Client Suite v2.0.1 session using the "Other Authentication" option
    for the Client Security Type.
-1. Select the "Client Registration" group from the list at the left and and click
+1. Select the "Client Registration" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Optionally provide a value for the **Session-specific URL path extension** input to
    specify the extra path for the dedicated session endpoint or leave blank to let
    Inferno generate a value for you. Then click the "SUBMIT" button at the bottom right.
 1. Attest to an alternate authentication approach in the "User Action Required" dialog that appears and
-   then configure your client to connect to the Inferno FHIR server subsequently displayed
-   and click the link continue.
+   then configure the PAS client to connect to the Inferno FHIR server subsequently displayed
+   and click the link to continue.
 1. Select the "Approval Response" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
@@ -72,7 +72,7 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    the response from the last step in Postman contains the string "Not Certified" and respond
    to the attestation. The "User Action Required" dialog should disappear and a new **Pended Scenario Test** "User Action Required"
    dialog will appear.
-1. In Postman, select the *Prior Auth Request For Pended* entry under the *Pended Scenario* folder in the
+1. In Postman, select the *Prior Auth Request For Pended* entry under the *Pended Scenario* folder
    and click the "Send" button in the upper right.
 1. Search in the response returned to Postman for the string "Pending" which indicates the prior
    auth request was pended and a final decision will be made later. You'll use this information in
@@ -85,7 +85,7 @@ the collection into the [Postman app](https://www.postman.com/downloads/) and fo
    hosts a notification endpoint that is used to receive Subscription notifications for this demo.
    Note that when looking for recent notifications, **Received** timestamps are in UTC which is
    5 hours ahead of Eastern Standard Time (4 hours ahead of Eastern Daylight Time).
-1. In Postman, select the *Prior Auth Inquiry for Pended* entry under the *Pended Scenario* folder in the
+1. In Postman, select the *Prior Auth Inquiry for Pended* entry under the *Pended Scenario* folder
    and click the "Send" button in the upper right.
 1. Search in the response returned to Postman for the string "Certified in total" which indicates the prior
    auth request was approved. You'll use this information in a later attestation.
@@ -117,13 +117,13 @@ under the `_payload` element).
 To use SMART Backend Services with the demo, choose the "SMART Backend Services" Client Security Type
 option and replace the 3. Client Registration steps above with the following:
 
-- In the **SMART JSON Web Key Set (JWKS)** input, put `https://inferno.healthit.gov/suites/custom/smart_stu2_2/.well-known/jwks.json`
+- In the **SMART Confidential Asymmetric JSON Web Key Set (JWKS)** input, put `https://inferno.healthit.gov/suites/custom/smart_stu2_2/.well-known/jwks.json`
 - In the **Client Id** input, put `pas_demo_smart`
 - Click the **SUBMIT** button
 - A "User Action Required" dialog will display asking the tester to confirm configuration of the PAS client. Note the
   FHIR endpoint and client id details
 - Start an instance of the SMART App Launch STU2.2 test suite.
-- Select the **3** Backend Services group from the list at the left and the click the "RUN TESTS"
+- Select the **3** Backend Services group from the list at the left and then click the "RUN TESTS"
   button in the upper right.
 - Fill in the following input values and then click "SUBMIT":
   - **FHIR Endpoint**: from the "User Action Required" dialog in the PAS Client suite
@@ -156,7 +156,7 @@ Security Type option and replace the 3. Client Registration steps above with the
   registration. Note the FHIR server endpoint displayed in the dialog.
 - Start an instance of the UDAP Security Server test suite.
 - Select the "Demo: Run Against the UDAP Security Client Suite" preset from the dropdown in the upper left.
-- Select the **2** UDAP Client Credentials Flow group from the list at the left and the click the "RUN ALL TESTS"
+- Select the **2** UDAP Client Credentials Flow group from the list at the left and then click the "RUN ALL TESTS"
   button in the upper right.
 - Update the **FHIR Server Base URL** input value to be the FHIR server endpoint from the "User Action Required" dialog
   in the PAS Client suite and then click "SUBMIT"
@@ -166,7 +166,7 @@ Security Type option and replace the 3. Client Registration steps above with the
   Copy the "access_token" value, which will be a ~100 character string of letters and numbers (e.g., eyJjbGllbnRfaWQiOiJzbWFydF9jbGllbnRfdGVzdF9kZW1vIiwiZXhwaXJhdGlvbiI6MTc0MzUxNDk4Mywibm9uY2UiOiJlZDI5MWIwNmZhMTE4OTc4In0)
 - In Postman, select the *PAS Client Suite Demonstration* Collection in postman and go to the "Variables" tab 
   (see the collection's Overview tab for more details on what the variables control).
-- In the current value for the **access_token** variable, put access token value copied from the SMART tests.
+- In the current value for the **access_token** variable, put access token value copied from the UDAP tests.
   Make sure that the **session_url_path** variable has a current value of `/`.
 - In the PAS Client suite tab, click the link in the "User Action Required" dialog to continue the tests. Do the same
   for the next "User Action Required" dialog that appears until a **Subscription Creation Test** "User Action Required" dialog appears.

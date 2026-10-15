@@ -1,7 +1,7 @@
 # Client Suite Implementation Details
 
-The Da Vinci PAS Test Kit Client Suite validates the conformance of client
-systems to the HL7® FHIR® Da Vinci Prior Authorization Support Implementation Guide,
+The Da Vinci PAS Test Kit Client Suite validates the conformance of PAS clients
+to the HL7® FHIR® Da Vinci Prior Authorization Support Implementation Guide,
 including versions
 - [2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/), and
 - [2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/).
@@ -24,7 +24,7 @@ requirements, including:
     - The denial of the request
     - The pending of the request and a subsequent notification that a final decision was made
     - additional scenarios such as updates, payer modifications, and errors (v2.2.1 only)
-- The ability of the PAS client to provide data covering the full scope of required by PAS, including
+- The ability of the PAS client to provide data covering the full scope of data required by PAS, including
     - The ability to send prior auth requests and inquiries with all PAS profiles and all must
       support elements on those profiles
     - The ability to handle responses that contain all PAS profiles and all must support elements
@@ -39,7 +39,7 @@ See [Validation](#validation) for details.
 ### Validation
 
 The client suites validate resources against the corresponding version of the PAS implementation
-and its dependencies. Profiles referenced in `meta.profile` and extensions used that come from
+guide and its dependencies. Profiles referenced in `meta.profile` and extensions used that come from
 other FHIR IGs are not recognized.
 
 Two configurations of the validator are used that differ only in their approach to custom extensions:
@@ -104,9 +104,9 @@ is left to the Da Vinci HRex IG, which [provides recommendations and potential
 approaches](https://hl7.org/fhir/us/davinci-hrex/STU1/security.html#exchange-security) for
 authentication, but does not require a specific one to be used.
 
-Inferno's use of authentication on incoming requests is different from that of system its tests
+Inferno's use of authentication on incoming requests is different from that of the systems it tests
 because its primary goal is to identify the session to associate a request with and to verify correct behavior,
-not to protect information (PHI must never be sent to publish Inferno endpoints). Thus, Inferno's
+not to protect information (PHI must never be sent to public Inferno endpoints). Thus, Inferno's
 simulation will in some cases allow requests to proceed without a successful authentication step,
 such as when using a dedicated session endpoint or receiving a JWT with an invalid signature
 as a bearer token. In both cases the tests separately verify that authentication was successful
@@ -122,7 +122,7 @@ the simulated authorization server are conformant and that the provided tokens a
 
 If the PAS client does not support either of these standards-based methods of authentication, the tester
 may instead attest to other authentication capabilities. In this case, the PAS client will not
-authenticate and will identify itself to Inferno by by sending requests to dedicated PAS endpoints
+authenticate and will identify itself to Inferno by sending requests to dedicated PAS endpoints
 created by Inferno for use during the testing session. To reduce configuration burden, the dedicated
 endpoints can be reused in subsequent sessions.
 
@@ -143,7 +143,7 @@ what details the tester needs to provide during the Client Registration tests:
 - **SMART Backend Services**: the PAS client will manually register
   with Inferno and request access tokens for use when accessing FHIR endpoints
   as per the SMART Backend Services specification. It requires the
-  **SMART JSON Web Key Set (JWKS)** input to be populated with either a URL that resolves
+  **SMART Confidential Asymmetric JSON Web Key Set (JWKS)** input to be populated with either a URL that resolves
   to a JWKS or a raw JWKS in JSON format. Additionally, testers may provide
   a **Client Id** if they want their client assigned a specific one.
 - **UDAP B2B Client Credentials**: the PAS client will dynamically register
@@ -156,7 +156,7 @@ what details the tester needs to provide during the Client Registration tests:
   so that the PAS client does not need to get access tokens or provide
   them when interacting with Inferno during these tests. Since PAS requires
   authentication of PAS clients, testers will be asked to attest that their
-  system supports another form of authentication, such as mutual authentication TLS.
+  PAS client supports another form of authentication, such as mutual TLS authentication.
   This approach uses the **Session-specific URL path extension** input to create a
   session-specific URL. This input can be provided for re-use across sessions, or
   left blank to have Inferno generate a value.
@@ -234,6 +234,6 @@ These and any other requirements found in the PAS IG may be tested in future ver
 ### Known Issues
 
 Testing has identified issues with the source IG that result in spurious failures. 
-Tests impacted by these issues have an indication in their documentations. The full
+Tests impacted by these issues have an indication in their documentation. The full
 list of known issues can be found on the [repository's issues page with the 'source ig issue'
 label](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).

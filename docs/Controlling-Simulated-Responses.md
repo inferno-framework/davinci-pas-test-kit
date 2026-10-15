@@ -4,24 +4,24 @@ During the PAS client tests, testers must demonstrate that their PAS client
 can handle a wide variety of conformant PAS responses and notifications,
 including a variety of scenarios (e.g., different decisions) and coverage
 of must support elements within response profiles. Inferno allows testers
-to provide the responses for Inferno to make because:
+to provide the responses for Inferno to return because:
 1. Requiring systems to handle specific responses could require additional setup
    (e.g., configuration of certain order codes) that could inadvertently place
    requirements on systems beyond what is required by the PAS specification.
 2. Inferno does not have the expertise or capability to produce sensical responses
-   to all systems that also cover all must support elements
+   for all systems that also cover all must support elements.
   
 Additionally, because the specification of responses for Inferno to use can be complex,
-Inferno can mock simple responses without tester input. While these response
+Inferno can mock simple responses without tester input. While these responses
 can be useful for a basic demonstration, to fully pass the tests testers will need
 to provide some responses for Inferno to return to their PAS client.
 
 However they are determined, Inferno's responses must appear as if sent by a generic
 server conformant to the PAS specification and not going beyond it. Each response:
-- Must be conformant: because only handling of conformant responses demonstrate support
+- Must be conformant: because only handling of conformant responses demonstrates support
   for PAS interop
 - Cannot contain data that goes beyond the PAS standard: this prevents the PAS client
-  system from relying on custom data. Inferno enforces this requirement by failing when
+  from relying on custom data. Inferno enforces this requirement by failing when
   a custom extension, i.e., one not defined within PAS or the IGs it depends on, is found
   within a response returned by Inferno. PAS client requests are allowed to have custom extensions,
   so resources echoed back from the request in Inferno responses (e.g., the Patient resource)
@@ -43,7 +43,7 @@ These responses are created mostly from the incoming request. Specific details i
 - The Patient, insurer Organization, and requestor entity instances are pulled into the response
   Bundle and referenced in the `patient`, `insurer`, and `requestor` elements respectively.
   Note that these are found by following references in the submitted Claim instance. If relative
-  references are used in the Claim, the Claim entry `fullUrl` needs to be a absolute reference
+  references are used in the Claim, the Claim entry `fullUrl` needs to be an absolute reference
   and not a UUID, else the entries won't get pulled in correctly. These entries are echoed as
   they appear in the request, including any extensions.
 - In the ClaimResponse, the `identifier`, `type`, `status`, and `use` elements are pulled
@@ -53,7 +53,7 @@ These responses are created mostly from the incoming request. Specific details i
   scenario, `addItem.productOrService`, since Inferno, acting as the payer, doesn't send custom
   extensions.
 - The `Bundle.timestamp` and `ClaimResponse.created` timestamps are populated using the current time.
-- The `ClaimResponse.outcome` is hardcoded to `complete`.
+- The `ClaimResponse.outcome` is set to `complete`, except for v2.0.1 pended responses, which use `queued`.
 - For each `item` entry in the request Claim, a `ClaimResponse.item` entry is created with the
   `itemSequence` value copied over, `itemPreAuthIssueDate` and `itemPreAuthPeriod` extensions 
   added using the current date and a month starting on the current date respectively,
@@ -83,7 +83,7 @@ Inferno supports mocking both `id-only` and `full-resource` notifications. The f
   references for each entry in the `$submit` response Bundle other than the ClaimResponse
   (which is already in the `focus`). Then it will include Notification Bundle entries for
   each instance in the `$submit` response Bundle, including the ClaimResponse, with `reviewActionCode`
-  extensions updated to indicate approval using code `A1` ("Certified in total") for approval.
+  extensions updated to indicate approval using code `A1` ("Certified in total").
 
 ## Tester-directed Custom Responses
 
@@ -131,10 +131,10 @@ default response. Supported fields within the "criteria" object include:
 
 - `requestRange`: a string of comma-separated request numbers or ranges, e.g., "1-2,4". Requests
   are numbered starting from 1 and counting only requests against the target operation ($submit
-  or $inquire) within a single "User Action Required". A request meets the criteria when its
+  or $inquire) within a single "User Action Required" dialog. A request meets the criteria when its
   number is one of the listed numbers or falls within one of the listed ranges.
 - `fhirpath`: a FHIRPath expression evaluated against the incoming request Bundle. A request
-  meets this criteria when the expression evaluated against the request body returns a single
+  meets this criterion when the expression evaluated against the request body returns a single
   truthy value.
 
 For example, the following list will return a denial response for a specific patient,
@@ -173,18 +173,18 @@ a pended response for the third request and an approval response for all others:
 
 ### Response Instantiation
 
-Before returning a selected response, Inferno will updated it with dynamic content,
+Before returning a selected response, Inferno will update it with dynamic content,
 including expression tokens specified by the tester and request-time details
 that they may not have known ahead of time.
 
 #### Expression Tokens
 
-Expression tokens for dynamic content indicated by a FHIRPath expression surrounded by double curly braces
-(`{{<FHIRPath expression}}`) within FHIR elements. The indicated FHIRPath
+Expression tokens for dynamic content are indicated by a FHIRPath expression surrounded by double curly braces
+(`{{<FHIRPath expression>}}`) within FHIR elements. The indicated FHIRPath
 expression will be evaluated against the request and the result used to replace the token.
 
 These can be used to make sure that details in the response reflect those in
-the request. For example, `entry.resource.ofType(Claim).patient.reference` would return the rerefernce to the
+the request. For example, `entry.resource.ofType(Claim).patient.reference` would return the reference to the
 Patient resource the Claim was submitted for, which could be used to make sure that the ClaimResponse in the
 response references the same Patient record.
 
@@ -203,7 +203,7 @@ Note that at this time, only string data can be added with expression tokens.
 
 #### Inferno Modifications of Tester-provided Responses and Notifications
 
-Following token instantiation, requests provided by testers will be modified by Inferno
+Following token instantiation, responses provided by testers will be modified by Inferno
 to populate and update details that testers won't know ahead of time. These modifications
 fall into two categories:
 - **Timestamps**: creation timestamps, such as those on Bundles, ClaimResponses, and event notifications,
@@ -243,9 +243,9 @@ to evaluate FHIRPath expressions on FHIR resources.
 
 Inferno's use of the HL7 FHIR Validator's FHIRPath engine comes with some restrictions.
 - The engine is not configured to resolve profiles or value sets. It has the base FHIR R4
-  definions loaded, so functions like `ofType` will work, but types defined in IGs or elsewhere
+  definitions loaded, so functions like `ofType` will work, but types defined in IGs or elsewhere
   cannot be used.
-- The FHIRPath engine may not implement the entire [FHIRPath specication](https://hl7.org/fhirpath/N1/index.html),
+- The FHIRPath engine may not implement the entire [FHIRPath specification](https://hl7.org/fhirpath/N1/index.html),
   for example the `resolve()` function is not supported.
 
 The Inferno team is open to adding support for additional FHIRPath functions. Please submit a

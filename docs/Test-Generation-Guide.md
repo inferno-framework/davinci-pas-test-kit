@@ -21,7 +21,7 @@ must support tests. This means that some manual effort is still needed to create
 test suites for a new version of the PAS IG.
 
 Note that any time you make changes to content in the
-`lib/davinci_pas/generator` directory, you will need to regenerate the tests. 
+`lib/davinci_pas_test_kit/generator` directory, you will need to regenerate the tests. 
 Do not make changes to any of the `client/generated`, `cross_suite/generated`, and `server/generated`
 directories directly, because these will be overwritten during the next generation.
 
@@ -68,7 +68,7 @@ Follow these steps to generate a new test suite or update an existing one for a 
         - The server error tests, server request profiles must support test, and server subscription setup and conformance tests.
     *   Implement these entities using the patterns from prior versions and re-use and update them as needed. Changes in requirements may require changes in the generator code as well.
 
-5.  **Test the Generated Suite**:
+6.  **Test the Generated Suite**:
     *   Run your local Inferno instance (`./run.sh` after `./setup.sh`).
     *   In the Inferno UI, you should now see the newly generated (or updated) test suite available for selection.
     *   Execute some of the generated tests to ensure they load correctly and behave as expected. Test against a reference implementation or sample data if possible.
@@ -98,11 +98,11 @@ The following sections contain high-level descriptions of the purpose for each f
 
 ### Generated Entities
 
-*   **`must_support_test_generator.rb` and `templates/must_support.rb.erb`**: Generates individual must support test instances. A unique instances gets created for each profile and system (`client` and `server`) used by each combination of operation (`$submit` and `$inquire`) and direction (`request` and `response`).
+*   **`must_support_test_generator.rb` and `templates/must_support.rb.erb`**: Generates individual must support test instances. A unique instance gets created for each profile and system (`client` and `server`) used by each combination of operation (`$submit` and `$inquire`) and direction (`request` and `response`).
 *   **`client_must_support_group_generator.rb` and `templates/client_must_support_group.rb.erb`**: Generates must support test groups for the client. Separate classes are generated for the `$submit` and `$inquire` groups.
 *   **`server_must_support_group_generator.rb` and `templates/server_must_support_group.rb.erb`**: Generates must support test groups for the server. A single class is generated which contains sub-groups for the `$submit` and `$inquire` tests.
 *   **`use_case_group_generator.rb` and `templates/use_case_group.rb.erb`**: Generates classes for the server scenario groups (`approval`, `denial`, `pended`).
-*   **`server_suite_generator.rb` and `templates/userver_suite.rb.erb`**: Generates a class for the server suite, referencing all necessary generated imports for the suite to operate.
+*   **`server_suite_generator.rb` and `templates/server_suite.rb.erb`**: Generates a class for the server suite, referencing all necessary generated imports for the suite to operate.
 
 ### Shared Generator Components
 

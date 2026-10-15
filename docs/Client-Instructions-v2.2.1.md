@@ -36,14 +36,14 @@ inferno-generated responses and dedicated session-specific endpoints with the fo
 
 1. Create a Da Vinci PAS Client Suite v2.2.1 session using the "Other Authentication" option
    for the Client Security Type.
-1. Select the "Client Registration" group from the list at the left and and click
+1. Select the "Client Registration" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Optionally provide a value for the **Session-specific URL path extension** input to
    specify the extra path for the dedicated session endpoint or leave blank to let
    Inferno generate a value for you. Then click the "SUBMIT" button at the bottom right.
 1. Attest to an alternate authentication approach in the "User Action Required" dialog that appears and
-   then configure your client to connect to the Inferno FHIR server subsequently displayed
-   and click the link continue.
+   then configure the PAS client to connect to the Inferno FHIR server subsequently displayed
+   and click the link to continue.
 1. Select the "Approval Response" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Click the "SUBMIT" button at the bottom right of the input dialog that appears.
@@ -61,7 +61,7 @@ The following groups and inputs can be used to expand the process described in t
 
 ### Testing the Denial, Claim Update, and Payer Modification Scenarios
 
-The "Denial Response", "Claim Updates" and "Payer Modification" groups can be run in the same manner as
+The "Denial Response", "Claim Updates" and "Payer Modifications" groups can be run in the same manner as
 described above. Testers may specify the responses for Inferno to return, but Inferno is also able
 to generate [mocked responses](Controlling-Simulated-Responses#mocked-responses)
 for these scenarios.
@@ -113,9 +113,8 @@ the authentication details are conformant.
 
 Due to [limitations of these tests](Overview#test-scope-and-limitations),
 passing this test suite in its entirety [does not prove conformance to the specification](Overview#conformance-criteria--interpreting-results).
-Additionally, some of the capabilities tested by this suite are optional including many of the hooks
-and response types, meaning that a conformant system will not necessarily be able to pass all tests
-in the suite.
+Additionally, some of the capabilities tested by this suite are optional, meaning that a conformant
+PAS client will not necessarily be able to pass all tests in the suite.
 
 With those caveats, a passing execution of this suite would include passing all groups.
 
@@ -123,7 +122,7 @@ With those caveats, a passing execution of this suite would include passing all 
 
 ### BR Provider
 
-If you would like to try out the order-sign hook invocation tests against
+If you would like to try out the PAS Approval Response tests against
 [the Da Vinci BR Provider reference implementation](https://br-provider.davinci.hl7.org/),
 use the following steps. While these tests are not expected to fully
 pass, they can give you a sense for how to execute the Inferno tests
@@ -131,7 +130,7 @@ against a real PAS client using SMART Backend Services for authentication.
 
 1. Start a Da Vinci PAS Client Suite v2.2.1 test suite session using the "SMART Backend Services"
    option for the Client Security Type suite option.
-1. Apply present "Da Vinci BR Provider reference implementation" using
+1. Apply preset "Da Vinci BR Provider Reference Implementation" using
    the dropdown in the upper right. This fills in `https://br-provider.davinci.hl7.org/api/security/jwks`
    for the value of the "SMART Confidential Asymmetric JSON Web Key Set (JWKS)" input.
 1. Select Group "**1** Client Registration", click the "Run Tests" button in the upper right, and
@@ -145,7 +144,7 @@ against a real PAS client using SMART Backend Services for authentication.
    1. Use the "Server" dropdown to select the "Custom" option.
    1. In the "CDS Services URL" input, put `https://br-payer.davinci.hl7.org/cds-services`.
    1. In the "FHIR" input, put Inferno's FHIR url displayed in the "User Action Required"
-      dialog on the Inferno tab (e.g., `https://inferno.healthit.gov/suites/custom/g33_certification/pas_v221/fhir`).
+      dialog on the Inferno tab (e.g., `https://inferno.healthit.gov/suites/custom/davinci_pas_client_suite_v221/fhir`).
    1. From the "Authentication" dropdown, select `SMART Backend Services`
    1. In the "Client ID" input, copy the client id displayed in the "User Action Required"
       dialog on the Inferno tab (11 character alpha-numeric value).
@@ -153,7 +152,7 @@ against a real PAS client using SMART Backend Services for authentication.
    1. Click the "Save" button and close the dialog to complete the setup.
 1. Back in the Inferno session tab, click the link to confirm the configuration and continue the tests.
 1. Select and run group "**3.1** Approval Response" without any changes to the inputs so that the default
-   mocked response response will be used. When the dialog appears indicating Inferno is ready to
+   mocked response will be used. When the dialog appears indicating Inferno is ready to
    receive requests, return to the tab with the reference implementation.
 1. In the reference implementation tab, select patient "Roosevelt, Theodor Alan Roosevelt"
    to open their chart.
@@ -170,14 +169,14 @@ against a real PAS client using SMART Backend Services for authentication.
    button on the next screen. The response should come back and be displayed
    as "Approved".
 1. Return to the Inferno tab, which will have begun to evaluate the prior authorization
-   interaction. A "User Action Required" dialog will appear asking for comfirmation
-   that the order displayed has having prior authorization "approved". Click the
+   interaction. A "User Action Required" dialog will appear asking for confirmation
+   that the order displayed as having prior authorization "approved". Click the
    appropriate answer based on what you saw in the reference implementation. This
    will complete the tests.
-1. Run group "**11** Review Authentication Interactions" to have Inferno verify the authentication
+1. Run group "**14** Review Authentication Interactions" to have Inferno verify the authentication
    requests received during this session.
 
-## CRD Request Generator (old)
+### CRD Request Generator (old)
 
 If you would like to try out the PAS Approval Response tests against
 [a public PAS reference client](https://crd-request-generator.davinci.hl7.org/),
@@ -207,14 +206,14 @@ PAS client will look like.
 11. In the "Select PriorAuth Endpoint" text box, put the FHIR Base URL from step 4.
 12. Edit the Bundle at the right so that the first Bundle entry has a `fullUrl` field before the `resource` field
     with a value of `urn:uuid:0583c759-bc19-4bfa-815c-8f43c1d488ea` or other uuid.
-12. Before, submitting return to the client session, select group "**9.1** Approval Response", click
+13. Before submitting, return to the client session, select group "**11.1** Approval Response", click
     the "Run Tests" button in the upper right, and click the "Submit" button on the input dialog that appears.
-13. When the "User Action Required" dialog appears asking for a $submit request, return to the crd-request-generator
+14. When the "User Action Required" dialog appears asking for a $submit request, return to the crd-request-generator
     tab and click the "Submit" button. A response should be returned and the Inferno session will now
     check the request and response for conformance.
-    - NOTE: currently the RI does not pull in the added `fullURL` value so it will indicate a failure.
+    - NOTE: currently the RI does not pull in the added `fullUrl` value so it will indicate a failure.
       Inferno will still verify the request.
-14. In the Inferno session, once the interaction has been checked for conformance a "User Action Required"
+15. In the Inferno session, once the interaction has been checked for conformance a "User Action Required"
     dialog will appear asking for confirmation that the PAS client displayed the submitted Claim as "approved".
     Click the appropriate link to complete the demonstration.
 

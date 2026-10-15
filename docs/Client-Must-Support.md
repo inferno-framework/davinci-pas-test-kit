@@ -2,7 +2,7 @@
 
 ## Background
 
-The must suppport flag is one mechanism used within FHIR to denote elements that
+The must support flag is one mechanism used within FHIR to denote elements that
 may not be required on all instances of a profile but are necessary to represent
 the full scope of situations that the profile is designed to handle. Each FHIR IG
 defines the precise meaning of must support within the profiles that it defines
@@ -12,13 +12,13 @@ defined by the IG.
 Inferno generally validates must support definitions by analyzing a set of
 resources gathered over one or more tests and checking that each must support
 element defined in the relevant profile(s) has been observed populated at
-lest once.
+least once.
 
 ## PAS Must Support Definitions for Clients
 
 PAS, in both the [v2.0.1](https://hl7.org/fhir/us/davinci-pas/STU2/background.html#must-support)
 and [v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/conformance.html#mustsupport)
-versions that Inferno current has suites for, requires that PAS clients follow the
+versions that Inferno currently has suites for, requires that PAS clients follow the
 [must support requirements defined in the Da Vinci HRex IG](https://hl7.org/fhir/us/davinci-hrex/1.2.0/en/conformance.html#mustsupport),
 including when acting as a:
 - **Data Source**: PAS clients act as a data source when they send information to
@@ -110,8 +110,8 @@ To pass the PAS client v2.0.1 must support tests, Inferno must see
 - On Responses
   - All must support elements defined on the [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claimresponse.html)
     or [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-claiminquiryresponse.html)
-    profiles for `$submit` and `$inquire` requests respectively.
-  - For both `$submit` and `$inquire` requests, at least one instance of each
+    profiles for `$submit` and `$inquire` responses respectively.
+  - For both `$submit` and `$inquire` responses, at least one instance of each
     other profile referenced from the PAS ClaimResponse profiles and all must support
     elements defined on those profiles. Specific profiles for which must support coverage
     must be demonstrated include:
@@ -152,8 +152,8 @@ To pass the PAS client v2.2.1 must support tests, Inferno must see
 - On Responses
   - All must support elements defined on the [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claimresponse.html)
     or [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claiminquiryresponse.html)
-    profiles for `$submit` and `$inquire` requests respectively.
-  - For both `$submit` and `$inquire` requests, at least one instance of each
+    profiles for `$submit` and `$inquire` responses respectively.
+  - For both `$submit` and `$inquire` responses, at least one instance of each
     other profile referenced from the PAS ClaimResponse profiles and all must support
     elements defined on those profiles. Specific profiles for which must support coverage
     must be demonstrated include:

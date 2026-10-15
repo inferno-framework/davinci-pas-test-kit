@@ -28,7 +28,7 @@ Inferno performs minimal validation before accepting a Subscription to ensure
 that it can send notifications based on it. To do so, Inferno requires:
 - `channel.type` to be "rest-hook"
 - `channel.endpoint` to be a valid "http" or "https" url
-- that no [heartbeat](https://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition-backport-heartbeat-period.html),
+- that no [heartbeat](https://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition-backport-heartbeat-period.html)
   is requested as Inferno does not support sending these periodic notifications.
 
 Additional conformance validation is performed as a part of the Inferno
@@ -95,7 +95,7 @@ notification with some updates](Controlling-Simulated-Responses#inferno-modifica
 
 The PAS client CapabilityStatement ([EHR PAS Capabilities v2.2.1](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/CapabilityStatement-EHRCapabilities.html))
 requires support for the `update` and `delete` FHIR interactions on the
-Subscription resource. The PAS Client suite tests client support for these
+Subscription resource. The PAS Client suite tests PAS client support for these
 interactions in the "Subscription Update and Deletion" group. That group
 must run at the end of the session after all scenario and must support tests
 have been performed. Critical notes:

@@ -37,14 +37,13 @@ This section details how to configure and run the tests against your own PAS ser
 3.  **Configure Inputs**:
     *   When you select a specific test group (e.g., "Approval Scenario") or click "Run All Tests", an input dialog will appear. You **must** provide the following information tailored to your server:
         *   **FHIR Server Endpoint URL**: The base FHIR URL of your PAS server (e.g., `https://your-pas-server.com/fhir`). Inferno will append `/Claim/$submit`, `/Claim/$inquire`, and `/Subscription` to this base URL.
-        *   **OAuth Credentials / Access Token**: If your server requires OAuth 2.0 authentication for its PAS endpoints, provide a valid Bearer token here. Inferno will include this token in the `Authorization` header of all requests it makes to your server.
+        *   **OAuth Credentials**: If your server requires OAuth 2.0 authentication for its PAS endpoints, provide a valid Bearer token in the **Access Token** sub field. Inferno will include this token in the `Authorization` header of all requests it makes to your server.
         *   **PAS Submit Request Payload for Approval Response**: A complete JSON-encoded FHIR Bundle. This bundle should be a `$submit` request that, when sent to your server, is expected to result in a prior authorization approval.
         *   **PAS Submit Request Payload for Denial Response**: A JSON FHIR Bundle for a `$submit` request that should lead to a denial from your server.
         *   **PAS Submit Request Payload for Pended Response**: A JSON FHIR Bundle for a `$submit` request that should cause your server to return a pended status.
         *   **PAS Inquire Request Payload for Pended Claim**: A JSON FHIR Bundle for a `$inquire` request. This request should be for the claim that was previously pended, and your server is expected to return the final decision (e.g., approval or denial).
-        *   **PAS Submit Request Payload for Error Response** (Optional but Recommended): A JSON FHIR Bundle for a `$submit` request that is malformed or should otherwise cause your server to return an error (typically an `OperationOutcome`).
-        *   **Additional PAS Submit Request Payloads** (Optional): A JSON array of JSON FHIR Bundles (e.g., `[bundle1, bundle2]`). These are used to test must-support elements more comprehensively by submitting varied requests.
-        *   **Additional PAS Inquire Request Payloads** (Optional): Similar to the above, but for `$inquire` operations.
+        *   **Additional $submit Request Payloads** (Optional): A JSON array of JSON FHIR Bundles (e.g., `[bundle1, bundle2]`). These are used to test must-support elements more comprehensively by submitting varied requests.
+        *   **Additional $inquire Request Payloads** (Optional): Similar to the above, but for `$inquire` operations.
         *   **Pended Prior Authorization Subscription**: A JSON FHIR `Subscription` resource body. Inferno will POST this to your server's `/Subscription` endpoint. This `Subscription` should be crafted so that your server sends notifications to Inferno when the pended prior authorization request (from "PAS Submit Request Payload for Pended Response") is updated with a final decision. Inferno will automatically modify the `channel.endpoint` in this provided `Subscription` to its own dynamically generated notification listener URL.
         *   **Notification Access Token**: If your server, when sending a notification *to* Inferno's endpoint, requires an `Authorization` header with a Bearer token, provide that token here.
 4.  **Run Tests**:

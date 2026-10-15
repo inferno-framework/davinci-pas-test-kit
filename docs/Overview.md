@@ -55,7 +55,7 @@ terminology validation and X12-based
 matching logic. Additionally, not all scenarios and requirements are covered
 by all suites in this test kit.
 
-For a details on specific specific limitations, detailed requirements, and known
+For details on specific limitations, detailed requirements, and known
 issues, please consult the following resources: 
 - [Client Testing Limitations](Client-Details#testing-limitations)
 - [Server Testing Limitations](Server-Details#testing-limitations)
