@@ -89,7 +89,7 @@ Key subdirectories and files within the `server/` folder include:
     a Subscription notification indicating that a pended claim has been updated.
 *   **`server_request_bundle_validation_test.rb` and `pserver_response_bundle_validation_test.rb`**:
     Common tests for server Bundle validation. The primary difference is that the requests tests
-    evaluate input provided by testers to drive Inferno's simulated client and so will skip when
+    evaluate input provided by testers to drive Inferno's simulated PAS client and so will skip when
     problems are detected, while the response tests evaluate server responses and will fail. Both
     result in a suite-level failure, but the skip on the request input errors indicates that Inferno
     was not able to verify conformant behavior, while the failure on server response errors indicates

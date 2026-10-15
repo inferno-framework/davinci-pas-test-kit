@@ -13,7 +13,7 @@ requirements and may change the test validation logic.
 
 ## Test Methodology
 
-Inferno will simulate a client and make a series of prior authorization requests to the 
+Inferno will simulate a PAS client and make a series of prior authorization requests to the 
 server under test. Over the course of these requests, Inferno will seek to observe
 conformant handling of PAS requirements, including
 - The ability of the server to use PAS API interactions to communicate 

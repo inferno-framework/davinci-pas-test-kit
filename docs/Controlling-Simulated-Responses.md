@@ -23,7 +23,7 @@ server conformant to the PAS specification and not going beyond it. Each respons
 - Cannot contain data that goes beyond the PAS standard: this prevents the PAS client
   system from relying on custom data. Inferno enforces this requirement by failing when
   a custom extension, i.e., one not defined within PAS or the IGs it depends on, is found
-  within a response returned by Inferno. Client requests are allowed to have custom extensions,
+  within a response returned by Inferno. PAS client requests are allowed to have custom extensions,
   so resources echoed back from the request in Inferno responses (e.g., the Patient resource)
   may keep the extensions they had in the request, as long as they are unchanged. See
   [Validation](Client-Details#validation) for details on how echoed resources are identified
@@ -34,7 +34,7 @@ server conformant to the PAS specification and not going beyond it. Each respons
 
 When generating responses and notifications, Inferno uses the following logic. Responses
 generated in this way conform to the requirements of the PAS specification, but may not
-make clinical sense when received by a real client.
+make clinical sense when received by a real PAS client.
 
 ### `$submit` and `$inquire` responses
 
