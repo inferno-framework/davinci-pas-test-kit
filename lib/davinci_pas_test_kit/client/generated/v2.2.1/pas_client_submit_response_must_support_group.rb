@@ -41,7 +41,7 @@ module DaVinciPASTestKit
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_claimresponse do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements(*verifies_requirements, 'hl7.fhir.us.davinci-pas_2.2.1@conf-7')
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_communication_request do
