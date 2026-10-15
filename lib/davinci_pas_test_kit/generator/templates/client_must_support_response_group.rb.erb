@@ -20,7 +20,7 @@ module DaVinciPASTestKit
       end
       <%- else -%>
       test from: :<%= profile_test[:id] %> do
-        verifies_requirements '<%= response_verifies_requirement %>'
+        verifies_requirements(*verifies_requirements, '<%= response_verifies_requirement %>')
         simulation_verification
       end
       <%- end -%>
