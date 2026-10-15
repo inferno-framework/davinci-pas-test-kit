@@ -12,7 +12,7 @@ module DaVinciPASTestKit
           new(ig_metadata, 'submit', submit_request_profiles, base_client_output_dir).generate
 
           submit_response_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportTargetProfiles.submit_response_profile?(profile)
+            MustSupportTargetProfiles.client_submit_response_profile?(profile)
           end
           new(ig_metadata, 'submit', submit_response_profiles, base_client_output_dir, 'response').generate
 
@@ -22,7 +22,7 @@ module DaVinciPASTestKit
           new(ig_metadata, 'inquire', inquire_request_profiles, base_client_output_dir).generate
 
           inquire_response_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportTargetProfiles.inquire_response_profile?(profile)
+            MustSupportTargetProfiles.client_inquire_response_profile?(profile)
           end
           new(ig_metadata, 'inquire', inquire_response_profiles, base_client_output_dir, 'response').generate
         end
@@ -147,17 +147,25 @@ module DaVinciPASTestKit
         ig_version == 'v2.2.1'
       end
 
+      # for now, disabling the attestation option and optional response tests. they are expected to be
+      # re-enabled for some ig versions in some form in the future, so leaving the structure in place.
+      def enable_lax_checks?
+        false
+      end
+
       # The Claim (request) / ClaimResponse (response) profiles remain mandatory standalone tests.
       def mandatory_profile?(profile_metadata)
         %w[Claim ClaimResponse].include?(profile_metadata.resource)
       end
 
-      # Response groups: pairs each per-profile test id with whether it should be marked optional.
+      # Response groups: pairs each per-profile test id with whether it should be marked optional and
+      # whether it verifies response_verifies_requirement (only the ClaimResponse profile does).
       def profile_tests
         profiles.map do |profile_metadata|
           {
             id: test_id_for_profile(profile_metadata),
-            optional: optional_must_support_enabled? && !mandatory_profile?(profile_metadata)
+            optional: optional_must_support_enabled? && !mandatory_profile?(profile_metadata) && enable_lax_checks?,
+            verifies_response_requirement: mandatory_profile?(profile_metadata)
           }
         end
       end
@@ -191,7 +199,7 @@ module DaVinciPASTestKit
         target_profiles.map { |profile_metadata| test_file_for_profile(profile_metadata) }
       end
 
-      # Requirement verified by the mandatory per-profile tests in response groups
+      # Requirement verified by the ClaimResponse per-profile test in response groups
       # (clients SHALL be capable of receiving must support elements).
       def response_verifies_requirement
         case ig_version
@@ -216,7 +224,7 @@ module DaVinciPASTestKit
 
       # Only v2.2.1 has optional response tests and the request attestation option.
       def optional_profiles_description
-        return '' unless optional_must_support_enabled?
+        return '' unless optional_must_support_enabled? && enable_lax_checks?
 
         if type == 'response'
           "\nDemonstration of the #{mandatory_profile_names} profile is strictly required\n" \

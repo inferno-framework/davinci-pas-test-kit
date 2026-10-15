@@ -18,6 +18,21 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       )
     end
   end
+  # Same as coverage_test but with attestation disabled, as in the generated must support groups.
+  let(:no_attestation_coverage_test) do
+    Class.new(described_class) do
+      config(
+        options: {
+          profiles: [{ resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' }],
+          require_one_of: false,
+          ig_version: 'v2.2.1',
+          type: 'request',
+          operation: 'submit',
+          disable_attestation: true
+        }
+      )
+    end
+  end
   # Same as coverage_test but for the $inquire operation, to check the operation-aware message.
   let(:inquire_coverage_test) do
     Class.new(described_class) do
@@ -177,6 +192,31 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       result = run(coverage_test)
       expect(result.result).to eq('pass')
+      expect(result.result_message).to eq(
+        'All must support elements for the following profiles were observed in the requests made by the ' \
+        'client: PAS Coverage.'
+      )
+    end
+
+    it 'names only the profiles with instances when multiple profiles are configured' do
+      codings = [
+        { system: 'http://terminology.hl7.org/CodeSystem/subscriber-relationship', code: 'self' },
+        { system: 'https://codesystem.x12.org/005010/1069', code: '18' }
+      ]
+      create_submit_request(coverage_bundle(relationship_codings: codings))
+      test = Class.new(require_one_of_test) do
+        config(options: { profiles: [
+                 { resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' },
+                 { resource_type: 'DeviceRequest', profile_key: 'device_request', title: 'PAS Device Request' }
+               ] })
+      end
+
+      result = run(test)
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to eq(
+        'All must support elements for the following profiles were observed in the requests made by the ' \
+        'client: PAS Coverage.'
+      )
     end
   end
 
@@ -213,6 +253,27 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
     end
   end
 
+  describe 'when attestation is disabled' do
+    it 'passes when every must support element is observed' do
+      codings = [
+        { system: 'http://terminology.hl7.org/CodeSystem/subscriber-relationship', code: 'self' },
+        { system: 'https://codesystem.x12.org/005010/1069', code: '18' }
+      ]
+      create_submit_request(coverage_bundle(relationship_codings: codings))
+
+      expect(run(no_attestation_coverage_test).result).to eq('pass')
+    end
+
+    it 'fails without waiting, naming the unobserved elements, when must support elements are not observed' do
+      create_submit_request(incomplete_coverage_bundle)
+
+      result = run(no_attestation_coverage_test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to match(/\ACould not find .+ in the provided PAS Coverage resource\(s\)\.\z/)
+      expect(result.result_message).to_not include('}')
+    end
+  end
+
   describe 'when require_one_of is true and none of the listed profiles are present' do
     it 'fails' do
       create_submit_request(FHIR::Bundle.new(type: 'collection').to_json)
@@ -230,7 +291,18 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
 
       result = run(coverage_test)
       expect(result.result).to eq('wait')
-      expect(result.result_message).to include('no Coverage instances were observed')
+      expect(result.result_message).to include('- PAS Coverage: no instances were observed')
+
+      info_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id).map(&:message)
+      expect(info_messages).to include('No instances of profile PAS Coverage were observed.')
+    end
+
+    it 'fails naming the profile when attestation is disabled' do
+      create_submit_request(FHIR::Bundle.new(type: 'collection').to_json)
+
+      result = run(no_attestation_coverage_test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq('No PAS Coverage resources were observed.')
     end
   end
 
@@ -334,6 +406,18 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(description).to include('testers can attest that they are not supported') # attestation option
       expect(description).to include('### PAS Device Request')
     end
+
+    it 'leaves out the attestation option when attestation is disabled' do
+      [true, false].each do |require_one_of|
+        options = {
+          profiles: [{ resource_type: 'Coverage', profile_key: 'coverage', title: 'PAS Coverage' }],
+          require_one_of:, ig_version: 'v2.2.1', disable_attestation: true
+        }
+        description = described_class.build_description(options)
+        expect(description).to include('### PAS Coverage')
+        expect(description).to_not include('attest')
+      end
+    end
   end
 
   describe 'the generated submit request-profiles attestation test' do
@@ -346,6 +430,20 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::MustSupportWithAttestationOpti
       expect(test).to_not be_nil
       expect(test.description).to include('### PAS Device Request')
       expect(test.description).to include('* DeviceRequest.')
+    end
+  end
+
+  describe 'the generated must support attestation tests' do
+    it 'disable attestation' do
+      groups = [DaVinciPASTestKit::DaVinciPASV221::PASClientSubmitMustSupportGroup,
+                DaVinciPASTestKit::DaVinciPASV221::PASClientInquireMustSupportGroup]
+      tests = groups.flat_map(&:tests).select { |test| test < described_class }
+
+      expect(tests.length).to eq(3)
+      tests.each do |test|
+        expect(test.config.options[:disable_attestation]).to be(true)
+        expect(test.description).to_not include('attest')
+      end
     end
   end
 end

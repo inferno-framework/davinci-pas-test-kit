@@ -26,6 +26,8 @@ module DaVinciPASTestKit
           end
           submit_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'submit').generate
+            next if MustSupportTargetProfiles.client_response_excluded_profile?(profile)
+
             new(ig_metadata, profile, base_client_output_dir, 'response', 'submit', 'client').generate
           end
 
@@ -37,13 +39,15 @@ module DaVinciPASTestKit
           end
           inquiry_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'inquire').generate
+            next if MustSupportTargetProfiles.client_response_excluded_profile?(profile)
+
             new(ig_metadata, profile, base_client_output_dir, 'response', 'inquire', 'client').generate
           end
         end
 
-        # For v2.2.1 the client request must support tests are collapsed into the attestation tests
+        # For v2.2.1 the client request must support tests are collapsed into shared tests
         # (see ClientMustSupportGroupGenerator), so only the mandatory Claim profile keeps a
-        # standalone per-profile client request test. Other profiles are covered by the attestation
+        # standalone per-profile client request test. Other profiles are covered by the shared
         # tests and their per-profile client request tests are not generated. Server tests and
         # earlier IG versions are unaffected.
         def generate_client_request_test?(ig_metadata, profile)

@@ -100,7 +100,7 @@ To pass the PAS client v2.0.1 must support tests, Inferno must see
     all must support elements defined on those profiles. Specific
     profiles for which must support coverage must be demonstrated include:
     - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-coverage.html)
-    - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-encounter.html)
+    - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-encounter.html) (`$submit` requests only)
     - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-insurer.html)
     - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-requestor.html)
     - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
@@ -122,18 +122,8 @@ To pass the PAS client v2.0.1 must support tests, Inferno must see
     - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
     - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
     - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-    - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
 
 ### Da Vinci PAS v2.2.1
-
-The PAS client v2.2.1 tests include some cases where the full must support requirements are not
-checked, including
-- Allows testers to indicate that they don't support must support elements on request profiles
-  other than Claim profiles.
-- Does not require demonstration of must support elements on response profiles other than
-  ClaimResponse. These tests are optional and thus systems do not need to pass them to be conformant.
-
-These relaxed requirements may be further loosened or re-tightened in the future.
 
 To pass the PAS client v2.2.1 must support tests, Inferno must see
 - On Requests
@@ -147,14 +137,12 @@ To pass the PAS client v2.2.1 must support tests, Inferno must see
     or [ServiceRequest](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-servicerequest.html))
     referenced from the [Requested Service extension](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-extension-requestedService.html)
     on element `Claim.item`, and all must support elements defined in the profiles for each
-    request resource type that was observed. Testers may attest that such elements not observed
-    are not supported by their system and pass the test.
+    request resource type that was observed.
   - For both `$submit` and `$inquire` requests, at least one instance of each other profile referenced from the PAS Claim profiles and
-    all must support elements defined on those profiles. Testers may attest that such
-    elements not observed are not supported by their system and pass the test. Specific
+    all must support elements defined on those profiles. Specific
     profiles for which must support coverage must be demonstrated include:
     - [PAS Coverage](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-coverage.html)
-    - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-encounter.html)
+    - [PAS Encounter](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-encounter.html) (`$submit` requests only)
     - [PAS Insurer Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-insurer.html)
     - [PAS Requestor Organization](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-requestor.html)
     - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-beneficiary.html)
@@ -165,7 +153,7 @@ To pass the PAS client v2.2.1 must support tests, Inferno must see
   - All must support elements defined on the [PAS Claim Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claimresponse.html)
     or [PAS Claim Inquiry Response](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-claiminquiryresponse.html)
     profiles for `$submit` and `$inquire` requests respectively.
-  - Optionally, for both `$submit` and `$inquire` requests, at least one instance of each
+  - For both `$submit` and `$inquire` requests, at least one instance of each
     other profile referenced from the PAS ClaimResponse profiles and all must support
     elements defined on those profiles. Specific profiles for which must support coverage
     must be demonstrated include:
@@ -176,5 +164,3 @@ To pass the PAS client v2.2.1 must support tests, Inferno must see
     - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-beneficiary.html)
     - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-practitioner.html)
     - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-practitionerrole.html)
-    - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/en/StructureDefinition-profile-task.html)
-

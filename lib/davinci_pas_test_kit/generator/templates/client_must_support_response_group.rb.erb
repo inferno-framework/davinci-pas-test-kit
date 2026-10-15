@@ -18,9 +18,13 @@ module DaVinciPASTestKit
         optional
         simulation_verification
       end
-      <%- else -%>
+      <%- elsif profile_test[:verifies_response_requirement] -%>
       test from: :<%= profile_test[:id] %> do
         verifies_requirements(*verifies_requirements, '<%= response_verifies_requirement %>')
+        simulation_verification
+      end
+      <%- else -%>
+      test from: :<%= profile_test[:id] %> do
         simulation_verification
       end
       <%- end -%>

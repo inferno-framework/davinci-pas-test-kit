@@ -24,8 +24,13 @@ module DaVinciPASTestKit
       
 <%- if optional_must_support_enabled? -%>
 <%- if operation == 'submit' -%>
+<%- if enable_lax_checks? -%>
       # At least one of the PAS request profiles must be present; unobserved must support
       # elements on the request profiles that are present may be attested as not collected.
+<%- else -%>
+      # At least one of the PAS request profiles must be present, with all of its must support
+      # elements observed.
+<%- end -%>
       test from: :pas_client_<%= ig_version_for_id %>_must_support_with_attestation_option do
         id :pas_client_<%= ig_version_for_id %>_submit_request_profiles_must_support_with_attestation_option
         title 'At least one instance of a request profile (PAS Medication Request, PAS Service Request, PAS Device Request, or PAS Nutrition Order) is observed with all of its must support elements'
@@ -37,7 +42,8 @@ module DaVinciPASTestKit
             ],
             ig_version: '<%= ig_version %>',
             type: 'request',
-            operation: '<%= operation %>'
+            operation: '<%= operation %>',
+            disable_attestation: <%= !enable_lax_checks? %>
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)
@@ -54,8 +60,12 @@ module DaVinciPASTestKit
       end<%- end -%>
 
 <%- end -%>
+<%- if enable_lax_checks? -%>
       # All other <%= operation %> request profiles - unobserved must support elements may be
       # attested as not collected by the client system.
+<%- else -%>
+      # All other <%= operation %> request profiles - all must support elements must be observed.
+<%- end -%>
       test from: :pas_client_<%= ig_version_for_id %>_must_support_with_attestation_option do
         id :pas_client_<%= ig_version_for_id %>_<%= operation %>_request_other_must_support_with_attestation_option
         title '<%= other_profiles_title %>'
@@ -67,7 +77,8 @@ module DaVinciPASTestKit
             ],
             ig_version: '<%= ig_version %>',
             type: 'request',
-            operation: '<%= operation %>'
+            operation: '<%= operation %>',
+            disable_attestation: <%= !enable_lax_checks? %>
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)

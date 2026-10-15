@@ -42,7 +42,7 @@ module DaVinciPASTestKit
 
       # A sorted, bulleted markdown list of this profile's must support elements (slices, elements,
       # extensions, and choices), each line prefixed with `indent` spaces. Shared by the per-profile
-      # must support tests and the collapsed attestation tests so both stay in sync with the metadata.
+      # must support tests and the collapsed tests so both stay in sync with the metadata.
       def must_support_list_string(indent: 8)
         slice_names = must_supports[:slices].map { |slice| slice[:slice_id] }
         element_names = must_supports[:elements].map { |element| "#{resource}.#{element[:path]}" }
