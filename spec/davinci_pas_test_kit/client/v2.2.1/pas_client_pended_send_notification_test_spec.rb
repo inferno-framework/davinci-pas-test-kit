@@ -54,6 +54,50 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedNotifyAndAttest
       expect(result.result_message).to include('no Subscription exists to receive notifications')
     end
 
+    it 'skips when the client has updated the Subscription' do
+      create_subscription_request
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 200,
+                     response_body: subscription_json.to_json)
+      create_pended_submit_request
+      result = run(described_class)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('submitted update or delete requests')
+    end
+
+    it 'skips when the client has deleted the Subscription' do
+      create_subscription_request
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 200,
+                     response_body: nil)
+      create_pended_submit_request
+      result = run(described_class)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('submitted update or delete requests')
+    end
+
+    it 'does not skip for update or delete requests made against an earlier Subscription' do
+      create_subscription_request
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, 'earlier-subscription-id'], status: 200,
+                     response_body: nil)
+      create_pended_submit_request
+      result, _args = run_capturing_job_args
+
+      expect(result.result).to eq('wait')
+    end
+
+    it 'does not skip for rejected update or delete requests' do
+      create_subscription_request
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_json['id']], status: 400,
+                     response_body: nil)
+      create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_DELETE_TAG, subscription_json['id']], status: 404,
+                     response_body: nil)
+      create_pended_submit_request
+      result, _args = run_capturing_job_args
+
+      expect(result.result).to eq('wait')
+    end
+
     it 'skips when there is no successful pended $submit request' do
       create_subscription_request
       create_pended_submit_request(status: 400)

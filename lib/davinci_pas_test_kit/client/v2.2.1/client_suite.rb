@@ -10,11 +10,14 @@ require_relative '../endpoints/token_endpoint'
 require_relative '../endpoints/subscription_create_endpoint'
 require_relative '../endpoints/subscription_read_endpoint'
 require_relative '../endpoints/subscription_status_endpoint'
+require_relative '../endpoints/subscription_update_endpoint'
+require_relative '../endpoints/subscription_delete_endpoint'
 require_relative '../metadata/mock_pas_server'
 require_relative '../pas_client_options'
 require_relative 'pas_client_workflows_group'
 require_relative 'pas_client_must_support_group'
 require_relative 'pas_client_subscription_setup_group'
+require_relative 'pas_client_subscription_update_delete_group'
 require_relative 'pas_client_registration_group'
 require_relative 'pas_client_auth_smart_group'
 require_relative 'pas_client_auth_udap_group'
@@ -175,7 +178,11 @@ module DaVinciPASTestKit
       suite_endpoint :post, FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_PATH, SubscriptionCreateEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
+      suite_endpoint :put, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionUpdateEndpoint
+      suite_endpoint :delete, FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionDeleteEndpoint
       suite_endpoint :get, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionReadEndpoint
+      suite_endpoint :put, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionUpdateEndpoint
+      suite_endpoint :delete, SESSION_FHIR_SUBSCRIPTION_INSTANCE_PATH, SubscriptionDeleteEndpoint
       suite_endpoint :post, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :post, SESSION_FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
       suite_endpoint :get, FHIR_SUBSCRIPTION_INSTANCE_STATUS_PATH, SubscriptionStatusEndpoint
@@ -217,6 +224,12 @@ module DaVinciPASTestKit
         PASClientOptions.recursive_remove_input(self, :session_url_path)
         config(inputs: { client_id: { optional: false } })
       end
+      group from: :pas_client_v221_subscription_update_delete,
+            id: :pas_client_v221_subscription_update_delete_smart do
+        required_suite_options client_type: PASClientOptions::SMART_BACKEND_SERVICES_CONFIDENTIAL_ASYMMETRIC
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
+      end
 
       # UDAP test groups (with :session_url_path input removed)
       group from: :pas_client_v221_subscription_setup, id: :pas_client_v221_subscription_setup_udap do
@@ -234,6 +247,12 @@ module DaVinciPASTestKit
         PASClientOptions.recursive_remove_input(self, :session_url_path)
         config(inputs: { client_id: { optional: false } })
       end
+      group from: :pas_client_v221_subscription_update_delete,
+            id: :pas_client_v221_subscription_update_delete_udap do
+        required_suite_options client_type: PASClientOptions::UDAP_CLIENT_CREDENTIALS
+        PASClientOptions.recursive_remove_input(self, :session_url_path)
+        config(inputs: { client_id: { optional: false } })
+      end
 
       # Dedicated Endpoints test groups (with :client_id input removed)
       group from: :pas_client_v221_subscription_setup, id: :pas_client_v221_subscription_setup_no_auth do
@@ -247,6 +266,12 @@ module DaVinciPASTestKit
         config(inputs: { session_url_path: { optional: false } })
       end
       group from: :pas_client_v221_must_support, id: :pas_client_v221_must_support_no_auth do
+        required_suite_options client_type: PASClientOptions::OTHER_AUTH
+        PASClientOptions.recursive_remove_input(self, :client_id)
+        config(inputs: { session_url_path: { optional: false } })
+      end
+      group from: :pas_client_v221_subscription_update_delete,
+            id: :pas_client_v221_subscription_update_delete_no_auth do
         required_suite_options client_type: PASClientOptions::OTHER_AUTH
         PASClientOptions.recursive_remove_input(self, :client_id)
         config(inputs: { session_url_path: { optional: false } })

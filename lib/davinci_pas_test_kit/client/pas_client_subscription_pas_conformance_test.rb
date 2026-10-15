@@ -16,7 +16,8 @@ module DaVinciPASTestKit
       - Inclusion of filter criteria for the client's organization.
     )
 
-    verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-62'
+    verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-62', 'hl7.fhir.uv.subscriptions_1.1.0@64',
+                          'hl7.fhir.uv.subscriptions_1.1.0@96', 'hl7.fhir.uv.subscriptions_1.1.0@116'
 
     def ig_version
       config.options[:ig_version]

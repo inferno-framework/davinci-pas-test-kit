@@ -54,8 +54,7 @@ module DaVinciPASTestKit
             )
 
       run do
-        subscription_request = require_successful_subscription_create_request
-        @subscription_json = JSON.parse(subscription_request.response_body)
+        @subscription_json = require_unmodified_subscription
 
         pended_submit_requests = load_tagged_requests(SUBMIT_TAG, PENDED_WORKFLOW_TAG)
         @pended_submit_request = pended_submit_requests.select { |req| req.status == 200 }.max_by(&:index)

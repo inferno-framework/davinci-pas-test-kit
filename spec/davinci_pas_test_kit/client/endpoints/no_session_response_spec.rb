@@ -3,9 +3,9 @@ require_relative '../../../../lib/davinci_pas_test_kit/client/client_urls'
 
 # Verifies the response returned by each client suite endpoint when no waiting test
 # run/session can be found for an incoming request.
-RSpec.shared_examples 'a no-session OperationOutcome response' do
+RSpec.shared_examples 'a no-session OperationOutcome response' do |http_method = :post|
   it 'returns a 500 OperationOutcome' do
-    post_json(request_path, {})
+    http_method == :post ? post_json(request_path, {}) : send(http_method, request_path)
 
     expect(last_response.status).to eq(500)
     expect(last_response.headers['Content-Type']).to eq('application/fhir+json')
@@ -14,6 +14,7 @@ RSpec.shared_examples 'a no-session OperationOutcome response' do
     expect(outcome).to be_a(FHIR::OperationOutcome)
     expect(outcome.issue.first.code).to eq('not-found')
     expect(outcome.issue.first.details.text).to include('Unable to find test run')
+    expect(outcome.issue.first.details.text).to include(DaVinciPASTestKit::EndpointSessionIdentification::LOCATION_DESCRIPTION)
   end
 end
 
@@ -29,16 +30,21 @@ RSpec.describe DaVinciPASTestKit::ClaimEndpoint, :request do
   end
 
   describe DaVinciPASTestKit::SubscriptionReadEndpoint do
-    it 'returns a 500 OperationOutcome' do
-      get "/custom/davinci_pas_client_suite_v201#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}/abc"
+    it_behaves_like 'a no-session OperationOutcome response', :get do
+      let(:request_path) { "/custom/davinci_pas_client_suite_v201#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}/abc" }
+    end
+  end
 
-      expect(last_response.status).to eq(500)
-      expect(last_response.headers['Content-Type']).to eq('application/fhir+json')
+  # Update and delete are only supported by the v2.2.1 client suite
+  describe DaVinciPASTestKit::SubscriptionUpdateEndpoint do
+    it_behaves_like 'a no-session OperationOutcome response', :put do
+      let(:request_path) { "/custom/davinci_pas_client_suite_v221#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}/abc" }
+    end
+  end
 
-      outcome = FHIR.from_contents(last_response.body)
-      expect(outcome).to be_a(FHIR::OperationOutcome)
-      expect(outcome.issue.first.code).to eq('not-found')
-      expect(outcome.issue.first.details.text).to include('Unable to find test run')
+  describe DaVinciPASTestKit::SubscriptionDeleteEndpoint do
+    it_behaves_like 'a no-session OperationOutcome response', :delete do
+      let(:request_path) { "/custom/davinci_pas_client_suite_v221#{DaVinciPASTestKit::FHIR_SUBSCRIPTION_PATH}/abc" }
     end
   end
 

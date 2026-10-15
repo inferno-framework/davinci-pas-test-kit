@@ -1,41 +1,29 @@
 require_relative '../../cross_suite/tags'
-require_relative 'endpoint_constants'
+require_relative 'endpoint_session_identification'
+require_relative 'expired_token'
 require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
   class SubscriptionStatusEndpoint < Inferno::DSL::SuiteEndpoint
     include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
     include ResponseGenerator
+    include EndpointSessionIdentification
+    prepend ExpiredTokenRejection
 
     error_response_format :operation_outcome
 
-    def test_run_identifier_location_description
-      SESSION_PATH_OR_BEARER_TOKEN_LOCATION_DESCRIPTION
-    end
-
-    def test_run_identifier
-      return request.params[:session_path] if request.params[:session_path].present?
-
-      UDAPSecurityTestKit::MockUDAPServer.issued_token_to_client_id(
-        request.headers['authorization']&.delete_prefix('Bearer ')
-      )
-    end
-
     def make_response
-      if expired_token?
-        UDAPSecurityTestKit::MockUDAPServer.update_response_for_expired_token(response, 'Bearer token')
-        return
-      end
-
       response.format = :json
-      subscription = find_subscription(test_run.test_session_id)
+      # Reflects any updates or deletion of the Subscription by the client
+      subscription = find_current_subscription(test_run.test_session_id)
 
-      unless subscription.present?
+      subscription_id = request.params[:id]
+      if subscription.blank? || (subscription_id.present? && subscription_id != subscription.id)
         not_found
         return
       end
 
-      subscription_id = request.params[:id]
+      status_code = current_subscription_status_code(subscription)
 
       # Handle resource-level status params
       unless subscription_id.present?
@@ -47,7 +35,7 @@ module DaVinciPASTestKit
           return
         end
 
-        unless subscription_params_match?(params, subscription)
+        unless subscription_params_match?(params, subscription, status_code)
           not_found
           return
         end
@@ -55,7 +43,6 @@ module DaVinciPASTestKit
 
       subscription_url = "#{base_subscription_url}/#{subscription.id}"
       subscription_topic = subscription.criteria
-      status_code = determine_subscription_status_code(subscription_id)
       event_count = determine_event_count(test_run.test_session_id)
 
       notification_json = notification_bundle_input(result)
@@ -76,32 +63,20 @@ module DaVinciPASTestKit
       response.status = 200
     end
 
-    def subscription_params_match?(params, subscription)
+    def subscription_params_match?(params, subscription, status_code)
       id_params = find_params(params, 'id')
 
       return false if id_params&.any? && id_params&.none? { |p| p.valueString == subscription.id }
 
       status_params = find_params(params, 'status')
-      subscription_status = determine_subscription_status_code(subscription.id)
-      status_params.blank? || status_params.any? { |p| p.valueString == subscription_status }
+      status_params.blank? || status_params.any? { |p| p.valueString == status_code }
     end
 
     def tags
-      # Requests rejected for an expired token are not treated as submissions of any workflow.
-      return [] if expired_token?
-
       [SUBSCRIPTION_STATUS_TAG]
     end
 
     private
-
-    # Memoized so the token is only decoded and parsed once per request, even though both
-    # #tags and #make_response need to check it.
-    def expired_token?
-      return @expired_token if defined?(@expired_token)
-
-      @expired_token = UDAPSecurityTestKit::MockUDAPServer.request_has_expired_token?(request)
-    end
 
     def not_found
       response.status = 404

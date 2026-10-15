@@ -27,6 +27,9 @@ module DaVinciPASTestKit
         sets containing X12 codes are not validated.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-1', 'hl7.fhir.us.davinci-pas_2.2.1@prof-1',
+                            'hl7.fhir.us.davinci-pas_2.2.1@prof-2', 'hl7.fhir.us.davinci-pas_2.2.1@prof-3'
+
       def operation_name
         'inquire'
       end
