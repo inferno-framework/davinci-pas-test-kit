@@ -178,7 +178,7 @@ in progress, so some tests do not fully align yet.
     *   Inferno will submit a PAS request to the client suite session. Wait for the server tests to complete. Server test "**2.1.1.04** Server response includes the 'Approval' decision code in the ClaimResponse instance" should fail because the client suites will return errors instead of items in the ClaimResponse.
     *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error and displayed the errors to the appropriate users. Completing the attestation will finish the run.
 12.  **Must Support Elements Execution**:
-    *   In the client session, select the "**10** Must Support Elements" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**12** Must Support Elements" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for additional $submit and $inquire requests demonstrating must support items not previously demonstrated.
@@ -188,6 +188,8 @@ in progress, so some tests do not fully align yet.
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a series of PAS request to the client suite session and then verify that the requests and responses demonstrate all must support elements. Wait for the server tests to complete.
     *   Once the server suite tests have completed, return to the client suite session. Click the link to indicate that all requests have been sent. A new "User Action Required" dialog will appear asking for an attestation that the client system handled the $submit and $inquire responses appropriately, displaying the results without error.
+    *   Once the "**12.1** Demonstrate Must Support Coverage" group completes, the "**12.2** Must Support Coverage" group will run and evaluate the requests. Where it asks for attestations that unobserved must support elements are not collected, respond as desired.
+    *   To re-evaluate must support coverage later, for example after re-running another group, select the "**12.2** Must Support Coverage" group and click the "Run Tests" button. The requests made during "**12.1** Demonstrate Must Support Coverage" will still be considered, so it does not need to be re-run.
 13.  **Visual Inspection and Attestation Execution**:
     *   In the client session, select the "**13** Visual Inspection and Attestation" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).

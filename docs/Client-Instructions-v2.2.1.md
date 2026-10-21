@@ -90,6 +90,12 @@ These tests can be run without providing custom responses, but because Inferno's
 will not populate all ClaimResponse must support elements, [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 will be needed to pass the group.
 
+The group has two parts that can be run separately. During "Demonstrate Must Support Coverage" the
+client makes the requests, and "Must Support Coverage" then evaluates them along with the requests
+from the PAS scenario groups. "Must Support Coverage" can be re-run on its own, for example after
+re-running a scenario group, without repeating the requests made during "Demonstrate Must Support
+Coverage". See [Evaluated Messages](Client-Must-Support#evaluated-messages).
+
 ### Selecting a US Core Version
 
 PAS allows supporting information resources to conform to US Core 3.1.1, 6.1.0, or 7.0.0. Inferno
