@@ -14,8 +14,8 @@ module DaVinciPASTestKit
     class PASClientMustSupportGroup < Inferno::TestGroup
       id :pas_client_v221_must_support
       title 'Must Support Elements'
-      run_as_group
-      description DaVinciPASTestKit.must_support_group_description('v2.2.1', 'da-vinci-pas-v221')
+      description "#{DaVinciPASTestKit.must_support_group_description('v2.2.1', 'da-vinci-pas-v221')}\n" \
+                  "#{MUST_SUPPORT_SEPARATE_GROUPS_DESCRIPTION}"
 
       # The must support response inputs already belong to pas_client_v221_gather_must_support
       # (the wait test below); declaring them here too, before the receive group is defined,
@@ -66,17 +66,26 @@ module DaVinciPASTestKit
                                   multiple_requests_ok: true } }
       end
 
-      # $submit Request Must Support (fail when errors detected)
-      group from: :pas_client_v221_submit_must_support
+      # Kept separate from the receive group so the analysis can be re-run without re-running the receive
+      # group, which would discard the requests made during its previous run
+      group do
+        id :pas_client_v221_must_support_coverage
+        title MUST_SUPPORT_COVERAGE_GROUP_TITLE
+        description MUST_SUPPORT_COVERAGE_GROUP_DESCRIPTION
+        run_as_group
 
-      # $submit Response Must Support (skip when errors detected)
-      group from: :pas_client_v221_submit_response_must_support
+        # $submit Request Must Support (fail when errors detected)
+        group from: :pas_client_v221_submit_must_support
 
-      # $inquire Request Must Support (fail when errors detected)
-      group from: :pas_client_v221_inquire_must_support
+        # $submit Response Must Support (skip when errors detected)
+        group from: :pas_client_v221_submit_response_must_support
 
-      # $inquire Response Must Support (skip when errors detected)
-      group from: :pas_client_v221_inquire_response_must_support
+        # $inquire Request Must Support (fail when errors detected)
+        group from: :pas_client_v221_inquire_must_support
+
+        # $inquire Response Must Support (skip when errors detected)
+        group from: :pas_client_v221_inquire_response_must_support
+      end
     end
   end
 end
