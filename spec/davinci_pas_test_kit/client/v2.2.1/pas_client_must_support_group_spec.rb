@@ -3,8 +3,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportGroup, :ru
   let(:receive_group) { child_group('pas_client_v221_must_support_receive') }
   let(:coverage_group) { child_group('pas_client_v221_must_support_coverage') }
   let(:gather_test) { receive_group.tests.first }
+  # The first coverage test, which fails with this message when it finds no $submit requests
+  let(:submit_profiles_test) { coverage_group.groups.first.tests.first }
+  let(:no_requests_message) { 'No submit requests received.' }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
-  let(:requests_repo) { Inferno::Repositories::Requests.new }
 
   # The instance in the suite, so that the groups and tests have the ids they are run under
   def group
@@ -31,6 +33,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportGroup, :ru
       expect(coverage_group.run_as_group?).to be(true)
     end
 
+    it 'does not ask for the must support response inputs when only the coverage group is run' do
+      input_names = coverage_group.available_inputs.keys
+      expect(input_names).to_not include(:ms_submit_responses, :ms_inquire_responses)
+      expect(receive_group.available_inputs.keys).to include(:ms_submit_responses, :ms_inquire_responses)
+    end
+
     it 'keeps the must support analysis out of the group that waits for requests' do
       expect(receive_group.groups).to be_empty
       expect(coverage_group.groups.map { |child| child.id.to_s.split('-').last }).to eq(
@@ -46,19 +54,22 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportGroup, :ru
 
   describe 'when the must support coverage group is re-run on its own' do
     it 'still evaluates the requests made during the demonstrate group' do
-      request = create_gather_request
+      create_gather_request
 
-      2.times { run(coverage_group) }
+      run(coverage_group)
+      result = run(submit_profiles_test)
 
-      expect(requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBMIT_TAG]).map(&:id))
-        .to eq([request.id])
+      expect(result.result_message).to_not eq(no_requests_message)
     end
 
     it 'no longer evaluates them once the demonstrate group is re-run' do
       create_gather_request
       repo_create(:result, test_session_id: test_session.id, runnable: { test_id: gather_test.id })
 
-      expect(requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBMIT_TAG])).to be_empty
+      result = run(submit_profiles_test)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq(no_requests_message)
     end
   end
 end
