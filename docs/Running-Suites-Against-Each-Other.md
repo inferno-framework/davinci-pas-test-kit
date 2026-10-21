@@ -97,7 +97,7 @@ in progress, so some tests do not fully align yet.
     *   A "User Action Required" dialog will appear asking for confirmation that authentication is supported. Click the link to indicate it is.
     *   A second "User Action Required" dialog will appear providing connection information. Click the link to confirm connectivity and finish the group.
 4.  **Subscription Setup Execution**:
-    *   In the client session, select the "**8** Subscription Setup" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**10** Subscription Setup" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a Subscription creation request.
@@ -110,7 +110,7 @@ in progress, so some tests do not fully align yet.
     *   In the client suite session, check that the "User Action Required" asking for a Subscription Creation request has disappeared and the tests have completed.
     *   The client suite has sent all expected notifications, so in the server suite session click the link to indicate that all requests have been sent, which will complete the test run.
 5.  **Approval Scenario Execution**:
-    *   In the client session, select the "**9.1** Approval Response" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**11.1** Approval Response" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
@@ -120,9 +120,9 @@ in progress, so some tests do not fully align yet.
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution of the test run.
     *   Inferno will submit a PAS request to the client suite session and evaluate the response.
     *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that the submitted prior authorization request was approved. Click the statement indicating that it was to complete the tests.
-6.  **Denial Scenario Execution**: Repeat the same steps as in 5. for client group "**9.2** Denial Response" and server group "**2.2** Successful Denial Scenario".
+6.  **Denial Scenario Execution**: Repeat the same steps as in 5. for client group "**11.2** Denial Response" and server group "**2.2** Successful Denial Scenario".
 7.  **Pended Scenario Execution**:
-    *   In the client session, select the "**9.3** Pended Response" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**11.3** Pended Response" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
@@ -134,7 +134,7 @@ in progress, so some tests do not fully align yet.
     *   In the client suite session, a new "User Action Required" dialog will be present asking for an attestation that the client displays the Claim as pended. Confirm that it has.
     *   A third "User Action Required" dialog will appear indicating that Inferno will shortly send a notification. It will disappear within 10 seconds replaced by a fourth "User Action Required" dialog asking for confirmation that the client received the notification and displays the Claim as approved. Check the server session, the tests should have completed due to the receipt of the notification. Confirm in the client session that the Claim was approved and the run will complete.
 8.  **Claim Updates Execution**:
-    *   In the client session, select the "**9.4** Claim Updates" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**11.4** Claim Updates" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
@@ -145,7 +145,7 @@ in progress, so some tests do not fully align yet.
     *   Inferno will submit a series of PAS request to the client suite session. Wait for the server tests to complete.
     *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error. Completing the attestation will finish the run.
 9.  **Payer Modifications Execution**:
-    *   In the client session, select the "**9.5** Payer Modifications" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**11.5** Payer Modifications" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
@@ -156,7 +156,7 @@ in progress, so some tests do not fully align yet.
     *   Inferno will submit a PAS request to the client suite session. Wait for the server tests to complete. Server test "**2.1.1.04** Server response includes the 'Approval' decision code in the ClaimResponse instance" should fail because "A6" (Modified) should be returned instead of "A1" (Certified in Total).
     *   Once the server suite tests have completed, return to the client suite session where there will be a "User Action Required" dialog asking the tester to attest that the client handled the responses without error and displayed the modifications. Completing the attestation will finish the run.
 10. **Operation Failure Execution**:
-    *   In the client session, select the "**9.6** Operation Failure" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**11.6** Operation Failure" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
@@ -167,7 +167,7 @@ in progress, so some tests do not fully align yet.
     *   Inferno will submit two PAS requests to the client suite session and evaluate the responses. The first will succeed as the client returns the expected OperationOutcome. The second will fail as Inferno will no longer be listening for requests.
     *   Once the server suite tests have completed, return to the client suite session. A "User Action Required" dialog will appear asking for an attestation that the client system indicated that there was an error appropriately. Click the statement indicating that it was to complete the tests.
 11.  **Processing Errors Execution**:
-    *   In the client session, select the "**9.7** Processing Errors" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**11.7** Processing Errors" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the pre-filled inputs from the preset. You can review them if you wish. Click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   A "User Action Required" dialog will appear indicating that Inferno is waiting for a $submit request.
@@ -191,7 +191,7 @@ in progress, so some tests do not fully align yet.
     *   Once the "**12.1** Demonstrate Must Support Coverage" group completes, the "**12.2** Must Support Coverage" group will run and evaluate the requests. Where it asks for attestations that unobserved must support elements are not collected, respond as desired.
     *   To re-evaluate must support coverage later, for example after re-running another group, select the "**12.2** Must Support Coverage" group and click the "Run Tests" button. The requests made during "**12.1** Demonstrate Must Support Coverage" will still be considered, so it does not need to be re-run.
 13.  **Visual Inspection and Attestation Execution**:
-    *   In the client session, select the "**13** Visual Inspection and Attestation" group from the sidebar (typically found on the left side).
+    *   In the client session, select the "**16** Visual Inspection and Attestation" group from the sidebar (typically found on the left side).
     *   Click the "Run Tests" button (typically found in the top-right).
     *   A dialog will appear showing the inputs used to record the attestations. Update them as desired and then click the "SUBMIT" button (usually at the bottom-right of the dialog) to start execution.
     *   The tests will complete with results based on the inputs provided.
