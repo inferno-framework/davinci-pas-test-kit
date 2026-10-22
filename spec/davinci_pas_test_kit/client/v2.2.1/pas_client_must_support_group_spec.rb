@@ -1,22 +1,13 @@
 RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportGroup, :runnable do
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
-  let(:receive_group) { child_group('pas_client_v221_must_support_receive') }
-  let(:coverage_group) { child_group('pas_client_v221_must_support_coverage') }
+  let(:group) { find_test(suite, 'pas_client_v221_must_support_no_auth') }
+  let(:receive_group) { find_test(group, 'pas_client_v221_must_support_receive') }
+  let(:coverage_group) { find_test(group, 'pas_client_v221_must_support_coverage') }
   let(:gather_test) { receive_group.tests.first }
   # The first coverage test, which fails with this message when it finds no $submit requests
   let(:submit_profiles_test) { coverage_group.groups.first.tests.first }
   let(:no_requests_message) { 'No submit requests received.' }
   let(:submit_url) { "/custom/#{suite_id}#{DaVinciPASTestKit::SUBMIT_PATH}" }
-
-  # The instance in the suite, so that the groups and tests have the ids they are run under
-  def group
-    DaVinciPASTestKit::DaVinciPASV221::ClientSuite.groups
-      .find { |child| child.id.to_s.end_with?('pas_client_v221_must_support_no_auth') }
-  end
-
-  def child_group(id_suffix)
-    group.groups.find { |child| child.id.to_s.end_with?(id_suffix) }
-  end
 
   def create_gather_request
     result = repo_create(:result, test_session_id: test_session.id, runnable: { test_id: gather_test.id })

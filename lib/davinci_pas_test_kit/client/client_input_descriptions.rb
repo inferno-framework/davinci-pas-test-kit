@@ -74,7 +74,7 @@ module DaVinciPASTestKit
     <<~DESCRIPTION
       A JSON list of objects ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format))
       that Inferno will use to respond to #{operation} requests during the
-      *Must Support Elements* group. For each request, Inferno will
+      *Demonstrate Must Support Coverage* group. For each request, Inferno will
       [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
       and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
       a response to return from this list. If no entries match or instantiation fails, Inferno will
