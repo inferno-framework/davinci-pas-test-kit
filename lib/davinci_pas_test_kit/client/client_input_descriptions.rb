@@ -34,6 +34,26 @@ module DaVinciPASTestKit
     'operation responses received from Inferno during this test, making the details ' \
     'available to users without errors.'
 
+  # Text for the v2.2.1 must support group, where the analysis is a separate group from the receive group
+  MUST_SUPPORT_COVERAGE_GROUP_TITLE = 'Must Support Coverage'
+  MUST_SUPPORT_COVERAGE_GROUP_DESCRIPTION =
+    %(
+      During this group, Inferno checks that the requests and responses exchanged during the
+      PAS scenario group and the most recent run of the "Demonstrate Must Support Coverage" group
+      include all required profiles and must support elements.
+
+      This group can be re-run on its own, for example after re-running another group, without
+      repeating the "Demonstrate Must Support Coverage" group or losing the requests made
+      during it.
+    )
+  MUST_SUPPORT_SEPARATE_GROUPS_DESCRIPTION =
+    <<~DESCRIPTION
+      The "Demonstrate Must Support Coverage" and "Must Support Coverage" groups can be run
+      separately. Re-running "Demonstrate Must Support Coverage" replaces the requests made during
+      its previous run, while "Must Support Coverage" can be re-run on its own to re-evaluate
+      coverage without making those requests again.
+    DESCRIPTION
+
   def self.must_support_group_description(ig_version, wiki_anchor)
     <<~DESCRIPTION
       During these tests, Inferno will check that the client system demonstrates support for
@@ -54,7 +74,7 @@ module DaVinciPASTestKit
     <<~DESCRIPTION
       A JSON list of objects ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format))
       that Inferno will use to respond to #{operation} requests during the
-      *Must Support Elements* group. For each request, Inferno will
+      *Demonstrate Must Support Coverage* group. For each request, Inferno will
       [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
       and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
       a response to return from this list. If no entries match or instantiation fails, Inferno will
