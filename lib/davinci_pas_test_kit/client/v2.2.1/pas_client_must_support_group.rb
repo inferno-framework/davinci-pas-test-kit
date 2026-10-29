@@ -14,22 +14,12 @@ module DaVinciPASTestKit
     class PASClientMustSupportGroup < Inferno::TestGroup
       id :pas_client_v221_must_support
       title 'Must Support Elements'
-      run_as_group
-      description DaVinciPASTestKit.must_support_group_description('v2.2.1', 'da-vinci-pas-v221')
+      description "#{DaVinciPASTestKit.must_support_group_description('v2.2.1', 'da-vinci-pas-v221')}\n" \
+                  "#{MUST_SUPPORT_SEPARATE_GROUPS_DESCRIPTION}"
 
-      # The must support response inputs already belong to pas_client_v221_gather_must_support
-      # (the wait test below); declaring them here too, before the receive group is defined,
-      # propagates them onto the bundle validation tests in that group as well, so they can tell
-      # whether a tester-provided response was used - see
-      # PasClientResponseBundleValidationTest/PasClientInquireResponseBundleValidationTest
-      # #failed_entities_description.
-      input :ms_submit_responses, optional: true
-      input :ms_inquire_responses, optional: true
+      MUST_SUPPORT_INPUT_ORDER = [:ms_submit_responses, :ms_inquire_responses, :client_id, :session_url_path].freeze
 
-      input_order :ms_submit_responses,
-                  :ms_inquire_responses,
-                  :client_id,
-                  :session_url_path
+      input_order(*MUST_SUPPORT_INPUT_ORDER)
 
       # Combined receive group - single wait test for both submit and inquire
       group do
@@ -37,6 +27,17 @@ module DaVinciPASTestKit
         title MUST_SUPPORT_RECEIVE_GROUP_TITLE
         description MUST_SUPPORT_RECEIVE_GROUP_DESCRIPTION
         run_as_group
+
+        # The must support response inputs already belong to pas_client_v221_gather_must_support
+        # (the wait test below); declaring them here too, before the tests are defined, propagates
+        # them onto the bundle validation tests as well, so they can tell whether a tester-provided
+        # response was used - see PasClientResponseBundleValidationTest/PasClientInquireResponseBundleValidationTest
+        # #failed_entities_description. They are declared on this group rather than the parent so they
+        # do not also propagate onto the coverage group, which does not use them.
+        input :ms_submit_responses, optional: true
+        input :ms_inquire_responses, optional: true
+
+        input_order(*MUST_SUPPORT_INPUT_ORDER)
 
         test from: :pas_client_v221_gather_must_support
         test from: :pas_client_v221_response_attest,
@@ -66,17 +67,26 @@ module DaVinciPASTestKit
                                   multiple_requests_ok: true } }
       end
 
-      # $submit Request Must Support (fail when errors detected)
-      group from: :pas_client_v221_submit_must_support
+      # Kept separate from the receive group so the analysis can be re-run without re-running the receive
+      # group, which would discard the requests made during its previous run
+      group do
+        id :pas_client_v221_must_support_coverage
+        title MUST_SUPPORT_COVERAGE_GROUP_TITLE
+        description MUST_SUPPORT_COVERAGE_GROUP_DESCRIPTION
+        run_as_group
 
-      # $submit Response Must Support (skip when errors detected)
-      group from: :pas_client_v221_submit_response_must_support
+        # $submit Request Must Support (fail when errors detected)
+        group from: :pas_client_v221_submit_must_support
 
-      # $inquire Request Must Support (fail when errors detected)
-      group from: :pas_client_v221_inquire_must_support
+        # $submit Response Must Support (skip when errors detected)
+        group from: :pas_client_v221_submit_response_must_support
 
-      # $inquire Response Must Support (skip when errors detected)
-      group from: :pas_client_v221_inquire_response_must_support
+        # $inquire Request Must Support (fail when errors detected)
+        group from: :pas_client_v221_inquire_must_support
+
+        # $inquire Response Must Support (skip when errors detected)
+        group from: :pas_client_v221_inquire_response_must_support
+      end
     end
   end
 end

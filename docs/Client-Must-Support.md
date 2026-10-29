@@ -63,6 +63,12 @@ recent execution of each group. When any group is re-run, including the "Must Su
 Elements" group, the requests made during the previous run of that group will no longer
 be considered.
 
+In the v2.2.1 client suite, the "Must Support Elements" group is split into two groups that
+can be run separately: "Demonstrate Must Support Coverage", where the client makes the additional
+requests, and "Must Support Coverage", which evaluates them. Re-running only "Must Support Coverage",
+for example after re-running a scenario group, keeps the requests made during the most recent run
+of "Demonstrate Must Support Coverage".
+
 Note that Inferno's mocked responses do not include all must support
 elements, so testers will need to provide responses for Inferno to use that include
 examples of all must support elements to pass these tests.
