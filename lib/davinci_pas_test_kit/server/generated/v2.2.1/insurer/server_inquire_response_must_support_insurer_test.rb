@@ -8,7 +8,7 @@ module DaVinciPASTestKit
       description %(
         
         PAS server systems are required to be able to populate all
-        must support elements on instances of all profiles included in 
+        must support elements on instances of all profiles included in `$inquire`
         responses, including instances of the PAS Insurer Organization Profile.
         This test checks all identified instances of the PAS Insurer Organization
         Profile on responses returned by the server to ensure that the following

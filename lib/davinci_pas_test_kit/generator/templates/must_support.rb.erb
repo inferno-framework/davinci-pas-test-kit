@@ -8,13 +8,13 @@ module DaVinciPASTestKit
       description %(
         <% if system == 'client' && request_type.include?('request') %>
         PAS clients are required to be able to populate all
-        must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
+        must support elements on instances of all profiles included in <%= request_type.include?('submit') ? '`$submit`' : '`$inquire`' %>
         requests, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
         Profile on requests sent by the PAS client to ensure that the following
         must support elements are observed: <% end %><% if system == 'client' && request_type.include?('response') %>
         PAS clients are required to be able to receive all
-        must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
+        must support elements on instances of all profiles included in <%= request_type.include?('submit') ? '`$submit`' : '`$inquire`' %>
         responses, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
         Profile on responses sent to the PAS client to ensure that the following
@@ -22,13 +22,13 @@ module DaVinciPASTestKit
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
 
         PAS server systems are required to be able to receive all
-        must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
+        must support elements on instances of all profiles included in <%= request_type.include?('submit') ? '`$submit`' : '`$inquire`' %>
         requests, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
         Profile on requests sent to the server to ensure that the following
         must support elements are observed:<% end %><% if system == 'server' && request_type.include?('response') %>
         PAS server systems are required to be able to populate all
-        must support elements on instances of all profiles included in <% request_type.include?('submit') ? 'Submit' : 'Inquiry' %>
+        must support elements on instances of all profiles included in <%= request_type.include?('submit') ? '`$submit`' : '`$inquire`' %>
         responses, including instances of the <%= profile_name %> Profile.
         This test checks all identified instances of the <%= profile_name %>
         Profile on responses returned by the server to ensure that the following

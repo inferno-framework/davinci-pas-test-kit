@@ -8,7 +8,7 @@ module DaVinciPASTestKit
       description %(
         
         PAS clients are required to be able to receive all
-        must support elements on instances of all profiles included in 
+        must support elements on instances of all profiles included in `$submit`
         responses, including instances of the PAS PractitionerRole Profile.
         This test checks all identified instances of the PAS PractitionerRole
         Profile on responses sent to the PAS client to ensure that the following

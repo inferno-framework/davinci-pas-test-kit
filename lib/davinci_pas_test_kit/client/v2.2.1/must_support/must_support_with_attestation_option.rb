@@ -5,8 +5,9 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     # Aggregates the must support assessment across a list of profiles. Each must support element
     # that was not observed is logged as an info message, and when at least one was not observed the
-    # tester is asked to attest that the client system does not collect that data. A true attestation
-    # passes the test; a false attestation fails it. When every must support element was observed, the
+    # tester is asked to attest that the PAS client does not collect that data. A true attestation
+    # passes the test; a false attestation fails it. The attestation option can be disabled
+    # using a config entry. When every must support element was observed, the
     # test passes without requiring any further input.
     #
     # The must support assessment - including the shared X12 / DataAbsentReason false-positive
@@ -110,7 +111,7 @@ module DaVinciPASTestKit
         # If nothing was unobserved, the test passes immediately without requiring any attestation.
         # Otherwise, the tester can attest that the client system does not collect, unless disabled
         pass all_observed_message if unobserved_by_profile.empty?
-        assert false, missing_elements_error_string(unobserved_by_profile) if attestation_disabled?
+        assert !attestation_disabled?, missing_elements_error_string(unobserved_by_profile)
 
         # only the tester continues this wait, so use a fresh random identifier - see SessionIdentification
         identifier = SecureRandom.uuid
