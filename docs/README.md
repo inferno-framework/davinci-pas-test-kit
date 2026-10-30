@@ -13,13 +13,13 @@ Guide. The following documentation provides information on how to use and contri
 *   **[Client Testing Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Details)**: Details on the client suites
 *   **[Controlling Client Suite Simulated Responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how the client suites' simulated PAS payer servers respond to requests and how testers can control those responses.
 *   **[Simulated Subscriptions and Notifications in the Client Suites](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications)**: Details on how the client suites' simulated PAS payer servers respond to Subscription requests and generate notifications.
-*   **[Client Must Support Tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support)**: Details on how the client suites evaluate must support elements and what clients must demonstrate to pass.
+*   **[Client Must Support Tests](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Must-Support)**: Details on how the client suites evaluate must support elements and what PAS clients must demonstrate to pass.
 *   **[Server Testing Details](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Server-Details)**: Details on the server suites
 
 ## Contributing to this Test Kit
 
 *   **[Technical Overview](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
-*   **[Server Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide)**: Information on how server tests are generated and how to maintain this process.
+*   **[Test Generation Guide](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Test-Generation-Guide)**: Information on how client and server tests are generated and how to maintain this process.
 *   **[Running the Client and Server Suites Against Each Other](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Running-Suites-Against-Each-Other)**: Step-by-step guide for using the Client and Server suites to demonstrate the test execution without a separate PAS implementation, which can be useful
 for demonstration as well as debugging.
 

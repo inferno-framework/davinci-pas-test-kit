@@ -6,7 +6,6 @@ require_relative 'requestor/client_submit_response_must_support_requestor_test'
 require_relative 'beneficiary/client_submit_response_must_support_beneficiary_test'
 require_relative 'practitioner/client_submit_response_must_support_practitioner_test'
 require_relative 'practitioner_role/client_submit_response_must_support_practitioner_role_test'
-require_relative 'task/client_submit_response_must_support_task_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -14,10 +13,8 @@ module DaVinciPASTestKit
       id :pas_client_v221_submit_response_must_support
       title '$submit Response Must Support Coverage'
       description %(
-        Check that `$submit` responses provided to the client contain
+        Check that `$submit` responses provided to the PAS client contain
         all PAS-defined profiles and their must support elements.
-        Demonstration of the PAS Claim Response profile is strictly required
-        while all others are optional.
         
         For `$submit` responses, this includes the following profiles:
         
@@ -29,7 +26,6 @@ module DaVinciPASTestKit
         - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-beneficiary.html)
         - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitioner.html)
         - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-practitionerrole.html)
-        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-task.html)
         
         
         
@@ -37,39 +33,28 @@ module DaVinciPASTestKit
       run_as_group
 
       test from: :pas_client_v221_submit_response_must_support_pas_response_bundle do
-        optional
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_claimresponse do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-7'
+        verifies_requirements(*verifies_requirements, 'hl7.fhir.us.davinci-pas_2.2.1@conf-7')
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_communication_request do
-        optional
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_insurer do
-        optional
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_requestor do
-        optional
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_beneficiary do
-        optional
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_practitioner do
-        optional
         simulation_verification
       end
       test from: :pas_client_v221_submit_response_must_support_practitioner_role do
-        optional
-        simulation_verification
-      end
-      test from: :pas_client_v221_submit_response_must_support_task do
-        optional
         simulation_verification
       end
     end

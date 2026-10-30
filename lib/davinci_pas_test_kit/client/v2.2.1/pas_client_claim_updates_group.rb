@@ -17,7 +17,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_claim_updates_group
       title 'Claim Updates'
       description %(
-        During these tests, the client system will demonstrate that it can update a previously submitted
+        During these tests, the PAS client will demonstrate that it can update a previously submitted
         prior authorization request by submitting a sequence of `$submit` requests: an initial
         request, an update that adds an item, an update that modifies one item and cancels another,
         and an update that cancels the entire request.
@@ -62,7 +62,7 @@ module DaVinciPASTestKit
         title 'Interaction'
         description %(
           During each test in this group, Inferno will wait for a prior authorization submission
-          from the client system. Each test will continue automatically when a request is received.
+          from the PAS client. Each test will continue automatically when a request is received.
           No Subscription notifications are triggered even if the tester provides pended responses.
         )
 
@@ -71,7 +71,7 @@ module DaVinciPASTestKit
              id: :pas_client_v221_response_attest_updates,
              title: 'PAS client handled the $submit responses without erroring',
              description: %(
-               During this test, the tester will verify that the client handled
+               During this test, the tester will verify that the PAS client handled
                the `$submit` operation responses received during the update
                sequence, making the result available to the user without failing
                or erroring.
@@ -80,7 +80,7 @@ module DaVinciPASTestKit
                workflow_tag: [CLAIM_UPDATE_INITIAL_TAG, CLAIM_UPDATE_ADD_ITEM_TAG,
                               CLAIM_UPDATE_MODIFY_CANCEL_TAG, CLAIM_UPDATE_CANCEL_ALL_TAG],
                multiple_requests_ok: true,
-               attest_message: 'I attest that the client system correctly handled the `$submit` ' \
+               attest_message: 'I attest that the PAS client correctly handled the `$submit` ' \
                                'operation responses received from Inferno during this test, making the details ' \
                                'available to users without errors.'
              } }
@@ -107,7 +107,7 @@ module DaVinciPASTestKit
         title '$submit Conformance'
         description %(
           For each submission received above, these tests validate the conformance of the request Bundle
-          the client submitted and of the response Bundle Inferno returned against the PAS Request and
+          the PAS client submitted and of the response Bundle Inferno returned against the PAS Request and
           Response Bundle profiles.
         )
 

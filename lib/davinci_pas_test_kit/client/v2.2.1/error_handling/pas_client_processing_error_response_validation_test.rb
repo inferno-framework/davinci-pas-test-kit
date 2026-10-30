@@ -11,7 +11,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_processing_error_response_validation_test
       title '$submit response Bundle has the correct structure and contains error entries'
       description %(
-        This test verifies input provided by the tester instead of the system under test.
+        This test verifies input provided by the tester instead of the PAS client.
         Errors encountered will be treated as a skip instead of a failure.
 
         This test verifies the conformity of the PAS Response Bundle returned by Inferno during the

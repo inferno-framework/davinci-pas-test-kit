@@ -8,7 +8,7 @@ module DaVinciPASTestKit
       id :pas_client_v201_workflows
       title 'PAS Scenarios'
       description %(
-        The scenario tests verify that the client can participate in complete end-to-end prior
+        The scenario tests verify that the PAS client can participate in complete end-to-end prior
         authorization interactions, initiating requests and reacting appropriately to the
         responses returned.
       )

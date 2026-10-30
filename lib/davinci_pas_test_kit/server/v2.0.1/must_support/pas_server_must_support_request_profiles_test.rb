@@ -21,7 +21,7 @@ module DaVinciPASTestKit
         * PAS Device Request
         * PAS Nutrition Order
 
-        System are allowed to support only the request profiles that fit their use cases. However,
+        PAS servers are allowed to support only the request profiles that fit their use cases. However,
         they must support at least one of them (because `Claim.item.extension:requestedService` is a
         must support element) and for any request profiles they support, they must be able to
         populate all of the defined must support elements.

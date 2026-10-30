@@ -13,11 +13,11 @@ module DaVinciPASTestKit
       title 'Subscription update requests meet PAS Subscription requirements'
       description %(
         This test verifies that the Subscriptions in the accepted [update](https://hl7.org/fhir/R4/http.html#update)
-        (`PUT`) requests that the client under test sent to Inferno for the Subscription it created during this
+        (`PUT`) requests that the PAS client sent to Inferno for the Subscription it created during this
         session are conformant to PAS requirements on the Subscription, including
         - Conformance to the [PAS Subscription
           profile](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-subscription.html), and
-        - Filter criteria for the client's organization in the format `org-identifier=<identifier>`.
+        - Filter criteria for the PAS client's organization in the format `org-identifier=<identifier>`.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@spec-62', 'hl7.fhir.uv.subscriptions_1.1.0@64',

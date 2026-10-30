@@ -125,7 +125,7 @@ is expected to return a non-2xx response containing an `OperationOutcome`.
 Due to [limitations of these tests](Overview#test-scope-and-limitations),
 passing this test suite in its entirety [does not prove conformance to the specification](Overview#conformance-criteria--interpreting-results).
 
-The request Bundle validation tests are marked as **Simulation Verifcation**. A skip in one of these tests
+The request Bundle validation tests are marked as **Simulation Verification**. A skip in one of these tests
 means Inferno deemed the supplied Bundle invalid. These validation errors should be considered when
 interpreting the results of the subsequent tests that validate the server response.
 

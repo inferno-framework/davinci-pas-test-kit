@@ -7,10 +7,8 @@ module DaVinciPASTestKit
       id :pas_client_v221_submit_must_support
       title '$submit Request Must Support Coverage'
       description %(
-        Check that the client can demonstrate `$submit` requests that contain
+        Check that the PAS client demonstrated `$submit` requests that contain
         all PAS-defined profiles and their must support elements.
-        For all profiles other than PAS Claim Update, testers can attest
-        that the missing elements are not supported by their system to pass the tests.
         
         For `$submit` requests, this includes the following profiles:
         
@@ -35,8 +33,8 @@ module DaVinciPASTestKit
       )
       run_as_group
       
-      # At least one of the PAS request profiles must be present; unobserved must support
-      # elements on the request profiles that are present may be attested as not collected.
+      # At least one of the PAS request profiles must be present, with all of its must support
+      # elements observed.
       test from: :pas_client_v221_must_support_with_attestation_option do
         id :pas_client_v221_submit_request_profiles_must_support_with_attestation_option
         title 'At least one instance of a request profile (PAS Medication Request, PAS Service Request, PAS Device Request, or PAS Nutrition Order) is observed with all of its must support elements'
@@ -51,19 +49,19 @@ module DaVinciPASTestKit
             ],
             ig_version: 'v2.2.1',
             type: 'request',
-            operation: 'submit'
+            operation: 'submit',
+            disable_attestation: true
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1'
+        verifies_requirements(*verifies_requirements, 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1')
       end
 
       # Mandatory - the PAS Claim Update profile must always be demonstrated.
       test from: :pas_client_v221_submit_request_must_support_claim_update do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1'
+        verifies_requirements(*verifies_requirements, 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1')
       end
-      # All other submit request profiles - unobserved must support elements may be
-      # attested as not collected by the client system.
+      # All other submit request profiles - all must support elements must be observed.
       test from: :pas_client_v221_must_support_with_attestation_option do
         id :pas_client_v221_submit_request_other_must_support_with_attestation_option
         title 'All must support elements for other profiles referenced by Claim submissions are observed on $submit requests'
@@ -83,11 +81,12 @@ module DaVinciPASTestKit
             ],
             ig_version: 'v2.2.1',
             type: 'request',
-            operation: 'submit'
+            operation: 'submit',
+            disable_attestation: true
           }
         )
         description MustSupportWithAttestationOption.build_description(config.options)
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1'
+        verifies_requirements(*verifies_requirements, 'hl7.fhir.us.davinci-pas_2.2.1@hrex-conf-1')
       end
     end
   end

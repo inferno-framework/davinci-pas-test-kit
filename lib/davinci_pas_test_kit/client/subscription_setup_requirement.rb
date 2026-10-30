@@ -11,7 +11,7 @@ module DaVinciPASTestKit
     ).freeze
 
     PENDED_SCENARIO_MODIFIED_SUBSCRIPTION_SKIP_MESSAGE = %(
-      This test cannot proceed because the client submitted update or delete requests for its
+      This test cannot proceed because the PAS client submitted update or delete requests for its
       Subscription during the _Subscription Update and Deletion_ tests. Re-run the _Subscription Setup_
       tests to create a new Subscription for use in delivering notifications before re-running the
       pended scenario tests.

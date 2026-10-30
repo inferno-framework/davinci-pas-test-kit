@@ -4,11 +4,11 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class ProviderReviewAttestationTest < Inferno::Test
       id :pas_client_v221_provider_review_attestation
-      ATTESTATION_TITLE = 'Health IT module allows but does not require providers to review information before ' \
+      ATTESTATION_TITLE = 'PAS client allows but does not require providers to review information before ' \
                           'submitting'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module allows but does not require providers
+        During this test, the tester will confirm that the PAS client allows but does not require providers
         to review submission details before sending PAS prior authorization requests.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
@@ -21,7 +21,7 @@ module DaVinciPASTestKit
       input :provider_review_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module allows but does not require providers to review
+              I attest that the PAS client allows but does not require providers to review
               submission details before sending PAS prior authorization requests.
             ),
             type: 'radio',

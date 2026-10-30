@@ -10,7 +10,7 @@ module DaVinciPASTestKit
         **USER INPUT VALIDATION**: This test validates input provided by the user instead of the system under test. Errors encountered will be treated as a skip instead of a failure.
 
         PAS server systems are required to be able to receive all
-        must support elements on instances of all profiles included in 
+        must support elements on instances of all profiles included in `$submit`
         requests, including instances of the PAS Subscriber Patient Profile.
         This test checks all identified instances of the PAS Subscriber Patient
         Profile on requests sent to the server to ensure that the following

@@ -7,11 +7,11 @@ module DaVinciPASTestKit
       title 'All must support elements for profile PAS PractitionerRole are observed on $inquire responses'
       description %(
         
-        PAS client systems are required to be able to receive all
-        must support elements on instances of all profiles included in 
+        PAS clients are required to be able to receive all
+        must support elements on instances of all profiles included in `$inquire`
         responses, including instances of the PAS PractitionerRole Profile.
         This test checks all identified instances of the PAS PractitionerRole
-        Profile on responses sent to the client to ensure that the following
+        Profile on responses sent to the PAS client to ensure that the following
         must support elements are observed:
 
         * PractitionerRole.code

@@ -5,7 +5,6 @@ require_relative 'requestor/client_inquire_response_must_support_requestor_test'
 require_relative 'beneficiary/client_inquire_response_must_support_beneficiary_test'
 require_relative 'practitioner/client_inquire_response_must_support_practitioner_test'
 require_relative 'practitioner_role/client_inquire_response_must_support_practitioner_role_test'
-require_relative 'task/client_inquire_response_must_support_task_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -13,7 +12,7 @@ module DaVinciPASTestKit
       id :pas_client_v201_inquire_response_must_support
       title '$inquire Response Must Support Coverage'
       description %(
-        Check that `$inquire` responses provided to the client contain
+        Check that `$inquire` responses provided to the PAS client contain
         all PAS-defined profiles and their must support elements.
         
         For `$inquire` responses, this includes the following profiles:
@@ -25,7 +24,6 @@ module DaVinciPASTestKit
         - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
         - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
         - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-        - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
         
         
         
@@ -33,35 +31,25 @@ module DaVinciPASTestKit
       run_as_group
 
       test from: :pas_client_v201_inquire_response_must_support_pas_inquiry_response_bundle do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_claiminquiryresponse do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
+        verifies_requirements(*verifies_requirements, 'hl7.fhir.us.davinci-pas_2.0.1@40')
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_insurer do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_requestor do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_beneficiary do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_practitioner do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
       test from: :pas_client_v201_inquire_response_must_support_practitioner_role do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
-        simulation_verification
-      end
-      test from: :pas_client_v201_inquire_response_must_support_task do
-        verifies_requirements 'hl7.fhir.us.davinci-pas_2.0.1@40'
         simulation_verification
       end
     end

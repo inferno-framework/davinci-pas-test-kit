@@ -27,7 +27,7 @@ The primary codebase for the PAS Test Kit resides within the `lib/davinci_pas_te
     and process.
 *   **`igs/`**: directory containing the ig versions used to generate test content for suites within
     this test kit.
-*   **`requirements/`**: directory containing the extractd requirements for this test kit.
+*   **`requirements/`**: directory containing the extracted requirements for this test kit.
 *   **`version.rb`**: Specifies the version of the test kit.
 *   **`metadata.rb`**: Contains metadata for the test kit, including its title, description
     (which appears in the Inferno UI), and suite IDs. This is a crucial file for how the test kit
@@ -40,10 +40,10 @@ Key subdirectories and files within the `cross_suite/` folder include:
 *   **`generated/`**: Contains metadata files generated from the PAS IG and used for must support tests.
 *   **`must_support/`**: Contains base must support test logic used by all suites.
 *   **`pas_bundle_validation.rb`**: Specific validation logic for PAS Bundles.
-*   **`pas_constants.rb`**: Import PAS IG details extracted into constants for use during test execution.
-*   **`pas_subscription_validation.rb`**: Specific validation logic for PAS Subscriptions.
+*   **`pas_constants.rb`**: Imported PAS IG details extracted into constants for use during test execution.
+*   **`pas_subscription_verification.rb`**: Specific validation logic for PAS Subscriptions.
 *   **`tags.rb`**: Tags used when storing and retrieving requests for validation.
-*   **`urls.rb`**: Specific paths and addresses used and displayed by the tests.
+*   **`base_urls.rb`**: Specific paths and addresses used and displayed by the tests.
 *   **`validation_test.rb`**: Core logic for FHIR validation tests.
 *   **`validator_suppressions.rb`**: Configuration for suppressing known, non-critical validation errors.
 
@@ -85,11 +85,11 @@ Key subdirectories and files within the `server/` folder include:
     Requests made are tagged for retrieval and evaluation during other tests.
 *   **`pas_claim_response_decision_test.rb`**: Common test for verifying that the expected decision
     was returned from the server in the ClaimResponse.
-*   **`pas_subscription_notification_wait_test.rb`**: Common test for waiting for the server to send
+*   **`abstract_pas_subscription_notification_wait_test.rb`**: Common test for waiting for the server to send
     a Subscription notification indicating that a pended claim has been updated.
-*   **`server_request_bundle_validation_test.rb` and `pserver_response_bundle_validation_test.rb`**:
+*   **`server_request_bundle_validation_test.rb` and `server_response_bundle_validation_test.rb`**:
     Common tests for server Bundle validation. The primary difference is that the requests tests
-    evaluate input provided by testers to drive Inferno's simulated client and so will skip when
+    evaluate input provided by testers to drive Inferno's simulated PAS client and so will skip when
     problems are detected, while the response tests evaluate server responses and will fail. Both
     result in a suite-level failure, but the skip on the request input errors indicates that Inferno
     was not able to verify conformant behavior, while the failure on server response errors indicates

@@ -4,10 +4,10 @@ module DaVinciPASTestKit
   module DaVinciPASV221
     class DataElementExpectationsAttestationTest < Inferno::Test
       id :pas_client_v221_data_element_expectations_attestation
-      ATTESTATION_TITLE = 'Health IT module does not set additional expectations for data elements'.freeze
+      ATTESTATION_TITLE = 'PAS client does not set additional expectations for data elements'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module does not set additional expectations
+        During this test, the tester will confirm that the PAS client does not set additional expectations
         for data elements beyond what is required by PAS.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
@@ -20,7 +20,7 @@ module DaVinciPASTestKit
       input :data_element_expectations_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module does not set additional expectations for
+              I attest that the PAS client does not set additional expectations for
               data elements beyond what is required by PAS.
             ),
             type: 'radio',

@@ -53,6 +53,11 @@ module DaVinciPASTestKit
         'PAS Task'
       ].freeze
 
+      # Response profiles not included in the client must support tests (server tests still include them).
+      CLIENT_RESPONSE_EXCLUDED_PROFILES = [
+        'PAS Task'
+      ].freeze
+
       REQUEST_PROFILES = [
         'PAS Medication Request',
         'PAS Service Request',
@@ -75,6 +80,18 @@ module DaVinciPASTestKit
 
         def inquire_response_profile?(profile_metadata)
           INQUIRY_RESPONSE_REQUIRED_PROFILES.include?(profile_metadata.profile_name)
+        end
+
+        def client_submit_response_profile?(profile_metadata)
+          submit_response_profile?(profile_metadata) && !client_response_excluded_profile?(profile_metadata)
+        end
+
+        def client_inquire_response_profile?(profile_metadata)
+          inquire_response_profile?(profile_metadata) && !client_response_excluded_profile?(profile_metadata)
+        end
+
+        def client_response_excluded_profile?(profile_metadata)
+          CLIENT_RESPONSE_EXCLUDED_PROFILES.include?(profile_metadata.profile_name)
         end
 
         def request_profile?(profile_metadata)

@@ -12,7 +12,7 @@ module DaVinciPASTestKit
     title 'PAS client submits Claims using the $submit and $inquire operations to demonstrate coverage of must ' \
           'support elements'
     description %(
-      During this test, Inferno will wait while the tester uses the client system to make `$submit`
+      During this test, Inferno will wait while the tester uses the PAS client to make `$submit`
       and `$inquire` operation requests against Inferno demonstrating any request and response
       must support elements not yet demonstrated.
 
@@ -64,7 +64,7 @@ module DaVinciPASTestKit
         message: <<~MESSAGE
           **Additional Must Support Demonstration**:
 
-          Inferno will wait while the tester uses the system to make additional $submit and $inquire requests.
+          Inferno will wait while the tester uses the PAS client to make additional $submit and $inquire requests.
           Along with the requests submitted during previous tests, these requests and their responses must
           cumulatively demonstrate coverage of all required profiles and all must support elements within
           those profiles, as specified by the PAS IG.

@@ -15,7 +15,7 @@ module DaVinciPASTestKit
       id :pas_client_v201_pended_group
       title 'Pended Response'
       description %(
-        During these tests, the client system will initiate a prior authorization
+        During these tests, the PAS client will initiate a prior authorization
         request and show it can react appropriately to a 'pended' decision, including
         waiting for a notification that an update has been made
         and making an inquiry request to retrieve the final result.
@@ -34,12 +34,12 @@ module DaVinciPASTestKit
         title 'Perform the pended scenario'
         description %(
           All interactions for the pended prior authorization request scenario
-          between Inferno and the client system will be performed during this group
+          between Inferno and the PAS client will be performed during this group
           including
-          - A `$submit` request from the client to Inferno where Inferno returns a pended response.
+          - A `$submit` request from the PAS client to Inferno where Inferno returns a pended response.
           - A notification that the prior authorization decision has been finalized from Inferno
-            to the client system.
-          - An `$inquire` request from the client to Inferno where Inferno returns an approved response.
+            to the PAS client.
+          - An `$inquire` request from the PAS client to Inferno where Inferno returns an approved response.
         )
 
         test from: :pas_client_v201_pended_submit_test
@@ -53,9 +53,9 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
-             title: 'Check that the client registers the request as pended',
+             title: 'Check that the PAS client registers the request as pended',
              description: %(
-              During this test, the tester will observe the client system following
+              During this test, the tester will observe the PAS client following
               the receipt of the pended response and attest that users are able to determine
               that the response has been pended and a decision will be forthcoming.
              ),
@@ -63,7 +63,7 @@ module DaVinciPASTestKit
                workflow_tag: PENDED_WORKFLOW_TAG,
                operation_tag: SUBMIT_TAG,
                multiple_requests_ok: true,
-               attest_message: "I attest that the client system did not error when handling the 'pended' " \
+               attest_message: "I attest that the PAS client did not error when handling the 'pended' " \
                                'response to the submitted claim and that it indicated to users that a final decision ' \
                                'on the request had not yet been made.'
              } }
@@ -75,7 +75,7 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_notification_input_verification,
              title: 'Tester-provided event notification Bundle is conformant',
              description: %(
-               This test checks that the notification Bundle sent to the client, which will be either
+               This test checks that the notification Bundle sent to the PAS client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, is conformant
                to Subscription Backport IG requirements.
@@ -89,7 +89,7 @@ module DaVinciPASTestKit
         test from: :subscriptions_r4_client_notification_input_payload_verification,
              title: 'Tester-provided event notification Bundle matches the Subscription',
              description: %(
-               This test checks that the notification Bundle sent to the client, which will be either
+               This test checks that the notification Bundle sent to the PAS client, which will be either
                the tester-provided notification Bundle in the **Claim updated notification JSON** input
                or mocked by Inferno based on details in the Subscription and submitted Claim, matches the details
                requested in the Subscription provided during the "Subscription Setup" tests.
@@ -104,9 +104,9 @@ module DaVinciPASTestKit
         # and testers have to demonstrate and attest that their systems work, which will require some
         # correspondence.
         test from: :subscriptions_r4_client_event_notification_verification,
-             title: 'Client accepts the "claim updated" event notification',
+             title: 'PAS client accepts the "claim updated" event notification',
              description: %(
-               This test checks that the client responds appropriately to the event notification request.
+               This test checks that the PAS client responds appropriately to the event notification request.
              )
       end
 
@@ -118,9 +118,9 @@ module DaVinciPASTestKit
         test from: :pas_client_v201_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: PENDED_WORKFLOW_TAG } }
         test from: :pas_client_v201_response_attest,
-             title: 'Check that the client registers the request as approved',
+             title: 'Check that the PAS client registers the request as approved',
              description: %(
-              During this test, the tester will observe the client system following
+              During this test, the tester will observe the PAS client following
               the receipt of the inquiry response with a final decision and attest that users
               are able to determine that the response has been approved in full.
              ),
@@ -128,7 +128,7 @@ module DaVinciPASTestKit
                workflow_tag: PENDED_WORKFLOW_TAG,
                operation_tag: INQUIRE_TAG,
                multiple_requests_ok: true,
-               attest_message: 'I attest that the client system did not error when handling the `$inquire` ' \
+               attest_message: 'I attest that the PAS client did not error when handling the `$inquire` ' \
                                "response and displays the submitted claim as 'approved' meaning that the " \
                                'user can proceed with ordering or providing the requested service.'
              } }

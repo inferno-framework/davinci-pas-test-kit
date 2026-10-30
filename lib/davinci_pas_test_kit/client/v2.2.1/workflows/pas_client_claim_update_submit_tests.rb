@@ -79,7 +79,7 @@ module DaVinciPASTestKit
         <<~MESSAGE
           **Claim Update Scenario**:
 
-          Inferno will wait while the tester uses the system to #{interaction_instructions}.
+          Inferno will wait while the tester uses the PAS client to #{interaction_instructions}.
           The tests will automatically continue once a request has been received.
 
           ### Endpoints
@@ -118,7 +118,7 @@ module DaVinciPASTestKit
       id :pas_client_v221_claim_update_initial_submit_test
       title 'PAS client submits an initial prior authorization request'
       description %(
-        During this test, Inferno will wait for an initial prior authorization `$submit` request from the client.
+        During this test, Inferno will wait for an initial prior authorization `$submit` request from the PAS client.
         This establishes the original Claim that the subsequent updates will reference and
         modify. Upon receipt, Inferno will respond with a [tester-provided](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
         or [Inferno-mocked](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)

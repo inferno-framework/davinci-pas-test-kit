@@ -55,7 +55,7 @@ module DaVinciPASTestKit
         message: <<~MESSAGE
           **Subscription Update and Deletion Tests**:
 
-          Inferno will wait while the tester uses the client system to update and delete the PAS
+          Inferno will wait while the tester uses the PAS client to update and delete the PAS
           Subscription created earlier in these tests. Updated Subscriptions must continue to meet
           [Inferno](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
           and PAS Subscription requirements, but Inferno will not use the updated Subscription to deliver

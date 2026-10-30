@@ -12,8 +12,8 @@ module DaVinciPASTestKit
       id :pas_client_v201_registration
       title 'Client Registration'
       description %(
-        Register the client system with Inferno's simulated PAS Server,
-        including configuration of the system under test to make requests against
+        Register the PAS client with Inferno's simulated PAS Server,
+        including configuration necessary to make requests against
         Inferno's simulated PAS endpoints and enable authentication and authorization of PAS requests.
       )
       run_as_group

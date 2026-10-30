@@ -29,9 +29,9 @@ module DaVinciPASTestKit
           optional: true,
           title: 'Client Notification Access Token',
           description: %(
-            The bearer token that Inferno will send on requests to the client system's rest-hook notification
-            endpoint, including handshake notifications sent after Subscription creation. Not needed if the client
-            under test will create a Subscription with an appropriate header value in the `channel.header` element.
+            The bearer token that Inferno will send on requests to the PAS client's rest-hook notification
+            endpoint, including handshake notifications sent after Subscription creation. Not needed if the PAS client
+            will create a Subscription with an appropriate header value in the `channel.header` element.
             If a value for the `authorization` header is provided in `channel.header`, this value will override it.
           )
 
@@ -44,7 +44,7 @@ module DaVinciPASTestKit
         message: <<~MESSAGE
           **Subscription Creation Test**:
 
-          Inferno will wait while the tester uses the client system to create a Subscription on
+          Inferno will wait while the tester uses the PAS client to create a Subscription on
           Inferno's simulated payer server. Inferno [will not accept all Subscriptions](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#subscription-validation)
           but a Subscription does not need to be fully conformant to be accepted.
 
@@ -64,7 +64,7 @@ module DaVinciPASTestKit
           ### Responses and Handshake Notifications
 
           The PAS Test Kit wiki contains details on the supported responses and
-          notifications that the client system can expect to receive during these tests:
+          notifications that the PAS client can expect to receive during these tests:
           - [Subscription creation responses](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#creation-response)
           - [Handshake notification](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Client-Subscriptions-and-Notifications#handshake-notification)
         MESSAGE

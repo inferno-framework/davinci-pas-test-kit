@@ -13,7 +13,7 @@ requirements and may change the test validation logic.
 
 ## Test Methodology
 
-Inferno will simulate a client and make a series of prior authorization requests to the 
+Inferno will simulate a PAS client and make a series of prior authorization requests to the 
 server under test. Over the course of these requests, Inferno will seek to observe
 conformant handling of PAS requirements, including
 - The ability of the server to use PAS API interactions to communicate 
@@ -27,7 +27,7 @@ conformant handling of PAS requirements, including
     - Ability to return responses that demonstrate the use of all PAS profiles and all must support elements on those profiles
 
 Because the business logic that determines decisions and the elements populated in responses
-Is outside of the PAS specification and will vary between implementers, testers
+is outside of the PAS specification and will vary between implementers, testers
 are required to provide the requests that Inferno will make to the server.
 
 All requests and responses will be checked for conformance to the PAS
@@ -44,7 +44,7 @@ for more details about the current scope of the tests and the reasons that some 
 
 ### Quick Start
 
-Execution of these tests require a significant amount of tester input in the
+Execution of these tests requires a significant amount of tester input in the
 form of requests that Inferno will make against the server under test.
 
 For v2.2.1, see the [v2.2.1 server instructions](Server-Instructions-v2.2.1) for version-specific
@@ -92,7 +92,7 @@ and instead relies on the tester to provide the requests that Inferno will make.
 
 For single-request fields (e.g., “PAS Submit Request Payload for Approval Response”), the input must be a json-encoded FHIR bundle.
 
-For multiple-request fields (e.g., “Additional PAS Submit Request Payloads”), the input must be a json array of json-encoded FHIR bundles (e.g., [fhir-bundle-1, fhir-bundle-2, …] where each fhir-bundle-n is a full bundle).
+For multiple-request fields (e.g., “Additional $submit Request Payloads”), the input must be a json array of json-encoded FHIR bundles (e.g., [fhir-bundle-1, fhir-bundle-2, …] where each fhir-bundle-n is a full bundle).
 
 ### Claim Updates (v2.2.1)
 
@@ -186,6 +186,6 @@ These and any other requirements found in the PAS IG may be tested in future ver
 ### Known Issues
 
 Testing has identified issues with the source IG that result in spurious failures. 
-Tests impacted by these issues have an indication in their documentations. The full
+Tests impacted by these issues have an indication in their documentation. The full
 list of known issues can be found on the [repository's issues page with the 'source ig issue'
 label](https://github.com/inferno-framework/davinci-pas-test-kit/labels/source%20ig%20issue).
