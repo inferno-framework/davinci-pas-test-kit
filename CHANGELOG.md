@@ -1,3 +1,14 @@
+# 0.16.0
+* ID-235: Add attestations for additional PAS requirements by @FlexonyoPizza in https://github.com/inferno-framework/davinci-pas-test-kit/pull/101
+* ID-252: br provider demonstration by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/103
+* ID-251: PAS Client tests UX review by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/105
+* ID-167: suite endpoints custom no session response by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/89
+* ID-189: Add US Core Version suite option to the PAS v2.2.1 Client Suite by @abhinandan2012 in https://github.com/inferno-framework/davinci-pas-test-kit/pull/106
+* ID-241: no custom extensions in tester responses by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/107
+* Id-240: client subscription update and delete interaction tests by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/108
+* ID-286: Run the v2.2.1 client must support analysis separately from the demonstration by @ljtucker in https://github.com/inferno-framework/davinci-pas-test-kit/pull/109
+* ID-294: documentation and requirements cleanup by @karlnaden in https://github.com/inferno-framework/davinci-pas-test-kit/pull/111
+
 # 0.15.2
 * ID-88: Narrow the x12 validator message filter and apply it to both Client and Server suites by @abhinandan2012 in https://github.com/inferno-framework/davinci-pas-test-kit/pull/83
 * ID-151: Add PAS v2.2 Timing and Quantity data type constraint validation by @abhinandan2012 in https://github.com/inferno-framework/davinci-pas-test-kit/pull/94
