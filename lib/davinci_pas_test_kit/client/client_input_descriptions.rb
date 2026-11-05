@@ -21,6 +21,17 @@ module DaVinciPASTestKit
       Inferno then asks for confirmation that all responses were handled
       without error and verifies the conformance of all requests and responses.
     )
+  MUST_SUPPORT_RECEIVE_GROUP_V221_DESCRIPTION =
+    <<~DESCRIPTION
+      During this group, Inferno will wait while the tester uses the PAS client to
+      make `$submit` and `$inquire` operation requests to Inferno demonstrating coverage
+      of must support elements not yet demonstrated. After returning a pended response to a
+      `$submit` request, Inferno will send a full-resource notification with the final decision
+      to the PAS client's Subscription.
+
+      Inferno then asks for confirmation that all responses were handled
+      without error and verifies the conformance of all requests, responses, and notifications.
+    DESCRIPTION
   MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_TITLE =
     'PAS client handled the $submit and $inquire responses without erroring'
   MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_DESCRIPTION =
@@ -80,6 +91,21 @@ module DaVinciPASTestKit
     "the tester-provided notification Bundle in the **Claim updated notification JSON** input\n" \
     'or mocked by Inferno based on details in the Subscription and submitted Claim'
   )
+
+  MS_NOTIFICATIONS_INPUT_DESCRIPTION =
+    <<~DESCRIPTION
+      A JSON list of objects ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format))
+      that Inferno will use to notify the PAS client of the final decision after returning a pended response
+      to a `$submit` request during the *Demonstrate Must Support Coverage* group. Each entry holds a
+      full-resource notification Bundle in place of a response Bundle. For each pended request, Inferno will
+      [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
+      and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
+      a notification to send from this list, evaluating the selection criteria against the `$submit` request.
+      If no entries match or instantiation fails, Inferno will
+      [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#notification-bundle)
+      a notification from the pended response. Inferno only sends notifications after pended responses,
+      which come from the *Must Support $submit Response Bundles* input.
+    DESCRIPTION
 
   def self.must_support_group_description(ig_version, wiki_anchor)
     <<~DESCRIPTION
