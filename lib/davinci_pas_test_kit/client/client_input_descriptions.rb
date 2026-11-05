@@ -54,6 +54,33 @@ module DaVinciPASTestKit
       coverage without making those requests again.
     DESCRIPTION
 
+  # Description of the PAS conformance check on notifications that Inferno sends to the PAS client.
+  # @param notification_source [String] where the notification came from, completing
+  #   "Each notification sent to the PAS client, which will be either ..."
+  def self.notification_pas_conformance_description(notification_source)
+    <<~DESCRIPTION
+      This test verifies that each notification sent to the PAS client, which will be either
+      #{notification_source}, conforms to PAS-specific requirements beyond the base
+      Subscription Backport IG notification requirements. In particular, the focus resource in the
+      notification must be the updated ClaimResponse in a Bundle conformant to the
+      [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
+      profile, including the presence of all referenced instances within the Bundle and the
+      conformance of those instances to the appropriate profiles.
+
+      Note that:
+      - To ensure that the PAS client is driving its behavior only based on standard
+        PAS information, custom extensions are not allowed within the focus Bundle, except on
+        resources echoed back unchanged from the `$submit` request.
+      - Because X12 value sets are not public, elements bound to value
+        sets containing X12 codes are not validated.
+    DESCRIPTION
+  end
+
+  PENDED_NOTIFICATION_PAS_CONFORMANCE_DESCRIPTION = notification_pas_conformance_description(
+    "the tester-provided notification Bundle in the **Claim updated notification JSON** input\n" \
+    'or mocked by Inferno based on details in the Subscription and submitted Claim'
+  )
+
   def self.must_support_group_description(ig_version, wiki_anchor)
     <<~DESCRIPTION
       During these tests, Inferno will check that the PAS client demonstrates support for

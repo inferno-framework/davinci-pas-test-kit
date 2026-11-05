@@ -3,8 +3,16 @@ require_relative 'tags'
 module DaVinciPASTestKit
   module PASNotificationVerification
     PAS_RESPONSE_BUNDLE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'.freeze
+    # Notifications carrying the PAS Response Bundle are only tested for PAS v2.2.1
+    PAS_NOTIFICATION_IG_VERSION = 'v2.2.1'.freeze
 
-    def verify_pas_notification(notification_json_str, ig_version: 'v2.2.1') # rubocop:disable Lint/UnusedMethodArgument
+    # @param focus_validator [Symbol, nil] when given, the name of the FHIR resource validator used to validate
+    #   each focus Bundle against the PAS Response Bundle profile with PasBundleValidation, which the including
+    #   class must also include. Use NO_CUSTOM_EXTENSIONS_VALIDATOR for notifications Inferno sends, which may
+    #   be tester-provided. When nil, only the PAS-specific structure is checked.
+    # @param echoed_from [FHIR::Bundle, String, nil] the request Bundle that the focus Bundle answers - see
+    #   PasBundleValidation#perform_bundle_validation.
+    def verify_pas_notification(notification_json_str, focus_validator: nil, echoed_from: nil)
       assert_valid_json(notification_json_str)
       notification_bundle = FHIR.from_contents(notification_json_str)
 
@@ -48,10 +56,10 @@ module DaVinciPASTestKit
           next
         end
 
-        # Check PAS-specific structural requirements only.
-        # Profile validation is handled by the Subscription conformance tests
-        # (9.3.3.01 and 9.3.3.02) to avoid duplicate error messages.
         validate_focus_as_response_bundle(focus_resource)
+        next unless focus_resource.resourceType == 'Bundle' && focus_validator.present?
+
+        validate_focus_against_profiles(focus_resource, focus_ref, focus_validator, echoed_from)
       end
 
       assert messages.none? { |msg| msg[:type] == 'error' },
@@ -115,6 +123,19 @@ module DaVinciPASTestKit
         The focus Bundle (PAS Response Bundle) must contain at least one
         ClaimResponse entry, but none was found.
       ))
+    end
+
+    # Validates the focus Bundle as a $submit response, since it carries the final decision on a pended
+    # $submit request.
+    def validate_focus_against_profiles(focus_bundle, focus_ref, validator, echoed_from)
+      focus_messages = perform_bundle_validation(focus_bundle, 'submit', 'response', PAS_NOTIFICATION_IG_VERSION,
+                                                 validator:, echoed_from:)
+      focus_messages.each do |message|
+        add_message(message[:type], "Focus Bundle `#{focus_ref}`: #{message[:message]}")
+      end
+    rescue NoMethodError, TypeError, ArgumentError => e
+      # a malformed Bundle (e.g., an entry with no resource) is reported rather than stopping the test
+      add_message('error', "Focus Bundle `#{focus_ref}` could not be validated: #{e.message}")
     end
   end
 end

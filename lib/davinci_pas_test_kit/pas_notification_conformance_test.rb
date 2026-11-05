@@ -1,8 +1,16 @@
+require_relative 'cross_suite/pas_bundle_validation'
 require_relative 'cross_suite/pas_notification_verification'
 require_relative 'cross_suite/tags'
 
 module DaVinciPASTestKit
+  # Options:
+  # - focus_validator: the name of the FHIR resource validator to validate the focus PAS Response Bundle with.
+  #   When not set, only the PAS-specific structure of the notification is checked.
+  # - echo_source_tags: tags identifying the $submit request that the notification's focus Bundle answers, so
+  #   that resources echoed from it may keep its extensions - see PasBundleValidation#perform_bundle_validation.
+  #   The most recent successful one is used.
   class NotificationPASConformanceTest < Inferno::Test
+    include PasBundleValidation
     include PASNotificationVerification
 
     id :pas_notification_pas_conformance_test
@@ -34,7 +42,17 @@ module DaVinciPASTestKit
       skip_if(requests.none?, 'Inferno did not send or receive an event notification')
 
       notification_body = request.request_body
-      verify_pas_notification(notification_body)
+      verify_pas_notification(notification_body, focus_validator: config.options[:focus_validator],
+                                                 echoed_from: echo_source_request&.request_body)
+    end
+
+    def echo_source_request
+      tags = config.options[:echo_source_tags]
+      return if tags.blank?
+
+      Inferno::Repositories::Requests.new.tagged_requests(test_session_id, tags)
+        .select { |req| req.status == 200 }
+        .max_by(&:index)
     end
   end
 end

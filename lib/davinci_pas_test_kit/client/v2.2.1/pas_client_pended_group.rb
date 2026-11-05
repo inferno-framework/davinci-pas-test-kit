@@ -6,6 +6,8 @@ require_relative 'workflows/pas_client_request_bundle_validation_test'
 require_relative '../../pas_notification_conformance_test'
 require_relative '../user_input_response'
 require_relative '../../cross_suite/tags'
+require_relative '../../cross_suite/validator_configuration'
+require_relative '../client_input_descriptions'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -122,7 +124,12 @@ module DaVinciPASTestKit
              }
         test from: :pas_notification_pas_conformance_test,
              title: 'Inferno\'s notification conforms to PAS-specific requirements',
-             simulation_verification: true
+             description: PENDED_NOTIFICATION_PAS_CONFORMANCE_DESCRIPTION,
+             simulation_verification: true,
+             config: { options: {
+               focus_validator: NO_CUSTOM_EXTENSIONS_VALIDATOR,
+               echo_source_tags: [SUBMIT_TAG, PENDED_WORKFLOW_TAG]
+             } }
         test from: :subscriptions_r4_client_event_notification_verification,
              title: 'PAS client accepts the "claim updated" event notification',
              description: %(

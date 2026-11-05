@@ -137,6 +137,14 @@ RSpec.describe DaVinciPASTestKit::NotificationPASConformanceTest, :request do
     expect(result.result).to eq('pass')
   end
 
+  it 'checks only the PAS structure of the focus Bundle when no focus validator is configured' do
+    create_notification_request(notification_body_good)
+    result = run(test)
+
+    expect(result.result).to eq('pass')
+    expect(a_request(:post, validation_url)).to_not have_been_made
+  end
+
   it 'skips when no notification requests are found' do
     result = run(test)
     expect(result.result).to eq('skip')
