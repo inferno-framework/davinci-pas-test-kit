@@ -114,6 +114,14 @@ RSpec.describe DaVinciPASTestKit::UserInputResponse do
       expect(described_class.notification_candidates(configurable, result)).to eq([notification, wrapped])
     end
 
+    it 'raises an InvalidInputError for a wrapper holding a resource that is not a Bundle' do
+      result = result_with_input('ms_submit_notifications',
+                                 [{ 'bundle' => { 'resourceType' => 'Parameters' } }].to_json)
+
+      expect { described_class.notification_candidates(configurable, result) }
+        .to raise_error(described_class::InvalidInputError, /Entry 1 /)
+    end
+
     it 'raises an InvalidInputError for a bare resource that is not a Bundle' do
       result = result_with_input('ms_submit_notifications', [{ 'resourceType' => 'Parameters' }].to_json)
 

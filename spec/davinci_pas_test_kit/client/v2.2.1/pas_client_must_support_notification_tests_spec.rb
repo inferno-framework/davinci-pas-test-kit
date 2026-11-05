@@ -12,7 +12,8 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
 
   let(:suite_id) { 'davinci_pas_client_suite_v221' }
   let(:session_url_path) { '1234' }
-  # Requests made while the gather test waits share its result
+  # Requests share a result: Inferno only loads tagged requests from the latest result of each runnable, and
+  # results created here have no runnable
   let(:gather_result) { repo_create(:result, test_session_id: test_session.id) }
   let(:generator) { Class.new { include DaVinciPASTestKit::ResponseGenerator }.new }
   let(:request_bundle_hash) do
@@ -50,14 +51,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
     repo_create(:request, direction: 'outgoing', url: 'http://client.example.com/notify',
                           test_session_id: test_session.id, result: gather_result, request_body: body, status:,
                           response_body: '', tags: [DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG,
-                                                    DaVinciPASTestKit::MUST_SUPPORT_WORKFLOW_TAG,
                                                     DaVinciPASTestKit.notification_link_tag(link_id)])
   end
 
   def create_subscription_request
     repo_create(:request, direction: 'incoming', url: "/custom/#{suite_id}/#{session_url_path}/fhir/Subscription",
-                          test_session_id: test_session.id,
-                          result: repo_create(:result, test_session_id: test_session.id),
+                          test_session_id: test_session.id, result: gather_result,
                           response_body: subscription_json.to_json, status: 201,
                           tags: [DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG])
   end
@@ -189,12 +188,48 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
   describe 'the Subscriptions conformance test' do
     let(:test) { suite_test(:pas_client_v221_ms_notification_conformance_test) }
 
-    before { create_subscription_request }
-
-    it 'passes a notification mocked by Inferno' do
+    it 'skips when there is no Subscription to check the payload content against' do
       create_pended_exchange
 
-      expect(run(test).result).to eq('pass')
+      result = run(test)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('there is no Subscription')
+    end
+  end
+
+  describe 'the Subscriptions conformance test with a Subscription' do
+    let(:test) { suite_test(:pas_client_v221_ms_notification_conformance_test) }
+
+    before { create_subscription_request }
+
+    it 'passes a notification mocked by Inferno, checking its payload content' do
+      create_pended_exchange
+
+      result = run(test)
+
+      expect(result.result).to eq('pass')
+      expect(result_messages(result, 'warning')).to be_empty
+    end
+
+    it 'reports a notification the checks cannot handle and goes on to check the others' do
+      first_response = response_json(:pended, 'first-cr')
+      create_submit_request(first_response, 'first')
+      malformed = JSON.parse(notification_json(first_response))
+      malformed['entry'][0]['resource']['parameter'].reject! { |param| param['name'] == 'type' }
+      create_notification(malformed.to_json, 'first')
+      second_response = response_json(:pended, 'second-cr')
+      create_submit_request(second_response, 'second')
+      second = JSON.parse(notification_json(second_response))
+      second['entry'][0]['resource']['extension'] = [custom_extension]
+      create_notification(second.to_json, 'second')
+
+      result = run(test)
+
+      errors = result_messages(result, 'error')
+      expect(errors).to include(a_string_starting_with('Notification for $submit request 1: '))
+      expect(errors).to include(a_string_starting_with('Notification for $submit request 2: ')
+                                  .and(a_string_including(custom_extension_url)))
     end
 
     it 'fails, naming the request, when the SubscriptionStatus has a custom extension' do

@@ -81,8 +81,9 @@ module DaVinciPASTestKit
     def self.valid_candidate?(candidate, resource_types)
       return false unless candidate.is_a?(Hash)
 
+      resource = candidate[ResponseSelectionUtils::BUNDLE_KEY]
       resource_types.include?(candidate['resourceType']) ||
-        candidate[ResponseSelectionUtils::BUNDLE_KEY].is_a?(Hash)
+        (resource.is_a?(Hash) && resource_types.include?(resource['resourceType']))
     end
 
     def user_inputted_response?(input_key)

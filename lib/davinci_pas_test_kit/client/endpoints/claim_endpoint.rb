@@ -204,9 +204,15 @@ module DaVinciPASTestKit
       end
 
       @selected_notification = resolve_must_support_notification(req_bundle)
+      # Not tagged with MUST_SUPPORT_WORKFLOW_TAG, which the must support tests for $submit and $inquire
+      # exchanges load by
       start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid,
-                             tags: [MUST_SUPPORT_NOTIFICATION_TAG, MUST_SUPPORT_WORKFLOW_TAG,
+                             tags: [MUST_SUPPORT_NOTIFICATION_TAG,
                                     DaVinciPASTestKit.notification_link_tag(notification_link_id)])
+    rescue StandardError => e
+      # The pended response has already been built, so a problem with the notification mustn't replace it
+      Inferno::Application['logger'].error("Must support notification not sent: #{e.full_message}")
+      add_result_warning("Inferno could not send a notification after a pended response: #{e.message}")
     end
 
     # Resolves the user-provided response, using criteria-based selection for must support
@@ -230,7 +236,25 @@ module DaVinciPASTestKit
       notification = select_must_support_candidate(req_bundle, 'notification') do
         UserInputResponse.notification_candidates(test, result)
       end
-      resolve_candidate(notification, req_bundle, 'notification')
+      notification_json = resolve_candidate(notification, req_bundle, 'notification')
+      return notification_json if notification_json.blank? || subscription_status_present?(notification_json)
+
+      add_result_warning(
+        'Unable to use the selected tester-provided notification, so Inferno will generate a default ' \
+        'notification. The notification is not a Bundle with a SubscriptionStatus Parameters entry ' \
+        'that has a `subscription` parameter.'
+      )
+      nil
+    end
+
+    # Whether the notification has the SubscriptionStatus that Inferno updates before sending it
+    def subscription_status_present?(notification_json)
+      notification = FHIR.from_contents(notification_json)
+      notification.is_a?(FHIR::Bundle) && Array(notification.entry).any? do |entry|
+        entry.resource.is_a?(FHIR::Parameters) && Array(entry.resource.parameter).any? do |param|
+          param.name == 'subscription'
+        end
+      end
     end
 
     # Replaces {{fhirpath}} tokens in a selected tester-provided response or notification.

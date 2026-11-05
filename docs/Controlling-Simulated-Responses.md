@@ -190,7 +190,7 @@ same request numbers. Inferno instantiates the selected notification as describe
 [below](#response-instantiation). If no entry matches or instantiation fails, Inferno
 [mocks](#notification-bundle) a notification from the pended response.
 
-Inferno sends each notification about 5-10 seconds after the pended response, and only while the
+Inferno sends each notification up to about 11 seconds after the pended response, and only while the
 *Demonstrate Must Support Coverage* test is still waiting, so testers should wait at least 15 seconds
 after the last pended response before continuing. Because notifications are sent to the PAS client's
 Subscription, the test is skipped when pended responses are provided but no Subscription has been

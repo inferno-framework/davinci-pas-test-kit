@@ -59,7 +59,7 @@ module DaVinciPASTestKit
                  end
         'After returning a pended response to a `$submit` request, Inferno will send a full-resource notification ' \
           "with the final decision to the PAS client's Subscription endpoint. The notification will be #{source}. " \
-          'Inferno sends each notification about 5-10 seconds after the pended response, and does not send it if ' \
+          'Inferno sends each notification up to about 11 seconds after the pended response, and does not send it if ' \
           'this wait has ended by then, so wait at least 15 seconds after the last pended response before ' \
           'continuing.'
       end

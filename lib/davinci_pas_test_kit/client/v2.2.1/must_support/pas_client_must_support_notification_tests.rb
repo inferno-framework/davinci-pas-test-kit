@@ -62,7 +62,7 @@ module DaVinciPASTestKit
         request_numbers = unnotified.map { |req| successful_submit_requests.index(req) + 1 }.join(', ')
         "Inferno did not send a notification after the pended response to $submit request(s) #{request_numbers}. " \
           'This happens when there is no Subscription to send it to, or when the *Demonstrate Must Support ' \
-          'Coverage* wait ends before Inferno sends it, which takes about 5-10 seconds after the response. ' \
+          'Coverage* wait ends before Inferno sends it, which takes up to about 11 seconds after the response. ' \
           'Check the messages on the waiting test, then re-run the *Demonstrate Must Support Coverage* group.'
       end
 
@@ -75,6 +75,9 @@ module DaVinciPASTestKit
       rescue Inferno::Exceptions::AssertionException => e
         # A notification too malformed to check further shouldn't stop the others from being checked
         add_message('error', e.message)
+      rescue StandardError => e
+        # Checks written for conformant content may also raise on malformed tester-provided notifications
+        add_message('error', "The notification could not be checked: #{e.message}")
       ensure
         messages[first_new_message..].each do |message|
           message[:message] = "#{label}: #{message[:message].strip.gsub(/\n[ \t]+/, "\n")}"
@@ -100,6 +103,9 @@ module DaVinciPASTestKit
 
       run do
         subscription = SubscriptionSetupRequirement.created_subscription(test_session_id)
+        skip_if subscription.blank?,
+                'The payload content of the notifications cannot be checked because there is no Subscription. ' \
+                'Re-run the *Subscription Setup* group, then the *Demonstrate Must Support Coverage* group.'
         each_must_support_notification do |_submit_request, notification, label|
           with_message_label(label) do
             notification_verification(notification.request_body, 'event-notification',
@@ -112,8 +118,7 @@ module DaVinciPASTestKit
       end
 
       def verify_payload_content(notification_body, subscription)
-        content_type = SubscriptionNotificationTrigger.subscription_content_type(subscription) if subscription.present?
-        case content_type
+        case SubscriptionNotificationTrigger.subscription_content_type(subscription)
         when 'full-resource'
           full_resource_event_notification_verification(notification_body, nil)
         when 'id-only'

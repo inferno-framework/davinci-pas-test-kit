@@ -87,9 +87,9 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
       job_args = notification_jobs.first
       expect(JSON.parse(job_args[5])['id']).to eq('first')
       tags = job_args.last
-      expect(tags).to include(DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG,
-                              DaVinciPASTestKit::MUST_SUPPORT_WORKFLOW_TAG)
-      expect(tags).to_not include(DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG)
+      expect(tags).to include(DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+      expect(tags).to_not include(DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG,
+                                  DaVinciPASTestKit::MUST_SUPPORT_WORKFLOW_TAG)
 
       link_tag = tags.find { |tag| tag.start_with?(DaVinciPASTestKit::NOTIFICATION_LINK_TAG_PREFIX) }
       expect(requests_repo.tagged_requests(test_session.id, [DaVinciPASTestKit::SUBMIT_TAG, link_tag]).length)
@@ -116,6 +116,42 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
 
       expect(last_response.status).to eq(200)
       expect(notification_jobs).to be_empty
+    end
+
+    it 'mocks the notification with a warning when the selected notification has no SubscriptionStatus' do
+      notification = notification_with_id('no-status')
+      notification['entry'] = notification['entry'].drop(1)
+      result = run_gather_test(ms_submit_responses: [pended_response].to_json,
+                               ms_submit_notifications: [notification].to_json)
+
+      post_json(submit_url, submit_request_json)
+
+      expect(notification_jobs.length).to eq(1)
+      expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('no-status')
+      expect(result_warnings(result)).to include(a_string_including('not a Bundle with a SubscriptionStatus'))
+    end
+
+    it 'mocks the notification with a warning when a wrapper does not hold a Bundle' do
+      result = run_gather_test(ms_submit_responses: [pended_response].to_json,
+                               ms_submit_notifications: [{ 'bundle' => { 'resourceType' => 'Parameters' } }].to_json)
+
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to eq(200)
+      expect(notification_jobs.length).to eq(1)
+      expect(result_warnings(result)).to include(a_string_including('Entry 1 of the'))
+    end
+
+    it 'still returns the pended response with a warning when the notification cannot be sent' do
+      allow(Inferno::Jobs).to receive(:perform)
+        .with(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification, any_args).and_raise('job queue down')
+      result = run_gather_test(ms_submit_responses: [pended_response].to_json)
+
+      post_json(submit_url, submit_request_json)
+
+      expect(last_response.status).to eq(200)
+      expect(DaVinciPASTestKit::PendedResponseDetection.pended?(last_response.body)).to be(true)
+      expect(result_warnings(result)).to include(a_string_including('job queue down'))
     end
 
     it 'mocks the notification with a warning when the notifications input is not usable' do
