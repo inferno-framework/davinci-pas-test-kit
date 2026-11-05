@@ -11,6 +11,9 @@ module DaVinciPASTestKit
   PENDED_WORKFLOW_TAG = 'pas_pended_workflow'
   MODIFICATION_WORKFLOW_TAG = 'pas_modified_workflow'
   MUST_SUPPORT_WORKFLOW_TAG = 'pas_must_support_workflow'
+  # Notifications Inferno sends after pended $submit responses during the must support workflow. They don't
+  # carry REST_HOOK_EVENT_NOTIFICATION_TAG, which the pended workflow's tests load the latest notification by.
+  MUST_SUPPORT_NOTIFICATION_TAG = 'pas_must_support_notification'
   # Claim update workflow: a unique tag per submission so verification tests can
   # reload each specific request (initial submit, then each subsequent update).
   CLAIM_UPDATE_INITIAL_TAG = 'pas_claim_update_initial'
@@ -29,6 +32,13 @@ module DaVinciPASTestKit
   OTHER_AUTH_TAG = 'other_auth'
   OPERATION_FAILURE_WORKFLOW_TAG = 'pas_operation_failure_workflow'
   PROCESSING_ERROR_WORKFLOW_TAG = 'pas_processing_error_workflow'
+
+  # Links a must support $submit request to the notification Inferno sends after it, if any, by tagging both.
+  NOTIFICATION_LINK_TAG_PREFIX = 'pas_notification_link_'
+
+  def self.notification_link_tag(link_id)
+    "#{NOTIFICATION_LINK_TAG_PREFIX}#{link_id}"
+  end
 
   def self.use_case_tag(use_case)
     const_get(:"#{use_case.upcase}_WORKFLOW_TAG")

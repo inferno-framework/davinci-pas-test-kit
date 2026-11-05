@@ -21,12 +21,21 @@ module DaVinciPASTestKit
     # Candidate handling
     # ***********************************************************************
 
-    def bare_response?(entity)
+    def self.bare_response?(entity)
       entity.is_a?(Hash) && RESPONSE_RESOURCE_TYPES.include?(entity['resourceType'])
     end
 
-    def entity_response(entity)
+    # The response resource a candidate holds, whether bare or wrapped with criteria.
+    def self.entity_response(entity)
       bare_response?(entity) ? entity : entity[BUNDLE_KEY]
+    end
+
+    def bare_response?(entity)
+      ResponseSelectionUtils.bare_response?(entity)
+    end
+
+    def entity_response(entity)
+      ResponseSelectionUtils.entity_response(entity)
     end
 
     def entity_criteria(entity)

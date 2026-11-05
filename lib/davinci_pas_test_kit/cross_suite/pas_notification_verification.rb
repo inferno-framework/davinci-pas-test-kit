@@ -13,6 +13,15 @@ module DaVinciPASTestKit
     # @param echoed_from [FHIR::Bundle, String, nil] the request Bundle that the focus Bundle answers - see
     #   PasBundleValidation#perform_bundle_validation.
     def verify_pas_notification(notification_json_str, focus_validator: nil, echoed_from: nil)
+      check_pas_notification(notification_json_str, focus_validator:, echoed_from:)
+
+      assert messages.none? { |msg| msg[:type] == 'error' },
+             'The notification does not conform to PAS requirements - see messages for details.'
+    end
+
+    # Like verify_pas_notification, but only records the problems found as messages, for checking several
+    # notifications in one test. It still fails the test when the notification is too malformed to check.
+    def check_pas_notification(notification_json_str, focus_validator: nil, echoed_from: nil)
       assert_valid_json(notification_json_str)
       notification_bundle = FHIR.from_contents(notification_json_str)
 
@@ -61,9 +70,6 @@ module DaVinciPASTestKit
 
         validate_focus_against_profiles(focus_resource, focus_ref, focus_validator, echoed_from)
       end
-
-      assert messages.none? { |msg| msg[:type] == 'error' },
-             'The notification does not conform to PAS requirements - see messages for details.'
     end
 
     private

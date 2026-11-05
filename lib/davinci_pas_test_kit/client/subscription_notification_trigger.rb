@@ -35,12 +35,24 @@ module DaVinciPASTestKit
 
     # With resume_test true, the job ends the wait identified by test_run_identifier once it has sent the
     # notification, for use by an Inferno test that waits for the notification to be sent.
-    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid, resume_test: false)
+    # @param tags [Array<String>] the tags the job records the notification request with.
+    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid, resume_test: false,
+                               tags: Jobs::SendPASSubscriptionNotification::DEFAULT_NOTIFICATION_TAGS)
       notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
 
       Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, notification_test_run_id,
                             notification_test_session_id, notification_result_id, notification_bearer_token,
-                            notification_contents, test_run_identifier, suite_id, ig_version, resume_test)
+                            notification_contents, test_run_identifier, suite_id, ig_version, resume_test, tags)
+    end
+
+    # @param subscription [Hash] a Subscription as parsed JSON, since the payload content is a primitive extension.
+    # @return [String, nil] the payload content code (e.g., 'full-resource') of the Subscription.
+    def self.subscription_content_type(subscription)
+      content_ext = subscription.dig('channel', '_payload', 'extension')
+        &.find do |ext|
+          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
+        end
+      content_ext&.dig('valueCode')
     end
 
     private
@@ -70,11 +82,7 @@ module DaVinciPASTestKit
     end
 
     def find_subscription_content_type(subscription)
-      content_ext = subscription.dig('channel', '_payload', 'extension')
-        &.find do |ext|
-          ext['url'] == 'http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content'
-        end
-      content_ext&.dig('valueCode')
+      SubscriptionNotificationTrigger.subscription_content_type(subscription)
     end
   end
 end

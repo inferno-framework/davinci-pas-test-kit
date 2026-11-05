@@ -1,6 +1,7 @@
 require_relative '../../cross_suite/tags'
 require_relative 'endpoint_session_identification'
 require_relative 'expired_token'
+require_relative '../jobs/send_pas_subscription_notification'
 require 'subscriptions_test_kit'
 
 module DaVinciPASTestKit
@@ -74,6 +75,12 @@ module DaVinciPASTestKit
 
     def tags
       [SUBSCRIPTION_STATUS_TAG]
+    end
+
+    # Overrides the Subscriptions Test Kit's count to include the notifications sent during the must support
+    # workflow, which aren't tagged as the Subscriptions Test Kit expects.
+    def determine_event_count(test_session_id)
+      Jobs::SendPASSubscriptionNotification.event_notification_count(test_session_id)
     end
 
     private
