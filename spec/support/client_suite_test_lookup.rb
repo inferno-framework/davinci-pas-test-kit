@@ -3,7 +3,7 @@
 # requests from the client.
 module ClientSuiteTestLookup
   # @param top_group_id [Symbol] the suite's no-auth group, e.g. :pas_client_v221_workflows_no_auth.
-  # @param group_id [Symbol] the id of the group within it that includes the test.
+  # @param group_id [Symbol] the id of the group within it that includes the test, directly or in a subgroup.
   # @param test_id [Symbol] the id of the test, as defined.
   def v221_client_suite_test(top_group_id, group_id, test_id)
     top_group = DaVinciPASTestKit::DaVinciPASV221::ClientSuite.groups
@@ -17,13 +17,15 @@ module ClientSuiteTestLookup
 
   private
 
-  def find_descendant_test(group, group_id, test_id)
-    if group.id.to_s.end_with?(group_id)
+  # Once within the group, the test may be in one of its unnamed subgroups.
+  def find_descendant_test(group, group_id, test_id, within_group: false)
+    within_group ||= group.id.to_s.end_with?(group_id)
+    if within_group
       test = group.tests.find { |child| child.id.to_s.end_with?(test_id) }
       return test if test.present?
     end
     group.groups.each do |child|
-      test = find_descendant_test(child, group_id, test_id)
+      test = find_descendant_test(child, group_id, test_id, within_group:)
       return test if test.present?
     end
     nil

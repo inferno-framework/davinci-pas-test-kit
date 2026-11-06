@@ -65,7 +65,8 @@ update references when it echoes resources in the responses it generates.
 
 #### Validation Limitations
 
-- Notifications sent by Inferno are not currently checked for custom extensions.
+- Notifications sent by Inferno are only checked for custom extensions in the v2.2.1 suite, and only
+  within the SubscriptionStatus and the focus PAS Response Bundle.
 - Extensions on primitive elements (e.g., `_birthDate` in JSON) are removed from all responses
   Inferno sends, including tester-provided responses, so they are neither sent to the PAS client nor
   validated.
