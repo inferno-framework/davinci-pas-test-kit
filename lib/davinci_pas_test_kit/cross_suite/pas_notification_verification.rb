@@ -3,15 +3,12 @@ require_relative 'tags'
 module DaVinciPASTestKit
   module PASNotificationVerification
     PAS_RESPONSE_BUNDLE_PROFILE = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle'.freeze
-    # Notifications carrying the PAS Response Bundle are only tested for PAS v2.2.1
+    # Notification focus Bundles are only checked for PAS v2.2.1
     PAS_NOTIFICATION_IG_VERSION = 'v2.2.1'.freeze
 
-    # @param focus_validator [Symbol, nil] when given, the name of the FHIR resource validator used to validate
-    #   each focus Bundle against the PAS Response Bundle profile with PasBundleValidation, which the including
-    #   class must also include. Use NO_CUSTOM_EXTENSIONS_VALIDATOR for notifications Inferno sends, which may
-    #   be tester-provided. When nil, only the PAS-specific structure is checked.
-    # @param echoed_from [FHIR::Bundle, String, nil] the request Bundle that the focus Bundle answers - see
-    #   PasBundleValidation#perform_bundle_validation.
+    # @param focus_validator [Symbol, nil] the validator to validate focus Bundles against their profile with,
+    #   using PasBundleValidation (which the including class must include). When nil, only structure is checked.
+    # @param echoed_from [FHIR::Bundle, String, nil] see PasBundleValidation#perform_bundle_validation
     def verify_pas_notification(notification_json_str, focus_validator: nil, echoed_from: nil)
       check_pas_notification(notification_json_str, focus_validator:, echoed_from:)
 
@@ -19,8 +16,8 @@ module DaVinciPASTestKit
              'The notification does not conform to PAS requirements - see messages for details.'
     end
 
-    # Like verify_pas_notification, but only records the problems found as messages, for checking several
-    # notifications in one test. It still fails the test when the notification is too malformed to check.
+    # Like verify_pas_notification, but records problems as messages without failing the test, unless the
+    # notification is too malformed to check
     def check_pas_notification(notification_json_str, focus_validator: nil, echoed_from: nil)
       assert_valid_json(notification_json_str)
       notification_bundle = FHIR.from_contents(notification_json_str)
@@ -131,8 +128,7 @@ module DaVinciPASTestKit
       ))
     end
 
-    # Validates the focus Bundle as a $submit response, since it carries the final decision on a pended
-    # $submit request.
+    # The focus Bundle carries the final decision on a pended $submit request
     def validate_focus_against_profiles(focus_bundle, focus_ref, validator, echoed_from)
       focus_messages = perform_bundle_validation(focus_bundle, 'submit', 'response', PAS_NOTIFICATION_IG_VERSION,
                                                  validator:, echoed_from:)
@@ -140,7 +136,6 @@ module DaVinciPASTestKit
         add_message(message[:type], "Focus Bundle `#{focus_ref}`: #{message[:message]}")
       end
     rescue NoMethodError, TypeError, ArgumentError => e
-      # a malformed Bundle (e.g., an entry with no resource) is reported rather than stopping the test
       add_message('error', "Focus Bundle `#{focus_ref}` could not be validated: #{e.message}")
     end
   end

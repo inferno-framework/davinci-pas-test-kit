@@ -78,8 +78,7 @@ Inferno supports mocking both `id-only` and `full-resource` notifications. The f
   If it cannot find the ClaimResponse reference from the `$submit` response returned
   by Inferno, it will generate a random UUID (which isn't likely to work correctly when received).
 - The subscription's `events-since-subscription-start` and the event's `event-number` count the event
-  notifications Inferno has sent during the test session, including this one. Notifications sent during
-  an earlier run of a group that has since been re-run are not counted.
+  notifications Inferno has sent during the test session.
 - When generating a `full-resource` notification, Inferno will include `additional-context`
   references for each entry in the `$submit` response Bundle other than the ClaimResponse
   (which is already in the `focus`). Then it will include Notification Bundle entries for
@@ -99,8 +98,7 @@ a single response which will always be used.
 In the case of the must support group, testers can send multiple $submit and $inquire
 requests before explicitly clicking a link telling Inferno that all desired requests have
 been made. Inferno allows a list of responses with criteria indicating when to use them.
-In the v2.2.1 suite, testers can also provide a list of notifications in the same format - see
-[Must Support Notifications](#must-support-notifications).
+In the v2.2.1 suite, a list of [notifications](#must-support-notifications) can be provided the same way.
 
 #### Response Option Format
 
@@ -176,25 +174,17 @@ a pended response for the third request and an approval response for all others:
 
 #### Must Support Notifications
 
-In the v2.2.1 suite, Inferno notifies the PAS client of the final decision on each `$submit` request
-that it returns a pended response to during the *Demonstrate Must Support Coverage* group. Since
-Inferno's mocked responses in this group are never pended, this only happens when a response provided
-in the **Must Support $submit Response Bundles** input pends the decision, using a `reviewActionCode`
-of `A4` ("Pending").
+In the v2.2.1 suite, when Inferno returns a pended response (`reviewActionCode` of `A4`) during the
+*Demonstrate Must Support Coverage* group, it then notifies the PAS client of the final decision.
+Inferno's mocked responses in this group are never pended, so this requires a pended response in the
+**Must Support $submit Response Bundles** input.
 
-The notification sent is selected from the **Must Support Notification Bundles** input, which uses the
-[response option format](#response-option-format) with a full-resource notification Bundle in place of
-the response. For each pended request, Inferno evaluates the criteria of each entry against the `$submit`
-request in the same way as [for responses](#response-option-evaluation), so a `requestRange` refers to the
-same request numbers. Inferno instantiates the selected notification as described
-[below](#response-instantiation). If no entry matches or instantiation fails, Inferno
-[mocks](#notification-bundle) a notification from the pended response.
-
-Inferno sends each notification up to about 11 seconds after the pended response, and only while the
-*Demonstrate Must Support Coverage* test is still waiting, so testers should wait at least 15 seconds
-after the last pended response before continuing. Because notifications are sent to the PAS client's
-Subscription, the test is skipped when pended responses are provided but no Subscription has been
-created, or the PAS client has updated or deleted it.
+The notification is selected from the **Must Support Notification Bundles** input, which uses the
+[response option format](#response-option-format) with a notification Bundle in place of the response,
+with criteria [evaluated](#response-option-evaluation) against the `$submit` request. If no entry matches,
+Inferno [mocks](#notification-bundle) one. Notifications are sent up to about 11 seconds after the
+response, and only while the test is waiting, so wait at least 15 seconds after the last pended response
+before continuing.
 
 ### Response Instantiation
 
@@ -241,9 +231,8 @@ fall into three categories:
     some systems.
   - *ClaimResponse Id*: if the tester provides a Notification but has Inferno generate the `$submit`
     response, then Inferno will update the focus to use the ClaimResponse id that it generates.
-- **Event Counts**: the `events-since-subscription-start` and, for notifications with a single
-  `notification-event`, its `event-number` are updated to count the event notifications Inferno has
-  sent during the session, as for [mocked notifications](#notification-bundle).
+- **Event Counts**: `events-since-subscription-start` and the `event-number` will be updated as for
+  [mocked notifications](#notification-bundle).
 
 If the tester provides an input that is malformed in some way such that Inferno cannot get the details
 that it needs to make the modifications, then the raw input will be used.
@@ -262,11 +251,9 @@ not associated with messaging time such as when a prior authorization response i
 by Inferno. Unlike details that Inferno modifies as described above, testers should have control over and/or
 knowledge of the necessary details and values to construct consistent and working messages for Inferno to use.
 
-In the v2.2.1 must support group, Inferno selects responses and notifications separately, so testers also
-need to make sure that the selection criteria pair each pended response with the notification meant to
-finalize it, for example by giving them the same `criteria`. To help catch mismatches, Inferno warns when the
-ClaimResponse in a notification shares neither an `id` nor an `identifier` with the ClaimResponse in the
-pended response it follows.
+In the v2.2.1 must support group, responses and notifications are selected separately, so testers must
+make sure their criteria pair them correctly. Inferno warns when a notification's ClaimResponse shares
+neither an `id` nor an `identifier` with the pended response's ClaimResponse.
 
 ### FHIRPath Evaluation Limitations
 

@@ -77,8 +77,7 @@ module DaVinciPASTestKit
       [SUBSCRIPTION_STATUS_TAG]
     end
 
-    # Overrides the Subscriptions Test Kit's count to include the notifications sent during the must support
-    # workflow, which aren't tagged as the Subscriptions Test Kit expects.
+    # Also counts must support notifications, which the Subscriptions Test Kit doesn't
     def determine_event_count(test_session_id)
       Jobs::SendPASSubscriptionNotification.event_notification_count(test_session_id)
     end

@@ -91,15 +91,14 @@ module DaVinciPASTestKit
       must_support_workflow? && operation == 'submit' && ig_version == 'v2.2.1'
     end
 
-    # Identifies this request, so that the notification sent after it can be linked to it - see tags
+    # Links this request to the notification sent after it
     def notification_link_id
       @notification_link_id ||= SecureRandom.uuid
     end
 
     MUST_SUPPORT_NO_SUBSCRIPTION_WARNING =
-      'Inferno returned a pended response to a $submit request, but did not send a notification with the ' \
-      'final decision because there is no Subscription to send it to, or the PAS client has updated or ' \
-      'deleted it. Run the Subscription Setup tests to create a Subscription before re-running this group.'.freeze
+      'Inferno did not send a notification after a pended response because there is no Subscription, or the ' \
+      'PAS client has updated or deleted it. Run the Subscription Setup tests before re-running this group.'.freeze
 
     WORKFLOW_TAG_MAP = {
       pended: PENDED_WORKFLOW_TAG,
@@ -193,8 +192,8 @@ module DaVinciPASTestKit
       start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
     end
 
-    # Starts sending a notification with the final decision when the response pends the request. The
-    # notification is the first tester-provided candidate whose criteria the request meets, or mocked by Inferno.
+    # Sends the final decision on a pended request, using the first matching tester-provided notification or a
+    # mocked one
     def notify_if_pended(response_bundle_json, req_bundle, generated_claim_response_uuid)
       return unless PendedResponseDetection.pended?(response_bundle_json)
 
@@ -204,13 +203,12 @@ module DaVinciPASTestKit
       end
 
       @selected_notification = resolve_must_support_notification(req_bundle)
-      # Not tagged with MUST_SUPPORT_WORKFLOW_TAG, which the must support tests for $submit and $inquire
-      # exchanges load by
+      # Not MUST_SUPPORT_WORKFLOW_TAG, which the $submit and $inquire must support tests load by
       start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid,
                              tags: [MUST_SUPPORT_NOTIFICATION_TAG,
                                     DaVinciPASTestKit.notification_link_tag(notification_link_id)])
     rescue StandardError => e
-      # The pended response has already been built, so a problem with the notification mustn't replace it
+      # A notification problem mustn't replace the pended response
       Inferno::Application['logger'].error("Must support notification not sent: #{e.full_message}")
       add_result_warning("Inferno could not send a notification after a pended response: #{e.message}")
     end
@@ -230,8 +228,7 @@ module DaVinciPASTestKit
       resolve_candidate(user_response, req_bundle, 'response')
     end
 
-    # The JSON of the tester-provided notification selected for the request, with {{fhirpath}} tokens
-    # replaced, or nil if Inferno should mock the notification.
+    # The selected tester-provided notification JSON, or nil to mock one
     def resolve_must_support_notification(req_bundle)
       notification = select_must_support_candidate(req_bundle, 'notification') do
         UserInputResponse.notification_candidates(test, result)
@@ -241,8 +238,7 @@ module DaVinciPASTestKit
 
       add_result_warning(
         'Unable to use the selected tester-provided notification, so Inferno will generate a default ' \
-        'notification. The notification is not a Bundle with a SubscriptionStatus Parameters entry ' \
-        'that has a `subscription` parameter.'
+        'notification: it is not a Bundle with a SubscriptionStatus entry.'
       )
       nil
     end

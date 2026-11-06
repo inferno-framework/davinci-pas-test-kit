@@ -26,8 +26,7 @@ module DaVinciPASTestKit
       TEST_WAITING_POLL_INTERVAL_SECONDS = 0.5
 
       DEFAULT_NOTIFICATION_TAGS = [REST_HOOK_EVENT_NOTIFICATION_TAG].freeze
-      # Each tag identifies a distinct set of event notifications sent in a session, which together give the
-      # number of events sent since the Subscription started.
+      # Together these tag every event notification sent
       EVENT_NOTIFICATION_TAGS = [REST_HOOK_EVENT_NOTIFICATION_TAG, MUST_SUPPORT_NOTIFICATION_TAG].freeze
 
       # test_run_id and result_id may be nil when the job is started by an Inferno test, which does not know
@@ -180,8 +179,7 @@ module DaVinciPASTestKit
         persist_notification_request(response, @notification_tags)
       end
 
-      # The Subscriptions Test Kit updates the count of events since the Subscription started, but not the number
-      # of the event in the notification, which neither Inferno's mocked notification nor the tester can know.
+      # derive_event_notification updates events-since-subscription-start, but not the event's own number
       def update_event_number(event_bundle, event_number)
         subscription_status = find_subscription_status_entry(event_bundle)&.resource
         events = subscription_status&.parameter&.select { |param| param.name == 'notification-event' }
@@ -195,8 +193,7 @@ module DaVinciPASTestKit
         self.class.event_notification_count(@test_session_id)
       end
 
-      # Event notifications sent during the session. Like the Subscriptions Test Kit's count for $status
-      # responses, this doesn't distinguish between the Subscriptions created during the session.
+      # Like the Subscriptions Test Kit's count, this isn't per Subscription
       def self.event_notification_count(test_session_id)
         requests_repo = Inferno::Repositories::Requests.new
         EVENT_NOTIFICATION_TAGS.sum { |tag| requests_repo.tagged_requests(test_session_id, [tag]).count }

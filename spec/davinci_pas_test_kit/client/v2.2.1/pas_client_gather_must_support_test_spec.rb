@@ -48,7 +48,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
       result = run(test, session_url_path:, ms_submit_responses: responses)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to include('submitted update or delete requests for its')
+      expect(result.result_message).to include('updated or deleted its Subscription')
     end
 
     it 'waits, describing the notifications it will send, when there is a Subscription' do
@@ -68,7 +68,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
 
       result = run(test, session_url_path:, ms_submit_responses: responses)
 
-      expect(result.result_message).to include('The notification will be mocked by Inferno from the pended response.')
+      expect(result.result_message).to include('mocked from the pended response.')
     end
   end
 

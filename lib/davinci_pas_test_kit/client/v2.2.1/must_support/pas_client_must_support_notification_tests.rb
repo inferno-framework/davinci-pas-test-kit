@@ -9,17 +9,14 @@ require_relative '../../subscription_setup_requirement'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
-    # Shared handling of the notifications Inferno sends during the must support workflow, one after each
-    # $submit request it returned a pended response to. Each notification is linked to that request by a tag
-    # (see DaVinciPASTestKit.notification_link_tag).
+    # Notifications Inferno sends after pended must support $submit responses, each linked to its request by a tag
     module MustSupportNotificationHelper
       NO_PENDED_RESPONSES_MESSAGE =
         'Inferno did not return any pended responses to must support $submit requests, so it sent no ' \
         'notifications to check.'.freeze
 
-      # Yields each pended must support $submit request with the notification Inferno sent after it, and a
-      # label identifying them to the tester. Omits the test if no responses were pended and skips it if any
-      # pended request has no notification, so that the test can't pass without checking every notification.
+      # Yields each pended must support $submit request with its notification and a label for messages. Omits
+      # if nothing was pended and skips if any notification is missing.
       # @yieldparam submit_request [Inferno::Entities::Request]
       # @yieldparam notification [Inferno::Entities::Request]
       # @yieldparam label [String]
@@ -36,8 +33,7 @@ module DaVinciPASTestKit
         end
       end
 
-      # Successful must support $submit requests, numbered as Inferno numbers them when selecting responses
-      # and notifications by request range.
+      # Numbered as for requestRange selection
       def successful_submit_requests
         @successful_submit_requests ||=
           Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [MUST_SUPPORT_WORKFLOW_TAG, SUBMIT_TAG])
@@ -60,23 +56,20 @@ module DaVinciPASTestKit
 
       def missing_notifications_message(unnotified)
         request_numbers = unnotified.map { |req| successful_submit_requests.index(req) + 1 }.join(', ')
-        "Inferno did not send a notification after the pended response to $submit request(s) #{request_numbers}. " \
-          'This happens when there is no Subscription to send it to, or when the *Demonstrate Must Support ' \
-          'Coverage* wait ends before Inferno sends it, which takes up to about 11 seconds after the response. ' \
-          'Check the messages on the waiting test, then re-run the *Demonstrate Must Support Coverage* group.'
+        "Inferno did not send a notification after the pended response to $submit request(s) #{request_numbers}, " \
+          'because there was no Subscription or the wait ended first. Check the messages on the waiting test ' \
+          'and re-run the *Demonstrate Must Support Coverage* group.'
       end
 
-      # Prefixes the messages added in the block with the label, so that the tester can tell which notification
-      # each is about. Message lines are moved to the left margin so that the label doesn't turn indented message
+      # Labels the messages added in the block. Lines are left-aligned so that the label doesn't turn indented
       # text into a markdown code block.
       def with_message_label(label)
         first_new_message = messages.length
         yield
       rescue Inferno::Exceptions::AssertionException => e
-        # A notification too malformed to check further shouldn't stop the others from being checked
+        # Keep checking the other notifications
         add_message('error', e.message)
       rescue StandardError => e
-        # Checks written for conformant content may also raise on malformed tester-provided notifications
         add_message('error', "The notification could not be checked: #{e.message}")
       ensure
         messages[first_new_message..].each do |message|
@@ -92,20 +85,17 @@ module DaVinciPASTestKit
       id :pas_client_v221_ms_notification_conformance_test
       title 'Inferno\'s must support event notification Bundles are conformant'
       description %(
-        This test checks that each notification Bundle sent to the PAS client after a pended `$submit`
-        response during the *Demonstrate Must Support Coverage* group, which will be either selected from
-        the tester-provided **Must Support Notification Bundles** input or mocked by Inferno, is conformant
-        to Subscription Backport IG requirements, including those of the payload content requested in the
-        Subscription. To ensure that the PAS client is driving its behavior only based on standard
-        information, custom extensions are not allowed within the SubscriptionStatus. The focus Bundle
-        is checked for custom extensions by the PAS-specific conformance test.
+        This test checks that each notification Bundle sent to the PAS client, which will be either
+        selected from the tester-provided **Must Support Notification Bundles** input or mocked by Inferno,
+        is conformant to Subscription Backport IG requirements, including the payload content requested in
+        the Subscription. Custom extensions are not allowed within the SubscriptionStatus.
       )
       simulation_verification
 
       run do
         subscription = nil
         each_must_support_notification do |_submit_request, notification, label|
-          # Only needed, and so only required, once there are notifications to check
+          # Only required once there are notifications to check
           subscription ||= payload_subscription
           with_message_label(label) do
             notification_verification(notification.request_body, 'event-notification',
@@ -120,8 +110,8 @@ module DaVinciPASTestKit
       def payload_subscription
         subscription = SubscriptionSetupRequirement.created_subscription(test_session_id)
         skip_if subscription.blank?,
-                'The payload content of the notifications cannot be checked because there is no Subscription. ' \
-                'Re-run the *Subscription Setup* group, then the *Demonstrate Must Support Coverage* group.'
+                'There is no Subscription to check the payload content against. Re-run the *Subscription Setup* ' \
+                'group, then the *Demonstrate Must Support Coverage* group.'
         subscription
       end
 
@@ -148,14 +138,11 @@ module DaVinciPASTestKit
       id :pas_client_v221_ms_notification_pas_conformance_test
       title 'Inferno\'s must support notifications conform to PAS-specific requirements'
       description DaVinciPASTestKit.notification_pas_conformance_description(
-        'selected from the tester-provided **Must Support Notification Bundles** input or mocked by Inferno ' \
-        'after a pended `$submit` response during the *Demonstrate Must Support Coverage* group'
+        'selected from the tester-provided **Must Support Notification Bundles** input or mocked by Inferno'
       ) + <<~CORRESPONDENCE
 
-        This test also warns when the ClaimResponse in a notification shares neither an id nor an identifier
-        with the ClaimResponse in the pended response it follows, since the PAS client may then be unable to
-        connect the final decision to the pended request. Responses and notifications are selected separately,
-        so check that their selection criteria pair them as intended.
+        This test also warns when a notification's ClaimResponse shares neither an id nor an identifier with
+        the pended response's ClaimResponse.
       CORRESPONDENCE
       simulation_verification
 
@@ -178,8 +165,7 @@ module DaVinciPASTestKit
         return if pended.blank? || final.blank? || corresponding?(pended, final)
 
         add_message('warning', "The notification's ClaimResponse (id `#{final.id}`) shares neither an id nor an " \
-                               "identifier with the ClaimResponse in the pended response (id `#{pended.id}`), so " \
-                               'the PAS client may not be able to connect the final decision to the pended request.')
+                               "identifier with the pended response's ClaimResponse (id `#{pended.id}`).")
       end
 
       def corresponding?(pended, final)
@@ -194,7 +180,7 @@ module DaVinciPASTestKit
         end
       end
 
-      # The first Bundle in the notification after its SubscriptionStatus, which a PAS notification's focus is
+      # The focus Bundle of a PAS notification
       def notification_focus_bundle(notification_body)
         notification = FHIR.from_contents(notification_body)
         return unless notification.is_a?(FHIR::Bundle)

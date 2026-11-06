@@ -4,11 +4,8 @@ require_relative 'cross_suite/tags'
 
 module DaVinciPASTestKit
   # Options:
-  # - focus_validator: the name of the FHIR resource validator to validate the focus PAS Response Bundle with.
-  #   When not set, only the PAS-specific structure of the notification is checked.
-  # - echo_source_tags: tags identifying the $submit request that the notification's focus Bundle answers, so
-  #   that resources echoed from it may keep its extensions - see PasBundleValidation#perform_bundle_validation.
-  #   The most recent successful one is used.
+  # - focus_validator: validator for the focus PAS Response Bundle. When not set, only structure is checked.
+  # - echo_source_tags: tags of the $submit request the focus Bundle answers (the latest successful one is used)
   class NotificationPASConformanceTest < Inferno::Test
     include PasBundleValidation
     include PASNotificationVerification

@@ -128,7 +128,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
 
       expect(notification_jobs.length).to eq(1)
       expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('no-status')
-      expect(result_warnings(result)).to include(a_string_including('not a Bundle with a SubscriptionStatus'))
+      expect(result_warnings(result)).to include(a_string_including('not a Bundle with a SubscriptionStatus entry'))
     end
 
     it 'mocks the notification with a warning when a wrapper does not hold a Bundle' do

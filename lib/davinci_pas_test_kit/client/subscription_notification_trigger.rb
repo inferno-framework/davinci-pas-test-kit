@@ -45,8 +45,7 @@ module DaVinciPASTestKit
                             notification_contents, test_run_identifier, suite_id, ig_version, resume_test, tags)
     end
 
-    # @param subscription [Hash] a Subscription as parsed JSON, since the payload content is a primitive extension.
-    # @return [String, nil] the payload content code (e.g., 'full-resource') of the Subscription.
+    # @param subscription [Hash] parsed JSON, since the payload content is a primitive extension
     def self.subscription_content_type(subscription)
       content_ext = subscription.dig('channel', '_payload', 'extension')
         &.find do |ext|

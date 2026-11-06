@@ -210,7 +210,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
       result = run(test)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to include('there is no Subscription')
+      expect(result.result_message).to include('There is no Subscription')
     end
   end
 

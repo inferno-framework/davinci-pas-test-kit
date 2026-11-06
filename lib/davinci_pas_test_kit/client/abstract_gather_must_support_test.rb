@@ -52,12 +52,10 @@ module DaVinciPASTestKit
     config options: { accepts_multiple_requests: true, submit_enabled: true, inquire_enabled: true }
     output :confirmation_url
 
-    # Checks that anything Inferno will need to send notifications during the test is in place. Versions that
-    # send notifications override it.
+    # Overridden by versions that send notifications
     def check_notification_prerequisites; end
 
-    # A section for the wait message describing the notifications Inferno will send, if any. Versions that
-    # send notifications override it.
+    # Overridden by versions that send notifications
     def notification_description_for_wait
       ''
     end

@@ -1,15 +1,12 @@
 module DaVinciPASTestKit
-  # Identifies v2.2.1 $submit responses that pend the prior authorization decision, which PAS v2.2.1
-  # conveys with a review action code of A4 (Pending) on a ClaimResponse item adjudication, since its
-  # ClaimResponse outcome value set has no 'queued' code.
+  # Identifies pended v2.2.1 $submit responses, which have a review action code of A4 (Pending) on a
+  # ClaimResponse item adjudication
   module PendedResponseDetection
     REVIEW_ACTION_URL = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'.freeze
     REVIEW_ACTION_CODE_URL = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'.freeze
     PENDED_REVIEW_ACTION_CODE = 'A4'.freeze
 
-    # @param response [Hash, String, nil] a $submit response Bundle, parsed or as JSON. Content that is
-    #   not a Bundle, or not JSON, is not pended.
-    # @return [Boolean] whether any ClaimResponse item adjudication in the Bundle has the pended review action code.
+    # @param response [Hash, String, nil] a $submit response Bundle, parsed or as JSON
     def self.pended?(response)
       bundle = response.is_a?(String) ? JSON.parse(response) : response
       claim_responses(bundle).any? { |claim_response| pended_claim_response?(claim_response) }
@@ -41,7 +38,7 @@ module DaVinciPASTestKit
       hashes(element['extension']).select { |extension| extension['url'] == url }
     end
 
-    # The Hash elements of a JSON array value, ignoring anything else, since the content may be tester-provided.
+    # The Hash elements of a JSON array, ignoring anything else in tester-provided content
     def self.hashes(value)
       value.is_a?(Array) ? value.grep(Hash) : []
     end

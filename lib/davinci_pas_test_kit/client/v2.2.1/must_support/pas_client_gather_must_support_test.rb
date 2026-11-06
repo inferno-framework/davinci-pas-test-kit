@@ -28,8 +28,7 @@ module DaVinciPASTestKit
               If a value for the `authorization` header is provided in `channel.header`, this value will override it.
             )
 
-      # Inferno only pends must support $submit requests when the tester provides pended responses, and then
-      # notifies the PAS client of the final decision, which needs the Subscription the PAS client created.
+      # Pended responses lead to notifications, which need the PAS client's Subscription
       def check_notification_prerequisites
         return unless pended_responses_provided?
 
@@ -47,21 +46,19 @@ module DaVinciPASTestKit
 
       def notification_behavior_for_wait
         unless pended_responses_provided?
-          return "None of the responses in the '**#{input_title(:ms_submit_responses)}**' input pend the " \
-                 'prior authorization decision, so Inferno will not send notifications.'
+          return "None of the responses in the '**#{input_title(:ms_submit_responses)}**' input are pended, so " \
+                 'Inferno will not send notifications.'
         end
 
         source = if ms_submit_notifications.present?
-                   "selected from the '**#{input_title(:ms_submit_notifications)}**' input in the same way " \
-                     'as responses, or mocked by Inferno if no entry matches'
+                   "selected from the '**#{input_title(:ms_submit_notifications)}**' input, or mocked if no " \
+                     'entry matches'
                  else
-                   'mocked by Inferno from the pended response'
+                   'mocked from the pended response'
                  end
-        'After returning a pended response to a `$submit` request, Inferno will send a full-resource notification ' \
-          "with the final decision to the PAS client's Subscription endpoint. The notification will be #{source}. " \
-          'Inferno sends each notification up to about 11 seconds after the pended response, and does not send it if ' \
-          'this wait has ended by then, so wait at least 15 seconds after the last pended response before ' \
-          'continuing.'
+        "After each pended `$submit` response, Inferno will send a notification with the final decision, #{source}. " \
+          'Notifications are not sent once this wait ends, so wait at least 15 seconds after the last pended ' \
+          'response before continuing.'
       end
 
       # Whether any of the tester-provided $submit responses pend the decision. An unusable input is reported

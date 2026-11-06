@@ -38,8 +38,7 @@ module DaVinciPASTestKit
       candidates(configurable, input_name, result, ResponseSelectionUtils::RESPONSE_RESOURCE_TYPES)
     end
 
-    # Returns the tester-provided notification candidates for the must support workflow, in the same
-    # format as response candidates (see response_candidates) except that each holds a notification Bundle.
+    # Like response_candidates, for the must support notifications input
     def self.notification_candidates(configurable, result)
       candidates(configurable, MS_NOTIFICATIONS_INPUT, result, NOTIFICATION_RESOURCE_TYPES)
     end
@@ -47,13 +46,11 @@ module DaVinciPASTestKit
     MS_NOTIFICATIONS_INPUT = 'ms_submit_notifications'.freeze
     NOTIFICATION_RESOURCE_TYPES = ['Bundle'].freeze
 
-    # Parses a must support candidate list input - see response_candidates.
-    # @param resource_types [Array<String>] the resource types a candidate may hold.
+    # @param resource_types [Array<String>] the resource types a candidate may hold
     def self.candidates(configurable, input_name, result, resource_types)
       parse_candidates(configurable, input_name, read_input(result, input_name), resource_types)
     end
 
-    # Parses the value of a must support candidate list input - see candidates.
     def self.parse_candidates(configurable, input_name, input_value, resource_types)
       return unless input_value.present?
 

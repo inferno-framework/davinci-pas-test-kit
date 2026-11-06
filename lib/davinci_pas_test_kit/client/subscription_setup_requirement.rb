@@ -18,17 +18,15 @@ module DaVinciPASTestKit
     ).freeze
 
     MS_PENDED_NO_SUBSCRIPTION_SKIP_MESSAGE = %(
-      This test cannot proceed because responses in the **Must Support $submit Response Bundles** input
-      pend the prior authorization decision, and no Subscription exists to receive the notifications
-      Inferno sends with the final decision. Run the _Subscription Setup_ tests to provide a Subscription
-      for use in delivering notifications before re-running this group.
+      This test cannot proceed because the **Must Support $submit Response Bundles** input includes
+      pended responses and no Subscription exists to receive the notifications for them. Run the
+      _Subscription Setup_ tests before re-running this group.
     ).freeze
 
     MS_PENDED_MODIFIED_SUBSCRIPTION_SKIP_MESSAGE = %(
-      This test cannot proceed because responses in the **Must Support $submit Response Bundles** input
-      pend the prior authorization decision, and the PAS client submitted update or delete requests for its
-      Subscription during the _Subscription Update and Deletion_ tests. Re-run the _Subscription Setup_
-      tests to create a new Subscription for use in delivering notifications before re-running this group.
+      This test cannot proceed because the **Must Support $submit Response Bundles** input includes
+      pended responses and the PAS client updated or deleted its Subscription during the _Subscription
+      Update and Deletion_ tests. Re-run the _Subscription Setup_ tests before re-running this group.
     ).freeze
 
     UPDATE_DELETE_SKIP_MESSAGE = %(
@@ -41,7 +39,7 @@ module DaVinciPASTestKit
     # @param skip_message [String] explanation shown when the test is skipped.
     # @return [Hash] the created Subscription as returned to the client, parsed from the response body.
     def require_created_subscription(skip_message: PENDED_SCENARIO_SKIP_MESSAGE)
-      # Loaded through the test, rather than created_subscription, so that the request is listed with its result
+      # Loaded through the test so that the request is listed with its result
       subscription_request = load_tagged_requests(SUBSCRIPTION_CREATE_TAG).find { |req| req.status == 201 }
       skip_if subscription_request.blank?, skip_message
       JSON.parse(subscription_request.response_body)
