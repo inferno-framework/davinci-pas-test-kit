@@ -41,9 +41,10 @@ module DaVinciPASTestKit
     # @param skip_message [String] explanation shown when the test is skipped.
     # @return [Hash] the created Subscription as returned to the client, parsed from the response body.
     def require_created_subscription(skip_message: PENDED_SCENARIO_SKIP_MESSAGE)
-      subscription = SubscriptionSetupRequirement.created_subscription(test_session_id)
-      skip_if subscription.blank?, skip_message
-      subscription
+      # Loaded through the test, rather than created_subscription, so that the request is listed with its result
+      subscription_request = load_tagged_requests(SUBSCRIPTION_CREATE_TAG).find { |req| req.status == 201 }
+      skip_if subscription_request.blank?, skip_message
+      JSON.parse(subscription_request.response_body)
     end
 
     # Like require_created_subscription, but also skips if the client has successfully updated or
@@ -55,7 +56,9 @@ module DaVinciPASTestKit
     def require_unmodified_subscription(skip_message: PENDED_SCENARIO_SKIP_MESSAGE,
                                         modified_skip_message: PENDED_SCENARIO_MODIFIED_SUBSCRIPTION_SKIP_MESSAGE)
       subscription = require_created_subscription(skip_message:)
-      skip_if SubscriptionSetupRequirement.subscription_modified?(test_session_id, subscription['id']),
+      # Only update and delete requests are tagged with the Subscription id, which is new for each create
+      change_requests = load_tagged_requests(subscription['id'])
+      skip_if change_requests.any? { |req| SubscriptionSetupRequirement.subscription_change_succeeded?(req) },
               modified_skip_message
       subscription
     end

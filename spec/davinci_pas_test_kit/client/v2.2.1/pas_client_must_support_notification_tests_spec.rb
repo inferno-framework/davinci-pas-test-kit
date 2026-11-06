@@ -109,6 +109,16 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
       expect(run(test).result).to eq('pass')
     end
 
+    it 'fails, naming the request, when the notification request failed outright' do
+      create_pended_exchange(notification_status: nil)
+
+      result = run(test)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages(result, 'error'))
+        .to contain_exactly(a_string_starting_with('Notification for $submit request 2: the request failed'))
+    end
+
     it 'fails, naming the request, when the PAS client rejected a notification' do
       create_pended_exchange(notification_status: 500)
 
@@ -187,6 +197,12 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
 
   describe 'the Subscriptions conformance test' do
     let(:test) { suite_test(:pas_client_v221_ms_notification_conformance_test) }
+
+    it 'omits rather than requiring a Subscription when Inferno returned no pended responses' do
+      create_submit_request(response_json(:approval, 'approved-cr'), 'approved')
+
+      expect(run(test).result).to eq('omit')
+    end
 
     it 'skips when there is no Subscription to check the payload content against' do
       create_pended_exchange

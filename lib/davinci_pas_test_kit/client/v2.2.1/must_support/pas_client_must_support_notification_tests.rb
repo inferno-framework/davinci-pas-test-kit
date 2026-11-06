@@ -97,16 +97,16 @@ module DaVinciPASTestKit
         the tester-provided **Must Support Notification Bundles** input or mocked by Inferno, is conformant
         to Subscription Backport IG requirements, including those of the payload content requested in the
         Subscription. To ensure that the PAS client is driving its behavior only based on standard
-        information, custom extensions are not allowed within the notification Bundle.
+        information, custom extensions are not allowed within the SubscriptionStatus. The focus Bundle
+        is checked for custom extensions by the PAS-specific conformance test.
       )
       simulation_verification
 
       run do
-        subscription = SubscriptionSetupRequirement.created_subscription(test_session_id)
-        skip_if subscription.blank?,
-                'The payload content of the notifications cannot be checked because there is no Subscription. ' \
-                'Re-run the *Subscription Setup* group, then the *Demonstrate Must Support Coverage* group.'
+        subscription = nil
         each_must_support_notification do |_submit_request, notification, label|
+          # Only needed, and so only required, once there are notifications to check
+          subscription ||= payload_subscription
           with_message_label(label) do
             notification_verification(notification.request_body, 'event-notification',
                                       validator: NO_CUSTOM_EXTENSIONS_VALIDATOR)
@@ -115,6 +115,14 @@ module DaVinciPASTestKit
         end
 
         assert_no_error_messages('The must support event notifications are not conformant - see messages.')
+      end
+
+      def payload_subscription
+        subscription = SubscriptionSetupRequirement.created_subscription(test_session_id)
+        skip_if subscription.blank?,
+                'The payload content of the notifications cannot be checked because there is no Subscription. ' \
+                'Re-run the *Subscription Setup* group, then the *Demonstrate Must Support Coverage* group.'
+        subscription
       end
 
       def verify_payload_content(notification_body, subscription)
