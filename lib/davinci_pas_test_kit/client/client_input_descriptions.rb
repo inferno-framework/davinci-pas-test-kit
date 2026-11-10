@@ -48,8 +48,8 @@ module DaVinciPASTestKit
   MUST_SUPPORT_COVERAGE_GROUP_TITLE = 'Must Support Coverage'
   MUST_SUPPORT_COVERAGE_GROUP_DESCRIPTION =
     %(
-      During this group, Inferno checks that the requests and responses exchanged during the
-      PAS scenario group and the most recent run of the "Demonstrate Must Support Coverage" group
+      During this group, Inferno checks that the requests, responses and notifications exchanged during
+      the PAS scenario group and the most recent run of the "Demonstrate Must Support Coverage" group
       include all required profiles and must support elements.
 
       This group can be re-run on its own, for example after re-running another group, without

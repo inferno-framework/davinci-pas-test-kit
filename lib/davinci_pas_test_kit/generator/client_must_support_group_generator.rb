@@ -235,11 +235,18 @@ module DaVinciPASTestKit
         end
       end
 
+      # Only v2.2.1 assesses notifications - see MustSupportDataGathering#tags.
+      def notifications_description
+        return '' unless operation == 'submit' && ig_version == 'v2.2.1'
+
+        "\nThis includes notifications Inferno sends after pended responses."
+      end
+
       def description
         if type == 'response'
           <<~DESCRIPTION
             Check that `$#{operation}` responses provided to the PAS client contain
-            all PAS-defined profiles and their must support elements.#{optional_profiles_description}
+            all PAS-defined profiles and their must support elements.#{notifications_description}#{optional_profiles_description}
 
             For `$#{operation}` responses, this includes the following profiles:
 
