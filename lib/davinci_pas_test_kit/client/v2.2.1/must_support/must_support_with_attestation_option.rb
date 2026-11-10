@@ -78,7 +78,9 @@ module DaVinciPASTestKit
       # requests are owned by the gather test, so associating them here would duplicate that
       # association onto each attestation test's result.
       def must_support_requests
-        @must_support_requests ||= Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [tag])
+        @must_support_requests ||= tags.flat_map do |request_tag|
+          Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [request_tag])
+        end
       end
 
       output :attest_true_url

@@ -67,7 +67,8 @@ In the v2.2.1 client suite, the "Must Support Elements" group is split into two 
 can be run separately: "Demonstrate Must Support Coverage", where the PAS client makes the additional
 requests, and "Must Support Coverage", which evaluates them. Re-running only "Must Support Coverage",
 for example after re-running a scenario group, keeps the requests made during the most recent run
-of "Demonstrate Must Support Coverage".
+of "Demonstrate Must Support Coverage". In v2.2.1, notifications Inferno sends after pended
+`$submit` responses count as `$submit` responses.
 
 Note that Inferno's mocked responses do not include all must support
 elements, so testers will need to provide responses for Inferno to use that include
