@@ -3,6 +3,8 @@ require_relative 'endpoint_session_identification'
 require_relative 'expired_token'
 require_relative '../response_generator'
 require_relative '../subscription_notification_trigger'
+require_relative '../subscription_setup_requirement'
+require_relative '../pended_response_detection'
 require_relative '../client_urls'
 require_relative '../../cross_suite/fhirpath_utils'
 require_relative '../../cross_suite/response_selection_utils'
@@ -38,6 +40,7 @@ module DaVinciPASTestKit
       tag_list = [operation_tag]
       tag_list << workflow_tag if workflow_tag.present?
       tag_list << MUST_SUPPORT_WORKFLOW_TAG if must_support_workflow?
+      tag_list << DaVinciPASTestKit.notification_link_tag(notification_link_id) if must_support_notifications?
       tag_list << claim_update_request_tag if claim_update_request_tag.present?
       tag_list
     end
@@ -82,6 +85,20 @@ module DaVinciPASTestKit
     def must_support_workflow?
       test.id =~ /.*must_support.*/
     end
+
+    # In v2.2.1, Inferno notifies the client of the final decision on each pended must support $submit request
+    def must_support_notifications?
+      must_support_workflow? && operation == 'submit' && ig_version == 'v2.2.1'
+    end
+
+    # Links this request to the notification sent after it
+    def notification_link_id
+      @notification_link_id ||= SecureRandom.uuid
+    end
+
+    MUST_SUPPORT_NO_SUBSCRIPTION_WARNING =
+      'Inferno did not send a notification after a pended response because there is no Subscription, or the ' \
+      'PAS client has updated or deleted it. Run the Subscription Setup tests before re-running this group.'.freeze
 
     WORKFLOW_TAG_MAP = {
       pended: PENDED_WORKFLOW_TAG,
@@ -141,13 +158,7 @@ module DaVinciPASTestKit
       end
 
       response.body = response_bundle_json
-
-      # Claim Update wait tests must never trigger a Subscription notification,
-      # even if the tester supplies a pended response body.
-      return if suppress_notifications?
-      return unless workflow == :pended && operation == 'submit'
-
-      start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
+      start_notification_if_needed(response_bundle_json, req_bundle, generated_claim_response_uuid)
     end
 
     def update_result
@@ -167,35 +178,106 @@ module DaVinciPASTestKit
 
     private
 
+    def start_notification_if_needed(response_bundle_json, req_bundle, generated_claim_response_uuid)
+      # Claim Update wait tests must never trigger a Subscription notification,
+      # even if the tester supplies a pended response body.
+      return if suppress_notifications?
+
+      if must_support_notifications?
+        notify_if_pended(response_bundle_json, req_bundle, generated_claim_response_uuid)
+        return
+      end
+      return unless workflow == :pended && operation == 'submit'
+
+      start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
+    end
+
+    # Sends the final decision on a pended request, using the first matching tester-provided notification or a
+    # mocked one
+    def notify_if_pended(response_bundle_json, req_bundle, generated_claim_response_uuid)
+      return unless PendedResponseDetection.pended?(response_bundle_json)
+
+      if SubscriptionSetupRequirement.unmodified_subscription(test_run.test_session_id).blank?
+        add_result_warning(MUST_SUPPORT_NO_SUBSCRIPTION_WARNING)
+        return
+      end
+
+      @selected_notification = resolve_must_support_notification(req_bundle)
+      # Not MUST_SUPPORT_WORKFLOW_TAG, which the $submit and $inquire must support tests load by
+      start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid,
+                             tags: [MUST_SUPPORT_NOTIFICATION_TAG,
+                                    DaVinciPASTestKit.notification_link_tag(notification_link_id)])
+    rescue StandardError => e
+      # A notification problem mustn't replace the pended response
+      Inferno::Application['logger'].error("Must support notification not sent: #{e.full_message}")
+      add_result_warning("Inferno could not send a notification after a pended response: #{e.message}")
+    end
+
     # Resolves the user-provided response, using criteria-based selection for must support
     # workflows or the single-response approach for other workflows
     # and replaces {{fhirpath}} tokens with values from the request.
     def resolve_user_response(req_bundle)
       user_response = if must_support_workflow?
-                        select_must_support_response(req_bundle)
+                        select_must_support_candidate(req_bundle, 'response') do
+                          UserInputResponse.response_candidates(test, operation, result)
+                        end
                       else
                         UserInputResponse.user_inputted_response(test, operation, result)
                       end
 
-      return nil unless user_response.present?
+      resolve_candidate(user_response, req_bundle, 'response')
+    end
 
-      replace_tokens(user_response, req_bundle)
-    rescue FhirpathUtils::FhirpathServiceError => e
+    # The selected tester-provided notification JSON, or nil to mock one
+    def resolve_must_support_notification(req_bundle)
+      notification = select_must_support_candidate(req_bundle, 'notification') do
+        UserInputResponse.notification_candidates(test, result)
+      end
+      notification_json = resolve_candidate(notification, req_bundle, 'notification')
+      return notification_json if notification_json.blank? || subscription_status_present?(notification_json)
+
       add_result_warning(
-        'Unable to instantiate a tester-provided response, so Inferno will generate a default response: ' \
-        "#{e.message}"
+        'Unable to use the selected tester-provided notification, so Inferno will generate a default ' \
+        'notification: it is not a Bundle with a SubscriptionStatus entry.'
       )
       nil
     end
 
-    # Selects the first tester-provided response candidate whose selection criteria all
-    # match the incoming request, extracts its response Bundle (unwrapping it when the
+    # Whether the notification has the SubscriptionStatus that Inferno updates before sending it
+    def subscription_status_present?(notification_json)
+      notification = FHIR.from_contents(notification_json)
+      notification.is_a?(FHIR::Bundle) && Array(notification.entry).any? do |entry|
+        entry.resource.is_a?(FHIR::Parameters) && Array(entry.resource.parameter).any? do |param|
+          param.name == 'subscription'
+        end
+      end
+    end
+
+    # Instantiates {{fhirpath}} tokens and $forEach objects in a selected tester-provided response or
+    # notification.
+    # @param message_type [String] 'response' or 'notification', naming the message in warnings.
+    def resolve_candidate(candidate, req_bundle, message_type)
+      return nil unless candidate.present?
+
+      replace_tokens(candidate, req_bundle, message_type)
+    rescue FhirpathUtils::FhirpathServiceError, ResponseTemplate::TemplateError => e
+      add_result_warning(
+        "Unable to instantiate a tester-provided #{message_type}, so Inferno will generate a default " \
+        "#{message_type}: #{e.message}"
+      )
+      nil
+    end
+
+    # Selects the first tester-provided candidate whose selection criteria all
+    # match the incoming request, extracts its response or notification Bundle (unwrapping it when the
     # candidate pairs the Bundle with criteria). Returns nil, causing Inferno to generate a default
-    # response, if no candidates are provided or none match. Problems with the
+    # one, if no candidates are provided or none match. Problems with the
     # tester-provided input or the FHIRPath service also result in nil, with a warning
     # on the waiting test so that the tester can see what went wrong.
-    def select_must_support_response(req_bundle)
-      candidates = UserInputResponse.response_candidates(test, operation, result)
+    # @param message_type [String] 'response' or 'notification', naming the message in warnings and logs.
+    # @yieldreturn [Array<Hash>, nil] the candidates - see UserInputResponse.candidates.
+    def select_must_support_candidate(req_bundle, message_type)
+      candidates = yield
       return if candidates.blank?
 
       operation_url_suffix = "$#{operation}"
@@ -204,41 +286,39 @@ module DaVinciPASTestKit
 
       if selected_index.nil?
         Inferno::Application['logger'].info(
-          "No tester-provided response bundle matched #{operation_url_suffix} request ##{request_number}. " \
-          'Inferno will generate a default response.'
+          "No tester-provided #{message_type} bundle matched #{operation_url_suffix} request ##{request_number}. " \
+          "Inferno will generate a default #{message_type}."
         )
         return
       end
 
       Inferno::Application['logger'].info(
-        "Selected tester-provided response bundle #{selected_index + 1} of #{candidates.length} " \
+        "Selected tester-provided #{message_type} bundle #{selected_index + 1} of #{candidates.length} " \
         "for #{operation_url_suffix} request ##{request_number}."
       )
       entity_response(candidates[selected_index])
     rescue UserInputResponse::InvalidInputError, FhirpathUtils::FhirpathServiceError => e
       add_result_warning(
-        'Unable to select a tester-provided response, so Inferno will generate a default response: ' \
-        "#{e.message}"
+        "Unable to select a tester-provided #{message_type}, so Inferno will generate a default " \
+        "#{message_type}: #{e.message}"
       )
       nil
     end
 
-    # Replaces {{fhirpath}} tokens using values from the incoming request, round-tripping
-    # the result through the FHIR model to normalize it. The response may be a parsed hash
-    # (must support workflow) or the raw JSON string of a single input. If a replaced value
-    # breaks the JSON structure, the result cannot be returned as a FHIR response, so nil is
-    # returned with a warning on the waiting test and Inferno generates a default response.
-    def replace_tokens(bundle_hash, req_bundle)
-      bundle_json = bundle_hash.is_a?(String) ? bundle_hash : bundle_hash.to_json
-      replaced = replace_tokens_in_string(bundle_json, req_bundle)
-      return bundle_json if replaced.equal?(bundle_json)
+    # Instantiates the candidate using values from the incoming request, round-tripping the result
+    # through the FHIR model to normalize it. The candidate may be a parsed hash (must support workflow)
+    # or the JSON string of a single input, which the waiting test has checked is valid JSON.
+    def replace_tokens(candidate, req_bundle, message_type)
+      candidate_json = candidate.is_a?(String) ? candidate : candidate.to_json
+      return candidate_json unless ResponseTemplate.template?(candidate_json)
 
-      FHIR.from_contents(replaced)&.to_json || replaced
+      template = candidate.is_a?(String) ? JSON.parse(candidate) : candidate
+      instantiated_json = instantiate_template(template, req_bundle).to_json
+      FHIR.from_contents(instantiated_json)&.to_json || instantiated_json
     rescue JSON::ParserError
       add_result_warning(
-        'Unable to use the selected tester-provided response, so Inferno will generate a default response. ' \
-        'The response is not valid JSON after {{fhirpath}} token replacement, for example because a token ' \
-        'value contains a double quote.'
+        "Unable to use the selected tester-provided #{message_type}, so Inferno will generate a default " \
+        "#{message_type}: it is not valid JSON."
       )
       nil
     end
@@ -349,7 +429,7 @@ module DaVinciPASTestKit
     end
 
     def tester_notification_bundle
-      notification_bundle_input(result)
+      must_support_workflow? ? @selected_notification : notification_bundle_input(result)
     end
 
     def client_subscription_json

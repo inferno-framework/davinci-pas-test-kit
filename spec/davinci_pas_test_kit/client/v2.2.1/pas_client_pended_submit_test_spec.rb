@@ -34,6 +34,14 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientPendedSubmitTest, :re
       expect(run(described_class, session_url_path:).result).to eq('wait')
     end
 
+    it 'lists the Subscription create request with its result' do
+      result = run(described_class, session_url_path:)
+
+      # Requests a test loads are linked to its result rather than moved to it
+      listed = Inferno::Repositories::Results::Model.find(id: result.id).requests
+      expect(listed.map(&:url)).to include(subscription_url)
+    end
+
     it 'skips when the client has updated the Subscription' do
       create_request(tags: [DaVinciPASTestKit::SUBSCRIPTION_UPDATE_TAG, subscription_id], status: 200,
                      response_body: subscription_json.to_json)

@@ -58,11 +58,21 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
   it 'starts the notification job with the values the including class provides' do
     args = started_job_args { host.start_notification_job(response_bundle_json, :approval, 'cr-1') }
 
-    job, run_id, session_id, result_id, token, _notification, resume_token, suite_id, ig_version, resume_test = args
+    job, run_id, session_id, result_id, token, _notification, resume_token, suite_id, ig_version, resume_test,
+      tags = args
     expect(job).to eq(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification)
     expect([run_id, session_id, result_id, token]).to eq(%w[run-1 session-1 result-1 token-1])
     expect([resume_token, suite_id, ig_version]).to eq(%w[resume-1 davinci_pas_client_suite_v221 v2.2.1])
     expect(resume_test).to be(false)
+    expect(tags).to eq([DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG])
+  end
+
+  it 'asks the job to record the notification with the given tags' do
+    args = started_job_args do
+      host.start_notification_job(response_bundle_json, :approval, 'cr-1', tags: %w[tag-1 tag-2])
+    end
+
+    expect(args.last).to eq(%w[tag-1 tag-2])
   end
 
   it 'asks the job to end the wait when resume_test is set' do
@@ -70,7 +80,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
       host.start_notification_job(response_bundle_json, :approval, 'cr-1', resume_test: true)
     end
 
-    expect(args.last).to be(true)
+    expect(args[9]).to be(true)
   end
 
   describe 'when the tester provides a notification' do

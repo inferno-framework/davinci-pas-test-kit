@@ -24,6 +24,14 @@ RSpec.describe DaVinciPASTestKit::FhirpathUtils do
       expect(stub).to have_been_requested
     end
 
+    it 'URL encodes the expression so that operators reach the service intact' do
+      stub = stub_fhirpath_service("today() + 1 month & 'a'", [{ type: 'string', element: 'value' }])
+
+      utils.execute_fhirpath(request_bundle, "today() + 1 month & 'a'")
+
+      expect(stub).to have_been_requested
+    end
+
     it 'raises FhirpathServiceError when the service returns an error' do
       stub_fhirpath_service('Bundle.id', 'internal error', status: 500)
 
@@ -59,38 +67,20 @@ RSpec.describe DaVinciPASTestKit::FhirpathUtils do
     end
   end
 
-  describe '#replace_tokens_in_string' do
-    it 'returns the string unchanged when it contains no tokens' do
-      expect(utils.replace_tokens_in_string('{"id":"static"}', request_bundle)).to eq('{"id":"static"}')
-      expect(a_request(:post, %r{/evaluate})).to_not have_been_made
-    end
-
-    it 'replaces each token with the fhirpath result evaluated against the request' do
-      stub_fhirpath_service('Bundle.id', [{ type: 'string', element: 'example-request' }])
-
-      replaced = utils.replace_tokens_in_string('{"id":"{{Bundle.id}}"}', request_bundle)
-
-      expect(replaced).to eq('{"id":"example-request"}')
-    end
-
-    it 'evaluates repeated tokens only once' do
-      stub = stub_fhirpath_service('Bundle.id', [{ type: 'string', element: 'example-request' }])
-
-      replaced = utils.replace_tokens_in_string('{{Bundle.id}} and {{Bundle.id}}', request_bundle)
-
-      expect(replaced).to eq('example-request and example-request')
-      expect(stub).to have_been_requested.once
-    end
-
-    it 'joins multiple primitive results with commas and drops complex results' do
+  describe '#evaluate_fhirpath_results' do
+    it 'returns the type and element of each result' do
       stub_fhirpath_service('Bundle.entry.resource.id',
-                            [{ type: 'string', element: 'a' },
-                             { type: 'BackboneElement', element: { 'key' => 'value' } },
-                             { type: 'string', element: 'b' }])
+                            [{ type: 'string', element: 'a' }, { type: 'Identifier', element: { 'value' => 'b' } }])
 
-      replaced = utils.replace_tokens_in_string('{{Bundle.entry.resource.id}}', request_bundle)
+      expect(utils.evaluate_fhirpath_results(request_bundle, 'Bundle.entry.resource.id'))
+        .to eq([{ 'type' => 'string', 'element' => 'a' }, { 'type' => 'Identifier', 'element' => { 'value' => 'b' } }])
+    end
 
-      expect(replaced).to eq('a,b')
+    it 'raises FhirpathServiceError when the service response is not a list of results' do
+      stub_fhirpath_service('Bundle.id', { 'element' => 'a' })
+
+      expect { utils.evaluate_fhirpath_results(request_bundle, 'Bundle.id') }
+        .to raise_error(DaVinciPASTestKit::FhirpathUtils::FhirpathServiceError, /unparseable response/)
     end
   end
 end

@@ -1,13 +1,9 @@
 require_relative '../parameters_helper'
+require_relative '../cross_suite/custom_extension_removal'
 
 module DaVinciPASTestKit
   module ResponseGenerator
     include ParametersHelper
-
-    # Extensions on elements of the request Claim that Inferno copies into the ClaimResponse it generates
-    # are kept only if they are published by HL7 (e.g., the PAS identifier extensions), since Inferno,
-    # acting as the payer, doesn't send custom extensions - see NO_CUSTOM_EXTENSIONS_VALIDATOR.
-    HL7_EXTENSION_URL_PREFIX = 'http://hl7.org/fhir/'.freeze
 
     def mock_id_only_notification_bundle(submit_response, subscription_reference, subscription_topic,
                                          ig_version = 'v2.0.1')
@@ -314,26 +310,7 @@ module DaVinciPASTestKit
       return element.map { |child| copy_without_custom_extensions(child) } if element.is_a?(Array)
       return element if element.nil?
 
-      element.class.new(without_custom_extensions(element.to_hash))
-    end
-
-    # Kept extensions are left whole, since complex extensions' sub-extensions use relative urls.
-    def without_custom_extensions(value)
-      case value
-      when Hash
-        value.each_with_object({}) do |(key, child), result|
-          if %w[extension modifierExtension].include?(key)
-            kept = child.select { |extension| extension['url'].to_s.start_with?(HL7_EXTENSION_URL_PREFIX) }
-            result[key] = kept if kept.present?
-          else
-            result[key] = without_custom_extensions(child)
-          end
-        end
-      when Array
-        value.map { |child| without_custom_extensions(child) }
-      else
-        value
-      end
+      element.class.new(CustomExtensionRemoval.without_custom_extensions(element.to_hash))
     end
 
     # Pairs each modified item (already marked A6 above) with a ClaimResponse.addItem, referenced by
