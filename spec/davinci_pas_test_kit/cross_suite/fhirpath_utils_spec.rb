@@ -24,6 +24,14 @@ RSpec.describe DaVinciPASTestKit::FhirpathUtils do
       expect(stub).to have_been_requested
     end
 
+    it 'URL encodes the expression so that operators reach the service intact' do
+      stub = stub_fhirpath_service("today() + 1 month & 'a'", [{ type: 'string', element: 'value' }])
+
+      utils.execute_fhirpath(request_bundle, "today() + 1 month & 'a'")
+
+      expect(stub).to have_been_requested
+    end
+
     it 'raises FhirpathServiceError when the service returns an error' do
       stub_fhirpath_service('Bundle.id', 'internal error', status: 500)
 

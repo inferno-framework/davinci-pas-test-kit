@@ -12,8 +12,10 @@ module DaVinciPASTestKit
       @fhirpath_evaluator ||= Inferno::DSL::FhirpathEvaluation::Evaluator.new
     end
 
+    # The query is URL encoded because the evaluator adds it to the service URL as given, where a `+`
+    # would be read as a space and a `&` would end the query.
     def execute_fhirpath(body, query)
-      fhirpath_result = fhirpath_evaluator.call_fhirpath_service(body, query)
+      fhirpath_result = fhirpath_evaluator.call_fhirpath_service(body, ERB::Util.url_encode(query))
       return fhirpath_result if fhirpath_result.status.to_s.start_with?('2')
 
       raise FhirpathServiceError,
