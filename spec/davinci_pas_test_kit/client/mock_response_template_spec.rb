@@ -102,6 +102,8 @@ RSpec.describe 'Mocked responses as response templates' do # rubocop:disable RSp
     'submit_denial_v2.0.1' => ['submit', :denial, 'v2.0.1', MockResponseTemplates::SUBMIT_REQUESTS],
     'submit_pended_v2.0.1' => ['submit', :pended, 'v2.0.1', MockResponseTemplates::SUBMIT_REQUESTS],
     'submit_modification_v2.0.1' => ['submit', :modification, 'v2.0.1', MockResponseTemplates::SUBMIT_REQUESTS],
+    'submit_approval_v2.2.1' => ['submit', :approval, 'v2.2.1', MockResponseTemplates::SUBMIT_REQUESTS],
+    'submit_denial_v2.2.1' => ['submit', :denial, 'v2.2.1', MockResponseTemplates::SUBMIT_REQUESTS],
     'submit_pended_v2.2.1' => ['submit', :pended, 'v2.2.1', MockResponseTemplates::SUBMIT_REQUESTS],
     'submit_modification_v2.2.1' => ['submit', :modification, 'v2.2.1', MockResponseTemplates::SUBMIT_REQUESTS],
     'inquire_approval_v2.0.1' => ['inquire', :approval, 'v2.0.1', MockResponseTemplates::INQUIRE_REQUESTS],

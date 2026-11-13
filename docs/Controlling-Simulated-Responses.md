@@ -211,6 +211,8 @@ How the result is used depends on where the token appears:
   other elements, a single result becomes the element's value, several results become an array, and no results
   remove the element. Extensions not published by HL7 are removed from copied data types, as in
   [mocked responses](#submit-and-inquire-responses), while resources and Bundle entries are copied as they are.
+  Because results keep their type, a number copied into a text element must be converted, e.g., with
+  `.select(toString())`, and several results can be combined into one text value with `.join(',')`.
 - **Within text**: when the token is part of a longer string (e.g., `"text": "Response to {{...}}"`),
   results that are primitive values are joined with commas and inserted into the text, and other results are
   ignored.
@@ -250,8 +252,8 @@ in which case `%current` refers to the result of the innermost one.
 
 #### Example: Mocked Responses as Templates
 
-Each [mocked response](#mocked-responses) can be written as a tester-provided response using expression tokens.
-The Da Vinci PAS Test Kit's tests check that the templates in its
+The [mocked `$submit` and `$inquire` responses](#submit-and-inquire-responses) can be written as tester-provided
+responses using expression tokens. The Da Vinci PAS Test Kit's tests check that the templates in its
 [response templates folder](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/spec/fixtures/response_templates)
 produce the same responses as Inferno's mocks, which can serve as starting points. For example, the
 approval `$submit` response for v2.0.1 has the following structure (static content left out):
@@ -297,9 +299,10 @@ approval `$submit` response for v2.0.1 has the following structure (static conte
 }
 ```
 
-Unlike the mock, which includes each referenced entry once, these templates include an entry for each of
-the patient, insurer, and requestor references, so an entry referenced by more than one of them would
-appear more than once.
+These templates copy the patient, insurer, and requestor entries as they are in the request. Unlike the mock,
+they don't include further entries that those entries reference, don't update references within the copied
+entries to use `fullUrl` values, and include an entry referenced by more than one of the patient, insurer,
+and requestor once for each reference. Add tokens for any other entries the response needs.
 
 #### Inferno Modifications of Tester-provided Responses and Notifications
 
