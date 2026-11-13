@@ -195,7 +195,7 @@ that they may not have known ahead of time.
 #### Expression Tokens
 
 Expression tokens for dynamic content are indicated by a FHIRPath expression surrounded by double curly braces
-(`{{<FHIRPath expression>}}`) within FHIR elements. The indicated FHIRPath
+(`{{<FHIRPath expression>}}`) within JSON strings. The indicated FHIRPath
 expression will be evaluated against the request and the result used to replace the token.
 
 These can be used to make sure that details in the response reflect those in
@@ -203,18 +203,103 @@ the request. For example, `entry.resource.ofType(Claim).patient.reference` would
 Patient resource the Claim was submitted for, which could be used to make sure that the ClaimResponse in the
 response references the same Patient record.
 
+How the result is used depends on where the token appears:
+- **Whole value**: when a JSON string contains only the token (e.g., `"type": "{{entry.resource.ofType(Claim).type}}"`),
+  the string is replaced by the results themselves, which can be strings, numbers, booleans, data types, or
+  whole resources and Bundle entries. Within a JSON array, each result is inserted in place of the token, so
+  `"entry": [..., "{{entry.where(resource is Patient)}}"]` copies every Patient entry from the request. For
+  other elements, a single result becomes the element's value, several results become an array, and no results
+  remove the element. Extensions not published by HL7 are removed from copied data types, as in
+  [mocked responses](#submit-and-inquire-responses), while resources and Bundle entries are copied as they are.
+- **Within text**: when the token is part of a longer string (e.g., `"text": "Response to {{...}}"`),
+  results that are primitive values are joined with commas and inserted into the text, and other results are
+  ignored.
+
 Notes:
-- Entries within the returned collection that are not data types (lists or objects) will be ignored.
-- If multiple entries (not including ignored and nil entries) are returned, then the results will
-  be turned into a comma-delimited list for use in replacing the token.
 - Inferno supports the raw `today()` function alone as well as with addition
   and subtraction of days, e.g., `{{today()}}`, `{{today() - 7 days}}`, and
   `{{today() + 365 days}}`.
 - While the syntax follows CDS Hooks prefetch tokens, Inferno allows additional FHIRPath functions
   beyond the [limited set allowed by CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-tokens-containing-simpler-fhirpath). See 
   the [FHIRPath Evaluation Limitations](#fhirpath-evaluation-limitations) section for details.
+- `resolve()` is not supported, so to find the Bundle entry for a reference in the Claim, compare entry
+  `fullUrl` values to it, using `%resource` to refer to the request Bundle, e.g.,
+  `entry.where(fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))`.
 
-Note that at this time, only string data can be added with expression tokens.
+#### Repeated Content
+
+To include content once for each result of a FHIRPath expression, such as a `ClaimResponse.item` for
+each `Claim.item`, use an object holding the expression under `$forEach` and the content to repeat under
+`template`:
+
+```
+"item": [
+  {
+    "$forEach": "entry.resource.ofType(Claim).item",
+    "template": {
+      "itemSequence": "{{%current.sequence}}",
+      "adjudication": [ ... ]
+    }
+  }
+]
+```
+
+Within the template, `%current` in an expression token refers to the result the copy is for. Each copy is
+inserted into the array in place of the object, and no results remove it. `$forEach` objects can be nested,
+in which case `%current` refers to the result of the innermost one.
+
+#### Example: Mocked Responses as Templates
+
+Each [mocked response](#mocked-responses) can be written as a tester-provided response using expression tokens.
+The Da Vinci PAS Test Kit's tests check that the templates in its
+[response templates folder](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/spec/fixtures/response_templates)
+produce the same responses as Inferno's mocks, which can serve as starting points. For example, the
+approval `$submit` response for v2.0.1 has the following structure (static content left out):
+
+```
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
+      "resource": {
+        "resourceType": "ClaimResponse",
+        "id": "5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
+        "identifier": ["{{Bundle.entry.resource.ofType(Claim).identifier}}"],
+        "status": "{{Bundle.entry.resource.ofType(Claim).status}}",
+        "type": "{{Bundle.entry.resource.ofType(Claim).type}}",
+        "use": "{{Bundle.entry.resource.ofType(Claim).use}}",
+        "patient": {
+          "reference": "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl}}"
+        },
+        "created": "2025-01-01T00:00:00Z",
+        "request": { "reference": "{{Bundle.entry.where(resource is Claim).fullUrl}}" },
+        "outcome": "complete",
+        "preAuthPeriod": { "start": "{{today()}}", "end": "{{today() + 1 month}}" },
+        "item": [
+          {
+            "$forEach": "Bundle.entry.resource.ofType(Claim).item",
+            "template": {
+              "extension": [ ... itemPreAuthIssueDate and itemPreAuthPeriod using today() ... ],
+              "itemSequence": "{{%current.sequence}}",
+              "adjudication": [ ... reviewActionCode A1 ... ]
+            }
+          }
+        ],
+        ... insurer and requestor follow the same pattern as patient ...
+      }
+    },
+    "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))}}",
+    ... the insurer and requestor entries follow the same pattern ...
+  ]
+}
+```
+
+Unlike the mock, which includes each referenced entry once, these templates include an entry for each of
+the patient, insurer, and requestor references, so an entry referenced by more than one of them would
+appear more than once.
 
 #### Inferno Modifications of Tester-provided Responses and Notifications
 
