@@ -1,0 +1,1559 @@
+{
+  "recorded_on": "2026-11-13",
+  "requests": {
+    "conformant_pas_bundle_v110": {
+      "(Bundle.entry.resource.ofType(Claim).item)[0].productOrService": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1365",
+                "code": "3",
+                "display": "Consultation"
+              }
+            ]
+          }
+        }
+      ],
+      "(Bundle.entry.resource.ofType(Claim).item)[0].sequence": [
+        {
+          "type": "positiveInt",
+          "element": 1
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).identifier": [
+        {
+          "type": "Identifier",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://www.usps.com/",
+                      "code": "MA"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierSubDepartment",
+                "valueString": "223412"
+              }
+            ],
+            "system": "https://prior-auth.davinci.hl7.org/fhir/PATIENT_EVENT_TRACE_NUMBER",
+            "value": "111099",
+            "assigner": {
+              "identifier": {
+                "system": "https://prior-auth.davinci.hl7.org/fhir/USER_ASSIGNED",
+                "value": "9012345678"
+              }
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).item": [
+        {
+          "type": "Claim.item",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber",
+                "valueIdentifier": {
+                  "system": "https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER",
+                  "value": "1122334"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber",
+                "valueString": "1122445"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber",
+                "valueString": "9988311"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1525",
+                      "code": "SC",
+                      "display": "Specialty Care Review"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1322",
+                      "code": "I",
+                      "display": "Initial"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService",
+                "valueReference": {
+                  "reference": "ServiceRequest/ReferralRequestExample"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator",
+                "valueBoolean": false
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1345",
+                      "code": "2",
+                      "display": "Newly Admitted"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1337",
+                      "code": "2",
+                      "display": "Intermediate Care Facility (ICF)"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit",
+                "valueDecimal": 100
+              }
+            ],
+            "sequence": 1,
+            "careTeamSequence": [
+              1
+            ],
+            "diagnosisSequence": [
+              1
+            ],
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://codesystem.x12.org/005010/1365",
+                  "code": "3",
+                  "display": "Consultation"
+                }
+              ]
+            },
+            "locationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                  "code": "11"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).status": [
+        {
+          "type": "code",
+          "element": "active"
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).type": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+                "code": "professional"
+              }
+            ]
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).use": [
+        {
+          "type": "code",
+          "element": "preauthorization"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Organization/InsurerExample",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "InsurerExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer"
+                ]
+              },
+              "text": {
+                "status": "generated",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;InsurerExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-insurer.html\">PAS Insurer Organization</a></p></div><p><b>identifier</b>: id: 789312</p><p><b>active</b>: true</p><p><b>type</b>: PR <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#PR)</span></p><p><b>name</b>: MARYLAND CAPITAL INSURANCE COMPANY</p></div>"
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "789312"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "PR"
+                    }
+                  ]
+                }
+              ],
+              "name": "MARYLAND CAPITAL INSURANCE COMPANY"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Organization/InsurerExample"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Patient/SubscriberExample",
+            "resource": {
+              "resourceType": "Patient",
+              "id": "SubscriberExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber"
+                ]
+              },
+              "text": {
+                "status": "extensions",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;SubscriberExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-subscriber.html\">PAS Subscriber Patient</a></p></div><p><b>MilitaryStatus</b>: RU <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (584#RU)</span></p><p><b>identifier</b>: id: 12345678901</p><p><b>name</b>: JOE SMITH </p><p><b>gender</b>: male</p></div>"
+              },
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-militaryStatus",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "https://codesystem.x12.org/005010/584",
+                        "code": "RU"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "identifier": [
+                {
+                  "system": "https://prior-auth.davinci.hl7.org/MIN",
+                  "value": "12345678901"
+                }
+              ],
+              "name": [
+                {
+                  "family": "SMITH",
+                  "given": [
+                    "JOE"
+                  ]
+                }
+              ],
+              "gender": "male"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Patient/SubscriberExample"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Organization/UMOExample",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "UMOExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor"
+                ]
+              },
+              "text": {
+                "status": "generated",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;UMOExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-requestor.html\">PAS Requestor Organization</a></p></div><p><b>identifier</b>: id: 8189991234</p><p><b>active</b>: true</p><p><b>type</b>: X3 <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#X3)</span></p><p><b>name</b>: DR. JOE SMITH CORPORATION</p><p><b>address</b>: 111 1ST STREET SAN DIEGO CA 92101 US </p></div>"
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "8189991234"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "X3"
+                    }
+                  ]
+                }
+              ],
+              "name": "DR. JOE SMITH CORPORATION",
+              "address": [
+                {
+                  "line": [
+                    "111 1ST STREET"
+                  ],
+                  "city": "SAN DIEGO",
+                  "state": "CA",
+                  "postalCode": "92101",
+                  "country": "US"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Organization/UMOExample"
+        }
+      ],
+      "Bundle.entry.where(resource is Claim).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Claim/ReferralAuthorizationExample"
+        }
+      ],
+      "today()": [
+        {
+          "type": "date",
+          "element": "2026-11-13"
+        }
+      ],
+      "today() + 1 month": [
+        {
+          "type": "date",
+          "element": "2026-12-13"
+        }
+      ]
+    },
+    "conformant_pas_bundle_v110_multiple_items": {
+      "(Bundle.entry.resource.ofType(Claim).item)[0].productOrService": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1365",
+                "code": "3",
+                "display": "Consultation"
+              }
+            ]
+          }
+        }
+      ],
+      "(Bundle.entry.resource.ofType(Claim).item)[0].sequence": [
+        {
+          "type": "positiveInt",
+          "element": 1
+        }
+      ],
+      "(Bundle.entry.resource.ofType(Claim).item)[1].productOrService": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1365",
+                "code": "3",
+                "display": "Consultation"
+              }
+            ]
+          }
+        }
+      ],
+      "(Bundle.entry.resource.ofType(Claim).item)[1].sequence": [
+        {
+          "type": "positiveInt",
+          "element": 1
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).identifier": [
+        {
+          "type": "Identifier",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://www.usps.com/",
+                      "code": "MA"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierSubDepartment",
+                "valueString": "223412"
+              }
+            ],
+            "system": "https://prior-auth.davinci.hl7.org/fhir/PATIENT_EVENT_TRACE_NUMBER",
+            "value": "111099",
+            "assigner": {
+              "identifier": {
+                "system": "https://prior-auth.davinci.hl7.org/fhir/USER_ASSIGNED",
+                "value": "9012345678"
+              }
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).item": [
+        {
+          "type": "Claim.item",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber",
+                "valueIdentifier": {
+                  "system": "https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER",
+                  "value": "1122334"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber",
+                "valueString": "1122445"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber",
+                "valueString": "9988311"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1525",
+                      "code": "SC",
+                      "display": "Specialty Care Review"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1322",
+                      "code": "I",
+                      "display": "Initial"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService",
+                "valueReference": {
+                  "reference": "ServiceRequest/ReferralRequestExample"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator",
+                "valueBoolean": false
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1345",
+                      "code": "2",
+                      "display": "Newly Admitted"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1337",
+                      "code": "2",
+                      "display": "Intermediate Care Facility (ICF)"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit",
+                "valueDecimal": 100
+              }
+            ],
+            "sequence": 1,
+            "careTeamSequence": [
+              1
+            ],
+            "diagnosisSequence": [
+              1
+            ],
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://codesystem.x12.org/005010/1365",
+                  "code": "3",
+                  "display": "Consultation"
+                }
+              ]
+            },
+            "locationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                  "code": "11"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "Claim.item",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber",
+                "valueIdentifier": {
+                  "system": "https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER",
+                  "value": "11223349"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber",
+                "valueString": "11224459"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber",
+                "valueString": "99883119"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1525",
+                      "code": "SC",
+                      "display": "Specialty Care Review"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1322",
+                      "code": "I",
+                      "display": "Initial"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService",
+                "valueReference": {
+                  "reference": "ServiceRequest/AnotherReferralRequestExample"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator",
+                "valueBoolean": false
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1345",
+                      "code": "2",
+                      "display": "Newly Admitted"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1337",
+                      "code": "2",
+                      "display": "Intermediate Care Facility (ICF)"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit",
+                "valueDecimal": 100
+              }
+            ],
+            "sequence": 1,
+            "careTeamSequence": [
+              1
+            ],
+            "diagnosisSequence": [
+              1
+            ],
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://codesystem.x12.org/005010/1365",
+                  "code": "3",
+                  "display": "Consultation"
+                }
+              ]
+            },
+            "locationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                  "code": "11"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).status": [
+        {
+          "type": "code",
+          "element": "active"
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).type": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+                "code": "professional"
+              }
+            ]
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).use": [
+        {
+          "type": "code",
+          "element": "preauthorization"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Organization/InsurerExample",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "InsurerExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer"
+                ]
+              },
+              "text": {
+                "status": "generated",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;InsurerExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-insurer.html\">PAS Insurer Organization</a></p></div><p><b>identifier</b>: id: 789312</p><p><b>active</b>: true</p><p><b>type</b>: PR <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#PR)</span></p><p><b>name</b>: MARYLAND CAPITAL INSURANCE COMPANY</p></div>"
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "789312"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "PR"
+                    }
+                  ]
+                }
+              ],
+              "name": "MARYLAND CAPITAL INSURANCE COMPANY"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Organization/InsurerExample"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Patient/SubscriberExample",
+            "resource": {
+              "resourceType": "Patient",
+              "id": "SubscriberExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber"
+                ]
+              },
+              "text": {
+                "status": "extensions",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;SubscriberExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-subscriber.html\">PAS Subscriber Patient</a></p></div><p><b>MilitaryStatus</b>: RU <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (584#RU)</span></p><p><b>identifier</b>: id: 12345678901</p><p><b>name</b>: JOE SMITH </p><p><b>gender</b>: male</p></div>"
+              },
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-militaryStatus",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "https://codesystem.x12.org/005010/584",
+                        "code": "RU"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "identifier": [
+                {
+                  "system": "https://prior-auth.davinci.hl7.org/MIN",
+                  "value": "12345678901"
+                }
+              ],
+              "name": [
+                {
+                  "family": "SMITH",
+                  "given": [
+                    "JOE"
+                  ]
+                }
+              ],
+              "gender": "male"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Patient/SubscriberExample"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Organization/UMOExample",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "UMOExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor"
+                ]
+              },
+              "text": {
+                "status": "generated",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;UMOExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-requestor.html\">PAS Requestor Organization</a></p></div><p><b>identifier</b>: id: 8189991234</p><p><b>active</b>: true</p><p><b>type</b>: X3 <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#X3)</span></p><p><b>name</b>: DR. JOE SMITH CORPORATION</p><p><b>address</b>: 111 1ST STREET SAN DIEGO CA 92101 US </p></div>"
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "8189991234"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "X3"
+                    }
+                  ]
+                }
+              ],
+              "name": "DR. JOE SMITH CORPORATION",
+              "address": [
+                {
+                  "line": [
+                    "111 1ST STREET"
+                  ],
+                  "city": "SAN DIEGO",
+                  "state": "CA",
+                  "postalCode": "92101",
+                  "country": "US"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Organization/UMOExample"
+        }
+      ],
+      "Bundle.entry.where(resource is Claim).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Claim/ReferralAuthorizationExample"
+        }
+      ],
+      "today()": [
+        {
+          "type": "date",
+          "element": "2026-11-13"
+        }
+      ],
+      "today() + 1 month": [
+        {
+          "type": "date",
+          "element": "2026-12-13"
+        }
+      ]
+    },
+    "conformant_pas_bundle_v110_uuid": {
+      "(Bundle.entry.resource.ofType(Claim).item)[0].productOrService": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1365",
+                "code": "3",
+                "display": "Consultation"
+              }
+            ]
+          }
+        }
+      ],
+      "(Bundle.entry.resource.ofType(Claim).item)[0].sequence": [
+        {
+          "type": "positiveInt",
+          "element": 1
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).identifier": [
+        {
+          "type": "Identifier",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://www.usps.com/",
+                      "code": "MA"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierSubDepartment",
+                "valueString": "223412"
+              }
+            ],
+            "system": "https://prior-auth.davinci.hl7.org/fhir/PATIENT_EVENT_TRACE_NUMBER",
+            "value": "111099",
+            "assigner": {
+              "identifier": {
+                "system": "https://prior-auth.davinci.hl7.org/fhir/USER_ASSIGNED",
+                "value": "9012345678"
+              }
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).item": [
+        {
+          "type": "Claim.item",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber",
+                "valueIdentifier": {
+                  "system": "https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER",
+                  "value": "1122334"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber",
+                "valueString": "1122445"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber",
+                "valueString": "9988311"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1525",
+                      "code": "SC",
+                      "display": "Specialty Care Review"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1322",
+                      "code": "I",
+                      "display": "Initial"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService",
+                "valueReference": {
+                  "reference": "urn:uuid:75832284-6c15-488c-8237-0290624d5b95"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator",
+                "valueBoolean": false
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1345",
+                      "code": "2",
+                      "display": "Newly Admitted"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1337",
+                      "code": "2",
+                      "display": "Intermediate Care Facility (ICF)"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit",
+                "valueDecimal": 100
+              }
+            ],
+            "sequence": 1,
+            "careTeamSequence": [
+              1
+            ],
+            "diagnosisSequence": [
+              1
+            ],
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://codesystem.x12.org/005010/1365",
+                  "code": "3",
+                  "display": "Consultation"
+                }
+              ]
+            },
+            "locationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                  "code": "11"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).status": [
+        {
+          "type": "code",
+          "element": "active"
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).type": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+                "code": "professional"
+              }
+            ]
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).use": [
+        {
+          "type": "code",
+          "element": "preauthorization"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "urn:uuid:75832284-6c15-488c-8237-0290624d5b92",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "75832284-6c15-488c-8237-0290624d5b92",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer"
+                ]
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "789312"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "PR"
+                    }
+                  ]
+                }
+              ],
+              "name": "MARYLAND CAPITAL INSURANCE COMPANY"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "urn:uuid:75832284-6c15-488c-8237-0290624d5b92"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "urn:uuid:75832284-6c15-488c-8237-0290624d5b94",
+            "resource": {
+              "resourceType": "Patient",
+              "id": "75832284-6c15-488c-8237-0290624d5b94",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber"
+                ]
+              },
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-militaryStatus",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "https://codesystem.x12.org/005010/584",
+                        "code": "RU"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "identifier": [
+                {
+                  "system": "https://prior-auth.davinci.hl7.org/MIN",
+                  "value": "12345678901"
+                }
+              ],
+              "name": [
+                {
+                  "family": "SMITH",
+                  "given": [
+                    "JOE"
+                  ]
+                }
+              ],
+              "gender": "male"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "urn:uuid:75832284-6c15-488c-8237-0290624d5b94"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "urn:uuid:75832284-6c15-488c-8237-0290624d5b91",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "75832284-6c15-488c-8237-0290624d5b91",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor"
+                ]
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "8189991234"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "X3"
+                    }
+                  ]
+                }
+              ],
+              "name": "DR. JOE SMITH CORPORATION",
+              "address": [
+                {
+                  "line": [
+                    "111 1ST STREET"
+                  ],
+                  "city": "SAN DIEGO",
+                  "state": "CA",
+                  "postalCode": "92101",
+                  "country": "US"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "urn:uuid:75832284-6c15-488c-8237-0290624d5b91"
+        }
+      ],
+      "Bundle.entry.where(resource is Claim).fullUrl": [
+        {
+          "type": "uri",
+          "element": "urn:uuid:75832284-6c15-488c-8237-0290624d5b98"
+        }
+      ],
+      "today()": [
+        {
+          "type": "date",
+          "element": "2026-11-13"
+        }
+      ],
+      "today() + 1 month": [
+        {
+          "type": "date",
+          "element": "2026-12-13"
+        }
+      ]
+    },
+    "conformant_pas_inquire_bundle_v110": {
+      "(Bundle.entry.resource.ofType(Claim).item)[0].sequence": [
+        {
+          "type": "positiveInt",
+          "element": 1
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).identifier": [
+        {
+          "type": "Identifier",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "https://www.usps.com/",
+                      "code": "MA"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierSubDepartment",
+                "valueString": "223412"
+              }
+            ],
+            "system": "https://prior-auth.davinci.hl7.org/fhir/PATIENT_EVENT_TRACE_NUMBER",
+            "value": "111099",
+            "assigner": {
+              "identifier": {
+                "system": "https://prior-auth.davinci.hl7.org/fhir/USER_ASSIGNED",
+                "value": "9012345678"
+              }
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).item": [
+        {
+          "type": "Claim.item",
+          "element": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber",
+                "valueIdentifier": {
+                  "system": "https://prior-auth.davinci.hl7.org/fhir/ITEM_TRACE_NUMBER",
+                  "value": "1122334"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber",
+                "valueString": "1122445"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber",
+                "valueString": "9988311"
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1525",
+                      "code": "SC",
+                      "display": "Specialty Care Review"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1322",
+                      "code": "I",
+                      "display": "Initial"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService",
+                "valueReference": {
+                  "reference": "ServiceRequest/ReferralRequestExample"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator",
+                "valueBoolean": false
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1345",
+                      "code": "2",
+                      "display": "Newly Admitted"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://codesystem.x12.org/005010/1337",
+                      "code": "2",
+                      "display": "Intermediate Care Facility (ICF)"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit",
+                "valueDecimal": 100
+              }
+            ],
+            "sequence": 1,
+            "careTeamSequence": [
+              1
+            ],
+            "diagnosisSequence": [
+              1
+            ],
+            "productOrService": {
+              "coding": [
+                {
+                  "system": "http://codesystem.x12.org/005010/1365",
+                  "code": "3",
+                  "display": "Consultation"
+                }
+              ]
+            },
+            "locationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                  "code": "11"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).status": [
+        {
+          "type": "code",
+          "element": "active"
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).type": [
+        {
+          "type": "CodeableConcept",
+          "element": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+                "code": "professional"
+              }
+            ]
+          }
+        }
+      ],
+      "Bundle.entry.resource.ofType(Claim).use": [
+        {
+          "type": "code",
+          "element": "preauthorization"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Organization/InsurerExample",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "InsurerExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-insurer"
+                ]
+              },
+              "text": {
+                "status": "generated",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;InsurerExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-insurer.html\">PAS Insurer Organization</a></p></div><p><b>identifier</b>: id: 789312</p><p><b>active</b>: true</p><p><b>type</b>: PR <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#PR)</span></p><p><b>name</b>: MARYLAND CAPITAL INSURANCE COMPANY</p></div>"
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "789312"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "PR"
+                    }
+                  ]
+                }
+              ],
+              "name": "MARYLAND CAPITAL INSURANCE COMPANY"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Organization/InsurerExample"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Patient/SubscriberExample",
+            "resource": {
+              "resourceType": "Patient",
+              "id": "SubscriberExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-subscriber"
+                ]
+              },
+              "text": {
+                "status": "extensions",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;SubscriberExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-subscriber.html\">PAS Subscriber Patient</a></p></div><p><b>MilitaryStatus</b>: RU <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (584#RU)</span></p><p><b>identifier</b>: id: 12345678901</p><p><b>name</b>: JOE SMITH </p><p><b>gender</b>: male</p></div>"
+              },
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-militaryStatus",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "https://codesystem.x12.org/005010/584",
+                        "code": "RU"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "identifier": [
+                {
+                  "system": "https://prior-auth.davinci.hl7.org/MIN",
+                  "value": "12345678901"
+                }
+              ],
+              "name": [
+                {
+                  "family": "SMITH",
+                  "given": [
+                    "JOE"
+                  ]
+                }
+              ],
+              "gender": "male"
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Patient/SubscriberExample"
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference))": [
+        {
+          "type": "Bundle.entry",
+          "element": {
+            "fullUrl": "https://prior-auth.davinci.hl7.org/fhir/Organization/UMOExample",
+            "resource": {
+              "resourceType": "Organization",
+              "id": "UMOExample",
+              "meta": {
+                "profile": [
+                  "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-requestor"
+                ]
+              },
+              "text": {
+                "status": "generated",
+                "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource &quot;UMOExample&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-profile-requestor.html\">PAS Requestor Organization</a></p></div><p><b>identifier</b>: id: 8189991234</p><p><b>active</b>: true</p><p><b>type</b>: X3 <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (98#X3)</span></p><p><b>name</b>: DR. JOE SMITH CORPORATION</p><p><b>address</b>: 111 1ST STREET SAN DIEGO CA 92101 US </p></div>"
+              },
+              "identifier": [
+                {
+                  "system": "http://hl7.org/fhir/sid/us-npi",
+                  "value": "8189991234"
+                }
+              ],
+              "active": true,
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://codesystem.x12.org/005010/98",
+                      "code": "X3"
+                    }
+                  ]
+                }
+              ],
+              "name": "DR. JOE SMITH CORPORATION",
+              "address": [
+                {
+                  "line": [
+                    "111 1ST STREET"
+                  ],
+                  "city": "SAN DIEGO",
+                  "state": "CA",
+                  "postalCode": "92101",
+                  "country": "US"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference)).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Organization/UMOExample"
+        }
+      ],
+      "Bundle.entry.where(resource is Claim).fullUrl": [
+        {
+          "type": "uri",
+          "element": "https://prior-auth.davinci.hl7.org/fhir/Claim/ReferralAuthorizationExample"
+        }
+      ],
+      "today()": [
+        {
+          "type": "date",
+          "element": "2026-11-13"
+        }
+      ],
+      "today() + 1 month": [
+        {
+          "type": "date",
+          "element": "2026-12-13"
+        }
+      ]
+    }
+  }
+}
