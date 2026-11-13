@@ -1,15 +1,11 @@
 require_relative 'custom_extension_removal'
 
 module DaVinciPASTestKit
-  # Instantiates a tester-provided response template (parsed JSON) using values from a request:
-  # - A string that is exactly one `{{fhirpath}}` token is replaced by the typed results of the expression.
-  #   In an array, every result is inserted in its place. In an object, no result removes the element,
-  #   one result becomes its value, and several become an array. Copied data types lose extensions not
-  #   published by HL7, while resources and Bundle entries are copied as they are.
-  # - Tokens within a longer string are replaced by their primitive results joined with commas.
-  # - A `{ "$forEach": "<fhirpath>", "template": <value> }` object becomes one copy of the template for
-  #   each result of the expression, in which `%current` in token expressions refers to that result.
-  #   In an object, the copies always form an array.
+  # Instantiates a tester-provided response template (parsed JSON) using values from a request. A string that
+  # is exactly one `{{fhirpath}}` token is replaced by the typed results, while tokens within longer strings are
+  # replaced by their primitive results joined with commas. A `{ "$forEach": ..., "template": ... }` object
+  # becomes a copy of the template for each result, in which `%current` refers to that result. See the
+  # "Response Instantiation" section of docs/Controlling-Simulated-Responses.md for details.
   class ResponseTemplate
     # Raised when the template's structure is invalid. Messages can be shown to the tester as-is.
     class TemplateError < StandardError; end

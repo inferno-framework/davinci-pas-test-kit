@@ -204,35 +204,31 @@ Patient resource the Claim was submitted for, which could be used to make sure t
 response references the same Patient record.
 
 How the result is used depends on where the token appears:
-- **Whole value**: when a JSON string contains only the token (e.g., `"type": "{{entry.resource.ofType(Claim).type}}"`),
-  the string is replaced by the results themselves, which can be strings, numbers, booleans, data types, or
-  whole resources and Bundle entries. Within a JSON array, each result is inserted in place of the token, so
-  `"entry": [..., "{{entry.where(resource is Patient)}}"]` copies every Patient entry from the request. For
-  other elements, a single result becomes the element's value, several results become an array, and no results
-  remove the element. Extensions not published by HL7 are removed from copied data types, as in
-  [mocked responses](#submit-and-inquire-responses), while resources and Bundle entries are copied as they are.
-  Because results keep their type, a number copied into a text element must be converted, e.g., with
-  `.select(toString())`, and several results can be combined into one text value with `.join(',')`.
-- **Within text**: when the token is part of a longer string (e.g., `"text": "Response to {{...}}"`),
-  results that are primitive values are joined with commas and inserted into the text, and other results are
-  ignored.
+- **Whole value**: if the token is the entire JSON string, it will be replaced by the results themselves,
+  which may be strings, numbers, data types, or whole resources and Bundle entries. Within an array, each
+  result will be inserted in place of the token. Elsewhere, multiple results will become an array and no
+  results will remove the element.
+- **Within text**: if the token is part of a longer string, results that are primitive values (not lists or objects)
+  will be joined with commas and inserted into the text.
 
 Notes:
+- Extensions not published by HL7 will be removed from copied data types, as in
+  [mocked responses](#submit-and-inquire-responses). Resources and Bundle entries will be copied as they are.
+- Whole value results keep their type, so a number copied into a text element must be converted, e.g., with
+  `.select(toString())` or `.join(',')`.
 - Inferno supports the raw `today()` function alone as well as with addition
   and subtraction of days, e.g., `{{today()}}`, `{{today() - 7 days}}`, and
   `{{today() + 365 days}}`.
 - While the syntax follows CDS Hooks prefetch tokens, Inferno allows additional FHIRPath functions
   beyond the [limited set allowed by CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-tokens-containing-simpler-fhirpath). See 
   the [FHIRPath Evaluation Limitations](#fhirpath-evaluation-limitations) section for details.
-- `resolve()` is not supported, so to find the Bundle entry for a reference in the Claim, compare entry
-  `fullUrl` values to it, using `%resource` to refer to the request Bundle, e.g.,
-  `entry.where(fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))`.
+- Since `resolve()` is not supported, find the entry for a reference by comparing entry `fullUrl` values
+  to it, using `%resource` to refer to the request Bundle. See the example below.
 
 #### Repeated Content
 
-To include content once for each result of a FHIRPath expression, such as a `ClaimResponse.item` for
-each `Claim.item`, use an object holding the expression under `$forEach` and the content to repeat under
-`template`:
+To repeat content for each result of a FHIRPath expression, such as a `ClaimResponse.item` for each
+`Claim.item`, use an object with the expression under `$forEach` and the content under `template`:
 
 ```
 "item": [
@@ -246,17 +242,15 @@ each `Claim.item`, use an object holding the expression under `$forEach` and the
 ]
 ```
 
-Within the template, `%current` in an expression token refers to the result the copy is for. Each copy is
-inserted into the array in place of the object, and no results remove it. `$forEach` objects can be nested,
-in which case `%current` refers to the result of the innermost one.
+Within the template, `%current` will refer to the result being repeated. The copies will replace the object
+in the array. Nested `$forEach` objects are supported, with `%current` referring to the innermost result.
 
-#### Example: Mocked Responses as Templates
+#### Mocked Response Template Example
 
-The [mocked `$submit` and `$inquire` responses](#submit-and-inquire-responses) can be written as tester-provided
-responses using expression tokens. The Da Vinci PAS Test Kit's tests check that the templates in its
+Inferno's mocked `$submit` and `$inquire` responses can be specified as tester-provided responses. The
 [response templates folder](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/spec/fixtures/response_templates)
-produce the same responses as Inferno's mocks, which can serve as starting points. For example, the
-approval `$submit` response for v2.0.1 has the following structure (static content left out):
+contains templates that the test kit checks against the mocks, which can be used as starting points.
+For example, the v2.0.1 approval `$submit` template has the following structure:
 
 ```
 {
@@ -268,41 +262,31 @@ approval `$submit` response for v2.0.1 has the following structure (static conte
       "fullUrl": "urn:uuid:5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
       "resource": {
         "resourceType": "ClaimResponse",
-        "id": "5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
         "identifier": ["{{Bundle.entry.resource.ofType(Claim).identifier}}"],
-        "status": "{{Bundle.entry.resource.ofType(Claim).status}}",
         "type": "{{Bundle.entry.resource.ofType(Claim).type}}",
-        "use": "{{Bundle.entry.resource.ofType(Claim).use}}",
+        ... status and use copied in the same way ...
         "patient": {
           "reference": "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl}}"
         },
-        "created": "2025-01-01T00:00:00Z",
-        "request": { "reference": "{{Bundle.entry.where(resource is Claim).fullUrl}}" },
-        "outcome": "complete",
+        ... insurer and requestor in the same way ...
         "preAuthPeriod": { "start": "{{today()}}", "end": "{{today() + 1 month}}" },
         "item": [
           {
             "$forEach": "Bundle.entry.resource.ofType(Claim).item",
-            "template": {
-              "extension": [ ... itemPreAuthIssueDate and itemPreAuthPeriod using today() ... ],
-              "itemSequence": "{{%current.sequence}}",
-              "adjudication": [ ... reviewActionCode A1 ... ]
-            }
+            "template": { "itemSequence": "{{%current.sequence}}", ... }
           }
         ],
-        ... insurer and requestor follow the same pattern as patient ...
+        ...
       }
     },
     "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))}}",
-    ... the insurer and requestor entries follow the same pattern ...
+    ... insurer and requestor entries in the same way ...
   ]
 }
 ```
 
-These templates copy the patient, insurer, and requestor entries as they are in the request. Unlike the mock,
-they don't include further entries that those entries reference, don't update references within the copied
-entries to use `fullUrl` values, and include an entry referenced by more than one of the patient, insurer,
-and requestor once for each reference. Add tokens for any other entries the response needs.
+Unlike the mocks, these templates will not include entries referenced by the copied entries or update the
+references within them, and will include an entry more than once if it is referenced more than once.
 
 #### Inferno Modifications of Tester-provided Responses and Notifications
 
