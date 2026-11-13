@@ -95,8 +95,8 @@ module DaVinciPASTestKit
       if user_input
         <<~DESCRIPTION.strip
           Inferno will respond to `#{operation}` requests with the content provided in the
-          '**#{user_input_title}**' input, with `{{...}}` fhirpath expressions replaced with
-          their value when evaluated against the request and timestamps and resources references
+          '**#{user_input_title}**' input, with `{{...}}` FHIRPath expression tokens and `$forEach`
+          objects filled in from the request and timestamps and resources references
           updated to be current and consistent. See the ["Response Instantiation" section](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
           of the Da Vinci PAS Test Kit wiki for details on these updates.
         DESCRIPTION

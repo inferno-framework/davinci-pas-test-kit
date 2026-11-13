@@ -1,7 +1,9 @@
+require_relative 'response_template'
+
 module DaVinciPASTestKit
   # Utilities for evaluating FHIRPath expressions against FHIR resources using
-  # the FHIRPath evaluation service and for replacing {{fhirpath}} tokens in
-  # serialized resources with values pulled from a request.
+  # the FHIRPath evaluation service and for instantiating response templates
+  # with values pulled from a request.
   module FhirpathUtils
     # Raised when the FHIRPath service cannot be reached or does not return a usable
     # result. Messages name the query and end with the service's response or the
@@ -38,26 +40,18 @@ module DaVinciPASTestKit
       false
     end
 
-    def replace_tokens_in_string(string, request)
-      return string unless string.include?('{{')
-
-      tokens_to_replace = string.scan(/\{\{([^}]+)\}\}/).flatten
-      replacements = tokens_to_replace.each_with_object({}) do |expression, dictionary|
-        next if dictionary.key?("{{#{expression}}}")
-
-        dictionary["{{#{expression}}}"] = calculate_expression_string_value(request, expression)
-      end
-
-      string.gsub(/\{\{.*?\}\}/, replacements)
+    # Instantiates a parsed JSON response template against the request - see ResponseTemplate.
+    def instantiate_template(template, request)
+      ResponseTemplate.new(request, self).instantiate(template)
     end
 
-    def calculate_expression_string_value(request, expression)
-      fhirpath_result = execute_fhirpath(request, expression)
-      JSON.parse(fhirpath_result.body)
-        .map { |result| result['element'] }
-        .map { |element| element.is_a?(Array) || element.is_a?(Hash) ? nil : element }
-        .compact
-        .join(',')
+    # @return [Array] the element of each result of the expression evaluated against the resource.
+    def evaluate_fhirpath_elements(resource, expression)
+      fhirpath_result = execute_fhirpath(resource, expression)
+      results = JSON.parse(fhirpath_result.body)
+      raise JSON::ParserError unless results.is_a?(Array) && results.all?(Hash)
+
+      results.map { |result| result['element'] }
     rescue JSON::ParserError
       raise FhirpathServiceError,
             "The FHIRPath service returned an unparseable response for query '#{expression}': " \

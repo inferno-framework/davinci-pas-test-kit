@@ -253,13 +253,14 @@ module DaVinciPASTestKit
       end
     end
 
-    # Replaces {{fhirpath}} tokens in a selected tester-provided response or notification.
+    # Instantiates {{fhirpath}} tokens and $forEach objects in a selected tester-provided response or
+    # notification.
     # @param message_type [String] 'response' or 'notification', naming the message in warnings.
     def resolve_candidate(candidate, req_bundle, message_type)
       return nil unless candidate.present?
 
       replace_tokens(candidate, req_bundle, message_type)
-    rescue FhirpathUtils::FhirpathServiceError => e
+    rescue FhirpathUtils::FhirpathServiceError, ResponseTemplate::TemplateError => e
       add_result_warning(
         "Unable to instantiate a tester-provided #{message_type}, so Inferno will generate a default " \
         "#{message_type}: #{e.message}"
@@ -304,22 +305,20 @@ module DaVinciPASTestKit
       nil
     end
 
-    # Replaces {{fhirpath}} tokens using values from the incoming request, round-tripping
-    # the result through the FHIR model to normalize it. The candidate may be a parsed hash
-    # (must support workflow) or the raw JSON string of a single input. If a replaced value
-    # breaks the JSON structure, the result cannot be sent as a FHIR message, so nil is
-    # returned with a warning on the waiting test and Inferno generates a default one.
-    def replace_tokens(bundle_hash, req_bundle, message_type)
-      bundle_json = bundle_hash.is_a?(String) ? bundle_hash : bundle_hash.to_json
-      replaced = replace_tokens_in_string(bundle_json, req_bundle)
-      return bundle_json if replaced.equal?(bundle_json)
+    # Instantiates the candidate using values from the incoming request, round-tripping the result
+    # through the FHIR model to normalize it. The candidate may be a parsed hash (must support workflow)
+    # or the JSON string of a single input, which the waiting test has checked is valid JSON.
+    def replace_tokens(candidate, req_bundle, message_type)
+      candidate_json = candidate.is_a?(String) ? candidate : candidate.to_json
+      return candidate_json unless ResponseTemplate.template?(candidate_json)
 
-      FHIR.from_contents(replaced)&.to_json || replaced
+      template = candidate.is_a?(String) ? JSON.parse(candidate) : candidate
+      instantiated_json = instantiate_template(template, req_bundle).to_json
+      FHIR.from_contents(instantiated_json)&.to_json || instantiated_json
     rescue JSON::ParserError
       add_result_warning(
         "Unable to use the selected tester-provided #{message_type}, so Inferno will generate a default " \
-        "#{message_type}. The #{message_type} is not valid JSON after {{fhirpath}} token replacement, for " \
-        'example because a token value contains a double quote.'
+        "#{message_type}: it is not valid JSON."
       )
       nil
     end
