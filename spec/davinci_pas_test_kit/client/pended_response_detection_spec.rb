@@ -21,6 +21,15 @@ RSpec.describe DaVinciPASTestKit::PendedResponseDetection do
     expect(described_class.pended?(response_bundle('A4').to_json)).to be(true)
   end
 
+  it 'identifies a pended response template that repeats items with $forEach' do
+    templates_dir = File.join(__dir__, '../../fixtures/response_templates')
+    template = JSON.parse(File.read(File.join(templates_dir, 'submit_pended_v2.2.1.json')))
+    approval = JSON.parse(File.read(File.join(templates_dir, 'submit_approval_v2.2.1.json')))
+
+    expect(described_class.pended?(template)).to be(true)
+    expect(described_class.pended?(approval)).to be(false)
+  end
+
   it 'does not identify a response without the pended review action code' do
     expect(described_class.pended?(response_bundle('A1', 'A3'))).to be(false)
   end

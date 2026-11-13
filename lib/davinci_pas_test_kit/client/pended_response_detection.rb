@@ -1,3 +1,5 @@
+require_relative '../cross_suite/response_template'
+
 module DaVinciPASTestKit
   # Identifies pended v2.2.1 $submit responses, which have a review action code of A4 (Pending) on a
   # ClaimResponse item adjudication
@@ -38,9 +40,13 @@ module DaVinciPASTestKit
       hashes(element['extension']).select { |extension| extension['url'] == url }
     end
 
-    # The Hash elements of a JSON array, ignoring anything else in tester-provided content
+    # The Hash elements of a JSON array, ignoring anything else in tester-provided content. A response
+    # template's $forEach object counts as its template, so that the codes in repeated items are found.
     def self.hashes(value)
-      value.is_a?(Array) ? value.grep(Hash) : []
+      return [] unless value.is_a?(Array)
+
+      value.grep(Hash).map { |hash| hash.fetch(ResponseTemplate::FOR_EACH_KEY, nil) ? hash['template'] : hash }
+        .grep(Hash)
     end
   end
 end
