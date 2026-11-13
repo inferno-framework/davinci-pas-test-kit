@@ -3,15 +3,24 @@ require_relative '../../../lib/davinci_pas_test_kit/cross_suite/response_templat
 RSpec.describe DaVinciPASTestKit::ResponseTemplate do
   let(:request_bundle) { FHIR::Bundle.new(id: 'example-request') }
   let(:results) { {} }
+  # Results are given as elements, or as typed(...) for results whose FHIR type matters
   let(:evaluator) do
     expressions = results
     Class.new do
-      define_method(:evaluate_fhirpath_elements) do |_resource, expression|
+      define_method(:evaluate_fhirpath_results) do |_resource, expression|
         raise "unexpected expression: #{expression}" unless expressions.key?(expression)
 
-        expressions[expression]
+        expressions[expression].map do |result|
+          next result.transform_keys(&:to_s) if result.is_a?(Hash) && result.key?(:type)
+
+          { 'type' => 'test', 'element' => result }
+        end
       end
     end.new
+  end
+
+  def typed(type, element)
+    { type:, element: }
   end
 
   def instantiate(template)
@@ -79,23 +88,36 @@ RSpec.describe DaVinciPASTestKit::ResponseTemplate do
       results['identifier'] = [{ 'extension' => [custom, hl7], 'value' => '1',
                                  'assigner' => { 'extension' => [custom], 'display' => 'z' } }]
       results['resource'] = [{ 'resourceType' => 'Patient', 'extension' => [custom] }]
-      results['entry'] = [{ 'fullUrl' => 'a', 'resource' => { 'resourceType' => 'Patient', 'extension' => [custom] } }]
+      entry = { 'fullUrl' => 'a', 'resource' => { 'resourceType' => 'Patient', 'extension' => [custom] } }
+      results['entry'] = [typed('Bundle.entry', entry)]
+      parameter = { 'name' => 'p', 'resource' => { 'resourceType' => 'Patient' }, 'extension' => [custom] }
+      results['parameter'] = [typed('Parameters.parameter', parameter)]
 
       instantiated = instantiate('identifier' => ['{{identifier}}'], 'contained' => ['{{resource}}'],
-                                 'entry' => ['{{entry}}'])
+                                 'entry' => ['{{entry}}'], 'parameter' => ['{{parameter}}'])
 
       expect(instantiated['identifier']).to eq([{ 'extension' => [hl7], 'value' => '1',
                                                   'assigner' => { 'display' => 'z' } }])
       expect(instantiated['contained']).to eq(results['resource'])
-      expect(instantiated['entry']).to eq(results['entry'])
+      expect(instantiated['entry']).to eq([entry])
+      expect(instantiated['parameter']).to eq([parameter.except('extension')])
+    end
+
+    it 'copies only HL7 extensions when extensions themselves are copied' do
+      custom = { 'url' => 'http://example.org/custom', 'valueString' => 'x' }
+      hl7 = { 'url' => 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-x', 'valueString' => 'y' }
+      results['Bundle.entry.resource.ofType(Claim).extension'] = [typed('Extension', custom), typed('Extension', hl7)]
+
+      expect(instantiate('extension' => ['{{Bundle.entry.resource.ofType(Claim).extension}}']))
+        .to eq('extension' => [hl7])
     end
 
     it 'evaluates each expression once' do
       calls = Hash.new(0)
       counting_evaluator = Class.new do
-        define_method(:evaluate_fhirpath_elements) do |_resource, expression|
+        define_method(:evaluate_fhirpath_results) do |_resource, expression|
           calls[expression] += 1
-          ['value']
+          [{ 'type' => 'string', 'element' => 'value' }]
         end
       end.new
 
@@ -156,6 +178,29 @@ RSpec.describe DaVinciPASTestKit::ResponseTemplate do
       expect(instantiate(template)).to eq(
         'item' => [{ 'itemSequence' => 1, 'detail' => [{ 'detailSequence' => 11 }, { 'detailSequence' => 12 }] }]
       )
+    end
+
+    it 'makes a copy for each result, including results without a value' do
+      results[items] = [nil, { 'sequence' => 2 }]
+      results["(#{items})[0].sequence"] = []
+      results["(#{items})[1].sequence"] = [2]
+
+      expect(instantiate('item' => [{ '$forEach' => items, 'template' => { 'n' => '{{%current.sequence}}' } }]))
+        .to eq('item' => [{}, { 'n' => 2 }])
+    end
+
+    it 'keeps backslashes and quotes in the expression when replacing %current' do
+      expression = "Bundle.entry.where(fullUrl.matches('\\\\d') or fullUrl = 'O\\'Brien')"
+      results[expression] = [{}]
+      results["(#{expression})[0].id"] = ['found']
+
+      expect(instantiate('ids' => [{ '$forEach' => expression, 'template' => '{{%current.id}}' }]))
+        .to eq('ids' => ['found'])
+    end
+
+    it 'raises a TemplateError for an array template' do
+      expect { instantiate('item' => [{ '$forEach' => items, 'template' => [1, 2] }]) }
+        .to raise_error(described_class::TemplateError, /must not be an array/)
     end
 
     it 'raises a TemplateError for a $forEach object without exactly an expression and a template' do

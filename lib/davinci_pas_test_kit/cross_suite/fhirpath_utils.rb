@@ -45,13 +45,14 @@ module DaVinciPASTestKit
       ResponseTemplate.new(request, self).instantiate(template)
     end
 
-    # @return [Array] the element of each result of the expression evaluated against the resource.
-    def evaluate_fhirpath_elements(resource, expression)
+    # @return [Array<Hash>] the results of the expression evaluated against the resource, each a hash
+    #   with the result's FHIR 'type' and its 'element' value.
+    def evaluate_fhirpath_results(resource, expression)
       fhirpath_result = execute_fhirpath(resource, expression)
       results = JSON.parse(fhirpath_result.body)
       raise JSON::ParserError unless results.is_a?(Array) && results.all?(Hash)
 
-      results.map { |result| result['element'] }
+      results
     rescue JSON::ParserError
       raise FhirpathServiceError,
             "The FHIRPath service returned an unparseable response for query '#{expression}': " \

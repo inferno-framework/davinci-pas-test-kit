@@ -67,19 +67,19 @@ RSpec.describe DaVinciPASTestKit::FhirpathUtils do
     end
   end
 
-  describe '#evaluate_fhirpath_elements' do
-    it 'returns the element of each result' do
+  describe '#evaluate_fhirpath_results' do
+    it 'returns the type and element of each result' do
       stub_fhirpath_service('Bundle.entry.resource.id',
                             [{ type: 'string', element: 'a' }, { type: 'Identifier', element: { 'value' => 'b' } }])
 
-      expect(utils.evaluate_fhirpath_elements(request_bundle, 'Bundle.entry.resource.id'))
-        .to eq(['a', { 'value' => 'b' }])
+      expect(utils.evaluate_fhirpath_results(request_bundle, 'Bundle.entry.resource.id'))
+        .to eq([{ 'type' => 'string', 'element' => 'a' }, { 'type' => 'Identifier', 'element' => { 'value' => 'b' } }])
     end
 
     it 'raises FhirpathServiceError when the service response is not a list of results' do
       stub_fhirpath_service('Bundle.id', { 'element' => 'a' })
 
-      expect { utils.evaluate_fhirpath_elements(request_bundle, 'Bundle.id') }
+      expect { utils.evaluate_fhirpath_results(request_bundle, 'Bundle.id') }
         .to raise_error(DaVinciPASTestKit::FhirpathUtils::FhirpathServiceError, /unparseable response/)
     end
   end

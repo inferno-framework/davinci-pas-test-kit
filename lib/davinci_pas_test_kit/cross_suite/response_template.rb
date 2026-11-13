@@ -26,7 +26,7 @@ module DaVinciPASTestKit
     end
 
     # @param request [FHIR::Model] the resource expressions are evaluated against.
-    # @param evaluator [#evaluate_fhirpath_elements] see FhirpathUtils.
+    # @param evaluator [#evaluate_fhirpath_results] see FhirpathUtils.
     def initialize(request, evaluator)
       @request = request
       @evaluator = evaluator
@@ -67,9 +67,9 @@ module DaVinciPASTestKit
 
     def expand_string(string)
       whole_token = string.match(WHOLE_TOKEN_PATTERN)
-      return evaluate(whole_token[1]).map { |element| copy_element(element) } if whole_token
+      return evaluate(whole_token[1]).filter_map { |result| copy_element(result) } if whole_token
 
-      [string.gsub(TOKEN_PATTERN) { evaluate(::Regexp.last_match(1)).grep_v(Enumerable).join(',') }]
+      [string.gsub(TOKEN_PATTERN) { elements(evaluate(::Regexp.last_match(1))).grep_v(Enumerable).join(',') }]
     end
 
     def for_each?(value)
@@ -83,6 +83,11 @@ module DaVinciPASTestKit
               "A \"#{FOR_EACH_KEY}\" object must contain only a \"#{FOR_EACH_KEY}\" FHIRPath expression and a " \
               "\"#{TEMPLATE_KEY}\", but found keys #{directive.keys.map { |k| "\"#{k}\"" }.join(', ')}."
       end
+      if directive[TEMPLATE_KEY].is_a?(Array)
+        raise TemplateError,
+              "The \"#{TEMPLATE_KEY}\" of a \"#{FOR_EACH_KEY}\" object must not be an array: use a " \
+              "\"#{FOR_EACH_KEY}\" object for each repeated array item instead."
+      end
 
       Array.new(evaluate(expression).size) do |index|
         expand(with_current(directive[TEMPLATE_KEY], "(#{expression})[#{index}]"))
@@ -95,14 +100,14 @@ module DaVinciPASTestKit
       case value
       when Hash
         if for_each?(value)
-          value.merge(FOR_EACH_KEY => value[FOR_EACH_KEY].to_s.gsub(CURRENT_VARIABLE_PATTERN, replacement))
+          value.merge(FOR_EACH_KEY => value[FOR_EACH_KEY].to_s.gsub(CURRENT_VARIABLE_PATTERN) { replacement })
         else
           value.transform_values { |child| with_current(child, replacement) }
         end
       when Array
         value.map { |child| with_current(child, replacement) }
       when String
-        value.gsub(TOKEN_PATTERN) { "{{#{::Regexp.last_match(1).gsub(CURRENT_VARIABLE_PATTERN, replacement)}}}" }
+        value.gsub(TOKEN_PATTERN) { "{{#{::Regexp.last_match(1).gsub(CURRENT_VARIABLE_PATTERN) { replacement }}}}" }
       else
         value
       end
@@ -114,12 +119,20 @@ module DaVinciPASTestKit
               "The expression '#{expression}' uses %current outside of a \"#{FOR_EACH_KEY}\" template."
       end
 
-      @results[expression] ||= @evaluator.evaluate_fhirpath_elements(@request, expression).compact
+      @results[expression] ||= @evaluator.evaluate_fhirpath_results(@request, expression)
     end
 
-    def copy_element(element)
+    def elements(results)
+      results.map { |result| result['element'] }.compact
+    end
+
+    # Resources and Bundle entries are copied as they are. Extensions not published by HL7 are removed from
+    # other elements, including copied extensions themselves.
+    def copy_element(result)
+      element = result['element']
       return element unless element.is_a?(Hash)
-      return element if element.key?('resourceType') || element.key?('resource')
+      return element if element.key?('resourceType') || result['type'] == 'Bundle.entry'
+      return if result['type'] == 'Extension' && !CustomExtensionRemoval.hl7_extension?(element)
 
       CustomExtensionRemoval.without_custom_extensions(element)
     end
