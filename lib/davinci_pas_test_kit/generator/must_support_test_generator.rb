@@ -26,8 +26,6 @@ module DaVinciPASTestKit
           end
           submit_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'submit').generate
-            next if MustSupportTargetProfiles.client_response_excluded_profile?(profile)
-
             new(ig_metadata, profile, base_client_output_dir, 'response', 'submit', 'client').generate
           end
 
@@ -39,8 +37,6 @@ module DaVinciPASTestKit
           end
           inquiry_response_profiles.each do |profile|
             new(ig_metadata, profile, base_server_output_dir, 'response', 'inquire').generate
-            next if MustSupportTargetProfiles.client_response_excluded_profile?(profile)
-
             new(ig_metadata, profile, base_client_output_dir, 'response', 'inquire', 'client').generate
           end
         end
