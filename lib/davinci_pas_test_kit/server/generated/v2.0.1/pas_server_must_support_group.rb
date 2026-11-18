@@ -21,7 +21,6 @@ require_relative 'requestor/server_submit_response_must_support_requestor_test'
 require_relative 'beneficiary/server_submit_response_must_support_beneficiary_test'
 require_relative 'practitioner/server_submit_response_must_support_practitioner_test'
 require_relative 'practitioner_role/server_submit_response_must_support_practitioner_role_test'
-require_relative 'task/server_submit_response_must_support_task_test'
 require_relative 'pas_inquiry_request_bundle/server_inquire_request_must_support_pas_inquiry_request_bundle_test'
 require_relative 'claim_inquiry/server_inquire_request_must_support_claim_inquiry_test'
 require_relative 'coverage/server_inquire_request_must_support_coverage_test'
@@ -38,7 +37,6 @@ require_relative 'requestor/server_inquire_response_must_support_requestor_test'
 require_relative 'beneficiary/server_inquire_response_must_support_beneficiary_test'
 require_relative 'practitioner/server_inquire_response_must_support_practitioner_test'
 require_relative 'practitioner_role/server_inquire_response_must_support_practitioner_role_test'
-require_relative 'task/server_inquire_response_must_support_task_test'
 
 module DaVinciPASTestKit
   module DaVinciPASV201
@@ -104,7 +102,6 @@ module DaVinciPASTestKit
           - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
           - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
           - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
           
           
           
@@ -253,7 +250,6 @@ module DaVinciPASTestKit
           test from: :pas_server_v201_submit_response_must_support_beneficiary
           test from: :pas_server_v201_submit_response_must_support_practitioner
           test from: :pas_server_v201_submit_response_must_support_practitioner_role
-          test from: :pas_server_v201_submit_response_must_support_task
         end
       end
       group do
@@ -288,7 +284,6 @@ module DaVinciPASTestKit
           - [PAS Beneficiary Patient](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-beneficiary.html)
           - [PAS Practitioner](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitioner.html)
           - [PAS PractitionerRole](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-practitionerrole.html)
-          - [PAS Task](https://hl7.org/fhir/us/davinci-pas/STU2/StructureDefinition-profile-task.html)
           
           
           
@@ -434,7 +429,6 @@ module DaVinciPASTestKit
           test from: :pas_server_v201_inquire_response_must_support_beneficiary
           test from: :pas_server_v201_inquire_response_must_support_practitioner
           test from: :pas_server_v201_inquire_response_must_support_practitioner_role
-          test from: :pas_server_v201_inquire_response_must_support_task
         end
       end
     end
