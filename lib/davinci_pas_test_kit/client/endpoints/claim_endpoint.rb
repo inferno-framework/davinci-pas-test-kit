@@ -101,7 +101,7 @@ module DaVinciPASTestKit
       'PAS client has updated or deleted it. Run the Subscription Setup tests before re-running this group.'.freeze
 
     # Inferno updates these SubscriptionStatus parameters on a tester-provided notification, and the notification
-    # checks rely on them
+    # checks rely on them - see usable_notification?
     REQUIRED_SUBSCRIPTION_STATUS_PARAMETERS = %w[subscription type status].freeze
 
     WORKFLOW_TAG_MAP = {
@@ -239,24 +239,31 @@ module DaVinciPASTestKit
         UserInputResponse.notification_candidates(test, result)
       end
       notification_json = resolve_candidate(notification, req_bundle, 'notification')
-      return notification_json if notification_json.blank? || subscription_status_present?(notification_json)
+      return notification_json if notification_json.blank? || usable_notification?(notification_json)
 
       add_result_warning(
         'Unable to use the selected tester-provided notification, so Inferno will generate a default ' \
-        'notification: it is not a Bundle with a SubscriptionStatus entry that has `subscription`, `type`, and ' \
-        '`status` parameters.'
+        'notification: it is not a well-formed Bundle whose first entry is a SubscriptionStatus with ' \
+        '`subscription`, `type`, and `status` parameters.'
       )
       nil
     end
 
-    # Whether the notification has the SubscriptionStatus that Inferno updates before sending it, with the
-    # parameters that the notification checks rely on
-    def subscription_status_present?(notification_json)
+    # Whether the notification has the SubscriptionStatus that Inferno updates before sending it, where the
+    # notification checks expect it, with the parameters they rely on. fhir_models leaves nil for elements it
+    # can't read, which Inferno's updates and the checks don't expect.
+    def usable_notification?(notification_json)
       notification = FHIR.from_contents(notification_json)
-      notification.is_a?(FHIR::Bundle) && Array(notification.entry).compact.any? do |entry|
-        entry.resource.is_a?(FHIR::Parameters) &&
-          (REQUIRED_SUBSCRIPTION_STATUS_PARAMETERS - Array(entry.resource.parameter).compact.map(&:name)).empty?
-      end
+      return false unless notification.is_a?(FHIR::Bundle)
+
+      entries = Array(notification.entry)
+      subscription_status = entries.first&.resource
+      return false if entries.any?(&:nil?) || !subscription_status.is_a?(FHIR::Parameters)
+
+      parameters = Array(subscription_status.parameter)
+      return false if parameters.any?(&:nil?) || parameters.any? { |param| Array(param.part).any?(&:nil?) }
+
+      (REQUIRED_SUBSCRIPTION_STATUS_PARAMETERS - parameters.map(&:name)).empty?
     end
 
     # Replaces {{fhirpath}} tokens in a selected tester-provided response or notification.

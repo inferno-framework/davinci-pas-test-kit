@@ -128,7 +128,7 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
 
       expect(notification_jobs.length).to eq(1)
       expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('no-status')
-      expect(result_warnings(result)).to include(a_string_including('not a Bundle with a SubscriptionStatus entry'))
+      expect(result_warnings(result)).to include(a_string_including('first entry is a SubscriptionStatus'))
     end
 
     it 'mocks the notification with a warning when the SubscriptionStatus has no type parameter' do
@@ -142,6 +142,32 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
       expect(notification_jobs.length).to eq(1)
       expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('no-type')
       expect(result_warnings(result)).to include(a_string_including('`subscription`, `type`, and `status` parameters'))
+    end
+
+    it 'mocks the notification with a warning when the SubscriptionStatus is not the first entry' do
+      notification = notification_with_id('status-second')
+      notification['entry'] = notification['entry'].rotate
+      result = run_gather_test(ms_submit_responses: [pended_response].to_json,
+                               ms_submit_notifications: [notification].to_json)
+
+      post_json(submit_url, submit_request_json)
+
+      expect(notification_jobs.length).to eq(1)
+      expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('status-second')
+      expect(result_warnings(result)).to include(a_string_including('first entry is a SubscriptionStatus'))
+    end
+
+    it 'mocks the notification when a SubscriptionStatus parameter is malformed' do
+      notification = notification_with_id('malformed-parameter')
+      notification['entry'].first['resource']['parameter'].unshift({ 'name' => 'x', 'part' => [5] })
+      result = run_gather_test(ms_submit_responses: [pended_response].to_json,
+                               ms_submit_notifications: [notification].to_json)
+
+      post_json(submit_url, submit_request_json)
+
+      expect(notification_jobs.length).to eq(1)
+      expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('malformed-parameter')
+      expect(result_warnings(result)).to include(a_string_including('not a well-formed Bundle'))
     end
 
     it 'mocks the notification with a warning when a wrapper does not hold a Bundle' do

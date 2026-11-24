@@ -50,7 +50,7 @@ RSpec.describe DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification do
       .to be_empty
   end
 
-  it 'always counts the event as the first since the Subscription started' do
+  it 'counts the event as the first since the Subscription started, ignoring earlier notifications' do
     create_request([DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG])
 
     perform_job([DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG, 'new'])

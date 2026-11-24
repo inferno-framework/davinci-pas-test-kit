@@ -182,8 +182,8 @@ Inferno's mocked responses in this group are never pended, so this requires a pe
 The notification is selected from the **Must Support Notification Bundles** input, which uses the
 [response option format](#response-option-format) with a notification Bundle in place of the response,
 with criteria [evaluated](#response-option-evaluation) against the `$submit` request. If no entry matches,
-or the selected notification has no SubscriptionStatus with `subscription`, `type`, and `status` parameters,
-Inferno [mocks](#notification-bundle) one. Notifications are sent up to about 11 seconds after the
+or the selected notification's first entry isn't a SubscriptionStatus with `subscription`, `type`, and `status`
+parameters, Inferno [mocks](#notification-bundle) one. Notifications are sent up to about 11 seconds after the
 response, and only while the test is waiting, so wait at least 15 seconds after the last pended response
 before continuing.
 

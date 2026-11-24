@@ -109,7 +109,9 @@ module DaVinciPASTestKit
       pended `$submit` requests during the *Demonstrate Must Support Coverage* group. For each pended request,
       Inferno will [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
       and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
-      a notification to send from this list. If no entries match or instantiation fails, Inferno will
+      a notification to send from this list. If no entries match, instantiation fails, or the selected
+      notification's first entry isn't a SubscriptionStatus with `subscription`, `type`, and `status` parameters,
+      Inferno will
       [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#notification-bundle)
       a notification.
     DESCRIPTION
