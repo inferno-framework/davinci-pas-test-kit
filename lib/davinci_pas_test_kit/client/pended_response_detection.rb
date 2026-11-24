@@ -7,13 +7,12 @@ module DaVinciPASTestKit
   module PendedResponseDetection
     # @param response [Hash, String, nil] a $submit response Bundle, parsed or as JSON
     def self.pended?(response)
-      json = response.is_a?(Hash) ? response.to_json : response
-      return false unless json.is_a?(String)
+      bundle = response.is_a?(String) ? JSON.parse(response) : response
+      return false unless bundle.is_a?(Hash) && bundle['resourceType'] == 'Bundle'
 
-      bundle = FHIR.from_contents(json)
-      return false unless bundle.is_a?(FHIR::Bundle)
-
-      ReviewActionCodes.elements(bundle.entry).map(&:resource).grep(FHIR::ClaimResponse).any? do |claim_response|
+      claim_responses = ReviewActionCodes.hashes(bundle['entry']).map { |entry| entry['resource'] }
+        .select { |resource| resource.is_a?(Hash) && resource['resourceType'] == 'ClaimResponse' }
+      claim_responses.any? do |claim_response|
         ReviewActionCodes.claim_response_has_code?(claim_response, PASConstants::X12_ADJUDICATION_CODES[:pended])
       end
     rescue JSON::ParserError

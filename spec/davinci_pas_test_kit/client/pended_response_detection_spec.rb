@@ -46,6 +46,15 @@ RSpec.describe DaVinciPASTestKit::PendedResponseDetection do
     expect(described_class.pended?({ 'resourceType' => 'Parameters' })).to be(false)
     expect(described_class.pended?('not json')).to be(false)
     expect(described_class.pended?(nil)).to be(false)
+    expect(described_class.pended?('')).to be(false)
+  end
+
+  it 'still identifies a pended response when other elements are malformed' do
+    bundle = response_bundle('A4')
+    bundle['entry'].first['resource']['identifier'] = [123]
+    bundle['entry'] << 5
+
+    expect(described_class.pended?(bundle)).to be(true)
   end
 
   it 'ignores malformed elements while still finding a pended item' do
