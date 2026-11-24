@@ -77,8 +77,8 @@ Inferno supports mocking both `id-only` and `full-resource` notifications. The f
   time and with a `focus` that points to the ClaimResponse returned on the `$submit`.
   If it cannot find the ClaimResponse reference from the `$submit` response returned
   by Inferno, it will generate a random UUID (which isn't likely to work correctly when received).
-- The subscription's `events-since-subscription-start` and the event's `event-number` count the event
-  notifications Inferno has sent during the test session.
+- The subscription's `events-since-subscription-start` and the event's `event-number` will always
+  be 1 as Inferno is not able to track notifications across multiple sessions or runs.
 - When generating a `full-resource` notification, Inferno will include `additional-context`
   references for each entry in the `$submit` response Bundle other than the ClaimResponse
   (which is already in the `focus`). Then it will include Notification Bundle entries for
@@ -221,7 +221,7 @@ Note that at this time, only string data can be added with expression tokens.
 
 Following token instantiation, responses provided by testers will be modified by Inferno
 to populate and update details that testers won't know ahead of time. These modifications
-fall into three categories:
+fall into two categories:
 - **Timestamps**: creation timestamps, such as those on Bundles, ClaimResponses, and event notifications,
   will be updated or populated by Inferno so that they are in sync with the time the message is sent.
 - **Resource Ids**: some resource ids will not be known ahead of time and will be added or updated
@@ -232,8 +232,6 @@ fall into three categories:
     some systems.
   - *ClaimResponse Id*: if the tester provides a Notification but has Inferno generate the `$submit`
     response, then Inferno will update the focus to use the ClaimResponse id that it generates.
-- **Event Counts**: `events-since-subscription-start` and the `event-number` will be updated as for
-  [mocked notifications](#notification-bundle).
 
 If the tester provides an input that is malformed in some way such that Inferno cannot get the details
 that it needs to make the modifications, then the raw input will be used.

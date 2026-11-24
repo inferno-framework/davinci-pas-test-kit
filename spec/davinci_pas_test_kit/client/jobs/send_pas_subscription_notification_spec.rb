@@ -34,11 +34,6 @@ RSpec.describe DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification do
       .valueString
   end
 
-  def event_number(request)
-    event = subscription_status(request).parameter.find { |param| param.name == 'notification-event' }
-    event.part.find { |part| part.name == 'event-number' }.valueString
-  end
-
   before do
     create_request([DaVinciPASTestKit::SUBSCRIPTION_CREATE_TAG], response_body: subscription_json.to_json,
                                                                  status: 201)
@@ -55,14 +50,12 @@ RSpec.describe DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification do
       .to be_empty
   end
 
-  it 'counts the event notifications already sent in the session, from either workflow' do
+  it 'always counts the event as the first since the Subscription started' do
     create_request([DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG])
-    create_request([DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG])
 
     perform_job([DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG, 'new'])
 
     notification = requests_repo.tagged_requests(test_session.id, ['new']).first
-    expect(events_since_subscription_start(notification)).to eq('3')
-    expect(event_number(notification)).to eq('3')
+    expect(events_since_subscription_start(notification)).to eq('1')
   end
 end

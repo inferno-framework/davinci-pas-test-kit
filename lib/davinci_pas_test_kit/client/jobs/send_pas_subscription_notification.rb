@@ -26,8 +26,6 @@ module DaVinciPASTestKit
       TEST_WAITING_POLL_INTERVAL_SECONDS = 0.5
 
       DEFAULT_NOTIFICATION_TAGS = [REST_HOOK_EVENT_NOTIFICATION_TAG].freeze
-      # Together these tag every event notification sent
-      EVENT_NOTIFICATION_TAGS = [REST_HOOK_EVENT_NOTIFICATION_TAG, MUST_SUPPORT_NOTIFICATION_TAG].freeze
 
       # test_run_id and result_id may be nil when the job is started by an Inferno test, which does not know
       # them until it is waiting. They are then looked up from the test session once the test waits.
@@ -171,32 +169,10 @@ module DaVinciPASTestKit
       end
 
       def send_event_notification
-        event_number = previous_event_count + 1
-        event_bundle = derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
-                                                 event_number)
-        update_event_number(event_bundle, event_number)
-        response = send_notification(event_bundle.to_json)
+        event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
+                                               1).to_json
+        response = send_notification(event_json)
         persist_notification_request(response, @notification_tags)
-      end
-
-      # derive_event_notification updates events-since-subscription-start, but not the event's own number
-      def update_event_number(event_bundle, event_number)
-        subscription_status = find_subscription_status_entry(event_bundle)&.resource
-        events = subscription_status&.parameter&.select { |param| param.name == 'notification-event' }
-        return unless events&.length == 1
-
-        event_number_part = events.first.part&.find { |part| part.name == 'event-number' }
-        event_number_part&.valueString = event_number.to_s
-      end
-
-      def previous_event_count
-        self.class.event_notification_count(@test_session_id)
-      end
-
-      # Like the Subscriptions Test Kit's count, this isn't per Subscription
-      def self.event_notification_count(test_session_id)
-        requests_repo = Inferno::Repositories::Requests.new
-        EVENT_NOTIFICATION_TAGS.sum { |tag| requests_repo.tagged_requests(test_session_id, [tag]).count }
       end
 
       def send_notification(request_body)
