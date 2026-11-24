@@ -5,7 +5,6 @@ require_relative '../../../cross_suite/tags'
 require_relative '../../../cross_suite/validator_configuration'
 require_relative '../../pended_response_detection'
 require_relative '../../subscription_notification_trigger'
-require_relative '../../subscription_setup_requirement'
 
 module DaVinciPASTestKit
   module DaVinciPASV221
@@ -78,6 +77,7 @@ module DaVinciPASTestKit
 
     class PASClientMustSupportNotificationConformanceTest < Inferno::Test
       include SubscriptionsTestKit::NotificationConformanceVerification
+      include SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
       include MustSupportNotificationHelper
 
       id :pas_client_v221_ms_notification_conformance_test
@@ -106,7 +106,7 @@ module DaVinciPASTestKit
       end
 
       def payload_subscription
-        subscription = SubscriptionSetupRequirement.created_subscription(test_session_id)
+        subscription = find_subscription(test_session_id, as_json: true)
         skip_if subscription.blank?,
                 'There is no Subscription to check the payload content against. Re-run the *Subscription Setup* ' \
                 'group, then the *Demonstrate Must Support Coverage* group.'

@@ -1,9 +1,13 @@
+require 'subscriptions_test_kit'
+
 module DaVinciPASTestKit
   # Shared guard for client tests that need the client's Subscription Setup to have completed
   # before they can proceed - either because they need the created Subscription itself (e.g. to
   # generate a notification against it, or to update or delete it) or just need to know one exists
   # before continuing with the pended scenario.
   module SubscriptionSetupRequirement
+    extend SubscriptionsTestKit::SubscriptionsR5BackportR4Client::SubscriptionSimulationUtils
+
     PENDED_SCENARIO_SKIP_MESSAGE = %(
       This test cannot proceed because no Subscription exists to receive notifications
       for pended claims. Run the _Subscription Setup_ tests to provide a Subscription
@@ -61,18 +65,11 @@ module DaVinciPASTestKit
       subscription
     end
 
-    # @return [Hash, nil] the Subscription created during the session, as returned to the client, parsed from
-    #   the response body. Nil if no Subscription-create request succeeded (201).
-    def self.created_subscription(test_session_id)
-      subscription_request = requests_repo.tagged_requests(test_session_id, [SUBSCRIPTION_CREATE_TAG])
-        .find { |req| req.status == 201 }
-      JSON.parse(subscription_request.response_body) if subscription_request.present?
-    end
-
-    # @return [Hash, nil] the created Subscription (see created_subscription), unless the client has since
-    #   successfully updated or deleted it - see require_unmodified_subscription.
+    # @return [Hash, nil] the Subscription created during the session, as returned to the client and parsed from
+    #   the response body, unless the client has since successfully updated or deleted it - see
+    #   require_unmodified_subscription. Nil if there is none.
     def self.unmodified_subscription(test_session_id)
-      subscription = created_subscription(test_session_id)
+      subscription = find_subscription(test_session_id, as_json: true)
       return if subscription.blank? || subscription_modified?(test_session_id, subscription['id'])
 
       subscription
@@ -92,10 +89,6 @@ module DaVinciPASTestKit
       else
         request.status == 200
       end
-    end
-
-    def self.requests_repo
-      Inferno::Repositories::Requests.new
     end
   end
 end
