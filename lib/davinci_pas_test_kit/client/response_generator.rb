@@ -1,3 +1,4 @@
+require_relative '../cross_suite/pas_constants'
 require_relative '../parameters_helper'
 
 module DaVinciPASTestKit
@@ -200,10 +201,10 @@ module DaVinciPASTestKit
       claim_response&.item&.each do |item|
         item.adjudication.each do |adjudication|
           review_action_extension = adjudication.extension.find do |ext|
-            ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'
+            ext.url == PASConstants::REVIEW_ACTION_EXTENSION_URL
           end
           review_code_extension = review_action_extension&.extension&.find do |ext|
-            ext.url == 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'
+            ext.url == PASConstants::REVIEW_ACTION_CODE_EXTENSION_URL
           end
           next unless review_code_extension.present?
 
@@ -279,10 +280,10 @@ module DaVinciPASTestKit
               FHIR::ClaimResponse::Item::Adjudication.new(
                 extension: [
                   FHIR::Extension.new(
-                    url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
+                    url: PASConstants::REVIEW_ACTION_EXTENSION_URL,
                     extension: [
                       FHIR::Extension.new(
-                        url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode',
+                        url: PASConstants::REVIEW_ACTION_CODE_EXTENSION_URL,
                         valueCodeableConcept: FHIR::CodeableConcept.new(
                           coding: [
                             get_review_action_code(decision)
@@ -347,10 +348,10 @@ module DaVinciPASTestKit
             FHIR::ClaimResponse::Item::Adjudication.new(
               extension: [
                 FHIR::Extension.new(
-                  url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction',
+                  url: PASConstants::REVIEW_ACTION_EXTENSION_URL,
                   extension: [
                     FHIR::Extension.new(
-                      url: 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode',
+                      url: PASConstants::REVIEW_ACTION_CODE_EXTENSION_URL,
                       valueCodeableConcept: FHIR::CodeableConcept.new(
                         coding: [
                           get_review_action_code(:approval)

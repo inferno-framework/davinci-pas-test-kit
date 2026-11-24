@@ -1,3 +1,5 @@
+require_relative '../../../cross_suite/pas_constants'
+require_relative '../../../cross_suite/review_action_codes'
 require_relative '../../../cross_suite/tags'
 
 module DaVinciPASTestKit
@@ -16,11 +18,7 @@ module DaVinciPASTestKit
       )
       simulation_verification
 
-      REVIEW_ACTION_URL =
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'.freeze
-      REVIEW_ACTION_CODE_URL =
-        'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'.freeze
-      MODIFIED_REVIEW_ACTION_CODE = 'A6'.freeze
+      MODIFIED_REVIEW_ACTION_CODE = PASConstants::X12_ADJUDICATION_CODES[:modification]
 
       run do
         load_tagged_requests(MODIFICATION_WORKFLOW_TAG, SUBMIT_TAG)
@@ -48,7 +46,8 @@ module DaVinciPASTestKit
                       "'#{MODIFIED_REVIEW_ACTION_CODE}' (Modified), but none were found.")
         end
 
-        add_item_sequences = Array(claim_response.addItem).flat_map { |add_item| Array(add_item.itemSequence) }
+        add_item_sequences = ReviewActionCodes.elements(claim_response.addItem)
+          .flat_map { |add_item| Array(add_item.itemSequence) }
         missing = modified_sequences.reject { |sequence| add_item_sequences.include?(sequence) }
         return if missing.empty?
 
@@ -75,23 +74,9 @@ module DaVinciPASTestKit
       end
 
       def modified_item_sequences(claim_response)
-        Array(claim_response.item).select { |item| item_modified?(item) }.map(&:itemSequence).compact
-      end
-
-      def item_modified?(item)
-        Array(item.adjudication).any? { |adjudication| adjudication_modified?(adjudication) }
-      end
-
-      def adjudication_modified?(adjudication)
-        review_action = Array(adjudication.extension).find { |ext| ext.url == REVIEW_ACTION_URL }
-        return false if review_action.blank?
-
-        review_action_code = Array(review_action.extension).find { |ext| ext.url == REVIEW_ACTION_CODE_URL }
-        return false if review_action_code&.valueCodeableConcept.blank?
-
-        Array(review_action_code.valueCodeableConcept.coding).any? do |coding|
-          coding.code == MODIFIED_REVIEW_ACTION_CODE
-        end
+        ReviewActionCodes.elements(claim_response.item)
+          .select { |item| ReviewActionCodes.item_has_code?(item, MODIFIED_REVIEW_ACTION_CODE) }
+          .filter_map(&:itemSequence)
       end
     end
   end
