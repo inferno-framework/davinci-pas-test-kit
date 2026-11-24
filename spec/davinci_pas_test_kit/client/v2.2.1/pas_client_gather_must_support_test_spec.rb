@@ -79,6 +79,15 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
     expect(result.result_message).to include('so Inferno will not send notifications')
   end
 
+  it 'does not expect notifications for a pended response whose ClaimResponse Inferno cannot return' do
+    claim_response = pended_response['entry'].find { |entry| entry['resource']['resourceType'] == 'ClaimResponse' }
+    claim_response['resource']['identifier'] = [123]
+    result = run(test, session_url_path:, ms_submit_responses: [pended_response].to_json)
+
+    expect(result.result).to eq('wait')
+    expect(result.result_message).to include('so Inferno will not send notifications')
+  end
+
   it 'waits without a Subscription when the responses input is not usable, leaving it to be reported later' do
     result = run(test, session_url_path:, ms_submit_responses: '{')
 

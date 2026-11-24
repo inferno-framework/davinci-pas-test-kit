@@ -1,10 +1,9 @@
 require_relative 'pas_constants'
 
 module DaVinciPASTestKit
-  # Reads the X12 review action codes on ClaimResponse item adjudications from parsed JSON. Responses may be
-  # tester-provided, so anything that isn't the expected kind of JSON value is ignored rather than raising.
-  # Callers with FHIR models pass their to_hash, since fhir_models drops a whole resource when any of its
-  # elements is malformed.
+  # Reads the X12 review action codes on ClaimResponse item adjudications from parsed JSON (string keys).
+  # Responses may be tester-provided, so anything that isn't the expected kind of JSON value is ignored rather
+  # than raising. Callers holding FHIR models pass their to_hash.
   module ReviewActionCodes
     # @param claim_response [Hash] a ClaimResponse as parsed JSON
     # @param code [String] e.g. PASConstants::X12_ADJUDICATION_CODES[:pended]

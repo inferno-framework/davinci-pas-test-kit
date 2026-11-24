@@ -5,7 +5,7 @@ module DaVinciPASTestKit
   # Identifies pended v2.2.1 $submit responses, which have a review action code of A4 (Pending) on a
   # ClaimResponse item adjudication
   module PendedResponseDetection
-    # @param response [Hash, String, nil] a $submit response Bundle, parsed or as JSON
+    # @param response [Hash, String, nil] a $submit response Bundle, as JSON or parsed from it (string keys)
     def self.pended?(response)
       bundle = response.is_a?(String) ? JSON.parse(response) : response
       return false unless bundle.is_a?(Hash) && bundle['resourceType'] == 'Bundle'

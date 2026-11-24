@@ -69,10 +69,17 @@ module DaVinciPASTestKit
         candidates = UserInputResponse.parse_candidates(self, :ms_submit_responses, ms_submit_responses,
                                                         ResponseSelectionUtils::RESPONSE_RESOURCE_TYPES)
         @pended_responses_provided = Array(candidates).any? do |candidate|
-          PendedResponseDetection.pended?(ResponseSelectionUtils.entity_response(candidate))
+          PendedResponseDetection.pended?(as_returned(ResponseSelectionUtils.entity_response(candidate)))
         end
       rescue UserInputResponse::InvalidInputError
         @pended_responses_provided = false
+      end
+
+      # Inferno returns a tester-provided response as fhir_models reads it, which drops malformed resources,
+      # unless fhir_models can't read it at all - see ResponseGenerator#update_tester_provided_response
+      def as_returned(response)
+        resource = FHIR.from_contents(response.to_json) if response.is_a?(Hash)
+        resource.present? ? resource.to_json : response
       end
     end
   end
