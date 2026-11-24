@@ -100,6 +100,10 @@ module DaVinciPASTestKit
       'Inferno did not send a notification after a pended response because there is no Subscription, or the ' \
       'PAS client has updated or deleted it. Run the Subscription Setup tests before re-running this group.'.freeze
 
+    # Inferno updates these SubscriptionStatus parameters on a tester-provided notification, and the notification
+    # checks rely on them
+    REQUIRED_SUBSCRIPTION_STATUS_PARAMETERS = %w[subscription type status].freeze
+
     WORKFLOW_TAG_MAP = {
       pended: PENDED_WORKFLOW_TAG,
       denial: DENIAL_WORKFLOW_TAG,
@@ -239,18 +243,19 @@ module DaVinciPASTestKit
 
       add_result_warning(
         'Unable to use the selected tester-provided notification, so Inferno will generate a default ' \
-        'notification: it is not a Bundle with a SubscriptionStatus entry.'
+        'notification: it is not a Bundle with a SubscriptionStatus entry that has `subscription`, `type`, and ' \
+        '`status` parameters.'
       )
       nil
     end
 
-    # Whether the notification has the SubscriptionStatus that Inferno updates before sending it
+    # Whether the notification has the SubscriptionStatus that Inferno updates before sending it, with the
+    # parameters that the notification checks rely on
     def subscription_status_present?(notification_json)
       notification = FHIR.from_contents(notification_json)
-      notification.is_a?(FHIR::Bundle) && Array(notification.entry).any? do |entry|
-        entry.resource.is_a?(FHIR::Parameters) && Array(entry.resource.parameter).any? do |param|
-          param.name == 'subscription'
-        end
+      notification.is_a?(FHIR::Bundle) && Array(notification.entry).compact.any? do |entry|
+        entry.resource.is_a?(FHIR::Parameters) &&
+          (REQUIRED_SUBSCRIPTION_STATUS_PARAMETERS - Array(entry.resource.parameter).compact.map(&:name)).empty?
       end
     end
 

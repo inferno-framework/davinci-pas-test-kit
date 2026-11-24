@@ -131,6 +131,19 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientGatherMustSupportTest
       expect(result_warnings(result)).to include(a_string_including('not a Bundle with a SubscriptionStatus entry'))
     end
 
+    it 'mocks the notification with a warning when the SubscriptionStatus has no type parameter' do
+      notification = notification_with_id('no-type')
+      notification['entry'].first['resource']['parameter'].reject! { |param| param['name'] == 'type' }
+      result = run_gather_test(ms_submit_responses: [pended_response].to_json,
+                               ms_submit_notifications: [notification].to_json)
+
+      post_json(submit_url, submit_request_json)
+
+      expect(notification_jobs.length).to eq(1)
+      expect(JSON.parse(notification_jobs.first[5])['id']).to_not eq('no-type')
+      expect(result_warnings(result)).to include(a_string_including('`subscription`, `type`, and `status` parameters'))
+    end
+
     it 'mocks the notification with a warning when a wrapper does not hold a Bundle' do
       result = run_gather_test(ms_submit_responses: [pended_response].to_json,
                                ms_submit_notifications: [{ 'bundle' => { 'resourceType' => 'Parameters' } }].to_json)
