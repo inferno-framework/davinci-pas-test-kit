@@ -3,7 +3,7 @@ require_relative 'jobs/send_pas_subscription_notification'
 
 module DaVinciPASTestKit
   # Starts the job that sends a Subscription notification to the client after a pended $submit response.
-  # The notification is the tester-provided one (updated to be current) when there is one, or a mocked
+  # The notification is the tester-provided one passed in (updated to be current) when there is one, or a mocked
   # notification based on the response and the client's Subscription otherwise.
   #
   # The module does not know how to reach the tester's inputs or the requests made earlier in the session,
@@ -16,7 +16,6 @@ module DaVinciPASTestKit
   #   run and result ids may be nil when the including class cannot know them yet (an Inferno test that has
   #   not started waiting), in which case the job looks them up.
   # - notification_bearer_token: the access token to send with the notification, from the tester's inputs
-  # - tester_notification_bundle: the tester-provided notification Bundle JSON, or nil
   # - client_subscription_json: the Subscription the client created, as parsed JSON (so that primitive
   #   extensions are kept), from the earlier successful Subscription create request. nil if there is none.
   # - test_run_identifier: the token that identifies the waiting test to resume
@@ -26,7 +25,7 @@ module DaVinciPASTestKit
     include ResponseGenerator
 
     HELPERS = %i[notification_test_run_id notification_test_session_id notification_result_id
-                 notification_bearer_token tester_notification_bundle client_subscription_json].freeze
+                 notification_bearer_token client_subscription_json].freeze
     HELPERS.each do |helper|
       define_method(helper) do
         raise NotImplementedError, "#{self.class} must implement ##{helper} to use SubscriptionNotificationTrigger"
@@ -35,10 +34,12 @@ module DaVinciPASTestKit
 
     # With resume_test true, the job ends the wait identified by test_run_identifier once it has sent the
     # notification, for use by an Inferno test that waits for the notification to be sent.
+    # @param tester_notification [String, nil] the tester-provided notification Bundle JSON, or nil to mock one.
     # @param tags [Array<String>] the tags the job records the notification request with.
-    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid, resume_test: false,
-                               tags: Jobs::SendPASSubscriptionNotification::DEFAULT_NOTIFICATION_TAGS)
-      notification_contents = notification_json(response_bundle_json, decision, generated_claim_response_uuid)
+    def start_notification_job(response_bundle_json, decision, generated_claim_response_uuid, tester_notification:,
+                               resume_test: false, tags: Jobs::SendPASSubscriptionNotification::DEFAULT_NOTIFICATION_TAGS)
+      notification_contents =
+        notification_json(response_bundle_json, decision, generated_claim_response_uuid, tester_notification)
 
       Inferno::Jobs.perform(Jobs::SendPASSubscriptionNotification, notification_test_run_id,
                             notification_test_session_id, notification_result_id, notification_bearer_token,
@@ -56,11 +57,9 @@ module DaVinciPASTestKit
 
     private
 
-    def notification_json(response_bundle_json, decision, generated_claim_response_uuid)
-      user_inputted_notification_json = tester_notification_bundle
-
-      if user_inputted_notification_json.present?
-        update_tester_provided_notification(user_inputted_notification_json, generated_claim_response_uuid)
+    def notification_json(response_bundle_json, decision, generated_claim_response_uuid, tester_notification)
+      if tester_notification.present?
+        update_tester_provided_notification(tester_notification, generated_claim_response_uuid)
       else
         generate_notification(response_bundle_json, decision)
       end

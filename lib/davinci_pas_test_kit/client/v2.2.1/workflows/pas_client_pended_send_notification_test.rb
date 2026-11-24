@@ -72,7 +72,7 @@ module DaVinciPASTestKit
         end
 
         start_notification_job(@pended_submit_request.response_body, :approval, generated_claim_response_uuid,
-                               resume_test: true)
+                               tester_notification: notification_bundle, resume_test: true)
 
         wait(
           identifier: test_run_identifier,
@@ -114,10 +114,6 @@ module DaVinciPASTestKit
 
       def notification_bearer_token
         client_endpoint_access_token
-      end
-
-      def tester_notification_bundle
-        notification_bundle
       end
 
       def client_subscription_json

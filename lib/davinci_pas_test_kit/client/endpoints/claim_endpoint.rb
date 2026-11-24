@@ -189,7 +189,8 @@ module DaVinciPASTestKit
       end
       return unless workflow == :pended && operation == 'submit'
 
-      start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid)
+      start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid,
+                             tester_notification: notification_bundle_input(result))
     end
 
     # Sends the final decision on a pended request, using the first matching tester-provided notification or a
@@ -202,9 +203,9 @@ module DaVinciPASTestKit
         return
       end
 
-      @selected_notification = resolve_must_support_notification(req_bundle)
       # Not MUST_SUPPORT_WORKFLOW_TAG, which the $submit and $inquire must support tests load by
       start_notification_job(response_bundle_json, :approval, generated_claim_response_uuid,
+                             tester_notification: resolve_must_support_notification(req_bundle),
                              tags: [MUST_SUPPORT_NOTIFICATION_TAG,
                                     DaVinciPASTestKit.notification_link_tag(notification_link_id)])
     rescue StandardError => e
@@ -427,10 +428,6 @@ module DaVinciPASTestKit
 
     def notification_bearer_token
       client_access_token_input(result)
-    end
-
-    def tester_notification_bundle
-      must_support_workflow? ? @selected_notification : notification_bundle_input(result)
     end
 
     def client_subscription_json
