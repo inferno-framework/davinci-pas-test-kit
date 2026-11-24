@@ -12,7 +12,7 @@ module DaVinciPASTestKit
           new(ig_metadata, 'submit', submit_request_profiles, base_client_output_dir).generate
 
           submit_response_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportTargetProfiles.client_submit_response_profile?(profile)
+            MustSupportTargetProfiles.submit_response_profile?(profile)
           end
           new(ig_metadata, 'submit', submit_response_profiles, base_client_output_dir, 'response').generate
 
@@ -22,7 +22,7 @@ module DaVinciPASTestKit
           new(ig_metadata, 'inquire', inquire_request_profiles, base_client_output_dir).generate
 
           inquire_response_profiles = ig_metadata.profiles.select do |profile|
-            MustSupportTargetProfiles.client_inquire_response_profile?(profile)
+            MustSupportTargetProfiles.inquire_response_profile?(profile)
           end
           new(ig_metadata, 'inquire', inquire_response_profiles, base_client_output_dir, 'response').generate
         end
