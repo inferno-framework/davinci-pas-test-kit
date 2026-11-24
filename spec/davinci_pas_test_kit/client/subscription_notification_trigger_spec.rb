@@ -6,13 +6,12 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
     Class.new do
       include DaVinciPASTestKit::SubscriptionNotificationTrigger
 
-      attr_accessor :tester_notification, :subscription
+      attr_accessor :subscription
 
       def notification_test_run_id = 'run-1'
       def notification_test_session_id = 'session-1'
       def notification_result_id = 'result-1'
       def notification_bearer_token = 'token-1'
-      def tester_notification_bundle = tester_notification
       def client_subscription_json = subscription
       def test_run_identifier = 'resume-1'
       def suite_id = 'davinci_pas_client_suite_v221'
@@ -49,6 +48,10 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
     captured
   end
 
+  def start_job(tester_notification: nil, **)
+    host.start_notification_job(response_bundle_json, :approval, 'cr-1', tester_notification:, **)
+  end
+
   def notification_in(args)
     FHIR.from_contents(args[5])
   end
@@ -56,28 +59,32 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
   before { host.subscription = subscription_json }
 
   it 'starts the notification job with the values the including class provides' do
-    args = started_job_args { host.start_notification_job(response_bundle_json, :approval, 'cr-1') }
+    args = started_job_args { start_job }
 
-    job, run_id, session_id, result_id, token, _notification, resume_token, suite_id, ig_version, resume_test = args
+    job, run_id, session_id, result_id, token, _notification, resume_token, suite_id, ig_version, resume_test,
+      tags = args
     expect(job).to eq(DaVinciPASTestKit::Jobs::SendPASSubscriptionNotification)
     expect([run_id, session_id, result_id, token]).to eq(%w[run-1 session-1 result-1 token-1])
     expect([resume_token, suite_id, ig_version]).to eq(%w[resume-1 davinci_pas_client_suite_v221 v2.2.1])
     expect(resume_test).to be(false)
+    expect(tags).to eq([DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG])
+  end
+
+  it 'asks the job to record the notification with the given tags' do
+    args = started_job_args { start_job(tags: %w[tag-1 tag-2]) }
+
+    expect(args.last).to eq(%w[tag-1 tag-2])
   end
 
   it 'asks the job to end the wait when resume_test is set' do
-    args = started_job_args do
-      host.start_notification_job(response_bundle_json, :approval, 'cr-1', resume_test: true)
-    end
+    args = started_job_args { start_job(resume_test: true) }
 
-    expect(args.last).to be(true)
+    expect(args[9]).to be(true)
   end
 
   describe 'when the tester provides a notification' do
-    before { host.tester_notification = tester_notification_json }
-
     it 'sends the tester-provided notification, updated to be current' do
-      args = started_job_args { host.start_notification_job(response_bundle_json, :approval, 'cr-1') }
+      args = started_job_args { start_job(tester_notification: tester_notification_json) }
 
       notification = notification_in(args)
       expect(notification).to be_a(FHIR::Bundle)
@@ -87,7 +94,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
 
   describe 'when the tester does not provide a notification' do
     it 'mocks an id-only notification when the Subscription does not ask for full resources' do
-      args = started_job_args { host.start_notification_job(response_bundle_json, :approval, 'cr-1') }
+      args = started_job_args { start_job }
 
       notification = notification_in(args)
       expect(notification).to be_a(FHIR::Bundle)
@@ -96,7 +103,7 @@ RSpec.describe DaVinciPASTestKit::SubscriptionNotificationTrigger do
 
     it 'mocks a full-resource notification when the Subscription asks for full resources' do
       host.subscription = full_resource_subscription_json
-      args = started_job_args { host.start_notification_job(response_bundle_json, :approval, 'cr-1') }
+      args = started_job_args { start_job }
 
       resource_types = notification_in(args).entry.map { |e| e.resource.resourceType }
       expect(resource_types).to include('Parameters', 'Bundle')

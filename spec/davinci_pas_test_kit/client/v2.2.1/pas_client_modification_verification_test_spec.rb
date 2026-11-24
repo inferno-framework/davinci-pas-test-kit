@@ -106,6 +106,14 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PasClientModificationVerificat
     expect(error_messages(result)).to include('addItem')
   end
 
+  it 'fails rather than erroring when adjudications are malformed' do
+    malformed_response = response_bundle(item: [{ 'itemSequence' => 1, 'adjudication' => [5] }])
+    create_submit_response(malformed_response, modification_tags)
+    result = run(described_class)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('A6')
+  end
+
   def error_messages(result)
     Inferno::Repositories::Messages.new.messages_for_result(result.id)
       .select { |message| message.type == 'error' }

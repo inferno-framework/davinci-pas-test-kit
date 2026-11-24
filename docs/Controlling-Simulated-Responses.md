@@ -98,6 +98,7 @@ a single response which will always be used.
 In the case of the must support group, testers can send multiple $submit and $inquire
 requests before explicitly clicking a link telling Inferno that all desired requests have
 been made. Inferno allows a list of responses with criteria indicating when to use them.
+In the v2.2.1 suite, a list of [notifications](#must-support-notifications) can be provided the same way.
 
 #### Response Option Format
 
@@ -171,6 +172,21 @@ a pended response for the third request and an approval response for all others:
 ]
 ```
 
+#### Must Support Notifications
+
+In the v2.2.1 suite, when Inferno returns a pended response (`reviewActionCode` of `A4`) during the
+*Demonstrate Must Support Coverage* group, it then notifies the PAS client of the final decision.
+Inferno's mocked responses in this group are never pended, so this requires a pended response in the
+**Must Support $submit Response Bundles** input.
+
+The notification is selected from the **Must Support Notification Bundles** input, which uses the
+[response option format](#response-option-format) with a notification Bundle in place of the response,
+with criteria [evaluated](#response-option-evaluation) against the `$submit` request. If no entry matches,
+or the selected notification's first entry isn't a SubscriptionStatus with `subscription`, `type`, and `status`
+parameters, Inferno [mocks](#notification-bundle) one. Notifications are sent up to about 11 seconds after the
+response, and only while the test is waiting, so wait at least 15 seconds after the last pended response
+before continuing.
+
 ### Response Instantiation
 
 Before returning a selected response, Inferno will update it with dynamic content,
@@ -233,6 +249,10 @@ such as identifiers, needed to connect them together and drive the workflow in t
 not associated with messaging time such as when a prior authorization response is valid are also not modified
 by Inferno. Unlike details that Inferno modifies as described above, testers should have control over and/or
 knowledge of the necessary details and values to construct consistent and working messages for Inferno to use.
+
+In the v2.2.1 must support group, responses and notifications are selected separately, so testers must
+make sure their criteria pair them correctly. Inferno warns when a notification's ClaimResponse shares
+neither an `id` nor an `identifier` with the pended response's ClaimResponse.
 
 ### FHIRPath Evaluation Limitations
 

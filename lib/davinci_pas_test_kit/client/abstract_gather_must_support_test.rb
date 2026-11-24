@@ -52,7 +52,17 @@ module DaVinciPASTestKit
     config options: { accepts_multiple_requests: true, submit_enabled: true, inquire_enabled: true }
     output :confirmation_url
 
+    # Overridden by versions that send notifications
+    def check_notification_prerequisites; end
+
+    # Overridden by versions that send notifications
+    def notification_description_for_wait
+      ''
+    end
+
     run do
+      check_notification_prerequisites
+
       wait_identifier = session_wait_identifier(client_id, session_url_path)
       submit_endpoint = session_endpoint_url(:submit, client_id, session_url_path)
       inquire_endpoint = session_endpoint_url(:inquire, client_id, session_url_path)
@@ -124,6 +134,7 @@ module DaVinciPASTestKit
                                           input_title(:ms_inquire_responses),
                                           '$inquire')}
 
+          #{notification_description_for_wait}
         MESSAGE
       )
     end

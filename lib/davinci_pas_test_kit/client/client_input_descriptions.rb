@@ -21,6 +21,16 @@ module DaVinciPASTestKit
       Inferno then asks for confirmation that all responses were handled
       without error and verifies the conformance of all requests and responses.
     )
+  MUST_SUPPORT_RECEIVE_GROUP_V221_DESCRIPTION =
+    <<~DESCRIPTION
+      During this group, Inferno will wait while the tester uses the PAS client to
+      make `$submit` and `$inquire` operation requests to Inferno demonstrating coverage
+      of must support elements not yet demonstrated. Inferno will notify the PAS client of the
+      final decision on any pended `$submit` requests.
+
+      Inferno then asks for confirmation that all responses were handled
+      without error and verifies the conformance of all requests, responses, and notifications.
+    DESCRIPTION
   MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_TITLE =
     'PAS client handled the $submit and $inquire responses without erroring'
   MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_DESCRIPTION =
@@ -32,6 +42,19 @@ module DaVinciPASTestKit
   MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_MESSAGE =
     'I attest that the PAS client correctly handled the `$submit` and `$inquire` ' \
     'operation responses received from Inferno during this test, making the details ' \
+    'available to users without errors.'
+  # v2.2.1 also notifies the client of the final decision on pended $submit requests
+  MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_TITLE =
+    'PAS client handled the $submit and $inquire responses and notifications without erroring'
+  MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_DESCRIPTION =
+    %(
+      During this test, the tester will verify that the PAS client handled
+      the `$submit` and `$inquire` operation responses and any notifications of the final decision
+      on pended `$submit` requests, making the result available to the user without failing or erroring.
+    )
+  MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_MESSAGE =
+    'I attest that the PAS client correctly handled the `$submit` and `$inquire` ' \
+    'operation responses and any notifications received from Inferno during this test, making the details ' \
     'available to users without errors.'
 
   # Text for the v2.2.1 must support group, where the analysis is a separate group from the receive group
@@ -52,6 +75,45 @@ module DaVinciPASTestKit
       separately. Re-running "Demonstrate Must Support Coverage" replaces the requests made during
       its previous run, while "Must Support Coverage" can be re-run on its own to re-evaluate
       coverage without making those requests again.
+    DESCRIPTION
+
+  # @param notification_source [String] completes "which will be either ..."
+  def self.notification_pas_conformance_description(notification_source)
+    <<~DESCRIPTION
+      This test verifies that each notification sent to the PAS client, which will be either
+      #{notification_source}, conforms to PAS-specific requirements beyond the base
+      Subscription Backport IG notification requirements. In particular, the focus resource in the
+      notification must be the updated ClaimResponse in a Bundle conformant to the
+      [PAS Response Bundle](https://hl7.org/fhir/us/davinci-pas/2.2.1/StructureDefinition-profile-pas-response-bundle.html)
+      profile, including the presence of all referenced instances within the Bundle and the
+      conformance of those instances to the appropriate profiles.
+
+      Note that:
+      - To ensure that the PAS client is driving its behavior only based on standard
+        PAS information, custom extensions are not allowed within the focus Bundle, except on
+        resources echoed back unchanged from the `$submit` request.
+      - Because X12 value sets are not public, elements bound to value
+        sets containing X12 codes are not validated.
+    DESCRIPTION
+  end
+
+  PENDED_NOTIFICATION_PAS_CONFORMANCE_DESCRIPTION = notification_pas_conformance_description(
+    "the tester-provided notification Bundle in the **Claim updated notification JSON** input\n" \
+    'or mocked by Inferno based on details in the Subscription and submitted Claim'
+  )
+
+  MS_NOTIFICATIONS_INPUT_DESCRIPTION =
+    <<~DESCRIPTION
+      A JSON list of objects ([format](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-format))
+      holding notification Bundles that Inferno will use to notify the PAS client of the final decision on
+      pended `$submit` requests during the *Demonstrate Must Support Coverage* group. For each pended request,
+      Inferno will [select](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-option-evaluation)
+      and [instantiate](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#response-instantiation)
+      a notification to send from this list. If no entries match, instantiation fails, or the selected
+      notification's first entry isn't a SubscriptionStatus with `subscription`, `type`, and `status` parameters,
+      Inferno will
+      [mock](https://github.com/inferno-framework/davinci-pas-test-kit/wiki/Controlling-Simulated-Responses#notification-bundle)
+      a notification.
     DESCRIPTION
 
   def self.must_support_group_description(ig_version, wiki_anchor)

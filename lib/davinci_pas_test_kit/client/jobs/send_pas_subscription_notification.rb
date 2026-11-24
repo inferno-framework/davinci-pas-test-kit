@@ -25,13 +25,17 @@ module DaVinciPASTestKit
       TEST_WAIT_TIMEOUT_SECONDS = 300
       TEST_WAITING_POLL_INTERVAL_SECONDS = 0.5
 
+      DEFAULT_NOTIFICATION_TAGS = [REST_HOOK_EVENT_NOTIFICATION_TAG].freeze
+
       # test_run_id and result_id may be nil when the job is started by an Inferno test, which does not know
       # them until it is waiting. They are then looked up from the test session once the test waits.
       # When resume_test_after_notification is true, the job ends the wait with the resume_token after
       # sending the notification (or fails it if the job errors).
       # Sidekiq job arguments are positional, so the boolean cannot be a keyword argument
+      # notification_tags are the tags to record the notification request with.
       def perform(test_run_id, test_session_id, result_id, notification_bearer_token, notification_json, resume_token,
-                  notification_suite_id, ig_version = 'v2.0.1', resume_test_after_notification = false) # rubocop:disable Style/OptionalBooleanParameter
+                  notification_suite_id, ig_version = 'v2.0.1', resume_test_after_notification = false, # rubocop:disable Style/OptionalBooleanParameter
+                  notification_tags = DEFAULT_NOTIFICATION_TAGS)
         @test_run_id = test_run_id
         @test_session_id = test_session_id
         @result_id = result_id
@@ -41,6 +45,7 @@ module DaVinciPASTestKit
         @notification_suite_id = notification_suite_id
         @ig_version = ig_version
         @resume_test_after_notification = resume_test_after_notification
+        @notification_tags = notification_tags
 
         await_subscription_creation # NOTE: currently must exist - see PASClientPendedSubmitTest
         if @result_id.nil? && !test_starts_waiting?
@@ -167,7 +172,7 @@ module DaVinciPASTestKit
         event_json = derive_event_notification(@notification_json, subscription_full_url, subscription_topic,
                                                1).to_json
         response = send_notification(event_json)
-        persist_notification_request(response, [REST_HOOK_EVENT_NOTIFICATION_TAG])
+        persist_notification_request(response, @notification_tags)
       end
 
       def send_notification(request_body)

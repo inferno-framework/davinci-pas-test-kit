@@ -38,7 +38,13 @@ module DaVinciPASTestKit
     X12_ADJUDICATION_CODES = {
       approval: 'A1',
       denial: 'A3',
-      pended: 'A4'
+      pended: 'A4',
+      modification: 'A6'
     }.freeze
+
+    # Carry an X12 adjudication code on each ClaimResponse item adjudication
+    REVIEW_ACTION_EXTENSION_URL = 'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction'.freeze
+    REVIEW_ACTION_CODE_EXTENSION_URL =
+      'http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode'.freeze
   end
 end
