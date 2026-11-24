@@ -85,12 +85,13 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
   describe 'the acceptance test' do
     let(:test) { suite_test(:pas_client_v221_ms_notification_acceptance_test) }
 
-    it 'omits when Inferno returned no pended responses' do
+    it 'passes with an explanation when Inferno returned no pended responses' do
       create_submit_request(response_json(:approval, 'approved-cr'), 'approved')
 
       result = run(test)
 
-      expect(result.result).to eq('omit')
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to include('did not return any pended responses')
     end
 
     it 'skips when a pended response has no notification, naming the request' do
@@ -198,10 +199,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
   describe 'the Subscriptions conformance test' do
     let(:test) { suite_test(:pas_client_v221_ms_notification_conformance_test) }
 
-    it 'omits rather than requiring a Subscription when Inferno returned no pended responses' do
+    it 'passes rather than requiring a Subscription when Inferno returned no pended responses' do
       create_submit_request(response_json(:approval, 'approved-cr'), 'approved')
 
-      expect(run(test).result).to eq('omit')
+      expect(run(test).result).to eq('pass')
     end
 
     it 'skips when there is no Subscription to check the payload content against' do

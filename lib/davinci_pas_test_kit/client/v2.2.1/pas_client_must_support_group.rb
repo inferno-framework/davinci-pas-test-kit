@@ -44,13 +44,13 @@ module DaVinciPASTestKit
         test from: :pas_client_v221_gather_must_support
         test from: :pas_client_v221_response_attest,
              id: :pas_client_v221_response_attest_ms_submit_inquire,
-             title: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_TITLE,
-             description: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_DESCRIPTION,
+             title: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_TITLE,
+             description: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_DESCRIPTION,
              config: { options: {
                workflow_tag: MUST_SUPPORT_WORKFLOW_TAG,
                no_requests_ok: true,
                multiple_requests_ok: true,
-               attest_message: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_MESSAGE
+               attest_message: MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_MESSAGE
              } } do
           verifies_requirements 'hl7.fhir.us.davinci-pas_2.2.1@conf-8'
         end

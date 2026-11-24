@@ -43,6 +43,19 @@ module DaVinciPASTestKit
     'I attest that the PAS client correctly handled the `$submit` and `$inquire` ' \
     'operation responses received from Inferno during this test, making the details ' \
     'available to users without errors.'
+  # v2.2.1 also notifies the client of the final decision on pended $submit requests
+  MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_TITLE =
+    'PAS client handled the $submit and $inquire responses and notifications without erroring'
+  MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_DESCRIPTION =
+    %(
+      During this test, the tester will verify that the PAS client handled
+      the `$submit` and `$inquire` operation responses and any notifications of the final decision
+      on pended `$submit` requests, making the result available to the user without failing or erroring.
+    )
+  MUST_SUPPORT_SUBMIT_INQUIRE_ATTEST_V221_MESSAGE =
+    'I attest that the PAS client correctly handled the `$submit` and `$inquire` ' \
+    'operation responses and any notifications received from Inferno during this test, making the details ' \
+    'available to users without errors.'
 
   # Text for the v2.2.1 must support group, where the analysis is a separate group from the receive group
   MUST_SUPPORT_COVERAGE_GROUP_TITLE = 'Must Support Coverage'

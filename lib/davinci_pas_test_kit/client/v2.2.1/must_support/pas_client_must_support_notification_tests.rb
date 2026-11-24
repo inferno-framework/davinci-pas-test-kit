@@ -15,7 +15,7 @@ module DaVinciPASTestKit
         'Inferno did not return any pended responses to must support $submit requests, so it sent no ' \
         'notifications to check.'.freeze
 
-      # Yields each pended must support $submit request with its notification and a label for messages. Omits
+      # Yields each pended must support $submit request with its notification and a label for messages. Passes
       # if nothing was pended and skips if any notification is missing.
       # @yieldparam submit_request [Inferno::Entities::Request]
       # @yieldparam notification [Inferno::Entities::Request]
@@ -23,7 +23,7 @@ module DaVinciPASTestKit
       def each_must_support_notification
         notifications = load_tagged_requests(MUST_SUPPORT_NOTIFICATION_TAG)
         pended_requests = pended_submit_requests
-        omit_if pended_requests.empty?, NO_PENDED_RESPONSES_MESSAGE
+        pass_if pended_requests.empty?, NO_PENDED_RESPONSES_MESSAGE
 
         unnotified = pended_requests.reject { |submit_request| notification_for(submit_request, notifications) }
         skip_if unnotified.present?, missing_notifications_message(unnotified)
