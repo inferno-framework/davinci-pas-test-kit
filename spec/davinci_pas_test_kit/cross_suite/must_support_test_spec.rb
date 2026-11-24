@@ -299,6 +299,135 @@ RSpec.describe DaVinciPASTestKit::MustSupportTest, :runnable do
     end
   end
 
+  describe 'v2.2.1 $submit response notifications' do
+    def must_support_test(resource_type:, profile_key:, ig_version: 'v2.2.1', operation: 'submit')
+      Class.new(described_class) do
+        config(
+          options: {
+            resource_type:,
+            profile_key:,
+            user_input_validation: true,
+            ig_version:,
+            type: 'response',
+            operation:
+          }
+        )
+      end
+    end
+
+    let(:claim_response_test) { must_support_test(resource_type: 'ClaimResponse', profile_key: 'claimresponse') }
+    let(:response_bundle) { FHIR.from_contents(preset_v221_response_bundle('ms_submit_responses')) }
+
+    def notification_bundle(*resources)
+      subscription_status = FHIR::Parameters.new(
+        parameter: [{ name: 'type', valueCode: 'event-notification' }]
+      )
+      FHIR::Bundle.new(
+        type: 'history',
+        entry: [subscription_status, *resources].map { |resource| { resource: } }
+      ).to_json
+    end
+
+    def create_notification(body, tag, status: 200)
+      repo_create(
+        :request,
+        direction: 'outgoing',
+        url: 'http://example.com/notifications',
+        test_session_id: test_session.id,
+        result:,
+        request_body: body,
+        response_body: '',
+        tags: Array(tag),
+        status:
+      )
+    end
+
+    [DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG,
+     DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG].each do |tag|
+      it "assesses the focus Bundle of notifications tagged #{tag}" do
+        create_notification(notification_bundle(response_bundle), tag)
+
+        result = run(claim_response_test)
+        expect(result.result).to eq('pass')
+      end
+    end
+
+    it 'assesses resources included directly in the notification' do
+      claim_response = response_bundle.entry.map(&:resource).find { |resource| resource.is_a?(FHIR::ClaimResponse) }
+      create_notification(notification_bundle(claim_response), DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+
+      result = run(claim_response_test)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'does not assess the notification Bundle itself as a PAS Response Bundle' do
+      create_notification(notification_bundle(FHIR::Bundle.new(type: 'collection')),
+                          DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+
+      result = run(must_support_test(resource_type: 'Bundle', profile_key: 'pas_response_bundle'))
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('in the 1 provided Bundle resource(s)')
+    end
+
+    it 'counts a request with both notification tags once' do
+      create_notification(notification_bundle(FHIR::Bundle.new(type: 'collection')),
+                          [DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG,
+                           DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG])
+
+      result = run(must_support_test(resource_type: 'Bundle', profile_key: 'pas_response_bundle'))
+      expect(result.result_message).to include('in the 1 provided Bundle resource(s)')
+    end
+
+    it 'does not assess notifications for requests' do
+      create_notification(notification_bundle(response_bundle), DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+
+      result = run(Class.new(described_class) do
+        config(options: { resource_type: 'ClaimResponse', profile_key: 'claimresponse', user_input_validation: true,
+                          ig_version: 'v2.2.1', type: 'request', operation: 'submit' })
+      end)
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('No ClaimResponse resources were found')
+    end
+
+    it 'assesses notifications whatever the PAS client responded' do
+      create_notification(notification_bundle(response_bundle), DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG,
+                          status: nil)
+
+      result = run(claim_response_test)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'finds nothing in id-only and malformed notifications' do
+      id_only = File.read(File.join(__dir__, '../..', 'fixtures', 'PAS_notification_example_id_only.json'))
+      create_notification(id_only, DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG)
+      create_notification('not json', DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+      create_notification(response_bundle.entry.first.resource.to_json,
+                          DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+
+      result = run(claim_response_test)
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('No ClaimResponse resources were found')
+    end
+
+    it 'does not assess notifications for v2.0.1' do
+      create_notification(notification_bundle(response_bundle), DaVinciPASTestKit::REST_HOOK_EVENT_NOTIFICATION_TAG)
+
+      result = run(must_support_test(resource_type: 'ClaimResponse', profile_key: 'claimresponse',
+                                     ig_version: 'v2.0.1'))
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('No ClaimResponse resources were found')
+    end
+
+    it 'does not assess notifications for $inquire responses' do
+      create_notification(notification_bundle(response_bundle), DaVinciPASTestKit::MUST_SUPPORT_NOTIFICATION_TAG)
+
+      result = run(must_support_test(resource_type: 'ClaimResponse', profile_key: 'claiminquiryresponse',
+                                     operation: 'inquire'))
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('No ClaimResponse resources were found')
+    end
+  end
+
   describe 'When gathering data' do
     let(:test) do
       Class.new(described_class) do

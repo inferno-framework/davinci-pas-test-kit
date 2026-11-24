@@ -15,6 +15,7 @@ module DaVinciPASTestKit
       description %(
         Check that `$submit` responses provided to the PAS client contain
         all PAS-defined profiles and their must support elements.
+        This includes notifications Inferno sends after pended responses.
         
         For `$submit` responses, this includes the following profiles:
         

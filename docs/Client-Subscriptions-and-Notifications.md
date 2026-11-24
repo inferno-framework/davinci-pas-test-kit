@@ -89,6 +89,9 @@ Depending on which suite is in use, the notification will be sent either
 In either case, Inferno will either [mock a notification based on the `$submit` request](Controlling-Simulated-Responses#notification-bundle) or return a [tester-provided
 notification with some updates](Controlling-Simulated-Responses#inferno-modifications-of-tester-provided-responses-and-notifications).
 
+In the PAS Client v2.2.1 suite, Inferno also sends a notification after each pended response returned
+during the *Demonstrate Must Support Coverage* group - see [Must Support Notifications](Controlling-Simulated-Responses#must-support-notifications).
+
 ## Subscription Updates and Deletions
 
 (Currently only applicable to the Client v2.2.1 Suite)

@@ -96,6 +96,9 @@ from the PAS scenario groups. "Must Support Coverage" can be re-run on its own, 
 re-running a scenario group, without repeating the requests made during "Demonstrate Must Support
 Coverage". See [Evaluated Messages](Client-Must-Support#evaluated-messages).
 
+If any provided `$submit` responses are pended, Inferno will also send [notifications](Controlling-Simulated-Responses#must-support-notifications)
+with the final decision, so the Subscription Setup group must be run first.
+
 ### Selecting a US Core Version
 
 PAS allows supporting information resources to conform to US Core 3.1.1, 6.1.0, or 7.0.0. Inferno

@@ -94,4 +94,41 @@ RSpec.describe DaVinciPASTestKit::UserInputResponse do
         .to raise_error(described_class::InvalidInputError, /'ms_inquire_responses' input is not valid JSON/)
     end
   end
+
+  describe '.notification_candidates' do
+    let(:notification) { { 'resourceType' => 'Bundle', 'id' => 'notification' } }
+    let(:configurable) do
+      Class.new(Inferno::Entities::Test) do
+        input :ms_submit_notifications, title: 'Must Support Notification Bundles'
+      end
+    end
+
+    def result_with_input(name, value)
+      instance_double(Inferno::Entities::Result, input_json: [{ 'name' => name, 'value' => value }].to_json)
+    end
+
+    it 'reads the ms_submit_notifications input, accepting bare bundles and wrapper objects' do
+      wrapped = { 'criteria' => { 'requestRange' => '2' }, 'bundle' => notification }
+      result = result_with_input('ms_submit_notifications', [notification, wrapped].to_json)
+
+      expect(described_class.notification_candidates(configurable, result)).to eq([notification, wrapped])
+    end
+
+    it 'raises an InvalidInputError for a wrapper holding a resource that is not a Bundle' do
+      result = result_with_input('ms_submit_notifications',
+                                 [{ 'bundle' => { 'resourceType' => 'Parameters' } }].to_json)
+
+      expect { described_class.notification_candidates(configurable, result) }
+        .to raise_error(described_class::InvalidInputError, /Entry 1 /)
+    end
+
+    it 'raises an InvalidInputError for a bare resource that is not a Bundle' do
+      result = result_with_input('ms_submit_notifications', [{ 'resourceType' => 'Parameters' }].to_json)
+
+      expect { described_class.notification_candidates(configurable, result) }
+        .to raise_error(described_class::InvalidInputError,
+                        "Entry 1 of the 'Must Support Notification Bundles' input is not a FHIR Bundle resource, " \
+                        'or a wrapper object with one in the "bundle" key.')
+    end
+  end
 end

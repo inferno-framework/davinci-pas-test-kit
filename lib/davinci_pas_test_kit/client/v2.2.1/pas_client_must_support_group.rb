@@ -3,6 +3,7 @@ require_relative '../generated/v2.2.1/pas_client_inquire_must_support_group'
 require_relative '../generated/v2.2.1/pas_client_submit_response_must_support_group'
 require_relative '../generated/v2.2.1/pas_client_inquire_response_must_support_group'
 require_relative 'must_support/pas_client_gather_must_support_test'
+require_relative 'must_support/pas_client_must_support_notification_tests'
 require_relative 'workflows/pas_client_request_bundle_validation_test'
 require_relative 'workflows/pas_client_response_bundle_validation_test'
 require_relative 'workflows/pas_client_inquire_request_bundle_validation_test'
@@ -17,7 +18,8 @@ module DaVinciPASTestKit
       description "#{DaVinciPASTestKit.must_support_group_description('v2.2.1', 'da-vinci-pas-v221')}\n" \
                   "#{MUST_SUPPORT_SEPARATE_GROUPS_DESCRIPTION}"
 
-      MUST_SUPPORT_INPUT_ORDER = [:ms_submit_responses, :ms_inquire_responses, :client_id, :session_url_path].freeze
+      MUST_SUPPORT_INPUT_ORDER = [:ms_submit_responses, :ms_inquire_responses, :ms_submit_notifications,
+                                  :client_endpoint_access_token, :client_id, :session_url_path].freeze
 
       input_order(*MUST_SUPPORT_INPUT_ORDER)
 
@@ -25,7 +27,7 @@ module DaVinciPASTestKit
       group do
         id :pas_client_v221_must_support_receive
         title MUST_SUPPORT_RECEIVE_GROUP_TITLE
-        description MUST_SUPPORT_RECEIVE_GROUP_DESCRIPTION
+        description MUST_SUPPORT_RECEIVE_GROUP_V221_DESCRIPTION
         run_as_group
 
         # The must support response inputs already belong to pas_client_v221_gather_must_support
@@ -65,6 +67,9 @@ module DaVinciPASTestKit
         test from: :pas_client_v221_inquire_response_bundle_validation_test,
              config: { options: { workflow_tag: MUST_SUPPORT_WORKFLOW_TAG, no_requests_ok: true,
                                   multiple_requests_ok: true } }
+        test from: :pas_client_v221_ms_notification_conformance_test
+        test from: :pas_client_v221_ms_notification_pas_conformance_test
+        test from: :pas_client_v221_ms_notification_acceptance_test
       end
 
       # Kept separate from the receive group so the analysis can be re-run without re-running the receive
