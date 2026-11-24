@@ -135,8 +135,6 @@ module DaVinciPASTestKit
       focus_messages.each do |message|
         add_message(message[:type], "Focus Bundle `#{focus_ref}`: #{message[:message]}")
       end
-    rescue NoMethodError, TypeError, ArgumentError => e
-      add_message('error', "Focus Bundle `#{focus_ref}` could not be validated: #{e.message}")
     end
   end
 end

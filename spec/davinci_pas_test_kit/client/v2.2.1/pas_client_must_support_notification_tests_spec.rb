@@ -229,12 +229,10 @@ RSpec.describe DaVinciPASTestKit::DaVinciPASV221::PASClientMustSupportNotificati
       expect(result_messages(result, 'warning')).to be_empty
     end
 
-    it 'reports a notification the checks cannot handle and goes on to check the others' do
+    it 'reports a notification that fails an assertion and goes on to check the others' do
       first_response = response_json(:pended, 'first-cr')
       create_submit_request(first_response, 'first')
-      malformed = JSON.parse(notification_json(first_response))
-      malformed['entry'][0]['resource']['parameter'].reject! { |param| param['name'] == 'type' }
-      create_notification(malformed.to_json, 'first')
+      create_notification({ resourceType: 'Parameters' }.to_json, 'first')
       second_response = response_json(:pended, 'second-cr')
       create_submit_request(second_response, 'second')
       second = JSON.parse(notification_json(second_response))

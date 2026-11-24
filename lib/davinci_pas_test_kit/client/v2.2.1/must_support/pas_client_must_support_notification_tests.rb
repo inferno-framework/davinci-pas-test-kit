@@ -69,8 +69,6 @@ module DaVinciPASTestKit
       rescue Inferno::Exceptions::AssertionException => e
         # Keep checking the other notifications
         add_message('error', e.message)
-      rescue StandardError => e
-        add_message('error', "The notification could not be checked: #{e.message}")
       ensure
         messages[first_new_message..].each do |message|
           message[:message] = "#{label}: #{message[:message].strip.gsub(/\n[ \t]+/, "\n")}"
