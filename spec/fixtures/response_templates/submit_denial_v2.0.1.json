@@ -1,0 +1,104 @@
+{
+  "resourceType": "Bundle",
+  "id": "templated-response-bundle",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-pas-response-bundle|2.0.1"
+    ]
+  },
+  "type": "collection",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
+      "resource": {
+        "resourceType": "ClaimResponse",
+        "id": "5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claimresponse|2.0.1"
+          ]
+        },
+        "identifier": [
+          "{{Bundle.entry.resource.ofType(Claim).identifier}}"
+        ],
+        "status": "{{Bundle.entry.resource.ofType(Claim).status}}",
+        "type": "{{Bundle.entry.resource.ofType(Claim).type}}",
+        "use": "{{Bundle.entry.resource.ofType(Claim).use}}",
+        "patient": {
+          "reference": "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl}}"
+        },
+        "created": "2025-01-01T00:00:00Z",
+        "insurer": {
+          "reference": "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference)).fullUrl}}"
+        },
+        "requestor": {
+          "reference": "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference)).fullUrl}}"
+        },
+        "request": {
+          "reference": "{{Bundle.entry.where(resource is Claim).fullUrl}}"
+        },
+        "outcome": "complete",
+        "preAuthPeriod": {
+          "start": "{{today()}}",
+          "end": "{{today() + 1 month}}"
+        },
+        "item": [
+          {
+            "$forEach": "Bundle.entry.resource.ofType(Claim).item",
+            "template": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthIssueDate",
+                  "valueDate": "{{today()}}"
+                },
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemPreAuthPeriod",
+                  "valuePeriod": {
+                    "start": "{{today()}}",
+                    "end": "{{today() + 1 month}}"
+                  }
+                }
+              ],
+              "itemSequence": "{{%current.sequence}}",
+              "adjudication": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewAction",
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-reviewActionCode",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "system": "https://codesystem.x12.org/005010/306",
+                                "code": "A3",
+                                "display": "Not Certified"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "category": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/adjudication",
+                        "code": "submitted"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))}}",
+    "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).insurer.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).insurer.reference))}}",
+    "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).provider.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).provider.reference))}}"
+  ]
+}

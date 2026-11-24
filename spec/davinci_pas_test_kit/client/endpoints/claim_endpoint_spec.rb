@@ -277,7 +277,7 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       )
     end
 
-    it 'generates a default response with a warning when token replacement breaks the JSON structure' do
+    it 'serves token values that contain double quotes' do
       bundle = response_bundle(id: 'token-bundle')
       bundle['entry'][0]['resource']['preAuthRef'] = '{{Bundle.id}}'
       inputs = { session_url_path:, ms_submit_responses: bundle.to_json }
@@ -287,11 +287,47 @@ RSpec.describe DaVinciPASTestKit::AbstractGatherMustSupportTest, :request do
       stub_fhirpath_service('Bundle.id', [{ type: 'string', element: 'value with "quotes"' }])
       post_json(submit_url, submit_request_json)
 
+      expect(returned_claim_response.id).to eq('token-bundle')
+      expect(returned_claim_response.preAuthRef).to eq('value with "quotes"')
+      expect(result_warnings(result)).to be_empty
+    end
+
+    it 'inserts whole elements and spliced entries from the request for whole-value tokens' do
+      bundle = response_bundle(id: 'object-bundle')
+      bundle['entry'][0]['resource']['identifier'] = ['{{Bundle.entry.resource.ofType(Claim).identifier}}']
+      bundle['entry'] = [bundle['entry'][0], '{{Bundle.entry.where(resource is Patient)}}']
+      inputs = { session_url_path:, ms_submit_responses: bundle.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      claim = submit_request_json['entry'].find { |e| e['resource']['resourceType'] == 'Claim' }['resource']
+      patient_entry = submit_request_json['entry'].find { |e| e['resource']['resourceType'] == 'Patient' }
+      stub_fhirpath_service('Bundle.entry.resource.ofType(Claim).identifier',
+                            claim['identifier'].map { |identifier| { type: 'Identifier', element: identifier } })
+      stub_fhirpath_service('Bundle.entry.where(resource is Patient)',
+                            [{ type: 'Bundle.entry', element: patient_entry }])
+      post_json(submit_url, submit_request_json)
+
+      returned = FHIR.from_contents(last_response.body)
+      expect(returned.entry.map { |e| e.resource.resourceType }).to eq(%w[ClaimResponse Patient])
+      expect(returned.entry[1].fullUrl).to eq(patient_entry['fullUrl'])
+      expect(returned_claim_response.identifier.map(&:value)).to eq(claim['identifier'].map { |i| i['value'] })
+      expect(result_warnings(result)).to be_empty
+    end
+
+    it 'generates a default response with a warning when the template is malformed' do
+      bundle = response_bundle(id: 'malformed-template-bundle')
+      bundle['entry'][0]['resource']['item'] = [{ '$forEach' => 'Bundle.entry', 'other' => {} }]
+      inputs = { session_url_path:, ms_submit_responses: bundle.to_json }
+      result = run(test, inputs)
+      expect(result.result).to eq('wait')
+
+      post_json(submit_url, submit_request_json)
+
       expect(last_response.status).to be(200)
-      expect(returned_claim_response).to be_a(FHIR::ClaimResponse)
-      expect(returned_claim_response.id).to_not eq('token-bundle')
+      expect(returned_claim_response.id).to_not eq('malformed-template-bundle')
       expect(result_warnings(result)).to contain_exactly(
-        a_string_matching(/not valid JSON after \{\{fhirpath\}\} token replacement/)
+        a_string_matching(/Unable to instantiate a tester-provided response.*"\$forEach" object must contain only/)
       )
     end
 

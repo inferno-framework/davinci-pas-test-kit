@@ -77,8 +77,8 @@ Inferno supports mocking both `id-only` and `full-resource` notifications. The f
   time and with a `focus` that points to the ClaimResponse returned on the `$submit`.
   If it cannot find the ClaimResponse reference from the `$submit` response returned
   by Inferno, it will generate a random UUID (which isn't likely to work correctly when received).
-- The subscription's `events-since-subscription-start` and the event's `event-number` will always
-  be 1 as Inferno is not able to track notifications across multiple sessions or runs.
+- The subscription's `events-since-subscription-start` and the event's `event-number` count the event
+  notifications Inferno has sent during the test session.
 - When generating a `full-resource` notification, Inferno will include `additional-context`
   references for each entry in the `$submit` response Bundle other than the ClaimResponse
   (which is already in the `focus`). Then it will include Notification Bundle entries for
@@ -98,6 +98,7 @@ a single response which will always be used.
 In the case of the must support group, testers can send multiple $submit and $inquire
 requests before explicitly clicking a link telling Inferno that all desired requests have
 been made. Inferno allows a list of responses with criteria indicating when to use them.
+In the v2.2.1 suite, a list of [notifications](#must-support-notifications) can be provided the same way.
 
 #### Response Option Format
 
@@ -171,6 +172,20 @@ a pended response for the third request and an approval response for all others:
 ]
 ```
 
+#### Must Support Notifications
+
+In the v2.2.1 suite, when Inferno returns a pended response (`reviewActionCode` of `A4`) during the
+*Demonstrate Must Support Coverage* group, it then notifies the PAS client of the final decision.
+Inferno's mocked responses in this group are never pended, so this requires a pended response in the
+**Must Support $submit Response Bundles** input.
+
+The notification is selected from the **Must Support Notification Bundles** input, which uses the
+[response option format](#response-option-format) with a notification Bundle in place of the response,
+with criteria [evaluated](#response-option-evaluation) against the `$submit` request. If no entry matches,
+Inferno [mocks](#notification-bundle) one. Notifications are sent up to about 11 seconds after the
+response, and only while the test is waiting, so wait at least 15 seconds after the last pended response
+before continuing.
+
 ### Response Instantiation
 
 Before returning a selected response, Inferno will update it with dynamic content,
@@ -180,7 +195,7 @@ that they may not have known ahead of time.
 #### Expression Tokens
 
 Expression tokens for dynamic content are indicated by a FHIRPath expression surrounded by double curly braces
-(`{{<FHIRPath expression>}}`) within FHIR elements. The indicated FHIRPath
+(`{{<FHIRPath expression>}}`) within JSON strings. The indicated FHIRPath
 expression will be evaluated against the request and the result used to replace the token.
 
 These can be used to make sure that details in the response reflect those in
@@ -188,24 +203,96 @@ the request. For example, `entry.resource.ofType(Claim).patient.reference` would
 Patient resource the Claim was submitted for, which could be used to make sure that the ClaimResponse in the
 response references the same Patient record.
 
+How the result is used depends on where the token appears:
+- **Whole value**: if the token is the entire JSON string, it will be replaced by the results themselves,
+  which may be strings, numbers, data types, or whole resources and Bundle entries. Within an array, each
+  result will be inserted in place of the token. Elsewhere, multiple results will become an array and no
+  results will remove the element.
+- **Within text**: if the token is part of a longer string, results that are primitive values (not lists or objects)
+  will be joined with commas and inserted into the text.
+
 Notes:
-- Entries within the returned collection that are not data types (lists or objects) will be ignored.
-- If multiple entries (not including ignored and nil entries) are returned, then the results will
-  be turned into a comma-delimited list for use in replacing the token.
+- Extensions not published by HL7 will be removed from copied data types, as in
+  [mocked responses](#submit-and-inquire-responses). Resources and Bundle entries will be copied as they are.
+- Whole value results keep their type, so a number copied into a text element must be converted, e.g., with
+  `.select(toString())` or `.join(',')`.
 - Inferno supports the raw `today()` function alone as well as with addition
   and subtraction of days, e.g., `{{today()}}`, `{{today() - 7 days}}`, and
   `{{today() + 365 days}}`.
 - While the syntax follows CDS Hooks prefetch tokens, Inferno allows additional FHIRPath functions
   beyond the [limited set allowed by CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-tokens-containing-simpler-fhirpath). See 
   the [FHIRPath Evaluation Limitations](#fhirpath-evaluation-limitations) section for details.
+- Since `resolve()` is not supported, find the entry for a reference by comparing entry `fullUrl` values
+  to it, using `%resource` to refer to the request Bundle. See the example below.
 
-Note that at this time, only string data can be added with expression tokens.
+#### Repeated Content
+
+To repeat content for each result of a FHIRPath expression, such as a `ClaimResponse.item` for each
+`Claim.item`, use an object with the expression under `$forEach` and the content under `template`:
+
+```
+"item": [
+  {
+    "$forEach": "entry.resource.ofType(Claim).item",
+    "template": {
+      "itemSequence": "{{%current.sequence}}",
+      "adjudication": [ ... ]
+    }
+  }
+]
+```
+
+Within the template, `%current` will refer to the result being repeated. The copies will replace the object
+in the array. Nested `$forEach` objects are supported, with `%current` referring to the innermost result.
+
+#### Mocked Response Template Example
+
+Inferno's mocked `$submit` and `$inquire` responses can be specified as tester-provided responses. The
+[response templates folder](https://github.com/inferno-framework/davinci-pas-test-kit/tree/main/spec/fixtures/response_templates)
+contains templates that the test kit checks against the mocks, which can be used as starting points.
+For example, the v2.0.1 approval `$submit` template has the following structure:
+
+```
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:5f0c6a8e-1d2b-4c7a-9e3f-8b4d2a6c1e70",
+      "resource": {
+        "resourceType": "ClaimResponse",
+        "identifier": ["{{Bundle.entry.resource.ofType(Claim).identifier}}"],
+        "type": "{{Bundle.entry.resource.ofType(Claim).type}}",
+        ... status and use copied in the same way ...
+        "patient": {
+          "reference": "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference)).fullUrl}}"
+        },
+        ... insurer and requestor in the same way ...
+        "preAuthPeriod": { "start": "{{today()}}", "end": "{{today() + 1 month}}" },
+        "item": [
+          {
+            "$forEach": "Bundle.entry.resource.ofType(Claim).item",
+            "template": { "itemSequence": "{{%current.sequence}}", ... }
+          }
+        ],
+        ...
+      }
+    },
+    "{{Bundle.entry.where(fullUrl = %resource.entry.resource.ofType(Claim).patient.reference or fullUrl.endsWith('/' + %resource.entry.resource.ofType(Claim).patient.reference))}}",
+    ... insurer and requestor entries in the same way ...
+  ]
+}
+```
+
+Unlike the mocks, these templates will not include entries referenced by the copied entries or update the
+references within them, and will include an entry more than once if it is referenced more than once.
 
 #### Inferno Modifications of Tester-provided Responses and Notifications
 
 Following token instantiation, responses provided by testers will be modified by Inferno
 to populate and update details that testers won't know ahead of time. These modifications
-fall into two categories:
+fall into three categories:
 - **Timestamps**: creation timestamps, such as those on Bundles, ClaimResponses, and event notifications,
   will be updated or populated by Inferno so that they are in sync with the time the message is sent.
 - **Resource Ids**: some resource ids will not be known ahead of time and will be added or updated
@@ -216,6 +303,8 @@ fall into two categories:
     some systems.
   - *ClaimResponse Id*: if the tester provides a Notification but has Inferno generate the `$submit`
     response, then Inferno will update the focus to use the ClaimResponse id that it generates.
+- **Event Counts**: `events-since-subscription-start` and the `event-number` will be updated as for
+  [mocked notifications](#notification-bundle).
 
 If the tester provides an input that is malformed in some way such that Inferno cannot get the details
 that it needs to make the modifications, then the raw input will be used.
@@ -233,6 +322,10 @@ such as identifiers, needed to connect them together and drive the workflow in t
 not associated with messaging time such as when a prior authorization response is valid are also not modified
 by Inferno. Unlike details that Inferno modifies as described above, testers should have control over and/or
 knowledge of the necessary details and values to construct consistent and working messages for Inferno to use.
+
+In the v2.2.1 must support group, responses and notifications are selected separately, so testers must
+make sure their criteria pair them correctly. Inferno warns when a notification's ClaimResponse shares
+neither an `id` nor an `identifier` with the pended response's ClaimResponse.
 
 ### FHIRPath Evaluation Limitations
 
