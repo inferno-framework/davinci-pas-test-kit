@@ -4,10 +4,13 @@ module DaVinciPASTestKit
   # * V221_SUPPRESSIONS is the targeted list used by the v2.2.1 suites. Each entry is anchored to a
   #   specific unactionable failure mode confirmed to still occur in current validator output
   #   (HL7 validator 6.9.x) for v2.2.1 profiles, IG examples, and test kit payloads.
+  # * V221_PACKAGE_CONFLICT_SUPPRESSIONS covers failures that come from the v2.2.1 IG's package
+  #   dependencies, so they apply to the v2.2.1 suites only.
   # * LEGACY_SUPPRESSIONS is the previous list, retained unchanged for the v2.0.1 suites.
   #
-  # The v2.2.1 suites match only V221_SUPPRESSED_MESSAGES; the v2.0.1 suites match the union of
-  # both lists (V201_SUPPRESSED_MESSAGES).
+  # The v2.2.1 suites match V221_SUPPRESSED_MESSAGES (V221_SUPPRESSIONS and
+  # V221_PACKAGE_CONFLICT_SUPPRESSIONS); the v2.0.1 suites match V201_SUPPRESSED_MESSAGES
+  # (LEGACY_SUPPRESSIONS and V221_SUPPRESSIONS).
   #
   # rubocop:disable Layout/LineLength
   V221_SUPPRESSIONS = [
@@ -59,6 +62,21 @@ module DaVinciPASTestKit
     %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]},
     %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]},
     %r{The extension http://hl7\.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType( v[\d.]+)? is not allowed to be used at this point \(this element is \[(?:BackboneElement, )?ClaimResponse\.addItem\]}
+  ].freeze
+
+  V221_PACKAGE_CONFLICT_SUPPRESSIONS = [
+    # Interim workaround for an HL7 package dependency conflict
+    # (https://github.com/inferno-framework/davinci-pas-test-kit/issues/116). PAS 2.2.1 depends on
+    # CRD 2.2.1 and CDex 2.1.0, and CDex 2.1.0 pulls in DTR 2.1.0, which depends on CRD 2.1.0. The DTR
+    # intendedUse extension URL is unversioned, so the validator uses DTR 2.1.0's definition, which
+    # binds CRD 2.1.0's DocReason (CodeSystem/temp codes), while CRD 2.2.1 moved those codes to
+    # CodeSystem/coverage-information-codes. A DTR 2.2.0 QuestionnaireResponse using a code from CRD
+    # 2.2.1's DocReason, as DTR 2.2.0 requires, then fails. Anchored on DocReason 2.1.0 and on a
+    # coding from CRD 2.2.1's DocReason, so any other coding, or an error against another DocReason
+    # version, is still reported. Published packages don't change, so this is needed as long as the
+    # suites load PAS 2.2.1; it can be removed once they move to a PAS version whose dependencies no
+    # longer bring in DTR 2.1.0 and CRD 2.1.0.
+    %r{None of the codings provided are in the value set '[^']*' \(http://hl7\.org/fhir/us/davinci-crd/ValueSet/DocReason\|2\.1\.0\), and a coding from this value set is required\) \(codes = (?:[^()]*, )?http://hl7\.org/fhir/us/davinci-crd/CodeSystem/coverage-information-codes#(?:withpa|withclaim|withorder|retain-doc)(?:, [^()]*)?\)}
   ].freeze
 
   # This list captures all validator messages suppressed for the v2.0.1 suites
@@ -226,6 +244,6 @@ module DaVinciPASTestKit
   # stripped before matching messages against the suppressions.
   VALIDATOR_MESSAGE_LOCATION_PREFIX = /\A\S+: \S+: /
 
-  V221_SUPPRESSED_MESSAGES = Regexp.union(V221_SUPPRESSIONS)
+  V221_SUPPRESSED_MESSAGES = Regexp.union(V221_SUPPRESSIONS + V221_PACKAGE_CONFLICT_SUPPRESSIONS)
   V201_SUPPRESSED_MESSAGES = Regexp.union(LEGACY_SUPPRESSIONS + V221_SUPPRESSIONS)
 end

@@ -157,6 +157,18 @@ RSpec.describe DaVinciPASTestKit do
     'Bundle.entry[0].resource.ofType(Claim): All OK'
   end
 
+  let(:coverage_information_codes) { 'http://hl7.org/fhir/us/davinci-crd/CodeSystem/coverage-information-codes' }
+
+  # The DTR intendedUse binding error reported for a QuestionnaireResponse inside a PAS request Bundle
+  # (see V221_PACKAGE_CONFLICT_SUPPRESSIONS), with the given DocReason version and codes.
+  def doc_reason_binding_error(codes, doc_reason_version: '2.1.0')
+    'Bundle/ReferralAuthorizationBundleExample: ' \
+      'Bundle.entry[7].resource.ofType(QuestionnaireResponse).extension[0].value.ofType(CodeableConcept): ' \
+      "None of the codings provided are in the value set 'CRD Coverage Information Documentation Reason Value Set' " \
+      "(http://hl7.org/fhir/us/davinci-crd/ValueSet/DocReason|#{doc_reason_version}), and a coding from this " \
+      "value set is required) (codes = #{codes})"
+  end
+
   def validator_message(text, type)
     Inferno::Entities::Message.new(type:, message: text)
   end
@@ -233,6 +245,50 @@ RSpec.describe DaVinciPASTestKit do
         expect(exclude_message.call(validator_message(profile_match_error, 'error'))).to be false
         expect(exclude_message.call(validator_message(all_ok_message, 'info'))).to be false
       end
+
+      it 'excludes DocReason 2.1.0 binding errors for a CRD 2.2.1 DocReason code' do
+        %w[withpa withclaim withorder retain-doc].each do |code|
+          message = doc_reason_binding_error("#{coverage_information_codes}##{code}")
+          expect(exclude_message.call(validator_message(message, 'error'))).to be true
+        end
+      end
+
+      it 'excludes DocReason 2.1.0 binding errors when another coding accompanies the CRD 2.2.1 code' do
+        message = doc_reason_binding_error(
+          "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp#withpa, #{coverage_information_codes}#withpa"
+        )
+        expect(exclude_message.call(validator_message(message, 'error'))).to be true
+      end
+
+      it 'does not exclude DocReason 2.1.0 binding errors for a coverage-information-codes code outside DocReason' do
+        message = doc_reason_binding_error("#{coverage_information_codes}#covered")
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
+      end
+
+      it 'does not exclude DocReason 2.1.0 binding errors for a code that only starts with a DocReason code' do
+        message = doc_reason_binding_error("#{coverage_information_codes}#withpa-extra")
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
+      end
+
+      it 'does not exclude DocReason 2.1.0 binding errors for a CRD 2.1.0 CodeSystem/temp code' do
+        message = doc_reason_binding_error('http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp#withpa')
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
+      end
+
+      it 'does not exclude DocReason 2.1.0 binding errors for a code from an unrelated code system' do
+        message = doc_reason_binding_error('http://example.org/codes#withpa')
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
+      end
+
+      it 'does not exclude binding errors against DocReason 2.2.1' do
+        message = doc_reason_binding_error("#{coverage_information_codes}#withpa", doc_reason_version: '2.2.1')
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
+      end
+
+      it 'does not exclude binding errors against DocReason 2.0.0' do
+        message = doc_reason_binding_error("#{coverage_information_codes}#withpa", doc_reason_version: '2.0.0')
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
+      end
     end
   end
 
@@ -270,6 +326,12 @@ RSpec.describe DaVinciPASTestKit do
 
       it 'does not exclude resolution failures for non-X12 value sets' do
         expect(exclude_message.call(validator_message(non_x12_value_set_not_found, 'warning'))).to be false
+      end
+
+      # The CRD and DTR package conflict comes from the PAS 2.2.1 package dependencies only.
+      it 'does not exclude DocReason 2.1.0 binding errors' do
+        message = doc_reason_binding_error("#{coverage_information_codes}#withpa")
+        expect(exclude_message.call(validator_message(message, 'error'))).to be false
       end
     end
   end
